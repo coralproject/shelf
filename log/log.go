@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
 )
 
 // Level constants that define the supported usable LogLevel.
@@ -31,6 +32,7 @@ func Dev(context interface{}, funcName string, format string, a ...interface{}) 
 		if a != nil {
 			format = fmt.Sprintf(format, a...)
 		}
+
 		l.Output(2, fmt.Sprintf("%s : %s : DEV : %s", context, funcName, format))
 	}
 }
@@ -40,5 +42,16 @@ func User(context interface{}, funcName string, format string, a ...interface{})
 	if a != nil {
 		format = fmt.Sprintf(format, a...)
 	}
+
 	l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
+}
+
+// Fatal logs trace information for users and terminates the app.
+func Fatal(context interface{}, funcName string, format string, a ...interface{}) {
+	if a != nil {
+		format = fmt.Sprintf(format, a...)
+	}
+
+	l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
+	os.Exit(1)
 }
