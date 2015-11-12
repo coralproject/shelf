@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/ArdanStudios/aggserver/cfg"
+	"github.com/coralproject/shelf/cfg"
 )
 
 // ExampleDev shows how to use the config package.

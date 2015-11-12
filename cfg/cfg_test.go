@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ArdanStudios/aggserver/cfg"
+	"github.com/coralproject/shelf/cfg"
 )
 
 // succeed is the Unicode codepoint for a check mark.

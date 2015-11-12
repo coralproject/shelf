@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/ardanstudios/aggserver/log"
+	"github.com/coralproject/shelf/log"
 )
 
 // ExampleDev shows how to use the log package.
