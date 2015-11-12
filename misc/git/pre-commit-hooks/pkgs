@@ -1,0 +1,11 @@
+#!/bin/sh
+#
+# Source this file to use PKGS, which is a space delimited list of packges
+# to be tested, linted, etc. This avoids running tests on vendored, non vbo packages.
+#
+# Note the trailing "..." to make the paths recursive.
+# See "go help packages" for more info.
+#
+PKGS="github.com/shelf/log/... \
+github.com/shelf/cfg/... \
+github.com/shelf/xenia/tests/..."
