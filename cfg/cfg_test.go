@@ -42,23 +42,48 @@ func TestExists(t *testing.T) {
 
 		t.Log("\tWhen given a namspace key to search for that exists.")
 		{
-			if cfg.Int("proc_id") != 322 {
-				t.Errorf("\t\t%s Should have key %q with value %d", failed, "proc_id", 322)
+			proc, err := cfg.Int("proc_id")
+
+			if err != nil {
+				t.Errorf("\t\t%s Should not return error when valid key %q", failed, "proc_id")
 			} else {
-				t.Logf("\t\t%s Should have key %q with value %d", succeed, "proc_id", 322)
+				t.Logf("\t\t%s Should not return error when valid key %q", succeed, "proc_id")
+
+				if proc != 322 {
+					t.Errorf("\t\t%s Should have key %q with value %d", failed, "proc_id", 322)
+				} else {
+					t.Logf("\t\t%s Should have key %q with value %d", succeed, "proc_id", 322)
+				}
 			}
 
-			if cfg.String("socket") != "./tmp/sockets.po" {
-				t.Errorf("\t\t%s Should have key %q with value %q", failed, "socket", "./tmp/sockets.po")
+			socket, err := cfg.String("socket")
+
+			if err != nil {
+				t.Errorf("\t\t%s Should not return error when valid key %q", failed, "socket")
 			} else {
-				t.Logf("\t\t%s Should have key %q with value %q", succeed, "socket", "./tmp/sockets.po")
+				t.Logf("\t\t%s Should not return error when valid key %q", succeed, "socket")
+
+				if socket != "./tmp/sockets.po" {
+					t.Errorf("\t\t%s Should have key %q with value %q", failed, "socket", "./tmp/sockets.po")
+				} else {
+					t.Logf("\t\t%s Should have key %q with value %q", succeed, "socket", "./tmp/sockets.po")
+				}
 			}
 
-			if cfg.Int("port") != 4034 {
-				t.Errorf("\t\t%s Should have key %q with value %d", failed, "port", 4034)
+			port, err := cfg.Int("port")
+
+			if err != nil {
+				t.Errorf("\t\t%s Should not return error when valid key %q", failed, "port")
 			} else {
-				t.Logf("\t\t%s Should have key %q with value %d", succeed, "port", 4034)
+				t.Logf("\t\t%s Should not return error when valid key %q", succeed, "port")
+
+				if port != 4034 {
+					t.Errorf("\t\t%s Should have key %q with value %d", failed, "port", 4034)
+				} else {
+					t.Logf("\t\t%s Should have key %q with value %d", succeed, "port", 4034)
+				}
 			}
+
 		}
 	}
 }
@@ -78,15 +103,15 @@ func TestNotExists(t *testing.T) {
 		t.Log("\tWhen given a namspace key to search for that does NOT exist.")
 		{
 			shouldPanic(t, "stamp", func() {
-				cfg.Time("stamp")
+				cfg.MustTime("stamp")
 			})
 
 			shouldPanic(t, "pid", func() {
-				cfg.Int("pid")
+				cfg.MustInt("pid")
 			})
 
 			shouldPanic(t, "dest", func() {
-				cfg.String("dest")
+				cfg.MustString("dest")
 			})
 
 		}

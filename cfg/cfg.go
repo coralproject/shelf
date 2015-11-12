@@ -44,9 +44,20 @@ func Init(namespace string) {
 	}
 }
 
-// String returns the value of the giving key as a string, else it will panic
+// String returns the value of the giving key as a string, else it will return
+// a non-nil error if key was not found
+func String(key string) (string, error) {
+	value, found := c.m[key]
+	if !found {
+		return "", fmt.Errorf("Unknown key %s !", key)
+	}
+
+	return value, nil
+}
+
+// MustString returns the value of the giving key as a string, else it will panic
 // if the key was not found.
-func String(key string) string {
+func MustString(key string) string {
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown key %s !", key))
@@ -55,9 +66,25 @@ func String(key string) string {
 	return value
 }
 
-// Int returns the value of the giving key as an int, else it will panic
+// Int returns the value of the giving key as an int, else it will return a
+// non-nil error, if the key was not found or the value can't be convered to an int.
+func Int(key string) (int, error) {
+	value, found := c.m[key]
+	if !found {
+		return 0, fmt.Errorf("Unknown Key %s !", key)
+	}
+
+	iv, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, err
+	}
+
+	return iv, nil
+}
+
+// MustInt returns the value of the giving key as an int, else it will panic
 // if the key was not found or the value can't be convered to an int.
-func Int(key string) int {
+func MustInt(key string) int {
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown Key %s !", key))
@@ -71,9 +98,25 @@ func Int(key string) int {
 	return iv
 }
 
-// Time returns the value of the giving key as a Time, else it will panic
+// Time returns the value of the giving key as a Time, else it will return a non-nil
+// error, if the key was not found or the value can't be convered to a Time.
+func Time(key string) (time.Time, error) {
+	value, found := c.m[key]
+	if !found {
+		return time.Time{}, fmt.Errorf("Unknown Key %s !", key)
+	}
+
+	tv, err := time.Parse(time.UnixDate, value)
+	if err != nil {
+		return tv, err
+	}
+
+	return tv, nil
+}
+
+// MustTime returns the value of the giving key as a Time, else it will panic
 // if the key was not found or the value can't be convered to a Time.
-func Time(key string) time.Time {
+func MustTime(key string) time.Time {
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown Key %s !", key))
