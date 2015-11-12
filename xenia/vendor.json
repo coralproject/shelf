@@ -1,0 +1,48 @@
+{
+	"comment": "",
+	"ignore": "",
+	"package": [
+		{
+			"canonical": "github.com/dimfeld/httptreemux",
+			"comment": "",
+			"local": "vendor/github.com/dimfeld/httptreemux",
+			"revision": "89abad64706614f5e043bed9bbb7c9c3518d1faa",
+			"revisionTime": "2015-08-08T16:14:49-05:00"
+		},
+		{
+			"canonical": "github.com/pborman/uuid",
+			"comment": "",
+			"local": "vendor/github.com/pborman/uuid",
+			"revision": "cccd189d45f7ac3368a0d127efb7f4d08ae0b655",
+			"revisionTime": "2015-08-24T14:28:02-07:00"
+		},
+		{
+			"canonical": "gopkg.in/bluesuncorp/validator.v6",
+			"comment": "",
+			"local": "vendor/gopkg.in/bluesuncorp/validator.v6",
+			"revision": "15e8444e515459e82ef3c33c8cd2dc68b2031e5b",
+			"revisionTime": "2015-09-24T07:48:25-04:00"
+		},
+		{
+			"canonical": "gopkg.in/mgo.v2",
+			"comment": "",
+			"local": "vendor/gopkg.in/mgo.v2",
+			"revision": "4d04138ffef2791c479c0c8bbffc30b34081b8d9",
+			"revisionTime": "2015-10-26T14:34:53-02:00"
+		},
+		{
+			"canonical": "gopkg.in/mgo.v2/bson",
+			"comment": "",
+			"local": "vendor/gopkg.in/mgo.v2/bson",
+			"revision": "4d04138ffef2791c479c0c8bbffc30b34081b8d9",
+			"revisionTime": "2015-10-26T14:34:53-02:00"
+		},
+		{
+			"canonical": "gopkg.in/mgo.v2/internal/scram",
+			"comment": "",
+			"local": "vendor/gopkg.in/mgo.v2/internal/scram",
+			"revision": "4d04138ffef2791c479c0c8bbffc30b34081b8d9",
+			"revisionTime": "2015-10-26T14:34:53-02:00"
+		}
+	]
+}
