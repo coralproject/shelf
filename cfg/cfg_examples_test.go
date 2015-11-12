@@ -22,13 +22,13 @@ func ExampleDev() {
 	// NOTE: All keys must be in lowercase.
 
 	// To get the ip.
-	fmt.Println(cfg.String("ip"))
+	fmt.Println(cfg.MustString("ip"))
 
 	// To get the port number.
-	fmt.Println(cfg.Int("port"))
+	fmt.Println(cfg.MustInt("port"))
 
 	// To get the timestamp.
-	fmt.Println(cfg.Time("initstamp"))
+	fmt.Println(cfg.MustTime("initstamp"))
 
 	// Output:
 	// 40.23.233.10

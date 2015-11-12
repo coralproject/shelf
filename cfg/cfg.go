@@ -45,7 +45,7 @@ func Init(namespace string) {
 }
 
 // String returns the value of the giving key as a string, else it will return
-// a non-nil error if key was not found
+// an error if key was not found.
 func String(key string) (string, error) {
 	value, found := c.m[key]
 	if !found {
@@ -66,8 +66,8 @@ func MustString(key string) string {
 	return value
 }
 
-// Int returns the value of the giving key as an int, else it will return a
-// non-nil error, if the key was not found or the value can't be convered to an int.
+// Int returns the value of the giving key as an int, else it will return
+// an error, if the key was not found or the value can't be convered to an int.
 func Int(key string) (int, error) {
 	value, found := c.m[key]
 	if !found {
@@ -98,7 +98,7 @@ func MustInt(key string) int {
 	return iv
 }
 
-// Time returns the value of the giving key as a Time, else it will return a non-nil
+// Time returns the value of the giving key as a Time, else it will return an
 // error, if the key was not found or the value can't be convered to a Time.
 func Time(key string) (time.Time, error) {
 	value, found := c.m[key]
