@@ -22,9 +22,9 @@ const (
 // session maintains the master session
 var session *mgo.Session
 
-// init sets up the MongoDB environment.
-func init() {
-	log.Dev("mongodb", "init", "Started : Host[%s] Database[%s]\n", mongoDBHosts, database)
+// Init sets up the MongoDB environment.
+func InitMGO() {
+	log.Dev("mongodb", "InitMGO", "Started : Host[%s] Database[%s]", mongoDBHosts, database)
 
 	// We need this object to establish a session to our MongoDB.
 	mongoDBDialInfo := mgo.DialInfo{
@@ -39,7 +39,7 @@ func init() {
 	// to our MongoDB.
 	var err error
 	if session, err = mgo.DialWithInfo(&mongoDBDialInfo); err != nil {
-		log.Fatal("mongodb", "init", "MongoDB Dial : %v", err)
+		log.Fatal("mongodb", "InitMGO", "MongoDB Dial : %v", err)
 	}
 
 	// Reads may not be entirely up-to-date, but they will always see the
@@ -49,7 +49,7 @@ func init() {
 	// http://godoc.org/labix.org/v2/mgo#Session.SetMode
 	session.SetMode(mgo.Monotonic, true)
 
-	log.Dev("mongodb", "init", "Completed")
+	log.Dev("mongodb", "InitMGO", "Completed")
 }
 
 // Query provides a string version of the value
@@ -69,7 +69,7 @@ func GetSession() *mgo.Session {
 
 // ExecuteDB the MongoDB literal function.
 func ExecuteDB(session *mgo.Session, collectionName string, f func(*mgo.Collection) error) error {
-	log.Dev("mongodb", "ExecuteDB", "Started : Collection[%s]\n", collectionName)
+	log.Dev("mongodb", "ExecuteDB", "Started : Collection[%s]", collectionName)
 
 	// Capture the specified collection.
 	collection := session.DB(database).C(collectionName)
