@@ -1,7 +1,6 @@
 package cfg_test
 
 import (
-	"bytes"
 	"os"
 	"testing"
 
@@ -13,21 +12,6 @@ const succeed = "\u2713"
 
 // failed is the Unicode codepoint for an X mark.
 const failed = "\u2717"
-
-// logdest implements io.Writer and is the log package destination.
-var logdest bytes.Buffer
-
-// resetLog can be called at the beginning of a test or example.
-func resetLog() { logdest.Reset() }
-
-// displayLog can be called at the end of a test or example.
-// It only prints the log contents if the -test.v flag is set.
-func displayLog() {
-	if !testing.Verbose() {
-		return
-	}
-	logdest.WriteTo(os.Stdout)
-}
 
 // TestExists validates the ability to load configuration values
 // using the OS-level environment variables and read them back.
