@@ -130,17 +130,18 @@ func userUpdate(u db.User, t *testing.T) {
 
 		t.Log("\tWhen the need to validate a password change")
 		{
-			user, err := db.GetUserByEmail("Zhang.Shou.Luo@gmail.com")
+			_, err := db.GetUserByEmail("Zhang.Shou.Luo@gmail.com")
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved existing user record %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have retrieved existing user record %s", tests.Success)
 
-				if user.IsPasswordValid("Zhu57*sM321") {
-					t.Errorf("\t\tShould have new password for existing user %s", tests.Failed)
-				} else {
-					t.Logf("\t\tShould have new password for existing user %s", tests.Success)
-				}
+			}
+
+			if u.IsPasswordValid("Zhu57*sM321") {
+				t.Errorf("\t\tShould have new password for existing user %s", tests.Failed)
+			} else {
+				t.Logf("\t\tShould have new password for existing user %s", tests.Success)
 			}
 		}
 	}
