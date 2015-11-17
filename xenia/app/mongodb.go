@@ -22,7 +22,7 @@ const (
 // session maintains the master session
 var session *mgo.Session
 
-// Init sets up the MongoDB environment.
+// InitMGO sets up the MongoDB environment.
 func InitMGO() {
 	log.Dev("mongodb", "InitMGO", "Started : Host[%s] Database[%s]", mongoDBHosts, database)
 
