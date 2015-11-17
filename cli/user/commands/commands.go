@@ -158,7 +158,7 @@ Example:
 					return
 				}
 
-				log.Dev("GetUser", "commands.Get", `Completed : User : Get : Pid %q : Success : <User \n%s\nUser>`, pid, jsonFormatted)
+				log.Dev("GetUser", "commands.Get", "Completed : User : Get : Pid %q : Success : <User \n%s\nUser>", pid, jsonFormatted)
 				return
 			}
 
@@ -176,7 +176,7 @@ Example:
 					return
 				}
 
-				log.Dev("GetUser", "commands.Get", `Completed : User : Get : Email %q : Success : <User \n%s\nUser>`, email, jsonFormatted)
+				log.Dev("GetUser", "commands.Get", "Completed : User : Get : Pid %q : Success : <User \n%s\nUser>", pid, jsonFormatted)
 				return
 			}
 
@@ -193,7 +193,7 @@ Example:
 				return
 			}
 
-			log.Dev("GetUser", "commands.Get", `Completed : User : Get : Name %q : Success : <User \n%s\nUser>`, name, jsonFormatted)
+			log.Dev("GetUser", "commands.Get", "Completed : User : Get : Pid %q : Success : <User \n%s\nUser>", pid, jsonFormatted)
 			return
 		},
 	}
