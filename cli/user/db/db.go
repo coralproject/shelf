@@ -328,7 +328,6 @@ func UpdatePassword(u *User, existingPassword, newPassword string) error {
 		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate User Existing Password %s : Error %s", Query(existingPassword), "Invalid Password")
 		return errors.New("Invalid Password")
 	}
-
 	log.Dev(u.PublicID, "UpdatePassword", "Compeleted : Validate User Existing Password %s : Success", Query(existingPassword))
 
 	log.Dev(u.PublicID, "UpdatePassword", "Started : Create New Password %s", Query(newPassword))
@@ -348,6 +347,13 @@ func UpdatePassword(u *User, existingPassword, newPassword string) error {
 	}
 	log.Dev(u.PublicID, "UpdatePassword", "Completed : User : SetToken : Success")
 
+	log.Dev(u.PublicID, "UpdatePassword", "Started : Validate NewUser Password %s", Query(newPassword))
+	if !u.IsPasswordValid(newPassword) {
+		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate New User Password %s : Error %s", Query(newPassword), "Invalid Password")
+		return errors.New("Invalid Password")
+	}
+	log.Dev(u.PublicID, "UpdatePassword", "Compeleted : Validate New User Password %s : Success", Query(newPassword))
+
 	ms := time.Now().UTC()
 	u.ModifiedAt = &ms
 
@@ -360,11 +366,11 @@ func UpdatePassword(u *User, existingPassword, newPassword string) error {
 	})
 
 	if err != nil {
-		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Updating User Record : Error %s", err.Error())
+		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Updated User Record : Error %s", err.Error())
 		return nil
 	}
 
-	log.Dev(u.PublicID, "UpdatePassword", "Completed : Updating User Record")
+	log.Dev(u.PublicID, "UpdatePassword", "Completed : Updated User Record")
 	return nil
 }
 

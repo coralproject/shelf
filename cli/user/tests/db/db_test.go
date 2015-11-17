@@ -21,22 +21,22 @@ func TestUserAPI(t *testing.T) {
 	}
 	t.Logf("Creating User Data %s", tests.Success)
 
-	userCreate(*u, t)
+	userCreate(u, t)
 	userRecordByName(u.Name, t)
 	userRecordByEmail(u.Email, t)
 	userRecordByPublicID(u.PublicID, t)
-	userUpdate(*u, t)
-	userDelete(*u, t)
+	userUpdate(u, t)
+	userDelete(u, t)
 	tearDown(t)
 }
 
 // userCreate tests the addition of a user record into the database.
-func userCreate(u db.User, t *testing.T) {
+func userCreate(u *db.User, t *testing.T) {
 	t.Log("Given the need to create a new User.")
 	{
 		t.Log("\tWhen giving a new user record")
 		{
-			if err := db.Create(&u); err != nil {
+			if err := db.Create(u); err != nil {
 				t.Errorf("\t\tShould have added new user into the database %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have added new user into the database %s", tests.Success)
@@ -100,12 +100,12 @@ func userRecordByPublicID(pid string, t *testing.T) {
 }
 
 // userCreate tests the updating of a user record in the database.
-func userUpdate(u db.User, t *testing.T) {
+func userUpdate(u *db.User, t *testing.T) {
 	t.Log("Given the need to update a new User record.")
 	{
 		t.Log("\tWhen giving a user record with a name update")
 		{
-			if err := db.UpdateName(&u, "Zhang Shou Luo"); err != nil {
+			if err := db.UpdateName(u, "Zhang Shou Luo"); err != nil {
 				t.Errorf("\t\tShould have updated existing User record in the database %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have updated existing User record in the database %s", tests.Success)
@@ -113,7 +113,7 @@ func userUpdate(u db.User, t *testing.T) {
 		}
 		t.Log("\tWhen giving a user record with a email update")
 		{
-			if err := db.UpdateEmail(&u, "Zhang.Shou.Luo@gmail.com"); err != nil {
+			if err := db.UpdateEmail(u, "Zhang.Shou.Luo@gmail.com"); err != nil {
 				t.Errorf("\t\tShould have updated existing User record in the database %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have updated existing User record in the database %s", tests.Success)
@@ -121,7 +121,7 @@ func userUpdate(u db.User, t *testing.T) {
 		}
 		t.Log("\tWhen giving a user record with a password update")
 		{
-			if err := db.UpdatePassword(&u, "Zhu4*20F_M", "Zhu57*sM321"); err != nil {
+			if err := db.UpdatePassword(u, "Zhu4*20F_M", "Zhu57*sM321"); err != nil {
 				t.Errorf("\t\tShould have updated existing User record in the database %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have updated existing User record in the database %s", tests.Success)
@@ -130,30 +130,36 @@ func userUpdate(u db.User, t *testing.T) {
 
 		t.Log("\tWhen the need to validate a password change")
 		{
-			_, err := db.GetUserByEmail("Zhang.Shou.Luo@gmail.com")
+			if !u.IsPasswordValid("Zhu57*sM321") {
+				t.Errorf("\t\tShould have new password for existing user %s", tests.Failed)
+			} else {
+				t.Logf("\t\tShould have new password for existing user %s", tests.Success)
+			}
+
+			user, err := db.GetUserByEmail("Zhang.Shou.Luo@gmail.com")
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved existing user record %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have retrieved existing user record %s", tests.Success)
 
+				if !user.IsPasswordValid("Zhu57*sM321") {
+					t.Errorf("\t\tShould have new password for retrieved user %s", tests.Failed)
+				} else {
+					t.Logf("\t\tShould have new password for retrieved user %s", tests.Success)
+				}
 			}
 
-			if u.IsPasswordValid("Zhu57*sM321") {
-				t.Errorf("\t\tShould have new password for existing user %s", tests.Failed)
-			} else {
-				t.Logf("\t\tShould have new password for existing user %s", tests.Success)
-			}
 		}
 	}
 }
 
 // userDelete tests the removal of a user record in the database.
-func userDelete(u db.User, t *testing.T) {
+func userDelete(u *db.User, t *testing.T) {
 	t.Log("Given the need to delete a User record.")
 	{
 		t.Log("\tWhen giving a user record")
 		{
-			if err := db.Delete(&u); err != nil {
+			if err := db.Delete(u); err != nil {
 				t.Errorf("\t\tShould have removed existing User record in the database %s", tests.Failed)
 			} else {
 				t.Logf("\t\tShould have removed existing User record in the database %s", tests.Success)
