@@ -3,6 +3,13 @@
 	"ignore": "",
 	"package": [
 		{
+			"canonical": "github.com/dimfeld/httppath",
+			"comment": "",
+			"local": "vendor/github.com/dimfeld/httppath",
+			"revision": "c8e499c3ef3c3e272ed8bdcc1ccf39f73c88debc",
+			"revisionTime": "2014-05-15T11:47:37-05:00"
+		},
+		{
 			"canonical": "github.com/dimfeld/httptreemux",
 			"comment": "",
 			"local": "vendor/github.com/dimfeld/httptreemux",
