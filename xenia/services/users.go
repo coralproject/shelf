@@ -31,12 +31,12 @@ func (usersService) List(c *app.Context) ([]models.User, error) {
 	}
 
 	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
-		log.Dev(c.SessionID, "services : Users : List", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : List", err, "Completed")
 		return nil, err
 	}
 
 	if len(u) == 0 {
-		log.Dev(c.SessionID, "services : Users : List", "Completed : ERROR : %v", app.ErrNotFound)
+		log.Error(c.SessionID, "services : Users : List", app.ErrNotFound, "Completed")
 		return nil, app.ErrNotFound
 	}
 
@@ -49,7 +49,7 @@ func (usersService) Retrieve(c *app.Context, userID string) (*models.User, error
 	log.Dev(c.SessionID, "services : Users : Retrieve", "Started")
 
 	if !bson.IsObjectIdHex(userID) {
-		log.Dev(c.SessionID, "services : Users : Retrieve", "Completed : ERROR : %v", app.ErrInvalidID)
+		log.Error(c.SessionID, "services : Users : Retrieve", app.ErrInvalidID, "Completed")
 		return nil, app.ErrInvalidID
 	}
 
@@ -62,11 +62,11 @@ func (usersService) Retrieve(c *app.Context, userID string) (*models.User, error
 
 	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
 		if err != mgo.ErrNotFound {
-			log.Dev(c.SessionID, "services : Users : Retrieve", "Completed : ERROR : %v", err)
+			log.Error(c.SessionID, "services : Users : Retrieve", err, "Completed")
 			return nil, err
 		}
 
-		log.Dev(c.SessionID, "services : Users : Retrieve", "Completed : ERROR : Not Found")
+		log.Error(c.SessionID, "services : Users : Retrieve", app.ErrNotFound, "Completed")
 		return nil, app.ErrNotFound
 	}
 
@@ -89,7 +89,7 @@ func (usersService) Create(c *app.Context, u *models.User) ([]app.Invalid, error
 	}
 
 	if v, err := u.Validate(); err != nil {
-		log.Dev(c.SessionID, "services : Users : Create", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : Create", err, "Completed")
 		return v, app.ErrValidation
 	}
 
@@ -99,7 +99,7 @@ func (usersService) Create(c *app.Context, u *models.User) ([]app.Invalid, error
 	}
 
 	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
-		log.Dev(c.SessionID, "services : Users : Create", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : Create", err, "Completed")
 		return nil, err
 	}
 
@@ -112,7 +112,7 @@ func (usersService) Update(c *app.Context, userID string, u *models.User) ([]app
 	log.Dev(c.SessionID, "services : Users : Update", "Started")
 
 	if v, err := u.Validate(); err != nil {
-		log.Dev(c.SessionID, "services : Users : Update", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : Update", err, "Completed")
 		return v, app.ErrValidation
 	}
 
@@ -121,7 +121,7 @@ func (usersService) Update(c *app.Context, userID string, u *models.User) ([]app
 	}
 
 	if userID != u.UserID {
-		log.Dev(c.SessionID, "services : Users : Update", "Completed : ERROR : %v", app.ErrValidation)
+		log.Error(c.SessionID, "services : Users : Update", app.ErrValidation, "Completed")
 		return []app.Invalid{{Fld: "UserID", Err: "Specified UserID does not match user value."}}, app.ErrValidation
 	}
 
@@ -142,7 +142,7 @@ func (usersService) Update(c *app.Context, userID string, u *models.User) ([]app
 	}
 
 	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
-		log.Dev(c.SessionID, "services : Users : Create", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : Create", err, "Completed")
 		return nil, err
 	}
 
@@ -155,7 +155,7 @@ func (usersService) Delete(c *app.Context, userID string) error {
 	log.Dev(c.SessionID, "services : Users : Delete", "Started")
 
 	if !bson.IsObjectIdHex(userID) {
-		log.Dev(c.SessionID, "services : Users : Delete", "Completed : ERROR : %v", app.ErrInvalidID)
+		log.Error(c.SessionID, "services : Users : Delete", app.ErrInvalidID, "Completed")
 		return app.ErrInvalidID
 	}
 
@@ -166,7 +166,7 @@ func (usersService) Delete(c *app.Context, userID string) error {
 	}
 
 	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
-		log.Dev(c.SessionID, "services : Users : Delete", "Completed : ERROR : %v", err)
+		log.Error(c.SessionID, "services : Users : Delete", err, "Completed")
 		return err
 	}
 

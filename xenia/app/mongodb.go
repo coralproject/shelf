@@ -75,13 +75,13 @@ func ExecuteDB(session *mgo.Session, collectionName string, f func(*mgo.Collecti
 	collection := session.DB(database).C(collectionName)
 	if collection == nil {
 		err := fmt.Errorf("Collection %s does not exist", collectionName)
-		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR :", err)
+		log.Error("mongodb", "ExecuteDB", err, "Completed")
 		return err
 	}
 
 	// Execute the MongoDB call.
 	if err := f(collection); err != nil {
-		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR :", err)
+		log.Error("mongodb", "ExecuteDB", err, "Completed")
 		return err
 	}
 
