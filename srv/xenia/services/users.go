@@ -5,10 +5,10 @@ package services
 import (
 	"time"
 
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/mongo"
-	"github.com/coralproject/shelf/xenia/app"
-	"github.com/coralproject/shelf/xenia/models"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/srv/xenia/app"
+	"github.com/coralproject/shelf/srv/xenia/models"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

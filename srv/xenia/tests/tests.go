@@ -9,8 +9,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/xenia/app"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 // Succeed is the Unicode codepoint for a check mark.
@@ -37,7 +37,7 @@ func DisplayLog() {
 func init() {
 	// TODO: Need to read configuration.
 	log.Init(&logdest, func() int { return log.DEV })
-	app.InitMGO()
+	mongo.InitMGO()
 }
 
 // NewRequest used to setup a request for mocking API calls with httptreemux.

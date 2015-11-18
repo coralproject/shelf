@@ -5,7 +5,7 @@ import (
 	"os"
 	"testing"
 
-	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/pkg/log"
 )
 
 // ExampleDev shows how to use the log package.

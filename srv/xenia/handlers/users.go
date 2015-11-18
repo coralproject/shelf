@@ -6,9 +6,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/coralproject/shelf/xenia/app"
-	"github.com/coralproject/shelf/xenia/models"
-	"github.com/coralproject/shelf/xenia/services"
+	"github.com/coralproject/shelf/srv/xenia/app"
+	"github.com/coralproject/shelf/srv/xenia/models"
+	"github.com/coralproject/shelf/srv/xenia/services"
 )
 
 // usersHandle maintains the set of handlers for the users api.

@@ -6,10 +6,11 @@ import (
 	"testing"
 	"time"
 
-	"github.com/coralproject/shelf/xenia/app"
-	"github.com/coralproject/shelf/xenia/models"
-	"github.com/coralproject/shelf/xenia/services"
-	"github.com/coralproject/shelf/xenia/tests"
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/srv/xenia/app"
+	"github.com/coralproject/shelf/srv/xenia/models"
+	"github.com/coralproject/shelf/srv/xenia/services"
+	"github.com/coralproject/shelf/srv/xenia/tests"
 )
 
 // TestUsers validates a user can be created, retrieved and
@@ -19,7 +20,7 @@ func TestUsers(t *testing.T) {
 	defer tests.DisplayLog()
 
 	c := &app.Context{
-		Session:   app.GetSession(),
+		Session:   mongo.GetSession(),
 		SessionID: "TESTING",
 	}
 	defer c.Session.Close()

@@ -12,7 +12,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/pkg/log"
 	"gopkg.in/mgo.v2"
 )
 

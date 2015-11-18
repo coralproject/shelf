@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/coralproject/shelf/cfg"
+	"github.com/coralproject/shelf/pkg/gocfg"
 )
 
 // ExampleDev shows how to use the config package.

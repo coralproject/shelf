@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/coralproject/shelf/xenia/app"
+	"github.com/coralproject/shelf/srv/xenia/app"
 )
 
 // UserAddress contains information about a user's address.

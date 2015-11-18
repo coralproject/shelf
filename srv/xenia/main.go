@@ -7,9 +7,9 @@ import (
 	"os"
 	"os/signal"
 
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/mongo"
-	"github.com/coralproject/shelf/xenia/routes"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/srv/xenia/routes"
 )
 
 func init() {

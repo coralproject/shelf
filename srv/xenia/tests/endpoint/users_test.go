@@ -10,10 +10,11 @@ import (
 
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/coralproject/shelf/xenia/app"
-	"github.com/coralproject/shelf/xenia/models"
-	"github.com/coralproject/shelf/xenia/routes"
-	"github.com/coralproject/shelf/xenia/tests"
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/srv/xenia/app"
+	"github.com/coralproject/shelf/srv/xenia/models"
+	"github.com/coralproject/shelf/srv/xenia/routes"
+	"github.com/coralproject/shelf/srv/xenia/tests"
 )
 
 var u = models.User{
@@ -41,7 +42,7 @@ func TestUsers(t *testing.T) {
 	defer tests.DisplayLog()
 
 	c := &app.Context{
-		Session:   app.GetSession(),
+		Session:   mongo.GetSession(),
 		SessionID: "TESTING",
 	}
 	defer c.Session.Close()
