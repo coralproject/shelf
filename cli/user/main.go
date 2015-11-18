@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	log.Init(os.Stdout, func() int { return log.DEV })
+	log.Init(os.Stderr, func() int { return log.DEV })
 
 	commands.Run()
 }
