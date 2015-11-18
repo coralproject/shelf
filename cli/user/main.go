@@ -11,7 +11,6 @@ import (
 
 func main() {
 	log.Init(os.Stdout, func() int { return log.DEV })
-	// db.InitMGO()
 
 	commands.Run()
 }
