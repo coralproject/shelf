@@ -46,12 +46,21 @@ func User(context interface{}, funcName string, format string, a ...interface{})
 	l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
 }
 
+// Error logs trace information that are errors.
+func Error(context interface{}, funcName string, err error, format string, a ...interface{}) {
+	if a != nil {
+		format = fmt.Sprintf(format, a...)
+	}
+
+	l.Output(2, fmt.Sprintf("%s : %s : ERROR : %s : %s", context, funcName, err, format))
+}
+
 // Fatal logs trace information for users and terminates the app.
 func Fatal(context interface{}, funcName string, format string, a ...interface{}) {
 	if a != nil {
 		format = fmt.Sprintf(format, a...)
 	}
 
-	l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
+	l.Output(2, fmt.Sprintf("%s : %s : FATAL : %s", context, funcName, format))
 	os.Exit(1)
 }

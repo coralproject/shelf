@@ -2,6 +2,7 @@ package log_test
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os"
 	"testing"
@@ -31,27 +32,26 @@ func displayLog() {
 	logdest.WriteTo(os.Stdout)
 }
 
-func init() {
-	log.Init(&logdest, func() int { return log.USER })
-}
-
 // TestLogLevelUSER tests the basic functioning of the logger in USER mode.
 func TestLogLevelUSER(t *testing.T) {
 	t.Log("Given the need to log DEV and USER messages.")
 	{
 		t.Log("\tWhen we set the logging level to USER.")
 		{
+			log.Init(&logdest, func() int { return log.USER })
 			resetLog()
 			defer displayLog()
 
 			dt := time.Now().Format("2006/1/2 15:04:05")
 
-			log1 := fmt.Sprintf("%s log_test.go:52: context : FuncName : USER : Message 2 with format: A, B\n", dt)
+			log1 := fmt.Sprintf("%s log_test.go:51: context : FuncName : USER : Message 2 with format: A, B\n", dt)
+			log2 := fmt.Sprintf("%s log_test.go:52: context : FuncName : ERROR : An error : Message 3 no format\n", dt)
 
 			log.Dev("context", "FuncName", "Message 1 no format")
 			log.User("context", "FuncName", "Message 2 with format: %s, %s", "A", "B")
+			log.Error("context", "FuncName", errors.New("An error"), "Message 3 no format")
 
-			if logdest.String() == log1 {
+			if logdest.String() == log1+log2 {
 				t.Logf("\t\t%v : Should log the expected trace line.", succeed)
 			} else {
 				t.Errorf("\t\t%v : Should log the expected trace line.", failed)
@@ -66,18 +66,21 @@ func TestLogLevelDEV(t *testing.T) {
 	{
 		t.Log("\tWhen we set the logging level to DEV.")
 		{
+			log.Init(&logdest, func() int { return log.DEV })
 			resetLog()
 			defer displayLog()
 
 			dt := time.Now().Format("2006/1/2 15:04:05")
 
-			log1 := fmt.Sprintf("%s log_test.go:77: context : FuncName : DEV : Message 1 no format\n", dt)
-			log2 := fmt.Sprintf("%s log_test.go:78: context : FuncName : USER : Message 2 with format: A, B\n", dt)
+			log1 := fmt.Sprintf("%s log_test.go:79: context : FuncName : DEV : Message 1 no format\n", dt)
+			log2 := fmt.Sprintf("%s log_test.go:80: context : FuncName : USER : Message 2 with format: A, B\n", dt)
+			log3 := fmt.Sprintf("%s log_test.go:81: context : FuncName : ERROR : An error : Message 3 with format: C, D\n", dt)
 
 			log.Dev("context", "FuncName", "Message 1 no format")
 			log.User("context", "FuncName", "Message 2 with format: %s, %s", "A", "B")
+			log.Error("context", "FuncName", errors.New("An error"), "Message 3 with format: %s, %s", "C", "D")
 
-			if logdest.String() == log1+log2 {
+			if logdest.String() == log1+log2+log3 {
 				t.Logf("\t\t%v : Should log the expected trace line.", succeed)
 			} else {
 				t.Errorf("\t\t%v : Should log the expected trace line.", failed)

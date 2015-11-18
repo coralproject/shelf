@@ -21,8 +21,11 @@ func ExampleDev(t *testing.T) {
 	log.User("context", "ExampleDev", "This is a simple line with no formatting %d", 10)
 
 	// Write a message error for the user.
-	log.User("context", "ExampleDev", "ERROR: %v", errors.New("A user error"))
+	log.Error("context", "ExampleDev", errors.New("A user error"), "testing error")
+
+	// Write a message error for the user with formatting.
+	log.Error("context", "ExampleDev", errors.New("A user error"), "testing error %s", "value")
 
 	// Write a message error for the developer only.
-	log.Dev("context", "ExampleDev", "ERROR: %v", errors.New("An developer error"))
+	log.Dev("context", "ExampleDev", "Formatting %v", 42)
 }
