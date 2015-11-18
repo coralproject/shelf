@@ -6,6 +6,7 @@ import (
 
 	"github.com/coralproject/shelf/cli/user/db"
 	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/mongo"
 	"github.com/spf13/cobra"
 )
 
@@ -73,7 +74,7 @@ func runGet(cmd *cobra.Command, args []string) {
 	}
 
 	// Initialize the mongodb session.
-	db.InitMGO()
+	mongo.InitMGO()
 
 	if get.pid != "" {
 		log.Dev("commands", "runGet", "Pid[%s]", get.pid)

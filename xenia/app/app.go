@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net/http"
 
+	"github.com/coralproject/shelf/mongo"
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"
 )
@@ -51,7 +52,7 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	// The function to execute for each request.
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		c := Context{
-			Session:        GetSession(),
+			Session:        mongo.GetSession(),
 			ResponseWriter: w,
 			Request:        r,
 			Params:         p,

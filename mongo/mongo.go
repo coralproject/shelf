@@ -1,4 +1,4 @@
-package app
+package mongo
 
 import (
 	"encoding/json"
@@ -68,23 +68,23 @@ func GetSession() *mgo.Session {
 }
 
 // ExecuteDB the MongoDB literal function.
-func ExecuteDB(session *mgo.Session, collectionName string, f func(*mgo.Collection) error) error {
-	log.Dev("mongodb", "ExecuteDB", "Started : Collection[%s]", collectionName)
+func ExecuteDB(context interface{}, session *mgo.Session, collectionName string, f func(*mgo.Collection) error) error {
+	log.Dev(context, "ExecuteDB", "Started : Collection[%s]", collectionName)
 
 	// Capture the specified collection.
 	collection := session.DB(database).C(collectionName)
 	if collection == nil {
 		err := fmt.Errorf("Collection %s does not exist", collectionName)
-		log.Error("mongodb", "ExecuteDB", err, "Completed")
+		log.Error(context, "ExecuteDB", err, "Completed")
 		return err
 	}
 
 	// Execute the MongoDB call.
 	if err := f(collection); err != nil {
-		log.Error("mongodb", "ExecuteDB", err, "Completed")
+		log.Error(context, "ExecuteDB", err, "Completed")
 		return err
 	}
 
-	log.Dev("mongodb", "ExecuteDB", "Completed")
+	log.Dev(context, "ExecuteDB", "Completed")
 	return nil
 }

@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"github.com/coralproject/shelf/cli/user/db"
+	"github.com/coralproject/shelf/mongo"
 	"github.com/spf13/cobra"
 )
 
@@ -60,5 +60,5 @@ func runUpd(cmd *cobra.Command, args []string) {
 	}
 
 	// Initialize the mongodb session.
-	db.InitMGO()
+	mongo.InitMGO()
 }

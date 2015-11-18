@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/mongo"
 	"github.com/coralproject/shelf/xenia/app"
 	"github.com/coralproject/shelf/xenia/models"
 	"gopkg.in/mgo.v2"
@@ -30,7 +31,7 @@ func (usersService) List(c *app.Context) ([]models.User, error) {
 		return collection.Find(nil).All(&u)
 	}
 
-	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
+	if err := mongo.ExecuteDB(c.SessionID, c.Session, usersCollection, f); err != nil {
 		log.Error(c.SessionID, "services : Users : List", err, "Completed")
 		return nil, err
 	}
@@ -56,11 +57,11 @@ func (usersService) Retrieve(c *app.Context, userID string) (*models.User, error
 	var u *models.User
 	f := func(collection *mgo.Collection) error {
 		q := bson.M{"user_id": userID}
-		log.User(c.SessionID, "services : Users : Retrieve", "MGO :\n\ndb.users.find(%s)\n\n", app.Query(q))
+		log.User(c.SessionID, "services : Users : Retrieve", "MGO :\n\ndb.users.find(%s)\n\n", mongo.Query(q))
 		return collection.Find(q).One(&u)
 	}
 
-	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
+	if err := mongo.ExecuteDB(c.SessionID, c.Session, usersCollection, f); err != nil {
 		if err != mgo.ErrNotFound {
 			log.Error(c.SessionID, "services : Users : Retrieve", err, "Completed")
 			return nil, err
@@ -94,11 +95,11 @@ func (usersService) Create(c *app.Context, u *models.User) ([]app.Invalid, error
 	}
 
 	f := func(collection *mgo.Collection) error {
-		log.User(c.SessionID, "services : Users : Create", "MGO :\n\ndb.users.insert(%s)\n\n", app.Query(u))
+		log.User(c.SessionID, "services : Users : Create", "MGO :\n\ndb.users.insert(%s)\n\n", mongo.Query(u))
 		return collection.Insert(u)
 	}
 
-	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
+	if err := mongo.ExecuteDB(c.SessionID, c.Session, usersCollection, f); err != nil {
 		log.Error(c.SessionID, "services : Users : Create", err, "Completed")
 		return nil, err
 	}
@@ -137,11 +138,11 @@ func (usersService) Update(c *app.Context, userID string, u *models.User) ([]app
 
 	f := func(collection *mgo.Collection) error {
 		q := bson.M{"user_id": u.UserID}
-		log.User(c.SessionID, "services : Users : Update", "MGO :\n\ndb.users.update(%s, %s)\n\n", app.Query(q), app.Query(u))
+		log.User(c.SessionID, "services : Users : Update", "MGO :\n\ndb.users.update(%s, %s)\n\n", mongo.Query(q), mongo.Query(u))
 		return collection.Update(q, u)
 	}
 
-	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
+	if err := mongo.ExecuteDB(c.SessionID, c.Session, usersCollection, f); err != nil {
 		log.Error(c.SessionID, "services : Users : Create", err, "Completed")
 		return nil, err
 	}
@@ -161,11 +162,11 @@ func (usersService) Delete(c *app.Context, userID string) error {
 
 	f := func(collection *mgo.Collection) error {
 		q := bson.M{"user_id": userID}
-		log.User(c.SessionID, "services : Users : Delete", "MGO :\n\ndb.users.remove(%s)\n\n", app.Query(q))
+		log.User(c.SessionID, "services : Users : Delete", "MGO :\n\ndb.users.remove(%s)\n\n", mongo.Query(q))
 		return collection.Remove(q)
 	}
 
-	if err := app.ExecuteDB(c.Session, usersCollection, f); err != nil {
+	if err := mongo.ExecuteDB(c.SessionID, c.Session, usersCollection, f); err != nil {
 		log.Error(c.SessionID, "services : Users : Delete", err, "Completed")
 		return err
 	}

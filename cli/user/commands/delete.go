@@ -5,6 +5,7 @@ import (
 
 	"github.com/coralproject/shelf/cli/user/db"
 	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/mongo"
 	"github.com/spf13/cobra"
 )
 
@@ -72,7 +73,7 @@ func runDel(cmd *cobra.Command, args []string) {
 	}
 
 	// Initialize the mongodb session.
-	db.InitMGO()
+	mongo.InitMGO()
 
 	if del.pid != "" {
 		log.Dev("commands", "runDel", "Pid[%s]", del.pid)

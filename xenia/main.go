@@ -8,14 +8,14 @@ import (
 	"os/signal"
 
 	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/xenia/app"
+	"github.com/coralproject/shelf/mongo"
 	"github.com/coralproject/shelf/xenia/routes"
 )
 
 func init() {
 	// TODO: Need to read configuration.
 	log.Init(os.Stdout, func() int { return log.DEV })
-	app.InitMGO()
+	mongo.InitMGO()
 }
 
 func main() {
