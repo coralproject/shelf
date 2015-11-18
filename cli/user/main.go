@@ -6,7 +6,7 @@ import (
 	"os"
 
 	"github.com/coralproject/shelf/cli/user/commands"
-	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/pkg/log"
 )
 
 func main() {

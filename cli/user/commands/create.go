@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/coralproject/shelf/cli/user/db"
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/mongo"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/spf13/cobra"
 )
 
@@ -48,17 +48,17 @@ func runCreate(cmd *cobra.Command, args []string) {
 	}
 
 	if create.name == "" {
-		cmd.Println("\n\tname(-n) can not be empty. please supply a name using the `-n` or `-name` flag")
+		cmd.Println("\n\tError: name(-n) can not be empty. please supply a name using the `-n` or `-name` flag")
 		return
 	}
 
 	if create.pass == "" {
-		cmd.Println("\n\tpassword(-p) can not be empty. Please supply a password using `-p` or `-password` flag")
+		cmd.Println("\n\tError: password(-p) can not be empty. Please supply a password using `-p` or `-password` flag")
 		return
 	}
 
 	if create.email == "" {
-		cmd.Println("\n\temail(-e) can not be empty. Please supply a email address using `-e` or `-email` flag")
+		cmd.Println("\n\tError: email(-e) can not be empty. Please supply a email address using `-e` or `-email` flag")
 		return
 	}
 
@@ -66,7 +66,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 	// have a valid expectation pattern,we can skip alot of the mess.
 	// TODO: should we use something more robust?
 	if !strings.Contains(create.email, "@") {
-		cmd.Println("\n\tEmail address must be a valid addresss. Please supply a correct email address.")
+		cmd.Println("\n\tError: Email address must be a valid addresss. Please supply a correct email address.")
 		return
 	}
 
