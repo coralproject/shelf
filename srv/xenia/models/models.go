@@ -1,7 +1,7 @@
 // Package models contains data structures and associated behavior.
 package models
 
-import "dvcs.com/org/validator.v6"
+import "gopkg.in/bluesuncorp/validator.v6"
 
 var validate *validator.Validate
 
