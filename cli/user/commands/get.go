@@ -83,7 +83,7 @@ func runGet(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		doc, err := json.MarshalIndent(user, "", "\n\n")
+		_, err = json.MarshalIndent(user, "", "\n\n")
 		if err != nil {
 			log.Error("commands", "runGet", err, "Completed")
 			return
@@ -102,7 +102,7 @@ func runGet(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		doc, err := json.MarshalIndent(user, "", "\n\n")
+		_, err = json.MarshalIndent(user, "", "\n\n")
 		if err != nil {
 			log.Error("commands", "runGet", err, "Completed")
 			return
@@ -120,7 +120,7 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	doc, err := json.MarshalIndent(user, "", "\n\n")
+	_, err = json.MarshalIndent(user, "", "\n\n")
 	if err != nil {
 		log.Error("GetUser", "runGet", err, "Completed")
 		return

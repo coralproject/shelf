@@ -55,7 +55,7 @@ func addUpd() {
 
 // runUpd is the code that implements the update command.
 func runUpd(cmd *cobra.Command, args []string) {
-	if utype == "" {
+	if upd.utype == "" {
 		cmd.Println("\n\tname(-n) can not be empty. please supply a name using the `-n` or `-name` flag")
 	}
 
