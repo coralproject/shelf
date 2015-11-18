@@ -19,8 +19,8 @@ type Entity interface {
 
 // BcryptHash generates a hash using the bcrypt encoding standard from a provided
 // []byte of the password string.
-func BcryptHash(pwd []byte) (string, error) {
-	crypted, err := bcrypt.GenerateFromPassword(pwd, bcrypt.DefaultCost)
+func BcryptHash(pwd string) (string, error) {
+	crypted, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
 		return "", err
 	}
@@ -28,10 +28,21 @@ func BcryptHash(pwd []byte) (string, error) {
 	return base64.StdEncoding.EncodeToString(crypted), nil
 }
 
+// CompareBase64BcryptHash compares a given password to a base64 encoded, bcrypted hash key.
+// It returns a non-nil error if its not a match.
+func CompareBase64BcryptHash(hashed string, pwd string) error {
+	unbasedHashed, err := base64.StdEncoding.DecodeString(hashed)
+	if err != nil {
+		return err
+	}
+
+	return bcrypt.CompareHashAndPassword(unbasedHashed, []byte(pwd))
+}
+
 // CompareBcryptHash compares a given password to a bcrypted hash key. It returns
 // a non-nil error if its not a match.
-func CompareBcryptHash(hash []byte, pwd []byte) error {
-	return bcrypt.CompareHashAndPassword(hash, pwd)
+func CompareBcryptHash(hashed []byte, pwd []byte) error {
+	return bcrypt.CompareHashAndPassword(hashed, pwd)
 }
 
 // SignedSHAHash generates a signed hash using the SHA256 encoding standard from a given

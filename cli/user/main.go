@@ -3,12 +3,14 @@
 package main
 
 import (
+	"os"
+
 	"github.com/coralproject/shelf/cli/user/commands"
-	"github.com/coralproject/shelf/cli/user/db"
+	"github.com/coralproject/shelf/log"
 )
 
 func main() {
-	db.InitMGO()
+	log.Init(os.Stdout, func() int { return log.DEV })
 
 	commands.Run()
 }

@@ -39,7 +39,7 @@ func InitMGO() {
 	// to our MongoDB.
 	var err error
 	if session, err = mgo.DialWithInfo(&mongoDBDialInfo); err != nil {
-		log.Fatal("mongodb", "InitMGO", "MongoDB Dial : %v", err)
+		log.Fatal("mongodb", "InitMGO", "MongoDB Dial : %v", err.Error())
 	}
 
 	// Reads may not be entirely up-to-date, but they will always see the
@@ -75,13 +75,13 @@ func ExecuteDB(session *mgo.Session, collectionName string, f func(*mgo.Collecti
 	collection := session.DB(database).C(collectionName)
 	if collection == nil {
 		err := fmt.Errorf("Collection %s does not exist", collectionName)
-		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR :", err)
+		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR %s ", err.Error())
 		return err
 	}
 
 	// Execute the MongoDB call.
 	if err := f(collection); err != nil {
-		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR :", err)
+		log.Dev("mongodb", "ExecuteDB", "Completed : ERROR %s", err.Error())
 		return err
 	}
 
