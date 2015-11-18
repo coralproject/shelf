@@ -117,32 +117,6 @@ func (u *User) SetToken() error {
 	return nil
 }
 
-// UserHeader represents a user entity's publically allowed fields, for safe
-// transmission over the wire.
-type UserHeader struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Token    string `json:"token"`
-	PublicID string `json:"public_id"`
-}
-
-// SanitizedUser returns a User struct which only contain the safe and publically
-// allowed fields. Useful for creating a JWT Header.
-func (u *User) SanitizedUser() (*UserHeader, error) {
-	if !u.hasCrendentials() {
-		return nil, errors.New("Invalid User Entity")
-	}
-
-	return &UserHeader{
-		ID:       u.ID.String(),
-		Name:     u.Name,
-		Email:    u.Email,
-		Token:    u.Token,
-		PublicID: u.PublicID,
-	}, nil
-}
-
 // hasCrendentials returns true/false if authentication required fields are
 // blank or unloaded.
 func (u *User) hasCrendentials() bool {
