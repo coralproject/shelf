@@ -1,8 +1,10 @@
 package db
 
 import (
+	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -253,21 +255,139 @@ func Update(q *Query) error {
 // Returns a non-nil error if the operation fails.
 func Delete(q *Query) error {
 	log.Dev(q.Name, "Delete", "Started : Query : Delete Query")
-	session := mongo.GetSession()
-	defer session.Close()
 
-	var deleteQuery = func(c *mgo.Collection) error {
-		log.Dev(q.Name, "Delete", "Completed : Query : MongoDb.Remove()")
-		return c.Remove(bson.M{"name": q.Name})
-	}
-
-	log.Dev(q.Name, "Delete", "Started : Query : MongoDb.Remove()")
-	err := mongo.ExecuteDB("CONTEXT", session, QueryCollection, deleteQuery)
-	if err != nil {
+	if err := DeleteByName(q.Name); err != nil {
 		log.Error(q.Name, "Delete", err, "Completed : Query : Delete Query")
 		return err
 	}
 
 	log.Dev(q.Name, "Delete", "Completed : Query : Delete Query")
 	return nil
+}
+
+// DeleteByName removes the query with the giving name from the database collection
+// Returns a non-nil error if the operation fails.
+func DeleteByName(name string) error {
+	log.Dev(name, "DeleteByName", "Started : Query : Delete Query")
+	session := mongo.GetSession()
+	defer session.Close()
+
+	var deleteQuery = func(c *mgo.Collection) error {
+		log.Dev(name, "DeleteByName", "Completed : Query : MongoDb.Remove()")
+		return c.Remove(bson.M{"name": name})
+	}
+
+	log.Dev(name, "DeleteName", "Started : Query : MongoDb.Remove()")
+	err := mongo.ExecuteDB("CONTEXT", session, QueryCollection, deleteQuery)
+	if err != nil {
+		log.Error(name, "DeleteName", err, "Completed : Query : Delete Query")
+		return err
+	}
+
+	log.Dev(name, "DeleteByName", "Completed : Query : Delete Query")
+	return nil
+}
+
+// Execute executes the giving queries conditions and returns the result.
+// Returns a non-nil error if the operation fails.
+func Execute(q *Query, params map[string]string) ([]bson.M, error) {
+	var res []bson.M
+
+	log.Dev(q.Name, "Execute", "Started : Query : Execute Query")
+	session := mongo.GetSession()
+	defer session.Close()
+
+	// Replace all special variables in Query.
+	mapAttributesInExpression(q.Test, params)
+	mapAttributesInExpression(q.Passed, params)
+	mapAttributesInExpression(q.Failed, params)
+
+	// Convert all queries into bson.M objects.
+	tests, err := mapExpressionToBSON(q.Test)
+	log.Error(q.Name, "Execute", err, "Started : Query : MapExpression To BSON[query.Test]")
+	if err != nil {
+		log.Error(q.Name, "Execute", err, "Completed : Query : MapExpression To BSON[query.Test]")
+		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
+		return nil, err
+	}
+
+	failed, err := mapExpressionToBSON(q.Test)
+	log.Error(q.Name, "Execute", err, "Started : Query : MapExpression To BSON[query.Failed]")
+	if err != nil {
+		log.Error(q.Name, "Execute", err, "Completed : Query : MapExpression To BSON[query.Failed]")
+		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
+		return nil, err
+	}
+
+	passed, err := mapExpressionToBSON(q.Passed)
+	log.Error(q.Name, "Execute", err, "Started : Query : MapExpression To BSON[query.Passed]")
+	if err != nil {
+		log.Error(q.Name, "Execute", err, "Completed : Query : MapExpression To BSON[query.Passed]")
+		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
+		return nil, err
+	}
+
+	var executeQuery = func(c *mgo.Collection) error {
+		defer log.Dev(q.Name, "Execute", "Completed : Query : MongoDb.DB().C().Pipe()")
+
+		var result []bson.M
+
+		// Execute the query.Test query.
+		if err := c.Pipe(tests).All(&result); err != nil {
+			return err
+		}
+
+		// Execute the query.Passed query if the result was not empty or
+		// executes the query.Failed query.
+		if len(result) > 0 {
+			if err := c.Pipe(passed).All(&res); err != nil {
+				return err
+			}
+		} else {
+			if err := c.Pipe(failed).All(&res); err != nil {
+				return err
+			}
+		}
+
+		return nil
+	}
+
+	log.Dev(q.Name, "Execute", "Started : Query : MongoDb.DB().C().Pipe()")
+	err = mongo.ExecuteDB("CONTEXT", session, QueryCollection, executeQuery)
+	if err != nil {
+		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
+		return nil, err
+	}
+
+	log.Dev(q.Name, "Execute", "Completed : Query : Execute Query")
+	return res, nil
+}
+
+// mapAttributesInExpression will take an expression and map into it the giving keys using
+// the format '#key#' where found in a supplied map.
+func mapAttributesInExpression(exp *Expression, params map[string]string) {
+	if params != nil && len(params) != 0 {
+		for key, value := range params {
+			findKey := fmt.Sprintf("#%s#", key)
+			for n, rule := range exp.Queries {
+				exp.Queries[n] = strings.Replace(rule, findKey, value, -1)
+			}
+		}
+	}
+}
+
+// mapExpressionToBSON will take an expressions object and creates an equivalent
+// bson.M map for use with a mongodb execution call.
+func mapExpressionToBSON(exp *Expression) ([]bson.M, error) {
+	var conditions []bson.M
+
+	for _, cond := range exp.Queries {
+		var m = make(bson.M)
+		if err := json.NewDecoder(bytes.NewBufferString(cond)).Decode(&m); err != nil {
+			return nil, err
+		}
+		conditions = append(conditions, m)
+	}
+
+	return conditions, nil
 }

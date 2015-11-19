@@ -393,22 +393,80 @@ func UpdatePassword(u *User, existingPassword, newPassword string) error {
 // Returns a non-nil error, if the operation fails.
 func Delete(u *User) error {
 	log.Dev(u.PublicID, "Delete", "Started : Delete User")
+	if err := DeleteByPublicID(u.PublicID); err != nil {
+		log.Error(u.PublicID, "Delete", err, "Completed : Delete User")
+		return err
+	}
+	log.Dev(u.PublicID, "Delete", "Completed : Delete User")
+	return nil
+}
+
+// DeleteByPublicID removes an existing user from the database using the PublicID.
+// Returns a non-nil error, if the operation fails.
+func DeleteByPublicID(pid string) error {
+	log.Dev(pid, "DeleteByPublic", "Started : Delete User")
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(u.PublicID, "Delete", "Completed : Mongodb.RemoveId()")
-		return c.Remove(bson.M{"id": u.ID})
+		log.Dev(pid, "DeleteByPublicID", "Completed : Mongodb.RemoveId()")
+		return c.Remove(bson.M{"public_id": pid})
 	}
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
-	log.Dev(u.PublicID, "Delete", "Started : Mongodb.RemoveId()")
+	log.Dev(pid, "DeleteByPublicID", "Started : Mongodb.RemoveId()")
 	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
-		log.Error(u.PublicID, "Delete", err, "Completed")
+		log.Error(pid, "DeleteByPublicID", err, "Completed")
 		return err
 	}
 
-	log.Dev(u.PublicID, "Delete", "Completed : Delete User")
+	log.Dev(pid, "DeleteByPublicID", "Completed : Delete User")
+	return nil
+}
+
+// DeleteByName removes an existing user from the database using the name.
+// Returns a non-nil error, if the operation fails.
+func DeleteByName(name string) error {
+	log.Dev(name, "DeleteByName", "Started : Delete User")
+
+	f := func(c *mgo.Collection) error {
+		log.Dev(name, "DeleteByName", "Completed : Mongodb.RemoveId()")
+		return c.Remove(bson.M{"name": name})
+	}
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	log.Dev(name, "DeleteByName", "Started : Mongodb.RemoveId()")
+	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
+		log.Error(name, "DeleteByName", err, "Completed")
+		return err
+	}
+
+	log.Dev(name, "DeleteByName", "Completed : Delete User")
+	return nil
+}
+
+// DeleteByEmail removes an existing user from the database using the Email.
+// Returns a non-nil error, if the operation fails.
+func DeleteByEmail(email string) error {
+	log.Dev(email, "DeleteByEmail", "Started : Delete User")
+
+	f := func(c *mgo.Collection) error {
+		log.Dev(email, "DeleteByEmail", "Completed : Mongodb.RemoveId()")
+		return c.Remove(bson.M{"email": email})
+	}
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	log.Dev(email, "DeleteByEmail", "Started : Mongodb.RemoveId()")
+	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
+		log.Error(email, "DeleteEmail", err, "Completed")
+		return err
+	}
+
+	log.Dev(email, "DeleteEmail", "Completed : Delete User")
 	return nil
 }
 
