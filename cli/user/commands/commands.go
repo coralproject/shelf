@@ -10,6 +10,7 @@ var rootCmd = &cobra.Command{
 
 // Run will process the command line arguments for the application.
 func Run() {
+	addAuth()
 	addCreate()
 	addGet()
 	addUpd()

@@ -8,6 +8,7 @@ import (
 
 	"github.com/coralproject/shelf/cli/user/db"
 	"github.com/coralproject/shelf/cli/user/tests"
+	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 // TestUserAPI validates the user CRUD API.
@@ -180,7 +181,7 @@ func userDelete(u *db.User, t *testing.T) {
 
 // tearDown tears down the collection being used.
 func tearDown(t *testing.T) {
-	err := db.ExecuteDB(db.GetSession(), db.UserCollection, func(c *mgo.Collection) error {
+	err := mongo.ExecuteDB("tearDown", mongo.GetSession(), db.UserCollection, func(c *mgo.Collection) error {
 		return c.DropCollection()
 	})
 

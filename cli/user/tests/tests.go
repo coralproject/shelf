@@ -6,8 +6,8 @@ import (
 	"os"
 	"testing"
 
-	"github.com/coralproject/shelf/cli/user/db"
-	"github.com/coralproject/shelf/log"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 // Success is a unicode codepoint for a check mark.
@@ -37,5 +37,5 @@ func DisplayLog() {
 func init() {
 	// TODO: read current log mode from configuration.
 	log.Init(&logdash, func() int { return log.DEV })
-	db.InitMGO()
+	mongo.InitMGO()
 }

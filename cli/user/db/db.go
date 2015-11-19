@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/cli/user/crypto"
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/mongo"
-	"github.com/satori/go.uuid"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/pborman/uuid"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -35,11 +35,11 @@ type User struct {
 // NewUser creates a new user entity.
 func NewUser(name, email, password string) (*User, error) {
 	// Generate the users PublicID and PrivateID
-	pubID := uuid.NewV4()
-	privID := uuid.NewV4()
+	pubID := uuid.New()
+	privID := uuid.New()
 
 	// Generate the user encrypted password using the supplied password
-	pass, err := crypto.BcryptHash(privID.String() + password)
+	pass, err := crypto.BcryptHash(privID + password)
 	if err != nil {
 		return nil, err
 	}
@@ -50,8 +50,8 @@ func NewUser(name, email, password string) (*User, error) {
 	user.Name = name
 	user.Email = strings.ToLower(email)
 	user.Password = pass
-	user.PublicID = pubID.String()
-	user.PrivateID = privID.String()
+	user.PublicID = pubID
+	user.PrivateID = privID
 
 	created := time.Now().UTC()
 	mod := time.Now().UTC()
@@ -97,6 +97,15 @@ func (u *User) IsPasswordValid(pass string) bool {
 	return true
 }
 
+// IsTokenValid validates if the given token matches the user entities token.
+func (u *User) IsTokenValid(token string) bool {
+	if err := crypto.IsTokenValidForEntity(u, token); err != nil {
+		return false
+	}
+
+	return true
+}
+
 // SetToken sets the users authentication token
 func (u *User) SetToken() error {
 	token, err := crypto.TokenForEntity(u)
@@ -106,32 +115,6 @@ func (u *User) SetToken() error {
 
 	u.Token = crypto.Base64Token(token)
 	return nil
-}
-
-// UserHeader represents a user entity's publically allowed fields, for safe
-// transmission over the wire.
-type UserHeader struct {
-	ID       string `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Token    string `json:"token"`
-	PublicID string `json:"public_id"`
-}
-
-// SanitizedUser returns a User struct which only contain the safe and publically
-// allowed fields. Useful for creating a JWT Header.
-func (u *User) SanitizedUser() (*UserHeader, error) {
-	if !u.hasCrendentials() {
-		return nil, errors.New("Invalid User Entity")
-	}
-
-	return &UserHeader{
-		ID:       u.ID.String(),
-		Name:     u.Name,
-		Email:    u.Email,
-		Token:    u.Token,
-		PublicID: u.PublicID,
-	}, nil
 }
 
 // hasCrendentials returns true/false if authentication required fields are

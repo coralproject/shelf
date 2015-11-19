@@ -4,33 +4,36 @@ import (
 	"strings"
 
 	"github.com/coralproject/shelf/cli/user/db"
-	"github.com/coralproject/shelf/log"
-	"github.com/coralproject/shelf/mongo"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/spf13/cobra"
 )
 
 var delLong = `Deletes a user record from the system using any of the supplied keys.
-When deleting a record from the system, atleast one of the key points must be supplied, that is either the email(-e), the name(-n) or public id(-p). Each flag is checked in the order of important, where
+When deleting a record from the system, atleast one of the key points must be supplied,
+that is either the email(-e), the name(-n) or public id(-p).
+
+Each flag's presence and use is based on the order of importance:
 
 	'public_id' is first importance.
 	'email' is second in importance.
 	'name' is the third and last in importance.
 
-If all are supplied, the highest flag with the most importance gets used.
+If all are supplied, the highest flag with the most priority gets used.
 
 Example:
 
 	1. To delete a user using it's name:
 
-		user get -n "Alex Boulder"
+		user delete -n "Alex Boulder"
 
 	2. To delete a user using it's email address:
 
-		user get -e alex.boulder@gmail.com
+		user delete -e alex.boulder@gmail.com
 
 	3. To delete a user using it's public id number:
 
-		user get -p 199550d7-484d-4440-801f-390d44911ade
+		user delete -p 199550d7-484d-4440-801f-390d44911ade
 `
 
 // del contains the state for this command.
@@ -59,7 +62,9 @@ func addDel() {
 // runDel is the code that implements the delete command.
 func runDel(cmd *cobra.Command, args []string) {
 	if del.name == "" && del.pid == "" && del.email == "" {
-		cmd.Println("\n\tAtleast one key flag must be supplied. Use either -name(-n), -email(-e) or -public_id(-p) to delete the desired record.")
+		// cmd.Println("\n\tError: Atleast one key flag must be supplied. Use either -name(-n), -email(-e) or -public_id(-p) to delete the desired record.")
+		cmd.Help()
+		return
 	}
 
 	if del.email != "" {
@@ -67,7 +72,7 @@ func runDel(cmd *cobra.Command, args []string) {
 		// have a valid expectation pattern,we can skip alot of the mess.
 		// TODO: should we use something more robust?
 		if !strings.Contains(del.email, "@") {
-			cmd.Println("\n\tEmail address must be a valid addresss. Please supply a correct email address.")
+			cmd.Println("\n\tError: Email address must be a valid addresss. Please supply a correct email address.")
 			return
 		}
 	}
