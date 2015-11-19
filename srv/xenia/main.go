@@ -7,8 +7,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/srv/xenia/routes"
 )
 

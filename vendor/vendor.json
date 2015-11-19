@@ -1,7 +1,12 @@
 {
-	"comment": "govendor remove +v && govendor add +e",
+	"comment": "govendor remove +v \u0026\u0026 govendor add +e",
 	"ignore": "",
 	"package": [
+		{
+			"path": "github.com/astaxie/beego/validation",
+			"revision": "a89f14d80dab442927bdc11d641aa1250ab8ad71",
+			"revisionTime": "2015-06-19T11:43:15+08:00"
+		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
 			"revision": "71acacd42f85e5e82f70a55327789582a5200a90",

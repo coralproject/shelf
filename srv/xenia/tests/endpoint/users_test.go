@@ -8,13 +8,13 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"gopkg.in/mgo.v2/bson"
-
-	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/srv/xenia/app"
 	"github.com/coralproject/shelf/srv/xenia/models"
 	"github.com/coralproject/shelf/srv/xenia/routes"
 	"github.com/coralproject/shelf/srv/xenia/tests"
+
+	"gopkg.in/mgo.v2/bson"
 )
 
 var u = models.User{

@@ -9,8 +9,8 @@ import (
 	"os"
 	"testing"
 
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 // Succeed is the Unicode codepoint for a check mark.
