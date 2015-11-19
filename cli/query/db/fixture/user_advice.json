@@ -1,0 +1,23 @@
+{
+    "name": "user_advice",
+    "test" : {
+        "collection" : "user_transactions",
+        "queries" : [
+            "{ \"$match\" : { \"user_id\" : \"#userId#\", \"category\" : \"gas\" }}",
+            "{ \"$group\" : { \"_id\" : { \"category\" : \"$category\" }, \"amount\" : { \"$sum\" : \"$amount\" }}}",
+            "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00}}}"
+        ]
+    },
+    "passed" : {
+        "collection" : "advice",
+        "queries" : [
+            "{ \"$match\" : { \"advice_id\" : 1 }}"
+        ]
+    },
+    "failed" : {
+        "collection" : "advice",
+        "queries" : [
+            "{ \"$match\" : { \"advice_id\" : 2 }}"
+        ]
+    }
+}

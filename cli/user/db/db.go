@@ -66,6 +66,18 @@ func NewUser(name, email, password string) (*User, error) {
 	return &user, nil
 }
 
+// Compare compares two distinct records basic Fields(Name,Email,PublicID),
+// and returns an error if they don't have matching field values.
+func (u *User) Compare(user *User) error {
+	if u.Name != user.Name {
+		return errors.New("Names is not a match")
+	}
+	if u.Email != user.Email {
+		return errors.New("Email is not a match")
+	}
+	return nil
+}
+
 // Salt returns the user's password salt.
 func (u *User) Salt() ([]byte, error) {
 	if !u.hasCrendentials() {
@@ -397,5 +409,23 @@ func Delete(u *User) error {
 	}
 
 	log.Dev(u.PublicID, "Delete", "Completed : Delete User")
+	return nil
+}
+
+// CompareAll compares two distinct records using all their fields,
+// and returns an error if they don't have matching field values.
+func CompareAll(u *User, user *User) error {
+	if err := u.Compare(user); err != nil {
+		return err
+	}
+	if u.PublicID != user.PublicID {
+		return errors.New("PublicID is not a match")
+	}
+	if u.PrivateID != user.PrivateID {
+		return errors.New("PrivateID is not a match")
+	}
+	if u.Password != user.Password {
+		return errors.New("Password is not a match")
+	}
 	return nil
 }
