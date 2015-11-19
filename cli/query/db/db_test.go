@@ -91,7 +91,7 @@ func queryLoadFile(q *Query, t *testing.T) {
 func queryCreate(q *Query, t *testing.T) {
 	t.Log("Given the need to save a query into the database")
 	{
-		t.Log("When giving a query object to save")
+		t.Log("\tWhen giving a query object to save")
 		{
 			err := Create(q)
 			if err != nil {
@@ -107,7 +107,7 @@ func queryCreate(q *Query, t *testing.T) {
 func queryGetByName(name string, q *Query, t *testing.T) {
 	t.Log("Given the need to retrieve a query from the database")
 	{
-		t.Log("When giving a query record's name")
+		t.Log("\tWhen giving a query record's name")
 		{
 			query, err := GetByName(name)
 			if err != nil {
@@ -130,7 +130,7 @@ func queryGetByName(name string, q *Query, t *testing.T) {
 func queryGetByID(id string, q *Query, t *testing.T) {
 	t.Log("Given the need to retrieve a query from the database")
 	{
-		t.Log("When giving a query record's ID")
+		t.Log("\tWhen giving a query record's ID")
 		{
 			query, err := GetByID(id)
 			if err != nil {
@@ -153,7 +153,7 @@ func queryGetByID(id string, q *Query, t *testing.T) {
 func queryUpdate(q *Query, t *testing.T) {
 	t.Log("Given the need to update a query record in the database")
 	{
-		t.Log("When giving an updated query")
+		t.Log("\tWhen giving an updated query")
 		{
 
 			queryUpdate := []string{
@@ -165,15 +165,15 @@ func queryUpdate(q *Query, t *testing.T) {
 			q.Test.Queries = queryUpdate
 
 			if err := Update(q); err != nil {
-				t.Errorf("Should update query record in db successfully %s", tests.Failed)
+				t.Errorf("\t\tShould update query record in db successfully %s", tests.Failed)
 			} else {
-				t.Logf("Should update query record in db successfully %s", tests.Success)
+				t.Logf("\t\tShould update query record in db successfully %s", tests.Success)
 
 				updatedQuery, err := GetByName(q.Name)
 				if err != nil {
-					t.Errorf("Should retrieve updated record from the db successfully %s", tests.Failed)
+					t.Errorf("\t\tShould retrieve updated record from the db successfully %s", tests.Failed)
 				} else {
-					t.Logf("Should retrieve updated record from the db successfully %s", tests.Success)
+					t.Logf("\t\tShould retrieve updated record from the db successfully %s", tests.Success)
 
 					if err := q.Compare(updatedQuery); err != nil {
 						t.Errorf("\t\tShould have query matching the query from the database %s", tests.Failed)
@@ -191,18 +191,18 @@ func queryUpdate(q *Query, t *testing.T) {
 func queryDelete(q *Query, t *testing.T) {
 	t.Log("Given the need to remove a query record in the database")
 	{
-		t.Log("When giving an query")
+		t.Log("\tWhen giving an query")
 		{
 			if err := Delete(q); err != nil {
-				t.Errorf("Should update query record in db successfully %s", tests.Failed)
+				t.Errorf("\t\tShould update query record in db successfully %s", tests.Failed)
 			} else {
-				t.Logf("Should update query record in db successfully %s", tests.Success)
+				t.Logf("\t\tShould update query record in db successfully %s", tests.Success)
 
 				_, err := GetByName(q.Name)
 				if err == nil {
-					t.Errorf("Should not successfully retrieve deleted record from the db %s", tests.Failed)
+					t.Errorf("\t\tShould not successfully retrieve deleted record from the db %s", tests.Failed)
 				} else {
-					t.Logf("Should not successfully retrieve deleted record from the db %s", tests.Success)
+					t.Logf("\t\tShould not successfully retrieve deleted record from the db %s", tests.Success)
 				}
 			}
 
