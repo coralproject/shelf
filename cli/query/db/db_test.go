@@ -39,29 +39,29 @@ func queryLoadFile(q *Query, t *testing.T) {
 			err := q.LoadFile(qFile)
 
 			if err != nil {
-				t.Errorf("\t\tShould load File[%s] without error %s", qFile, tests.Failed)
+				t.Errorf("\t\tShould load File[%q] without error %s", qFile, tests.Failed)
 			} else {
-				t.Logf("\t\tShould load File[%s] without error %s", qFile, tests.Success)
+				t.Logf("\t\tShould load File[%q] without error %s", qFile, tests.Success)
 
 				qName := "user_advice"
 				if q.Name != qName {
-					t.Errorf("\t\tShould have name[%s] for loaded query %s", qName, tests.Failed)
+					t.Errorf("\t\tShould have name[%q] for loaded query %s", qName, tests.Failed)
 				} else {
-					t.Logf("\t\tShould have name[%s] for loaded query %s", qName, tests.Success)
+					t.Logf("\t\tShould have name[%q] for loaded query %s", qName, tests.Success)
 				}
 
 				qTestCollection := "user_transactions"
 				if q.Test.Collection != qTestCollection {
-					t.Errorf("\t\tShould have name[%s] for loaded query.Test expression collection %s", qTestCollection, tests.Failed)
+					t.Errorf("\t\tShould have name[%q] for loaded query.Test expression collection %s", qTestCollection, tests.Failed)
 				} else {
-					t.Logf("\t\tShould have name[%s] for loaded query.Test expression collection %s", qTestCollection, tests.Success)
+					t.Logf("\t\tShould have name[%q] for loaded query.Test expression collection %s", qTestCollection, tests.Success)
 				}
 
 				qResultCollection := "advice"
 				if q.Failed.Collection != qResultCollection || q.Passed.Collection != qResultCollection {
-					t.Errorf("\t\tShould have name[%s] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Failed)
+					t.Errorf("\t\tShould have name[%q] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Failed)
 				} else {
-					t.Logf("\t\tShould have name[%s] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Success)
+					t.Logf("\t\tShould have name[%q] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Success)
 				}
 
 				if len(q.Test.Queries) != 3 {

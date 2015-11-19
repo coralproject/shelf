@@ -1,5 +1,4 @@
 {
-    "name": "user_advice",
     "test" : {
         "collection" : "user_transactions",
         "queries" : [

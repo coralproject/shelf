@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"errors"
 	"os"
+	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/coralproject/shelf/pkg/log"
@@ -114,6 +116,12 @@ func (q *Query) LoadFile(file string) error {
 	if err := json.NewDecoder(inputFile).Decode(q); err != nil {
 		log.Error("Query", "LoadFile", err, "Completed : Query : LoadFile : File[%s]", file)
 		return err
+	}
+
+	if q.Name == "" {
+		_, fileName := filepath.Split(file)
+		ext := filepath.Ext(fileName)
+		q.Name = strings.Replace(fileName, ext, "", -1)
 	}
 
 	log.Dev("Query", "LoadFile", "Completed : Query : LoadFile : File[%s]", file)
