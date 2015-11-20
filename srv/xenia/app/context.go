@@ -13,6 +13,7 @@ import (
 	"net/http"
 
 	"github.com/coralproject/shelf/pkg/log"
+
 	"gopkg.in/mgo.v2"
 )
 

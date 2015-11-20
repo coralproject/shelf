@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/coralproject/shelf/cli/user/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/spf13/cobra"
 )
 
@@ -37,19 +37,18 @@ var auth struct {
 
 // addAuth handles the authentication of user credentails.
 func addAuth() {
-
-	auther := &cobra.Command{
+	cmd := &cobra.Command{
 		Use:   "auth",
 		Short: "Authenticates user credentails",
 		Long:  authLong,
 		Run:   runAuth,
 	}
 
-	auther.Flags().StringVarP(&auth.utype, "type", "t", "", "sets authentication type")
-	auther.Flags().StringVarP(&auth.key, "key", "k", "", "sets the key(email|publicId) of the user")
-	auther.Flags().StringVarP(&auth.pass, "pass", "p", "", "sets the Pass(password|token) of the user")
+	cmd.Flags().StringVarP(&auth.utype, "type", "t", "", "sets authentication type")
+	cmd.Flags().StringVarP(&auth.key, "key", "k", "", "sets the key(email|publicId) of the user")
+	cmd.Flags().StringVarP(&auth.pass, "pass", "p", "", "sets the Pass(password|token) of the user")
 
-	rootCmd.AddCommand(auther)
+	rootCmd.AddCommand(cmd)
 }
 
 // runAuth provides the operation logic for the auth command.
@@ -102,44 +101,46 @@ func runAuth(cmd *cobra.Command, args []string) {
 	// Initialize the mongodb session.
 	mongo.InitMGO()
 
-	var authenticateToken = func() {
-		log.Dev("commands", "runAuth", "Public Id[%s]", auth.key)
-
-		user, err := db.GetUserByPublicID(auth.key)
-		if err != nil {
-			log.Error("commands", "runAuth", err, "Completed")
-			return
-		}
-
-		if !user.IsTokenValid(auth.pass) {
-			log.Error("commands", "runAuth", errors.New("Invalid Token"), "Completed")
-			return
-		}
-
-		log.Dev("commands", "runAuth", "Auth: 200 Ok!")
-	}
-
-	var authenticatePassword = func() {
-		log.Dev("commands", "runAuth", "Email[%s]", auth.key)
-
-		user, err := db.GetUserByEmail(auth.key)
-		if err != nil {
-			log.Error("commands", "runAuth", err, "Completed")
-			return
-		}
-
-		if !user.IsPasswordValid(auth.pass) {
-			log.Error("commands", "runAuth", errors.New("Invalid Password"), "Completed")
-			return
-		}
-
-		log.Dev("commands", "runAuth", "Auth: 200 Ok!")
-	}
-
 	switch auth.utype {
 	case "auth":
-		authenticateToken()
+		authToken()
 	case "password":
-		authenticatePassword()
+		authPassword()
 	}
+}
+
+// authToken checks the token against the database.
+func authToken() {
+	log.Dev("commands", "runAuth", "Public Id[%s]", auth.key)
+
+	user, err := db.GetUserByPublicID(auth.key)
+	if err != nil {
+		log.Error("commands", "runAuth", err, "Completed")
+		return
+	}
+
+	if !user.IsTokenValid(auth.pass) {
+		log.Error("commands", "runAuth", errors.New("Invalid Token"), "Completed")
+		return
+	}
+
+	log.Dev("commands", "runAuth", "Auth: 200 Ok!")
+}
+
+// authPassword checks the password against the database.
+func authPassword() {
+	log.Dev("commands", "runAuth", "Email[%s]", auth.key)
+
+	user, err := db.GetUserByEmail(auth.key)
+	if err != nil {
+		log.Error("commands", "runAuth", err, "Completed")
+		return
+	}
+
+	if !user.IsPasswordValid(auth.pass) {
+		log.Error("commands", "runAuth", errors.New("Invalid Password"), "Completed")
+		return
+	}
+
+	log.Dev("commands", "runAuth", "Auth: 200 Ok!")
 }

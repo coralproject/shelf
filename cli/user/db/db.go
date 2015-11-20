@@ -7,10 +7,10 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/cli/user/crypto"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
-	"github.com/pborman/uuid"
 
+	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

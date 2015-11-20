@@ -4,8 +4,8 @@ import (
 	"strings"
 
 	"github.com/coralproject/shelf/cli/user/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/spf13/cobra"
 )
 
