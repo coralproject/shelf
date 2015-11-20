@@ -1,7 +1,7 @@
 package commands
 
 import (
-	"encoding/json"
+	"fmt"
 	"strings"
 
 	"github.com/coralproject/shelf/cli/user/db"
@@ -89,13 +89,16 @@ func runGet(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		_, err = json.MarshalIndent(user, "", "\n")
-		if err != nil {
-			log.Error("commands", "runGet", err, "Completed")
-			return
-		}
-
-		// TODO: What are you doing with doc
+		fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.pid, user.Name, user.Email, user.Token, user.PublicID, user.PrivateID, user.CreatedAt.String(), user.ModifiedAt.String())
 
 		return
 	}
@@ -108,13 +111,16 @@ func runGet(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		_, err = json.MarshalIndent(user, "", "\n")
-		if err != nil {
-			log.Error("commands", "runGet", err, "Completed")
-			return
-		}
-
-		// TODO: What are you doing with doc
+		fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.email, user.Name, user.Email, user.Token, user.PublicID, user.PrivateID, user.CreatedAt.String(), user.ModifiedAt.String())
 
 		return
 	}
@@ -126,13 +132,23 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	_, err = json.MarshalIndent(user, "", "\n")
-	if err != nil {
-		log.Error("GetUser", "runGet", err, "Completed")
-		return
-	}
+	// _, err = json.MarshalIndent(user, "", "\n")
+	// if err != nil {
+	// 	log.Error("GetUser", "runGet", err, "Completed")
+	// 	return
+	// }
 
 	// TODO: What are you doing with doc
+	fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.name, user.Name, user.Email, user.Token, user.PublicID, user.PrivateID, user.CreatedAt.String(), user.ModifiedAt.String())
 
 	return
 }

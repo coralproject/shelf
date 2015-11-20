@@ -49,8 +49,6 @@ type Query struct {
 	ID         bson.ObjectId `bson:"id" json:"id,omitempty"`
 	Name       string        `bson:"name" json:"name"`
 	Test       *Expression   `bson:"test" json:"test"`
-	Failed     *Expression   `bon:"failed" json:"failed"`
-	Passed     *Expression   `bson:"passed" json:"passed"`
 	CreatedAt  *time.Time    `bson:"created_at" json:"created_at,omitempty"`
 	ModifiedAt *time.Time    `bson:"modified_at" json:"modified_at,omitempty"`
 }
@@ -88,14 +86,6 @@ func (q *Query) Compare(qu *Query) error {
 	}
 
 	if err := q.Test.Compare(qu.Test); err != nil {
-		return err
-	}
-
-	if err := q.Passed.Compare(qu.Passed); err != nil {
-		return err
-	}
-
-	if err := q.Failed.Compare(qu.Failed); err != nil {
 		return err
 	}
 
@@ -224,14 +214,6 @@ func Update(q *Query) error {
 			"collection": q.Test.Collection,
 			"queries":    q.Test.Queries,
 		},
-		"passed": bson.M{
-			"collection": q.Passed.Collection,
-			"queries":    q.Passed.Queries,
-		},
-		"failed": bson.M{
-			"collection": q.Failed.Collection,
-			"queries":    q.Failed.Queries,
-		},
 		"modified_at": &ms,
 	}
 
@@ -299,8 +281,6 @@ func Execute(q *Query, params map[string]string) ([]bson.M, error) {
 
 	// Replace all special variables in Query.
 	mapAttributesInExpression(q.Test, params)
-	mapAttributesInExpression(q.Passed, params)
-	mapAttributesInExpression(q.Failed, params)
 
 	// Convert all queries into bson.M objects.
 	tests, err := mapExpressionToBSON(q.Test)
@@ -311,42 +291,12 @@ func Execute(q *Query, params map[string]string) ([]bson.M, error) {
 		return nil, err
 	}
 
-	failed, err := mapExpressionToBSON(q.Test)
-	log.Error(q.Name, "Execute", err, "Started : Query : MapExpression To BSON[query.Failed]")
-	if err != nil {
-		log.Error(q.Name, "Execute", err, "Completed : Query : MapExpression To BSON[query.Failed]")
-		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
-		return nil, err
-	}
-
-	passed, err := mapExpressionToBSON(q.Passed)
-	log.Error(q.Name, "Execute", err, "Started : Query : MapExpression To BSON[query.Passed]")
-	if err != nil {
-		log.Error(q.Name, "Execute", err, "Completed : Query : MapExpression To BSON[query.Passed]")
-		log.Error(q.Name, "Execute", err, "Completed : Query : Execute Query")
-		return nil, err
-	}
-
 	var executeQuery = func(c *mgo.Collection) error {
 		defer log.Dev(q.Name, "Execute", "Completed : Query : MongoDb.DB().C().Pipe()")
 
-		var result []bson.M
-
 		// Execute the query.Test query.
-		if err := c.Pipe(tests).All(&result); err != nil {
+		if err := c.Pipe(tests).All(&res); err != nil {
 			return err
-		}
-
-		// Execute the query.Passed query if the result was not empty or
-		// executes the query.Failed query.
-		if len(result) > 0 {
-			if err := c.Pipe(passed).All(&res); err != nil {
-				return err
-			}
-		} else {
-			if err := c.Pipe(failed).All(&res); err != nil {
-				return err
-			}
 		}
 
 		return nil

@@ -7,16 +7,4 @@
             "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00}}}"
         ]
     },
-    "passed" : {
-        "collection" : "advice",
-        "queries" : [
-            "{ \"$match\" : { \"advice_id\" : 1 }}"
-        ]
-    },
-    "failed" : {
-        "collection" : "advice",
-        "queries" : [
-            "{ \"$match\" : { \"advice_id\" : 2 }}"
-        ]
-    }
 }
