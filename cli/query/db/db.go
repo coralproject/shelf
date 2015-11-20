@@ -207,16 +207,39 @@ func GetByName(name string) (*Query, error) {
 // Returns a non-nil error if the operation fails.
 func Create(q *Query) error {
 	log.Dev(q.Name, "Create", "Started : Query : Create Query")
-	session := mongo.GetSession()
-	defer session.Close()
 
-	var createQuery = func(c *mgo.Collection) error {
+	log.Dev(q.Name, "Create", "Started : Check Query Exists : Query ")
+
+	f := func(col *mgo.Collection) error {
+		count, err := col.Find(bson.M{"name": q.Name}).Count()
+		if err != nil {
+			return err
+		}
+
+		if count > 0 {
+			return errors.New("Query Already Exists")
+		}
+
+		return nil
+	}
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	if err := mongo.ExecuteDB("CONTEXT", ses, QueryCollection, f); err != nil {
+		log.Error(q.Name, "Create", err, "Completed : Check Query Exists : Query")
+		return err
+	}
+
+	log.Dev(q.Name, "Create", "Completed : Check Query Exists : Query")
+
+	createQuery := func(c *mgo.Collection) error {
 		log.Dev(q.Name, "Create", "Complete : Query : MongoDb.Insert()")
 		return c.Insert(q)
 	}
 
 	log.Dev(q.Name, "Create", "Started : Query : MongoDb.Insert()")
-	err := mongo.ExecuteDB("CONTEXT", session, QueryCollection, createQuery)
+	err := mongo.ExecuteDB("CONTEXT", ses, QueryCollection, createQuery)
 	if err != nil {
 		log.Error(q.Name, "Create", err, "Completed : Query : Create Query")
 		return err
