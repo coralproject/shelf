@@ -10,8 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
