@@ -1,12 +1,6 @@
-package commands
+package cmdquery
 
 import (
-	"bytes"
-	"encoding/json"
-
-	"github.com/coralproject/shelf/cli/shelf/pkg/query/db"
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -39,42 +33,9 @@ func addExecute() {
 	cmd.Flags().StringVarP(&execute.name, "name", "n", "", "name of query in db")
 	cmd.Flags().StringVarP(&execute.params, "params", "p", "", "parameter map for query")
 
-	rootCmd.AddCommand(cmd)
+	queryCmd.AddCommand(cmd)
 }
 
 // runExecute is the code that implements the execute command.
 func runExecute(cmd *cobra.Command, args []string) {
-	if execute.name == "" {
-		cmd.Help()
-		return
-	}
-
-	q, err := db.GetByName(execute.name)
-	if err != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
-
-	// Convert paramter into map
-	params := map[string]string{}
-
-	if execute.params != "" && execute.params != "{}" {
-		err = json.NewDecoder(bytes.NewBufferString(execute.params)).Decode(&params)
-		if err != nil {
-			log.Error("commands", "runCreate", err, "Completed")
-			return
-		}
-	}
-
-	// Initialize the mongodb session.
-	mongo.InitMGO()
-
-	result, err := db.Execute(q, params)
-	if err != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
-
-	_ = result
-
 }

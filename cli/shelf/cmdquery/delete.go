@@ -1,9 +1,6 @@
-package commands
+package cmdquery
 
 import (
-	"github.com/coralproject/shelf/cli/shelf/pkg/query/db"
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -30,25 +27,9 @@ func addDel() {
 
 	cmd.Flags().StringVarP(&delete.name, "name", "n", "", "name of the user record")
 
-	rootCmd.AddCommand(cmd)
+	queryCmd.AddCommand(cmd)
 }
 
 // runDelete is the code that implements the delete command.
 func runDelete(cmd *cobra.Command, args []string) {
-	if delete.name == "" {
-		cmd.Help()
-		return
-	}
-
-	// Initialize the mongodb session.
-	mongo.InitMGO()
-
-	log.Dev("commands", "runGet", "Name[%s]", delete.name)
-	err := db.DeleteByName(delete.name)
-	if err != nil {
-		log.Error("commands", "runGet", err, "Completed")
-		return
-	}
-
-	return
 }

@@ -1,9 +1,6 @@
-package commands
+package cmdquery
 
 import (
-	"github.com/coralproject/shelf/cli/shelf/pkg/query/db"
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -35,36 +32,9 @@ func addUpd() {
 	cmd.Flags().StringVarP(&update.name, "name", "n", "", "name of query record")
 	cmd.Flags().StringVarP(&update.file, "file", "f", "", "file path of query json file")
 
-	rootCmd.AddCommand(cmd)
+	queryCmd.AddCommand(cmd)
 }
 
 // runUpdate is the code that implements the create command.
 func runUpdate(cmd *cobra.Command, args []string) {
-	if update.name == "" {
-		cmd.Help()
-		return
-	}
-
-	q, err := db.GetByName(update.name)
-	if err != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
-
-	if err := q.LoadFile(update.file); err != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
-
-	// Safeguard the name of the record.
-	q.Name = update.name
-
-	// Initialize the mongodb session.
-	mongo.InitMGO()
-
-	err2 := db.Update(q)
-	if err2 != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
 }

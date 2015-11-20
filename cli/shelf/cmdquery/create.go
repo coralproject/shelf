@@ -1,9 +1,6 @@
-package commands
+package cmdquery
 
 import (
-	"github.com/coralproject/shelf/cli/shelf/pkg/query/db"
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -35,28 +32,9 @@ func addCreate() {
 
 	cmd.Flags().StringVarP(&create.file, "file", "f", "", "file path of query json file")
 
-	rootCmd.AddCommand(cmd)
+	queryCmd.AddCommand(cmd)
 }
 
 // runCreate is the code that implements the create command.
 func runCreate(cmd *cobra.Command, args []string) {
-	if create.file == "" {
-		cmd.Help()
-		return
-	}
-
-	q, err := db.QueryFromFile(create.file)
-	if err != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
-
-	// Initialize the mongodb session.
-	mongo.InitMGO()
-
-	err2 := db.Create(q)
-	if err2 != nil {
-		log.Error("commands", "runCreate", err, "Completed")
-		return
-	}
 }
