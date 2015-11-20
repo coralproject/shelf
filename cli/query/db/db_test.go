@@ -80,6 +80,23 @@ func queryCreate(q *Query, t *testing.T) {
 				t.Logf("\t\tShould save query into the database %s", tests.Success)
 			}
 		}
+
+		t.Log("\tWhen query record has been saved and we need to validate")
+		{
+			query, err := GetByName(q.Name)
+			if err != nil {
+				t.Errorf("\t\tShould get query from the database with the Name[%q] %s", q.Name, tests.Failed)
+			} else {
+				t.Logf("\t\tShould save query from the database with the Name[%q] %s", q.Name, tests.Success)
+
+				if err := q.Compare(query); err != nil {
+					t.Errorf("\t\tShould have query matching the query from the database %s", tests.Failed)
+				} else {
+					t.Logf("\t\tShould have query matching the query from the database %s", tests.Success)
+				}
+			}
+
+		}
 	}
 }
 
