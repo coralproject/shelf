@@ -5,7 +5,7 @@ package main
 import (
 	"os"
 
-	"github.com/coralproject/shelf/cli/query/commands"
+	"github.com/coralproject/shelf/cli/shelf/pkg/query/commands"
 	"github.com/coralproject/shelf/pkg/log"
 )
 

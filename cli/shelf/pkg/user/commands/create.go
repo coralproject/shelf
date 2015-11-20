@@ -3,7 +3,7 @@ package commands
 import (
 	"strings"
 
-	"github.com/coralproject/shelf/cli/user/db"
+	"github.com/coralproject/shelf/cli/shelf/pkg/user/db"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"

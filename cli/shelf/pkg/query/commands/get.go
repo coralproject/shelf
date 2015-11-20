@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/coralproject/shelf/cli/query/db"
+	"github.com/coralproject/shelf/cli/shelf/pkg/query/db"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"

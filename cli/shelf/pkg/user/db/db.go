@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coralproject/shelf/cli/user/crypto"
+	"github.com/coralproject/shelf/cli/shelf/pkg/user/crypto"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 

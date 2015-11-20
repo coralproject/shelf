@@ -8,12 +8,17 @@ var rootCmd = &cobra.Command{
 	Short: "user provides a shelf CLI for managing user records.",
 }
 
-// Run will process the command line arguments for the application.
-func Run() {
+// GetCommand returns the user root commander.
+func GetCommand() *cobra.Command {
 	addAuth()
 	addCreate()
 	addGet()
 	addUpd()
 	addDel()
-	rootCmd.Execute()
+	return rootCmd
+}
+
+// Run will process the command line arguments for the application.
+func Run() {
+	GetCommand().Execute()
 }
