@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,18 +114,35 @@ func (q *Query) LoadFile(file string) error {
 
 	defer inputFile.Close()
 
-	if err := json.NewDecoder(inputFile).Decode(q); err != nil {
+	_, fileName := filepath.Split(file)
+	ext := filepath.Ext(fileName)
+	qName := strings.Replace(fileName, ext, "", -1)
+
+	if err := q.LoadReader(inputFile, qName); err != nil {
 		log.Error("Query", "LoadFile", err, "Completed : Query : LoadFile : File[%s]", file)
 		return err
 	}
 
-	if q.Name == "" {
-		_, fileName := filepath.Split(file)
-		ext := filepath.Ext(fileName)
-		q.Name = strings.Replace(fileName, ext, "", -1)
+	log.Dev("Query", "LoadFile", "Completed : Query : LoadFile : File[%s]", file)
+	return nil
+}
+
+// LoadReader loads the query structure from a giving io.Reader. It expects
+// the file to be a json document.
+// Returns a non-nil error if the operation fails.
+func (q *Query) LoadReader(rd io.Reader, name ...string) error {
+	log.Dev("Query", "LoadReader", "Started : Query : Load io.Reader")
+
+	if err := json.NewDecoder(rd).Decode(q); err != nil {
+		log.Error("Query", "LoadReader", err, "Completed : Query : Load io.Reader")
+		return err
 	}
 
-	log.Dev("Query", "LoadFile", "Completed : Query : LoadFile : File[%s]", file)
+	if q.Name == "" && len(name) > 0 {
+		q.Name = name[0]
+	}
+
+	log.Dev("Query", "LoadReader", "Completed : Query : Load io.Reader")
 	return nil
 }
 

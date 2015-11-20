@@ -2,10 +2,10 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
+	"github.com/ArdanStudios/aggserver/auth/crypto"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 
@@ -218,7 +218,7 @@ func UpdatePassword(u *User, existingPassword, newPassword string) error {
 		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate New User Password %s : Error %s", mongo.Query(newPassword), "Invalid Password")
 		return errors.New("Invalid Password")
 	}
-	log.Dev(u.PublicID, "UpdatePassword", "Compeleted : Validate New User Password %s : Success", mongo.Query(newPassword))
+	log.Dev(u.PublicID, "UpdatePassword", "Completed : Validate New User Password %s : Success", mongo.Query(newPassword))
 
 	ms := time.Now().UTC()
 	u.ModifiedAt = &ms
