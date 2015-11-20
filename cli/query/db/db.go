@@ -28,6 +28,10 @@ type Expression struct {
 // Compare compares the fields of one expression against itself. Returns a non-nil
 // error if any did not matche.
 func (e *Expression) Compare(eu *Expression) error {
+	if eu == nil {
+		return errors.New("Invalid Compare Type")
+	}
+
 	if e.Collection != eu.Collection {
 		return errors.New("Collection is not a match")
 	}
@@ -81,6 +85,10 @@ func NewQuery(name string) *Query {
 // Compare compares the fields of one query against itself. Returns a non-nil
 // error if any did not matche.
 func (q *Query) Compare(qu *Query) error {
+	if qu == nil {
+		return errors.New("Invalid Compare Type")
+	}
+
 	if q.Name != qu.Name {
 		return errors.New("Name is not a match")
 	}

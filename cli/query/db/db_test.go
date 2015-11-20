@@ -39,7 +39,7 @@ func queryLoadFile(q *Query, t *testing.T) {
 			err := q.LoadFile(qFile)
 
 			if err != nil {
-				t.Errorf("\t\tShould load File[%q] without error %s", qFile, tests.Failed)
+				t.Fatalf("\t\tShould load File[%q] without error %s", qFile, tests.Failed)
 			} else {
 				t.Logf("\t\tShould load File[%q] without error %s", qFile, tests.Success)
 
@@ -57,31 +57,11 @@ func queryLoadFile(q *Query, t *testing.T) {
 					t.Logf("\t\tShould have name[%q] for loaded query.Test expression collection %s", qTestCollection, tests.Success)
 				}
 
-				qResultCollection := "advice"
-				if q.Failed.Collection != qResultCollection || q.Passed.Collection != qResultCollection {
-					t.Errorf("\t\tShould have name[%q] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Failed)
-				} else {
-					t.Logf("\t\tShould have name[%q] for both query.Passed and query.Failed expression collection %s", qResultCollection, tests.Success)
-				}
-
 				if len(q.Test.Queries) != 3 {
 					t.Errorf("\t\tShould have a length of 3 for the query.Test conditions %s", tests.Failed)
 				} else {
 					t.Logf("\t\tShould have a length of 3 for the query.Test conditions %s", tests.Success)
 				}
-
-				if len(q.Passed.Queries) != 1 {
-					t.Errorf("\t\tShould have a length of 1 for the query.Passed conditions %s", tests.Failed)
-				} else {
-					t.Logf("\t\tShould have a length of 1 for the query.Passed conditions %s", tests.Success)
-				}
-
-				if len(q.Failed.Queries) != 1 {
-					t.Errorf("\t\tShould have a length of 1 for the query.Failed conditions %s", tests.Failed)
-				} else {
-					t.Logf("\t\tShould have a length of 1 for the query.Failed conditions %s", tests.Success)
-				}
-
 			}
 		}
 	}

@@ -6,5 +6,5 @@
             "{ \"$group\" : { \"_id\" : { \"category\" : \"$category\" }, \"amount\" : { \"$sum\" : \"$amount\" }}}",
             "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00}}}"
         ]
-    },
+    }
 }
