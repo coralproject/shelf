@@ -60,7 +60,8 @@ func runGet(cmd *cobra.Command, args []string) {
 	}
 
 	// TODO: What are you doing with doc
-	fmt.Printf(`Result of Query(%s):
+	fmt.Printf(`
+Result of Query(%s):
 	%s
 `, get.name, string(res))
 
