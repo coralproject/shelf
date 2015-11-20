@@ -5,6 +5,7 @@ package main
 import (
 	"os"
 
+	"github.com/coralproject/shelf/cli/shelf/cmddb"
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
 	"github.com/coralproject/shelf/cli/shelf/cmduser"
 	"github.com/coralproject/shelf/pkg/log"
@@ -19,6 +20,6 @@ var shelf = &cobra.Command{
 func main() {
 	log.Init(os.Stderr, func() int { return log.DEV })
 
-	shelf.AddCommand(cmduser.GetCommands(), cmdquery.GetCommands())
+	shelf.AddCommand(cmduser.GetCommands(), cmdquery.GetCommands(), cmddb.GetCommands())
 	shelf.Execute()
 }
