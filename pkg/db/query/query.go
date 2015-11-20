@@ -31,11 +31,6 @@ type Rule struct {
 	Scripts       []string      `bson:"scripts" json:"scripts"`                                   // Scripts to process for the rule.
 }
 
-// RuleGroup contains a set of rules.
-type RuleGroup struct {
-	Rules []Rule `bson:"rules" json:"rules"` // Collection of Rules for the Rule Group.
-}
-
 // RuleSetParam contains meta-data about a required parameter for the rule.
 type RuleSetParam struct {
 	Name    string `bson:"name" json:"name"`       // Name of the parameter.
@@ -45,11 +40,11 @@ type RuleSetParam struct {
 
 // RuleSet contains the configuration details for a rule set.
 type RuleSet struct {
-	Name        string         `bson:"name" json:"name"`               // Name of the RuleSet.
-	Description string         `bson:"desc" json:"desc"`               // Description of the RuleSet.
-	Enabled     bool           `bson:"enabled" json:"enabled"`         // If the RuleSet is enabled to run.
-	Params      []RuleSetParam `bson:"params" json:"params"`           // Collection of parameters.
-	Groups      []RuleGroup    `bson:"rule_groups" json:"rule_groups"` // Collection of RuleGroups.
+	Name        string         `bson:"name" json:"name"`       // Name of the RuleSet.
+	Description string         `bson:"desc" json:"desc"`       // Description of the RuleSet.
+	Enabled     bool           `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
+	Params      []RuleSetParam `bson:"params" json:"params"`   // Collection of parameters.
+	Rules       []Rule         `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
 }
 
 // Result contains the result of an ruleset execution.
