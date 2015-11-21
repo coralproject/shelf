@@ -18,19 +18,20 @@ var m struct {
 	ses    *mgo.Session
 }
 
-// InitMGO sets up the MongoDB environment.
-func InitMGO(hostKey, authDBKey, userKey, passKey, dbKey string) error {
+// InitMGO sets up the MongoDB environment. This expects that the
+// cfg package has been initialized first.
+func InitMGO() error {
 	if m.ses != nil {
 		return errors.New("Mongo environment already initialized")
 	}
 
 	// We need this object to establish a session to our MongoDB.
 	mongoDBDialInfo := mgo.DialInfo{
-		Addrs:    []string{cfg.MustString(hostKey)},
+		Addrs:    []string{cfg.MustString("MONGO_HOST")},
 		Timeout:  60 * time.Second,
-		Database: cfg.MustString(authDBKey),
-		Username: cfg.MustString(userKey),
-		Password: cfg.MustString(passKey),
+		Database: cfg.MustString("MONGO_AUTHDB"),
+		Username: cfg.MustString("MONGO_USER"),
+		Password: cfg.MustString("MONGO_PASS"),
 	}
 
 	// Create a session which maintains a pool of socket connections
@@ -41,7 +42,7 @@ func InitMGO(hostKey, authDBKey, userKey, passKey, dbKey string) error {
 	}
 
 	// Save the database name to use.
-	m.dbName = cfg.MustString(dbKey)
+	m.dbName = cfg.MustString("MONGO_DB")
 
 	// Reads may not be entirely up-to-date, but they will always see the
 	// history of changes moving forward, the data read will be consistent

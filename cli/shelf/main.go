@@ -25,7 +25,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := mongo.InitMGO("MONGO_HOST", "MONGO_AUTHDB", "MONGO_USER", "MONGO_PASS", "MONGO_DB")
+	err := mongo.InitMGO()
 	if err != nil {
 		shelf.Println("Unable to initialize MongoDB")
 		os.Exit(1)
