@@ -26,6 +26,16 @@
                         ]
                     }
                 ]
+        },
+        {
+            "name": "rule_sets",
+            "indexes":
+                [
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
+                    }
+                ]
         }
     ]
 }

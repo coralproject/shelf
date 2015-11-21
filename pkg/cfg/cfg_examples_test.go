@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/coralproject/shelf/pkg/gocfg"
+	"github.com/coralproject/shelf/pkg/cfg"
 )
 
 // ExampleDev shows how to use the config package.
@@ -13,7 +13,7 @@ func ExampleDev() {
 	// Set up some basic environment variables.
 	os.Setenv("DOCK_IP", "40.23.233.10")
 	os.Setenv("DOCK_PORT", "4044")
-	os.Setenv("DOCK_InitStamp", time.Date(2009, time.November,
+	os.Setenv("DOCK_INIT_STAMP", time.Date(2009, time.November,
 		10, 15, 0, 0, 0, time.UTC).UTC().Format(time.UnixDate))
 
 	// Init() must be called only once with the given namespace to load.
@@ -22,13 +22,13 @@ func ExampleDev() {
 	// NOTE: All keys must be in lowercase.
 
 	// To get the ip.
-	fmt.Println(cfg.MustString("ip"))
+	fmt.Println(cfg.MustString("IP"))
 
 	// To get the port number.
-	fmt.Println(cfg.MustInt("port"))
+	fmt.Println(cfg.MustInt("PORT"))
 
 	// To get the timestamp.
-	fmt.Println(cfg.MustTime("initstamp"))
+	fmt.Println(cfg.MustTime("INIT_STAMP"))
 
 	// Output:
 	// 40.23.233.10

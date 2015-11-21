@@ -1,6 +1,7 @@
 package cfg
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -16,13 +17,13 @@ var c struct {
 
 // Init is to be called only once, to load up the giving namespace if found,
 // in the environment variables. All keys will be made lowercase.
-func Init(namespace string) {
+func Init(namespace string) error {
 	c.m = make(map[string]string)
 
 	// Get the lists of available environment variables.
 	envs := os.Environ()
 	if len(envs) == 0 {
-		panic("No environment variables found")
+		return errors.New("No environment variables found")
 	}
 
 	// Create the uppercase version to meet the standard {NAMESPACE_} format.
@@ -35,13 +36,15 @@ func Init(namespace string) {
 		}
 
 		part := strings.Split(val, "=")
-		c.m[strings.ToLower(strings.TrimPrefix(part[0], uspace))] = part[1]
+		c.m[strings.ToUpper(strings.TrimPrefix(part[0], uspace))] = part[1]
 	}
 
 	// Did we find any keys for this namespace?
 	if len(c.m) == 0 {
-		panic(fmt.Sprintf("Namespace %q was not found", namespace))
+		return fmt.Errorf("Namespace %q was not found", namespace)
 	}
+
+	return nil
 }
 
 // String returns the value of the giving key as a string, else it will return
