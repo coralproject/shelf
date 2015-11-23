@@ -19,9 +19,9 @@ type VarOption struct {
 	ObjectID bool `bson:"object_id,omitempty" json:"object_id,omitempty"` // Indicates to save ObjectId values with ObjectId tag.
 }
 
-// Rule contains the configuration details for a rule.
+// Query contains the configuration details for a rule.
 // Options use a pointer so they can be excluded when not in use.
-type Rule struct {
+type Query struct {
 	Description   string        `bson:"desc,omitempty" json:"desc,omitempty"`                     // Description of this specific rule.
 	Type          string        `bson:"type" json:"type"`                                         // variable, inventory, pipeline, template
 	Continue      bool          `bson:"continue,omitempty" json:"continue,omitempty"`             // Indicates that on failure to process the next rule.
@@ -31,20 +31,20 @@ type Rule struct {
 	Scripts       []string      `bson:"scripts" json:"scripts"`                                   // Scripts to process for the rule.
 }
 
-// RuleSetParam contains meta-data about a required parameter for the rule.
-type RuleSetParam struct {
+// QuerySetParam contains meta-data about a required parameter for the rule.
+type QuerySetParam struct {
 	Name    string `bson:"name" json:"name"`       // Name of the parameter.
 	Default string `bson:"default" json:"default"` // Default value for the parameter.
 	Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
 }
 
-// RuleSet contains the configuration details for a rule set.
-type RuleSet struct {
-	Name        string         `bson:"name" json:"name"`       // Name of the RuleSet.
-	Description string         `bson:"desc" json:"desc"`       // Description of the RuleSet.
-	Enabled     bool           `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
-	Params      []RuleSetParam `bson:"params" json:"params"`   // Collection of parameters.
-	Rules       []Rule         `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
+// QuerySet contains the configuration details for a rule set.
+type QuerySet struct {
+	Name        string          `bson:"name" json:"name"`       // Name of the RuleSet.
+	Description string          `bson:"desc" json:"desc"`       // Description of the RuleSet.
+	Enabled     bool            `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
+	Params      []QuerySetParam `bson:"params" json:"params"`   // Collection of parameters.
+	Rules       []Query         `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
 }
 
 // Result contains the result of an ruleset execution.

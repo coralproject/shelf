@@ -1,6 +1,11 @@
 package cmduser
 
 import (
+	"strings"
+
+	"github.com/coralproject/shelf/pkg/db/auth"
+	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -54,4 +59,105 @@ func addUpd() {
 
 // runUpdate is the code that implements the update command.
 func runUpdate(cmd *cobra.Command, args []string) {
+	if upd.utype == "" && upd.email == "" {
+		cmd.Help()
+		return
+	}
+
+	if upd.utype == "" {
+		cmd.Println("\n\tError: type(-t) can not be empty. Please supply a name using the `-t` or `-type` flag")
+		return
+	}
+
+	if upd.email == "" {
+		cmd.Println("\n\tError: email(-e) can not be empty. Please supply a email using the `-e` or `-email` flag")
+		return
+	}
+
+	if upd.newValue == "" {
+		cmd.Println("\n\tError: newValue(-n) can not be empty. Please supply the new value using the `-n` or `-new` flag")
+		return
+	}
+
+	if upd.utype == "auth" {
+		if upd.oldValue == "" {
+			cmd.Println("\n\tError: oldValue(-o) can not be empty. Please supply the old value using the `-o` or `-old` flag")
+			return
+		}
+	}
+
+	if upd.email != "" {
+		// Trying to match the complexity of email address is unecessary, as far as we
+		// have a valid expectation pattern,we can skip alot of the mess.
+		// TODO: should we use something more robust?
+		if !strings.Contains(upd.email, "@") {
+			cmd.Println("\n\tError: Email address must be a valid addresss. Please supply a correct email address.")
+			return
+		}
+	}
+
+	// Initialize the mongodb session.
+	mongo.InitMGO()
+
+	var updateEmail = func() {
+		log.Dev("commands", "runUpdate", "Email[%s]", upd.email)
+
+		session := mongo.GetSession()
+		defer session.Close()
+
+		user, err := auth.GetUserByEmail("commands", session, upd.email)
+		if err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+			return
+		}
+
+		if err := auth.UpdateEmail(user, upd.newValue); err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+		}
+
+	}
+
+	var updateName = func() {
+		log.Dev("commands", "runUpdate", "Name[%s]", upd.newValue)
+
+		session := mongo.GetSession()
+		defer session.Close()
+
+		user, err := auth.GetUserByEmail("commands", session, upd.email)
+		if err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+			return
+		}
+
+		if err := auth.UpdateName(user, upd.newValue); err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+		}
+
+	}
+
+	var updatePassword = func() {
+		log.Dev("commands", "runUpdate", "Password[%s]", upd.newValue)
+
+		session := mongo.GetSession()
+		defer session.Close()
+
+		user, err := auth.GetUserByEmail("commands", session, upd.email)
+		if err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+			return
+		}
+
+		if err := auth.UpdatePassword(user, upd.oldValue, upd.newValue); err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+		}
+	}
+
+	switch upd.utype {
+	case "auth":
+		updatePassword()
+	case "name":
+		updateName()
+	case "email":
+		updateEmail()
+	}
 }

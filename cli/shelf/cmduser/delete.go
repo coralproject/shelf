@@ -1,6 +1,11 @@
 package cmduser
 
 import (
+	"strings"
+
+	"github.com/coralproject/shelf/pkg/db/auth"
+	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -56,4 +61,73 @@ func addDel() {
 
 // runDel is the code that implements the delete command.
 func runDel(cmd *cobra.Command, args []string) {
+	if del.name == "" && del.pid == "" && del.email == "" {
+		cmd.Help()
+		return
+	}
+
+	if del.email != "" {
+		// Trying to match the complexity of email address is unecessary, as far as we
+		// have a valid expectation pattern,we can skip alot of the mess.
+		// TODO: should we use something more robust?
+		if !strings.Contains(del.email, "@") {
+			cmd.Println("\n\tError: Email address must be a valid addresss. Please supply a correct email address.")
+			return
+		}
+	}
+
+	// Initialize the mongodb session.
+	mongo.InitMGO()
+
+	session := mongo.GetSession()
+	defer session.Close()
+
+	if del.pid != "" {
+		log.Dev("commands", "runDel", "Pid[%s]", del.pid)
+		user, err := auth.GetUserByPublicID("commands", session, del.pid)
+		if err != nil {
+			log.Error("commands", "runDel", err, "Completed")
+			return
+		}
+
+		err = auth.Delete(user)
+		if err != nil {
+			log.Error("commands", "runDel", err, "Completed")
+			return
+		}
+
+		return
+	}
+
+	if del.email != "" {
+		log.Dev("commands", "runDel", "Email[%s]", del.email)
+		user, err := auth.GetUserByEmail("commands", session, del.email)
+		if err != nil {
+			log.Error("commands", "runDel", err, "Completed")
+			return
+		}
+
+		err = auth.Delete(user)
+		if err != nil {
+			log.Error("commands", "runDel", err, "Completed")
+			return
+		}
+
+		return
+	}
+
+	log.Dev("commands", "runDel", "Name[%s]", del.name)
+	user, err := auth.GetUserByName("commands", session, del.name)
+	if err != nil {
+		log.Error("commands", "runDel", err, "Completed")
+		return
+	}
+
+	err = auth.Delete(user)
+	if err != nil {
+		log.Error("commands", "runDel", err, "Completed")
+		return
+	}
+
+	return
 }

@@ -1,6 +1,12 @@
 package cmduser
 
 import (
+	"fmt"
+	"strings"
+
+	"github.com/coralproject/shelf/pkg/db/auth"
+	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/log"
 	"github.com/spf13/cobra"
 )
 
@@ -56,4 +62,95 @@ func addGet() {
 
 // runGet is the code that implements the get command.
 func runGet(cmd *cobra.Command, args []string) {
+	if get.name == "" && get.pid == "" && get.email == "" {
+		cmd.Help()
+		return
+	}
+
+	if get.email != "" {
+		// Trying to match the complexity of email address is unecessary, as far as we
+		// have a valid expectation pattern,we can skip alot of the mess.
+		// TODO: should we use something more robust?
+		if !strings.Contains(get.email, "@") {
+			cmd.Println("\n\tError: Email address must be a valid addresss. Please supply a correct email address.")
+			return
+		}
+	}
+
+	// Initialize the mongodb session.
+	mongo.InitMGO()
+
+	session := mongo.GetSession()
+	defer session.Close()
+
+	if get.pid != "" {
+		log.Dev("commands", "runGet", "Pid[%s]", get.pid)
+		user, err := auth.GetUserByPublicID("commands", session, get.pid)
+		if err != nil {
+			log.Error("commands", "runGet", err, "Completed")
+			return
+		}
+
+		fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.pid, user.FullName, user.Email, user.Token, user.PublicID, user.PrivateID, user.DateCreated.String(), user.DateModified.String())
+
+		return
+	}
+
+	if get.email != "" {
+		log.Dev("commands", "runGet", "Email[%s]", get.email)
+		user, err := auth.GetUserByEmail("commands", session, get.email)
+		if err != nil {
+			log.Error("commands", "runGet", err, "Completed")
+			return
+		}
+
+		fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.pid, user.FullName, user.Email, user.Token, user.PublicID, user.PrivateID, user.DateCreated.String(), user.DateModified.String())
+
+		return
+	}
+
+	log.Dev("commands", "runGet", "Name[%s]", get.name)
+	user, err := auth.GetUserByName("commands", session, get.name)
+	if err != nil {
+		log.Error("commands", "runGet", err, "Completed")
+		return
+	}
+
+	// _, err = json.MarshalIndent(user, "", "\n")
+	// if err != nil {
+	// 	log.Error("GetUser", "runGet", err, "Completed")
+	// 	return
+	// }
+
+	// TODO: What are you doing with doc
+	fmt.Printf(`
+Record for User(%s):
+	 Name: %s
+	 Email: %s
+	 Token: %s
+	 PublicID: %s
+	 PrivateID: %s
+	 Record Creation Date: %s
+	 Modified At: %s
+`, get.pid, user.FullName, user.Email, user.Token, user.PublicID, user.PrivateID, user.DateCreated.String(), user.DateModified.String())
+
+	return
 }
