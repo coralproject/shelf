@@ -23,7 +23,7 @@ The credentails are passed into the '-key' and '-pass' flags.
 `
 
 // auth contains the state for this command.
-var auth struct {
+var auths struct {
 	utype string
 	key   string
 	pass  string
@@ -38,13 +38,17 @@ func addAuth() {
 		Run:   runAuth,
 	}
 
-	cmd.Flags().StringVarP(&auth.utype, "type", "t", "", "sets authentication type")
-	cmd.Flags().StringVarP(&auth.key, "key", "k", "", "sets the key(email|publicId) of the user")
-	cmd.Flags().StringVarP(&auth.pass, "pass", "p", "", "sets the Pass(password|token) of the user")
+	cmd.Flags().StringVarP(&auths.utype, "type", "t", "", "sets authentication type")
+	cmd.Flags().StringVarP(&auths.key, "key", "k", "", "sets the key(email|publicId) of the user")
+	cmd.Flags().StringVarP(&auths.pass, "pass", "p", "", "sets the Pass(password|token) of the user")
 
 	userCmd.AddCommand(cmd)
 }
 
 // runAuth provides the operation logic for the auth command.
 func runAuth(cmd *cobra.Command, args []string) {
+}
+
+// authPassword checks the password against the database.
+func authPassword() {
 }

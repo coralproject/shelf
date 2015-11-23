@@ -15,6 +15,7 @@ import (
 
 // collections contains the name of the user collection.
 const collection = "user"
+const serviceID = ""
 
 // GetUserByEmail retrieves a user record by using the provided email.
 func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error) {

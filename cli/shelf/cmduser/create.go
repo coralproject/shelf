@@ -14,9 +14,10 @@ Example:
 
 // create contains the state for this command.
 var create struct {
-	name  string
-	pass  string
-	email string
+	name   string
+	pass   string
+	email  string
+	postal string
 }
 
 // addCreate handles the creation of users.
@@ -30,6 +31,7 @@ func addCreate() {
 
 	cmd.Flags().StringVarP(&create.name, "name", "n", "", "name of user")
 	cmd.Flags().StringVarP(&create.pass, "pass", "p", "", "password for user")
+	cmd.Flags().StringVarP(&create.postal, "postal", "po", "", "postal code for user")
 	cmd.Flags().StringVarP(&create.email, "email", "e", "", "email of user")
 
 	userCmd.AddCommand(cmd)
