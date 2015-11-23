@@ -2,6 +2,10 @@
   "name":"",
   "description":"",
   "enabled": true,
-  "params":{},
-  "rules": {}
+  "params":[{
+    "name":"name",
+    "default":"",
+    "desc":"provides the name to be used in the commute db checks"
+  }],
+  "rules": [{}],
 }
