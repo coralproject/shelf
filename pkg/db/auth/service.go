@@ -5,7 +5,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ArdanStudios/aggserver/auth/crypto"
+	_ "github.com/ArdanStudios/aggserver/auth/crypto"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 
@@ -97,7 +97,7 @@ func Create(context interface{}, ses *mgo.Session, u *User) error {
 		return nil
 	}
 
-	if err := mongo.ExecuteDB(context, ses, UserCollection, f); err != nil {
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
 		return err
 	}
@@ -107,7 +107,7 @@ func Create(context interface{}, ses *mgo.Session, u *User) error {
 		return col.Insert(u)
 	}
 
-	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
 		return err
 	}
@@ -116,68 +116,43 @@ func Create(context interface{}, ses *mgo.Session, u *User) error {
 	return nil
 }
 
-// UpdateName updates an existing user's name in the database.
-// Uses the user entity's id as the update parameter.
-// Returns a non-nil error, if the operation fails.
-func UpdateName(u *User, name string) error {
-	log.Dev(u.PublicID, "UpdateName", "Started : Updating User Record")
-
-	ms := time.Now().UTC()
-
-	updateBson := bson.M{"name": name, "email": u.Email, "password": u.Password, "modified_at": &ms}
+// UpdateName updates an existing user's full Name in the database.
+func UpdateName(context interface{}, ses *mgo.Session, uID bson.ObjectId, fullName string) error {
+	log.Dev(context, "UpdateName", "Started : Updating User Record : ID[%v] FullName[%s]", uID, fullName)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(u.PublicID, "UpdateName", "Completed : Mongodb.Update()")
-		return c.Update(bson.M{"id": u.ID}, bson.M{"$set": updateBson})
+		q := bson.M{"id": uID}
+		upd := bson.M{"$set": bson.M{"full_name": fullName, "modified_at": time.Now().UTC()}}
+		log.Dev(context, "UpdateName", "MGO : db.%s.update(%s, %s).count()", collection, mongo.Query(q), mongo.Query(upd))
+		return c.Update(q, upd)
 	}
 
-	ses := mongo.GetSession()
-	defer ses.Close()
-
-	log.Dev(u.PublicID, "UpdateName", "Started : Mongodb.Update()")
-	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
-		log.Error(u.PublicID, "UpdateName", err, "Completed")
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+		log.Error(context, "UpdateName", err, "Completed")
 		return err
 	}
 
-	u.Name = name
-	u.ModifiedAt = &ms
-
-	log.Dev(u.PublicID, "UpdateName", "Completed : Updating User Record")
+	log.Dev(context, "UpdateName", "Completed")
 	return nil
 }
 
-// UpdateEmail updates the email for a user record.
-// Uses the user entity's id as the update parameter.
-// Returns a non-nil error, if the operation fails.
-func UpdateEmail(u *User, email string) error {
-	log.Dev(u.PublicID, "UpdateEmail", "Started : Updating User Record")
-
-	// All emails will be in lowercase.
-	email = strings.ToLower(email)
-
-	ms := time.Now().UTC()
-
-	updateBson := bson.M{"name": u.Name, "email": email, "password": u.Password, "modified_at": &ms}
+// UpdateEmail updates an existing user's email in the database.
+func UpdateEmail(context interface{}, ses *mgo.Session, uID bson.ObjectId, email string) error {
+	log.Dev(context, "UpdateEmail", "Started : Updating User Record : ID[%v] Email[%s]", uID, email)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(u.PublicID, "UpdateEmail", "Completed : Mongodb.Update()")
-		return c.Update(bson.M{"id": u.ID}, bson.M{"$set": updateBson})
+		q := bson.M{"id": uID}
+		upd := bson.M{"$set": bson.M{"email": email, "modified_at": time.Now().UTC()}}
+		log.Dev(context, "UpdateEmail", "MGO : db.%s.update(%s, %s).count()", collection, mongo.Query(q), mongo.Query(upd))
+		return c.Update(q, upd)
 	}
 
-	ses := mongo.GetSession()
-	defer ses.Close()
-
-	log.Dev(u.PublicID, "UpdateEmail", "Started : Mongodb.Update()")
-	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
-		log.Error(u.PublicID, "UpdateEmail", err, "Completed")
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+		log.Error(context, "UpdateEmail", err, "Completed")
 		return err
 	}
 
-	u.Email = email
-	u.ModifiedAt = &ms
-
-	log.Dev(u.PublicID, "UpdateEmail", "Completed : Updated User Record")
+	log.Dev(context, "UpdateEmail", "Completed")
 	return nil
 }
 
@@ -186,82 +161,82 @@ func UpdateEmail(u *User, email string) error {
 // Requires provision of the old password and the new password.
 // Returns a non-nil error, if the existingPassword is not a match, or
 // the update operation fails.
-func UpdatePassword(u *User, existingPassword, newPassword string) error {
-	log.Dev(u.PublicID, "UpdatePassword", "Started : Updating User Record")
+// func UpdatePassword(u *User, existingPassword, newPassword string) error {
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : Updating User Record")
 
-	log.Dev(u.PublicID, "UpdatePassword", "Started : Validate User Existing Password %s", mongo.Query(existingPassword))
-	if !u.IsPasswordValid(existingPassword) {
-		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate User Existing Password %s : Error %s", mongo.Query(existingPassword), "Invalid Password")
-		return errors.New("Invalid Password")
-	}
-	log.Dev(u.PublicID, "UpdatePassword", "Compeleted : Validate User Existing Password %s : Success", mongo.Query(existingPassword))
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : Validate User Existing Password %s", mongo.Query(existingPassword))
+// 	if !u.IsPasswordValid(existingPassword) {
+// 		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate User Existing Password %s : Error %s", mongo.Query(existingPassword), "Invalid Password")
+// 		return errors.New("Invalid Password")
+// 	}
+// 	log.Dev(u.PublicID, "UpdatePassword", "Compeleted : Validate User Existing Password %s : Success", mongo.Query(existingPassword))
 
-	log.Dev(u.PublicID, "UpdatePassword", "Started : Create New Password %s", mongo.Query(newPassword))
-	newPassHash, err := crypto.BcryptHash((u.PrivateID + newPassword))
-	if err != nil {
-		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
-		return err
-	}
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : Create New Password %s", mongo.Query(newPassword))
+// 	newPassHash, err := crypto.BcryptHash((u.PrivateID + newPassword))
+// 	if err != nil {
+// 		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
+// 		return err
+// 	}
 
-	log.Dev(u.PublicID, "UpdatePassword", "Completed : Create New Password %s : Success", mongo.Query(newPassword))
-	u.Password = newPassHash
+// 	log.Dev(u.PublicID, "UpdatePassword", "Completed : Create New Password %s : Success", mongo.Query(newPassword))
+// 	u.Password = newPassHash
 
-	log.Dev(u.PublicID, "UpdatePassword", "Started : User : SetToken")
-	if err := u.SetToken(); err != nil {
-		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
-		return err
-	}
-	log.Dev(u.PublicID, "UpdatePassword", "Completed : User : SetToken : Success")
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : User : SetToken")
+// 	if err := u.SetToken(); err != nil {
+// 		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
+// 		return err
+// 	}
+// 	log.Dev(u.PublicID, "UpdatePassword", "Completed : User : SetToken : Success")
 
-	log.Dev(u.PublicID, "UpdatePassword", "Started : Validate NewUser Password %s", mongo.Query(newPassword))
-	if !u.IsPasswordValid(newPassword) {
-		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate New User Password %s : Error %s", mongo.Query(newPassword), "Invalid Password")
-		return errors.New("Invalid Password")
-	}
-	log.Dev(u.PublicID, "UpdatePassword", "Completed : Validate New User Password %s : Success", mongo.Query(newPassword))
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : Validate NewUser Password %s", mongo.Query(newPassword))
+// 	if !u.IsPasswordValid(newPassword) {
+// 		log.Dev(u.PublicID, "UpdatePassword", "Completed Error : Validate New User Password %s : Error %s", mongo.Query(newPassword), "Invalid Password")
+// 		return errors.New("Invalid Password")
+// 	}
+// 	log.Dev(u.PublicID, "UpdatePassword", "Completed : Validate New User Password %s : Success", mongo.Query(newPassword))
 
-	ms := time.Now().UTC()
-	u.ModifiedAt = &ms
+// 	ms := time.Now().UTC()
+// 	u.ModifiedAt = &ms
 
-	log.Dev(u.PublicID, "UpdatePassword", "Started : Mongodb.UpdateId()")
+// 	log.Dev(u.PublicID, "UpdatePassword", "Started : Mongodb.UpdateId()")
 
-	updateBson := bson.M{"name": u.Name, "email": u.Email, "password": newPassHash, "modified_at": &ms}
-	f := func(c *mgo.Collection) error {
-		log.Dev(u.PublicID, "UpdatePassword", "Completed : Mongodb.UpdateId()")
-		return c.Update(bson.M{"id": u.ID}, bson.M{"$set": updateBson})
-	}
+// 	updateBson := bson.M{"name": u.Name, "email": u.Email, "password": newPassHash, "modified_at": &ms}
+// 	f := func(c *mgo.Collection) error {
+// 		log.Dev(u.PublicID, "UpdatePassword", "Completed : Mongodb.UpdateId()")
+// 		return c.Update(bson.M{"id": u.ID}, bson.M{"$set": updateBson})
+// 	}
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+// 	ses := mongo.GetSession()
+// 	defer ses.Close()
 
-	if err = mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
-		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
-		return nil
-	}
+// 	if err = mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
+// 		log.Error(u.PublicID, "UpdatePassword", err, "Completed")
+// 		return nil
+// 	}
 
-	log.Dev(u.PublicID, "UpdatePassword", "Completed : Updated User Record")
-	return nil
-}
+// 	log.Dev(u.PublicID, "UpdatePassword", "Completed : Updated User Record")
+// 	return nil
+// }
 
-// Delete removes an existing user from the database.
-// Returns a non-nil error, if the operation fails.
-func Delete(u *User) error {
-	log.Dev(u.PublicID, "Delete", "Started : Delete User")
+// // Delete removes an existing user from the database.
+// // Returns a non-nil error, if the operation fails.
+// func Delete(u *User) error {
+// 	log.Dev(u.PublicID, "Delete", "Started : Delete User")
 
-	f := func(c *mgo.Collection) error {
-		log.Dev(u.PublicID, "Delete", "Completed : Mongodb.RemoveId()")
-		return c.Remove(bson.M{"id": u.ID})
-	}
+// 	f := func(c *mgo.Collection) error {
+// 		log.Dev(u.PublicID, "Delete", "Completed : Mongodb.RemoveId()")
+// 		return c.Remove(bson.M{"id": u.ID})
+// 	}
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+// 	ses := mongo.GetSession()
+// 	defer ses.Close()
 
-	log.Dev(u.PublicID, "Delete", "Started : Mongodb.RemoveId()")
-	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
-		log.Error(u.PublicID, "Delete", err, "Completed")
-		return err
-	}
+// 	log.Dev(u.PublicID, "Delete", "Started : Mongodb.RemoveId()")
+// 	if err := mongo.ExecuteDB("CONTEXT", ses, UserCollection, f); err != nil {
+// 		log.Error(u.PublicID, "Delete", err, "Completed")
+// 		return err
+// 	}
 
-	log.Dev(u.PublicID, "Delete", "Completed : Delete User")
-	return nil
-}
+// 	log.Dev(u.PublicID, "Delete", "Completed : Delete User")
+// 	return nil
+// }
