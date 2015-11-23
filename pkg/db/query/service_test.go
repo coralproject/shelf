@@ -1,11 +1,14 @@
 package query
 
 import (
+	"encoding/json"
+	"os"
 	"testing"
 
 	"gopkg.in/mgo.v2"
 
 	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/db/query"
 	"github.com/coralproject/shelf/pkg/tests"
 )
 
@@ -18,8 +21,18 @@ func TestQueryAPI(t *testing.T) {
 	defer tests.DisplayLog()
 
 	qFile := "./fixtures/spending_advice.json"
-	qs, err := QuerySetFromFile("Tests", qFile)
 
+	file, err := os.Open(qFile)
+	if err != nil {
+		t.Fatalf("\t\tShould open File[%q] without error %s", qFile, tests.Failed)
+	} else {
+		t.Logf("\t\tShould open File[%q] without error %s", qFile, tests.Success)
+	}
+
+	var qs query.QuerySet
+
+	err = json.NewDecoder(file).Decode(&qs)
+	qs, err := QuerySetFromFile("Tests", qFile)
 	if err != nil {
 		t.Fatalf("\t\tShould load File[%q] without error %s", qFile, tests.Failed)
 	} else {
