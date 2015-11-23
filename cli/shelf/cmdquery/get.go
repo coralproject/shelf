@@ -41,16 +41,16 @@ func addGet() {
 func runGet(cmd *cobra.Command, args []string) {
 }
 
-// getQuerySetFromFile serializes the content of a RuleSet from a file using the
+// getQuerySetFromFile serializes the content of a getQuerySet from a file using the
 // given file path.
-// Returns the serialized query.RuleSet, else returns a non-nil error if
+// Returns the serialized query.getQuerySet, else returns a non-nil error if
 // the operation failed.
 func getQuerySetFromFile(context interface{}, path string) (*query.QuerySet, error) {
-	log.Dev(context, "RuleSetFromFile", "Started : Load RuleSet : File %s", path)
+	log.Dev(context, "getQuerySetFromFile", "Started : Load getQuerySet : File %s", path)
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error(context, "RuleSetFromFile", err, "Completed : Load RuleSet : File %s", path)
+		log.Error(context, "getQuerySetFromFile", err, "Completed : Load getQuerySet : File %s", path)
 		return nil, err
 	}
 
@@ -58,73 +58,73 @@ func getQuerySetFromFile(context interface{}, path string) (*query.QuerySet, err
 
 	err = json.NewDecoder(file).Decode(&qs)
 	if err != nil {
-		log.Error(context, "RuleSetFromFile", err, "Completed : Load RuleSet : File %s", path)
+		log.Error(context, "getQuerySetFromFile", err, "Completed : Load getQuerySet : File %s", path)
 		return nil, err
 	}
 
-	log.Dev(context, "RuleSetFromFile", "Completed : Load RuleSet : File %s", path)
+	log.Dev(context, "getQuerySetFromFile", "Completed : Load getQuerySet : File %s", path)
 	return &qs, nil
 }
 
-// getQueriesFromPaths loads sets of rules from the giving array of file paths.
-// Returns a list of query.Rule, each serialized with the contents of it's file.
+// getQueriesFromPaths loads sets of getQuerys from the giving array of file paths.
+// Returns a list of query.getQuery, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
-func getQueriesFromPaths(context interface{}, ruleFilePaths []string) ([]query.Query, error) {
-	log.Dev(context, "RuleFromPaths", "Started : Paths %s", ruleFilePaths)
+func getQueriesFromPaths(context interface{}, getQueryFilePaths []string) ([]query.Query, error) {
+	log.Dev(context, "getQueriesFromPaths", "Started : Paths %s", getQueryFilePaths)
 
 	var queries []query.Query
 
-	for _, file := range ruleFilePaths {
-		ruleFile, err := os.Open(file)
+	for _, file := range getQueryFilePaths {
+		getQueryFile, err := os.Open(file)
 		if err != nil {
-			log.Error(context, "RuleFromPaths", err, "Completed : Paths %s", ruleFilePaths)
+			log.Error(context, "getQueriesFromPaths", err, "Completed : Paths %s", getQueryFilePaths)
 			return nil, err
 		}
 
 		var q query.Query
-		err = json.NewDecoder(ruleFile).Decode(&q)
+		err = json.NewDecoder(getQueryFile).Decode(&q)
 		if err != nil {
-			log.Error(context, "RuleFromPaths", err, "Completed : Paths %s", ruleFilePaths)
+			log.Error(context, "getQueriesFromPaths", err, "Completed : Paths %s", getQueryFilePaths)
 			return nil, err
 		}
 
 		queries = append(queries, q)
 	}
 
-	log.Dev(context, "RuleFromPaths", "Completed : Paths %s", ruleFilePaths)
+	log.Dev(context, "getQueriesFromPaths", "Completed : Paths %s", getQueryFilePaths)
 	return queries, nil
 }
 
-// queryFromDir loads sets of rules from the giving files in the directory path,
+// queryFromDir loads sets of getQuerys from the giving files in the directory path,
 // only reading the current directory level and not sub-directories.
-// Returns a list of Rule pointers, each serialized with the contents of it's file.
+// Returns a list of getQuery pointers, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
 func queryFromDir(context interface{}, dirPath string) ([]query.Query, error) {
-	log.Dev(context, "RulesFromDir", "Started : Load Rules : Dir %s", dirPath)
+	log.Dev(context, "queryFromDirDir", "Started : Load getQuerys : Dir %s", dirPath)
 
 	stat, err := os.Stat(dirPath)
 	if err != nil {
-		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
+		log.Error(context, "queryFromDirDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
 		return nil, err
 	}
 
 	if !stat.IsDir() {
-		log.Error(context, "RulesFromDir", fmt.Errorf("Path[%s] is not a Directory", dirPath), "Completed : Load Rules : Dir %s", dirPath)
+		log.Error(context, "queryFromDirDir", fmt.Errorf("Path[%s] is not a Directory", dirPath), "Completed : Load getQuerys : Dir %s", dirPath)
 		return nil, err
 	}
 
 	//open up the filepath since its a directory, read and sort
 	dir, err := os.Open(dirPath)
 	if err != nil {
-		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
+		log.Error(context, "queryFromDirDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
 		return nil, err
 	}
 
 	filesInfo, err := dir.Readdir(0)
 	if err != nil {
-		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
+		log.Error(context, "queryFromDirDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
 		return nil, err
 	}
 
@@ -140,12 +140,12 @@ func queryFromDir(context interface{}, dirPath string) ([]query.Query, error) {
 		files = append(files, filepath.Join(dirPath, info.Name()))
 	}
 
-	rules, err := getQueriesFromPaths(context, files)
+	getQuerys, err := getQueriesFromPaths(context, files)
 	if err != nil {
-		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
+		log.Error(context, "queryFromDirDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
 		return nil, err
 	}
 
-	log.Dev(context, "RulesFromDir", "Completed : Load Rules : Dir %s", dirPath)
-	return rules, nil
+	log.Dev(context, "queryFromDirDir", "Completed : Load getQuerys : Dir %s", dirPath)
+	return getQuerys, nil
 }
