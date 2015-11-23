@@ -31,20 +31,20 @@ type Query struct {
 	Scripts       []string      `bson:"scripts" json:"scripts"`                                   // Scripts to process for the rule.
 }
 
-// QuerySetParam contains meta-data about a required parameter for the rule.
-type QuerySetParam struct {
+// SetParam contains meta-data about a required parameter for the rule.
+type SetParam struct {
 	Name    string `bson:"name" json:"name"`       // Name of the parameter.
 	Default string `bson:"default" json:"default"` // Default value for the parameter.
 	Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
 }
 
-// QuerySet contains the configuration details for a rule set.
-type QuerySet struct {
-	Name        string          `bson:"name" json:"name"`       // Name of the RuleSet.
-	Description string          `bson:"desc" json:"desc"`       // Description of the RuleSet.
-	Enabled     bool            `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
-	Params      []QuerySetParam `bson:"params" json:"params"`   // Collection of parameters.
-	Rules       []Query         `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
+// Set contains the configuration details for a rule set.
+type Set struct {
+	Name        string     `bson:"name" json:"name"`       // Name of the RuleSet.
+	Description string     `bson:"desc" json:"desc"`       // Description of the RuleSet.
+	Enabled     bool       `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
+	Params      []SetParam `bson:"params" json:"params"`   // Collection of parameters.
+	Rules       []Query    `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
 }
 
 // Result contains the result of an ruleset execution.

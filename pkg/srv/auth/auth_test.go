@@ -7,7 +7,7 @@ import (
 
 	"gopkg.in/mgo.v2"
 
-	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/tests"
 )
 
