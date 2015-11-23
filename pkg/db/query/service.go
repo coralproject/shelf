@@ -152,11 +152,11 @@ func QuerySetFromFile(context interface{}, path string) (*QuerySet, error) {
 	return &rs, nil
 }
 
-// queryFromPaths loads sets of rules from the giving array of file paths.
+// QueryFromPaths loads sets of rules from the giving array of file paths.
 // Returns a list of query.Rule, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
-func queryFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
+func QueryFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
 	log.Dev(context, "RuleFromPaths", "Started : Paths %s", ruleFilePaths)
 
 	var rules []Query
@@ -226,7 +226,7 @@ func queryFromDir(context interface{}, dirPath string) ([]Query, error) {
 		files = append(files, filepath.Join(dirPath, info.Name()))
 	}
 
-	rules, err := RulesFromPaths(context, files)
+	rules, err := QueryFromPaths(context, files)
 	if err != nil {
 		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
 		return nil, err
