@@ -41,28 +41,28 @@ func addGet() {
 func runGet(cmd *cobra.Command, args []string) {
 }
 
-// getQuerySetFromFile serializes the content of a getQuerySet from a file using the
+// getSetFromFile serializes the content of a getSet from a file using the
 // given file path.
-// Returns the serialized query.getQuerySet, else returns a non-nil error if
+// Returns the serialized query.getSet, else returns a non-nil error if
 // the operation failed.
-func getQuerySetFromFile(context interface{}, path string) (*query.QuerySet, error) {
-	log.Dev(context, "getQuerySetFromFile", "Started : Load getQuerySet : File %s", path)
+func getSetFromFile(context interface{}, path string) (*query.Set, error) {
+	log.Dev(context, "getSetFromFile", "Started : Load getSet : File %s", path)
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error(context, "getQuerySetFromFile", err, "Completed : Load getQuerySet : File %s", path)
+		log.Error(context, "getSetFromFile", err, "Completed : Load getSet : File %s", path)
 		return nil, err
 	}
 
-	var qs query.QuerySet
+	var qs query.Set
 
 	err = json.NewDecoder(file).Decode(&qs)
 	if err != nil {
-		log.Error(context, "getQuerySetFromFile", err, "Completed : Load getQuerySet : File %s", path)
+		log.Error(context, "getSetFromFile", err, "Completed : Load getSet : File %s", path)
 		return nil, err
 	}
 
-	log.Dev(context, "getQuerySetFromFile", "Completed : Load getQuerySet : File %s", path)
+	log.Dev(context, "getSetFromFile", "Completed : Load getSet : File %s", path)
 	return &qs, nil
 }
 

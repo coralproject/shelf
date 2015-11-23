@@ -13,19 +13,19 @@ import (
 // collections contains the name of the rules collection.
 const collection = "rules"
 
-// GetNames retrieves a list of QuerySet names in the db.
+// GetNames retrieves a list of Set names in the db.
 func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
-	log.Dev(context, "GetQuerySetNames", "Started")
+	log.Dev(context, "GetSetNames", "Started")
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": 1}
-		log.Dev(context, "GetQuerySetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", collection, mongo.Query(q))
+		log.Dev(context, "GetSetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", collection, mongo.Query(q))
 		return c.Find(nil).Select(q).Sort("name").All(&names)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetQuerySetNames", err, "Completed")
+		log.Error(context, "GetSetNames", err, "Completed")
 		return nil, err
 	}
 
@@ -39,32 +39,32 @@ func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 		rsn = append(rsn, name)
 	}
 
-	log.Dev(context, "GetQuerySetNames", "Completed : RSN[%+v]", rsn)
+	log.Dev(context, "GetSetNames", "Completed : RSN[%+v]", rsn)
 	return rsn, nil
 }
 
-// GetByName retrieves the configuration for the specified QuerySet.
-func GetByName(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
-	log.Dev(context, "GetQuerySet", "Started : Name[%s]", name)
+// GetByName retrieves the configuration for the specified Set.
+func GetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+	log.Dev(context, "GetSet", "Started : Name[%s]", name)
 
-	var rs QuerySet
+	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "GetQuerySet", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetSet", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&rs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetQuerySet", err, "Completed")
+		log.Error(context, "GetSet", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "GetQuerySet", "Completed : RS[%+v]", rs)
+	log.Dev(context, "GetSet", "Completed : RS[%+v]", rs)
 	return &rs, nil
 }
 
-// Create is used to create QuerySet document/record in the db.
-func Create(context interface{}, ses *mgo.Session, rs *QuerySet) error {
+// Create is used to create Set document/record in the db.
+func Create(context interface{}, ses *mgo.Session, rs *Set) error {
 	log.Dev(context, "Create", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
@@ -81,43 +81,43 @@ func Create(context interface{}, ses *mgo.Session, rs *QuerySet) error {
 	return nil
 }
 
-// Update is used to create or update existing QuerySet documents.
-func Update(context interface{}, ses *mgo.Session, rs *QuerySet) error {
-	log.Dev(context, "UpdateQuerySet", "Started : Name[%s]", rs.Name)
+// Update is used to create or update existing Set documents.
+func Update(context interface{}, ses *mgo.Session, rs *Set) error {
+	log.Dev(context, "UpdateSet", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
 
-		log.Dev(context, "UpdateQuerySet", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
+		log.Dev(context, "UpdateSet", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
 		return c.Update(q, rs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "UpdateQuerySet", err, "Completed")
+		log.Error(context, "UpdateSet", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "UpdateQuerySet", "Completed")
+	log.Dev(context, "UpdateSet", "Completed")
 	return nil
 }
 
-// Delete is used to remove an existing QuerySet documents.
-func Delete(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
-	log.Dev(context, "RemoveQuerySet", "Started : Name[%s]", name)
+// Delete is used to remove an existing Set documents.
+func Delete(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+	log.Dev(context, "RemoveSet", "Started : Name[%s]", name)
 
-	var rs QuerySet
+	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
 
-		log.Dev(context, "RemoveQuerySet", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
+		log.Dev(context, "RemoveSet", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "RemoveQuerySet", err, "Completed")
+		log.Error(context, "RemoveSet", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "RemoveQuerySet", "Completed")
+	log.Dev(context, "RemoveSet", "Completed")
 	return &rs, nil
 }
