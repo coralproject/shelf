@@ -18,8 +18,8 @@ import (
 // collections contains the name of the rules collection.
 const collection = "rules"
 
-// GetQuerySetNames retrieves a list of rule names.
-func GetQuerySetNames(context interface{}, ses *mgo.Session) ([]string, error) {
+// GetNames retrieves a list of QuerySet names in the db.
+func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	log.Dev(context, "GetQuerySetNames", "Started")
 
 	var names []bson.M
@@ -48,8 +48,8 @@ func GetQuerySetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	return rsn, nil
 }
 
-// GetQuerySet retrieves the configuration for the specified QuerySet.
-func GetQuerySet(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
+// GetByName retrieves the configuration for the specified QuerySet.
+func GetByName(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
 	log.Dev(context, "GetQuerySet", "Started : Name[%s]", name)
 
 	var rs QuerySet
@@ -68,16 +68,33 @@ func GetQuerySet(context interface{}, ses *mgo.Session, name string) (*QuerySet,
 	return &rs, nil
 }
 
-// UpdateQuerySet is used to create or update existing QuerySet documents.
-func UpdateQuerySet(context interface{}, ses *mgo.Session, rs *QuerySet) error {
+// Create is used to create QuerySet document/record in the db.
+func Create(context interface{}, ses *mgo.Session, rs *QuerySet) error {
+	log.Dev(context, "Create", "Started : Name[%s]", rs.Name)
+
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "Create", "MGO :\n\ndb.%s.Insert(%s)\n", collection, mongo.Query(rs))
+		return c.Insert(rs)
+	}
+
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+		log.Error(context, "Create", err, "Completed")
+		return err
+	}
+
+	log.Dev(context, "Create", "Completed")
+	return nil
+}
+
+// Update is used to create or update existing QuerySet documents.
+func Update(context interface{}, ses *mgo.Session, rs *QuerySet) error {
 	log.Dev(context, "UpdateQuerySet", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
 
 		log.Dev(context, "UpdateQuerySet", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
-		_, err := c.Upsert(q, rs)
-		return err
+		return c.Update(q, rs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
@@ -89,8 +106,8 @@ func UpdateQuerySet(context interface{}, ses *mgo.Session, rs *QuerySet) error {
 	return nil
 }
 
-// RemoveQuerySet is used to remove an existing QuerySet documents.
-func RemoveQuerySet(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
+// Delete is used to remove an existing QuerySet documents.
+func Delete(context interface{}, ses *mgo.Session, name string) (*QuerySet, error) {
 	log.Dev(context, "RemoveQuerySet", "Started : Name[%s]", name)
 
 	var rs QuerySet
@@ -110,10 +127,10 @@ func RemoveQuerySet(context interface{}, ses *mgo.Session, name string) (*QueryS
 	return &rs, nil
 }
 
-// QuerySetFromReader serializes the content of a RuleSet from a io.Reader.
+// GetQuerySetFromReader serializes the content of a RuleSet from a io.Reader.
 // Returns the serialized RuleSet pointer, else returns a non-nil error if
 // the operation failed.
-func QuerySetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
+func GetQuerySetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
 	log.Dev(context, "RuleSetFromReader", "Started : Load RuleSet")
 	var rs QuerySet
 
@@ -127,11 +144,11 @@ func QuerySetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
 	return &rs, nil
 }
 
-// QuerySetFromFile serializes the content of a RuleSet from a file using the
+// GetQuerySetFromFile serializes the content of a RuleSet from a file using the
 // given file path.
 // Returns the serialized query.RuleSet, else returns a non-nil error if
 // the operation failed.
-func QuerySetFromFile(context interface{}, path string) (*QuerySet, error) {
+func GetQuerySetFromFile(context interface{}, path string) (*QuerySet, error) {
 	log.Dev(context, "RuleSetFromFile", "Started : Load RuleSet : File %s", path)
 
 	file, err := os.Open(path)
@@ -152,11 +169,11 @@ func QuerySetFromFile(context interface{}, path string) (*QuerySet, error) {
 	return &rs, nil
 }
 
-// QueryFromPaths loads sets of rules from the giving array of file paths.
+// GetQueriesFromPaths loads sets of rules from the giving array of file paths.
 // Returns a list of query.Rule, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
-func QueryFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
+func GetQueriesFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
 	log.Dev(context, "RuleFromPaths", "Started : Paths %s", ruleFilePaths)
 
 	var rules []Query
@@ -226,7 +243,7 @@ func queryFromDir(context interface{}, dirPath string) ([]Query, error) {
 		files = append(files, filepath.Join(dirPath, info.Name()))
 	}
 
-	rules, err := QueryFromPaths(context, files)
+	rules, err := GetQueriesFromPaths(context, files)
 	if err != nil {
 		log.Error(context, "RulesFromDir", err, "Completed : Load Rules : Dir %s", dirPath)
 		return nil, err
