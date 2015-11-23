@@ -110,10 +110,10 @@ func RemoveQuerySet(context interface{}, ses *mgo.Session, name string) (*QueryS
 	return &rs, nil
 }
 
-// RuleSetFromReader serializes the content of a RuleSet from a io.Reader.
+// QuerySetFromReader serializes the content of a RuleSet from a io.Reader.
 // Returns the serialized RuleSet pointer, else returns a non-nil error if
 // the operation failed.
-func RuleSetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
+func QuerySetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
 	log.Dev(context, "RuleSetFromReader", "Started : Load RuleSet")
 	var rs QuerySet
 
@@ -127,11 +127,11 @@ func RuleSetFromReader(context interface{}, r io.Reader) (*QuerySet, error) {
 	return &rs, nil
 }
 
-// RuleSetFromFile serializes the content of a RuleSet from a file using the
+// QuerySetFromFile serializes the content of a RuleSet from a file using the
 // given file path.
 // Returns the serialized query.RuleSet, else returns a non-nil error if
 // the operation failed.
-func RuleSetFromFile(context interface{}, path string) (*QuerySet, error) {
+func QuerySetFromFile(context interface{}, path string) (*QuerySet, error) {
 	log.Dev(context, "RuleSetFromFile", "Started : Load RuleSet : File %s", path)
 
 	file, err := os.Open(path)
@@ -152,11 +152,11 @@ func RuleSetFromFile(context interface{}, path string) (*QuerySet, error) {
 	return &rs, nil
 }
 
-// rulesFromPaths loads sets of rules from the giving array of file paths.
+// queryFromPaths loads sets of rules from the giving array of file paths.
 // Returns a list of query.Rule, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
-func rulesFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
+func queryFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error) {
 	log.Dev(context, "RuleFromPaths", "Started : Paths %s", ruleFilePaths)
 
 	var rules []Query
@@ -182,12 +182,12 @@ func rulesFromPaths(context interface{}, ruleFilePaths []string) ([]Query, error
 	return rules, nil
 }
 
-// rulesFromDir loads sets of rules from the giving files in the directory path,
+// queryFromDir loads sets of rules from the giving files in the directory path,
 // only reading the current directory level and not sub-directories.
 // Returns a list of Rule pointers, each serialized with the contents of it's file.
 // If any of the paths are invalid or there was a failure to load their content,
 // a non-nil error is returned.
-func rulesFromDir(context interface{}, dirPath string) ([]Query, error) {
+func queryFromDir(context interface{}, dirPath string) ([]Query, error) {
 	log.Dev(context, "RulesFromDir", "Started : Load Rules : Dir %s", dirPath)
 
 	stat, err := os.Stat(dirPath)
