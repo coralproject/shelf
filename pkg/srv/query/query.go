@@ -3,8 +3,8 @@ package query
 import (
 	"strings"
 
-	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -13,8 +13,8 @@ import (
 // collections contains the name of the rules collection.
 const collection = "rules"
 
-// GetNames retrieves a list of Set names in the db.
-func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
+// GetSetNames retrieves a list of rule names.
+func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	log.Dev(context, "GetSetNames", "Started")
 
 	var names []bson.M
@@ -43,8 +43,8 @@ func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	return rsn, nil
 }
 
-// GetByName retrieves the configuration for the specified Set.
-func GetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+// GetSet retrieves the configuration for the specified Set.
+func GetSet(context interface{}, ses *mgo.Session, name string) (*Set, error) {
 	log.Dev(context, "GetSet", "Started : Name[%s]", name)
 
 	var rs Set
@@ -81,15 +81,16 @@ func Create(context interface{}, ses *mgo.Session, rs *Set) error {
 	return nil
 }
 
-// Update is used to create or update existing Set documents.
-func Update(context interface{}, ses *mgo.Session, rs *Set) error {
+// UpdateSet is used to create or update existing Set documents.
+func UpdateSet(context interface{}, ses *mgo.Session, rs *Set) error {
 	log.Dev(context, "UpdateSet", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
 
 		log.Dev(context, "UpdateSet", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
-		return c.Update(q, rs)
+		_, err := c.Upsert(q, rs)
+		return err
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
@@ -101,23 +102,22 @@ func Update(context interface{}, ses *mgo.Session, rs *Set) error {
 	return nil
 }
 
-// Delete is used to remove an existing Set documents.
-func Delete(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+// DeleteSet is used to remove an existing Set documents.
+func DeleteSet(context interface{}, ses *mgo.Session, name string) (*Set, error) {
 	log.Dev(context, "RemoveSet", "Started : Name[%s]", name)
 
 	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-
-		log.Dev(context, "RemoveSet", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
+		log.Dev(context, "DeleteSet", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "RemoveSet", err, "Completed")
+		log.Error(context, "DeleteSet", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "RemoveSet", "Completed")
+	log.Dev(context, "DeleteSet", "Completed")
 	return &rs, nil
 }

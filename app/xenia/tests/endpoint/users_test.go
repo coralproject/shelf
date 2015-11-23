@@ -8,7 +8,7 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/srv/xenia/app"
 	"github.com/coralproject/shelf/srv/xenia/models"
 	"github.com/coralproject/shelf/srv/xenia/routes"

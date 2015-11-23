@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"

@@ -6,8 +6,8 @@ import (
 	"time"
 
 	_ "github.com/ArdanStudios/aggserver/auth/crypto"
-	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -15,7 +15,6 @@ import (
 
 // collections contains the name of the user collection.
 const collection = "user"
-const serviceID = ""
 
 // GetUserByEmail retrieves a user record by using the provided email.
 func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error) {

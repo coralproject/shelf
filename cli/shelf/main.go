@@ -9,7 +9,7 @@ import (
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
 	"github.com/coralproject/shelf/cli/shelf/cmduser"
 	"github.com/coralproject/shelf/pkg/cfg"
-	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"github.com/spf13/cobra"
 )

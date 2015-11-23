@@ -1,4 +1,4 @@
-package query
+package query_test
 
 import (
 	"encoding/json"
@@ -7,8 +7,8 @@ import (
 
 	"gopkg.in/mgo.v2"
 
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/db/query"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/coralproject/shelf/pkg/tests"
 )
 
@@ -29,10 +29,10 @@ func TestQueryAPI(t *testing.T) {
 		t.Logf("\t\tShould open File[%q] without error %s", qFile, tests.Success)
 	}
 
-	var qs query.QuerySet
+	var qs query.Set
 
 	err = json.NewDecoder(file).Decode(&qs)
-	qs, err := QuerySetFromFile("Tests", qFile)
+	qs, err := SetFromFile("Tests", qFile)
 	if err != nil {
 		t.Fatalf("\t\tShould load File[%q] without error %s", qFile, tests.Failed)
 	} else {
@@ -48,7 +48,7 @@ func TestQueryAPI(t *testing.T) {
 }
 
 // queryCreate validates the creation of a query in the databae.
-func queryCreate(q *QuerySet, t *testing.T) {
+func queryCreate(q *Set, t *testing.T) {
 	t.Log("Given the need to save a query into the database")
 	{
 		t.Log("\tWhen giving a query object to save")
@@ -57,7 +57,7 @@ func queryCreate(q *QuerySet, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			err := UpdateQuerySet("Tests", ses, q)
+			err := UpdateSet("Tests", ses, q)
 			if err != nil {
 				t.Errorf("\t\tShould have added new query record %s", tests.Failed)
 			} else {
@@ -77,7 +77,7 @@ func queryGetNames(t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			names, err := GetQuerySetNames("Test", ses)
+			names, err := GetSetNames("Test", ses)
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved query record names successfully %s", tests.Failed)
 			} else {
@@ -101,7 +101,7 @@ func queryGetNames(t *testing.T) {
 }
 
 // queryGetByName validates the retrieval of a query using its name.
-func queryGetByName(name string, q *QuerySet, t *testing.T) {
+func queryGetByName(name string, q *Set, t *testing.T) {
 	t.Log("Given the need to retrieve a query from the database")
 	{
 		t.Log("\tWhen giving a query record's name")
@@ -109,7 +109,7 @@ func queryGetByName(name string, q *QuerySet, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			qs, err := GetQuerySet("Tests", ses, name)
+			qs, err := GetSet("Tests", ses, name)
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved query record name[%s] successfully %s", name, tests.Failed)
 			} else {
@@ -151,7 +151,7 @@ func queryGetByName(name string, q *QuerySet, t *testing.T) {
 }
 
 // queryUpdate validates the updating of a query's content in the database.
-func queryUpdate(q *QuerySet, t *testing.T) {
+func queryUpdate(q *Set, t *testing.T) {
 	t.Log("Given the need to update a query record in the database")
 	{
 		t.Log("\tWhen giving an updated query")
@@ -163,7 +163,7 @@ func queryUpdate(q *QuerySet, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			err := UpdateQuerySet("Tests", ses, q)
+			err := UpdateSet("Tests", ses, q)
 
 			if err != nil {
 				t.Errorf("\t\tShould have updated query record name[%s] successfully %s", q.Name, tests.Failed)
@@ -173,7 +173,7 @@ func queryUpdate(q *QuerySet, t *testing.T) {
 				getSes := mongo.GetSession()
 				defer getSes.Close()
 
-				qs, err := GetQuerySet("Tests", getSes, q.Name)
+				qs, err := GetSet("Tests", getSes, q.Name)
 				if err != nil {
 					t.Errorf("\t\tShould have retrieved query record name[%s] successfully %s", q.Name, tests.Failed)
 				} else {
@@ -193,7 +193,7 @@ func queryUpdate(q *QuerySet, t *testing.T) {
 }
 
 // queryDelete validates the removal of a query from the database.
-func queryDelete(q *QuerySet, t *testing.T) {
+func queryDelete(q *Set, t *testing.T) {
 	t.Log("Given the need to remove a query record in the database")
 	{
 		t.Log("\tWhen giving an query")
@@ -201,7 +201,7 @@ func queryDelete(q *QuerySet, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			qs, err := RemoveQuerySet("Tests", ses, q.Name)
+			qs, err := RemoveSet("Tests", ses, q.Name)
 			if err != nil {
 				t.Errorf("\t\tShould have removed query record name[%s] successfully %s", q.Name, tests.Failed)
 			} else {
