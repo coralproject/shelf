@@ -55,7 +55,7 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	res, err := json.MarshalIndent(user, "", "\n")
+	res, err := json.MarshalIndent(user, "", "\t")
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return
