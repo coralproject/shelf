@@ -38,6 +38,8 @@ func removeSessions(ses *mgo.Session) error {
 	return nil
 }
 
+// TestIsExpired tests that we can properly identify when a
+// session is expired or not.
 func TestIsExpired(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
