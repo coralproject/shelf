@@ -1,6 +1,9 @@
 package cmdquery
 
 import (
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/spf13/cobra"
 )
 
@@ -11,13 +14,13 @@ was created in the system
 
 Example:
 
-	query update -n user_advice -f ./queries/user_advice.json
+	query update -f ./queries/user_advice.json
 `
 
 // update contains the state for this command.
 var update struct {
 	file string
-	name string
+	// name string
 }
 
 // addUpd handles the update of query record.
@@ -29,7 +32,7 @@ func addUpd() {
 		Run:   runUpdate,
 	}
 
-	cmd.Flags().StringVarP(&update.name, "name", "n", "", "name of query record")
+	// cmd.Flags().StringVarP(&update.name, "name", "n", "", "name of query record")
 	cmd.Flags().StringVarP(&update.file, "file", "f", "", "file path of query json file")
 
 	queryCmd.AddCommand(cmd)
@@ -37,4 +40,36 @@ func addUpd() {
 
 // runUpdate is the code that implements the create command.
 func runUpdate(cmd *cobra.Command, args []string) {
+	if update.file == "" {
+		cmd.Help()
+		return
+	}
+
+	// Initialize the mongodb session.
+	mongo.InitMGO()
+
+	session := mongo.GetSession()
+	defer session.Close()
+
+	// // check if the record exists with the giving name
+	// _, err := query.Get("commands", session, update.name)
+	// if err != nil {
+	// 	log.Error("commands", "runUpdate", err, "Completed")
+	// 	return
+	// }
+
+	q, err := setFromFile("commands", update.file)
+	if err != nil {
+		log.Error("commands", "runUpdate", err, "Completed")
+		return
+	}
+
+	// persist the name of the record
+	// q.Name = update.name
+
+	err2 := query.Update("commands", session, q)
+	if err2 != nil {
+		log.Error("commands", "runUpdate", err, "Completed")
+		return
+	}
 }

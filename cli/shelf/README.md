@@ -8,7 +8,7 @@
     go get github.com/CoralProject/shelf/cli/...
 
 ## Usage
-  In your terminal, once you've installed the Shelf CLI tools using `go get`, Simply
+  In your terminal, once you've installed the Shelf CLI tools using `go get`, Simply run
 
 
   ```bash
@@ -28,16 +28,31 @@
       # Use "shelf [command] --help" for more information about a command.  
   ```
 
+ Before using the CLI tools, certain configuration values must be already exported.
+
+  - Database configuration
+
+    Using the environment variables, set up the mongo connection configuration
+
+    ```bash
+
+      export SHELF_MONGO_HOST="ds04353434.mongolab.com:53894"
+      export SHELF_MONGO_AUTHDB="shelf"
+      export SHELF_MONGO_DB="shelfbox"
+      export SHELF_MONGO_USER="box"
+      export SHELF_MONGO_PASS="box"
+
+    ```
 
 ## Tools
 
   - **Query**
-  
+
     The `query` command provides CRUD based subcommands for interfacing with the
     query database API. These commands are:
 
     - **`create`**
-    
+
         Create allows the creation of a new query record into to the system, by
         loading the query records content from a json file.
 
@@ -45,12 +60,12 @@
 
           ```bash
 
-          	> query create -f ./queries/user_advice.json
+          	> shelf query create -f ./queries/user_advice.json
 
           ```
 
     - **`get`**
-    
+
         Get allows the retrieval of a query record from the system using the
         giving name of the record. It returns a json response of the contents of
         the record.
@@ -59,12 +74,12 @@
 
           ```bash
 
-          	> query get -n user_advice
+          	> shelf query get -n user_advice
 
           ```
 
     - **`update`**
-    
+
         Update provides the means of updating a giving query record in the query
         database using a file.
 
@@ -72,12 +87,12 @@
 
           ```bash
 
-          	> query update -n user_advice -f ./queries/user_advice_update.json
+          	> shelf query update  -f ./queries/user_advice_update.json
 
           ```
 
     - **`delete`**
-    
+
         Delete provides the means of remove a giving query record in the query
         database using its giving name.
 
@@ -85,12 +100,12 @@
 
           ```bash
 
-          	> query delete -n user_advice
+          	> shelf query delete -n user_advice
 
           ```
 
     - **`execute`**
-    
+
         Execute provides the means of remove a executing a query record in the query
         database using its name and a optional parameter of map contain key value pairs.
 
@@ -98,20 +113,20 @@
 
           ```bash
 
-            > query execute -n user_advice
+            > shelf query execute -n user_advice
 
-            >	query execute -n user_advice -p {"name":"john"}
+            >	shelf query execute -n user_advice -p {"name":"john"}
 
           ```
 
 
   - **Users**
-  
+
     The `user` command provides CRUD based subcommands for interfacing with the
     user database and authentication API. These commands are:
 
     - **`create`**
-    
+
         Create allows the creation of a new user record into to the system, with the
         provided record data.
 
@@ -124,7 +139,7 @@
           ```
 
     - **`get`**
-      
+
         Get allows the retrieval of a user record from the system using the
         giving name of the record. It returns a json response of the contents of
         the record.
@@ -148,7 +163,7 @@
           ```
 
     - **`update`**
-        
+
         Update provides the means of updating a giving user record in the user
         database. It provides update to basic information(FullName, Email) and
         allows password change updates.
@@ -177,7 +192,7 @@
           ```
 
     - **`delete`**
-      
+
         Delete provides the means of remove a giving user record in the user
         database using specific identification information such as the users Email,
         PublicID or FullName.
@@ -201,7 +216,7 @@
           ```
 
       - **`auth`**
-      
+
         Auth provides the means of authenticating user credentials from the CLI.
         It provides authentication either using the `Username and Password` combination or
         using the records access `Token and PublicID` information.

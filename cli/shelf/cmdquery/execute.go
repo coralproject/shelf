@@ -1,6 +1,8 @@
 package cmdquery
 
 import (
+	"log"
+
 	"github.com/spf13/cobra"
 )
 
@@ -38,4 +40,5 @@ func addExecute() {
 
 // runExecute is the code that implements the execute command.
 func runExecute(cmd *cobra.Command, args []string) {
+	log.Fatal("commands", "runExecute", "The query execute functionality is still pending")
 }

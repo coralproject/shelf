@@ -1,6 +1,9 @@
 package cmdquery
 
 import (
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/spf13/cobra"
 )
 
@@ -37,4 +40,26 @@ func addCreate() {
 
 // runCreate is the code that implements the create command.
 func runCreate(cmd *cobra.Command, args []string) {
+	if create.file == "" {
+		cmd.Help()
+		return
+	}
+
+	q, err := setFromFile("commands", create.file)
+	if err != nil {
+		log.Error("commands", "runCreate", err, "Completed")
+		return
+	}
+
+	// Initialize the mongodb session.
+	mongo.InitMGO()
+
+	session := mongo.GetSession()
+	defer session.Close()
+
+	err2 := query.Create("commands", session, q)
+	if err2 != nil {
+		log.Error("commands", "runCreate", err, "Completed")
+		return
+	}
 }

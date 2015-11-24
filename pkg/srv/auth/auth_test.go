@@ -6,16 +6,19 @@ import (
 
 	"gopkg.in/mgo.v2"
 
+	"github.com/coralproject/shelf/pkg/srv/auth"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/tests"
 )
 
-var nu = NewUser{
-	FullName:        "Zhang Luo",
-	Email:           "zhang.luo@gmail.com",
-	Password:        "Zhu4*20F_M",
-	PasswordConfirm: "Zhu4*20F_M",
-	PostalCode:      "43223L NY",
+var collection = "users"
+var u auth.User
+var nu = auth.NewUser{
+	UserType: 0,
+	Status:   auth.StatusActive,
+	FullName: "Zhang Luo",
+	Email:    "zhang.luo@gmail.com",
+	Password: "Zhu4*20F_M",
 }
 
 // TestUserAPI validates the user CRUD API.
@@ -26,46 +29,40 @@ func TestUserAPI(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	u, err := nu.Create("tests")
-	if err != nil {
-		t.Fatalf("Creating User Data %s", tests.Failed)
-	}
-	t.Logf("Creating User Data %s", tests.Success)
-
-	userCreate(u, t)
-	userRecordByName(u.FullName, u, t)
-	userRecordByEmail(u.Email, u, t)
-	userRecordByPublicID(u.PublicID, u, t)
-	userUpdate(u, t)
-	userDelete(u, t)
+	userCreate(nu, t)
+	userRecordByName(&u, t)
+	userRecordByEmail(&u, t)
+	userRecordByPublicID(&u, t)
+	userUpdate(&u, t)
+	userDelete(&u, t)
 	tearDown(t)
 }
 
 // userCreate tests the addition of a user record into the database.
-func userCreate(u *User, t *testing.T) {
+func userCreate(u auth.NewUser, t *testing.T) {
 }
 
 // userRecordByName tests the retrieval of a user record from the database, using
 // the records "Name".
-func userRecordByName(name string, u *User, t *testing.T) {
+func userRecordByName(u *auth.User, t *testing.T) {
 }
 
 // userRecordByEmail tests the retrieval of a user record from the database, using
 // the records "Email".
-func userRecordByEmail(email string, u *User, t *testing.T) {
+func userRecordByEmail(u *auth.User, t *testing.T) {
 }
 
 // userRecordByPublicID tests the retrieval of a user record from the database, using
 // the records "PublicID".
-func userRecordByPublicID(pid string, u *User, t *testing.T) {
+func userRecordByPublicID(u *auth.User, t *testing.T) {
 }
 
 // userCreate tests the updating of a user record in the database.
-func userUpdate(u *User, t *testing.T) {
+func userUpdate(u *auth.User, t *testing.T) {
 }
 
 // userDelete tests the removal of a user record in the database.
-func userDelete(u *User, t *testing.T) {
+func userDelete(u *auth.User, t *testing.T) {
 }
 
 // tearDown tears down the collection being used.
