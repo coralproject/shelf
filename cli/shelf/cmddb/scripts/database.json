@@ -7,7 +7,11 @@
                 [
                     {   "name" : "session_id",
                         "unique" : true,
-                        "fields" : [{"name" : "s_id", "type":1}]
+                        "fields" : [{"name" : "session_id", "type":1}]
+                    },
+                    {   "name" : "public_id",
+                        "unique" : true,
+                        "fields" : [{"name" : "public_id", "type":1}]
                     }
                 ]
         },

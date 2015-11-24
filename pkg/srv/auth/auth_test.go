@@ -64,16 +64,3 @@ func userUpdate(u *auth.User, t *testing.T) {
 // userDelete tests the removal of a user record in the database.
 func userDelete(u *auth.User, t *testing.T) {
 }
-
-// tearDown tears down the collection being used.
-func tearDown(t *testing.T) {
-	err := mongo.ExecuteDB("tearDown", mongo.GetSession(), collection, func(c *mgo.Collection) error {
-		return c.DropCollection()
-	})
-
-	if err != nil {
-		t.Errorf("Successfully dropped users collection %s", tests.Failed)
-	} else {
-		t.Logf("Successfully dropped users collection %s", tests.Success)
-	}
-}

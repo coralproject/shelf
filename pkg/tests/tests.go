@@ -38,24 +38,12 @@ func DisplayLog() {
 // Init is to be runned once. It initializes the necessary logs and mongodb
 // connections for testing.
 func Init() {
-	initConfig()
 	cfg.Init("shelf")
-
-	// TODO: read current log mode from configuration.
 	log.Init(&logdash, func() int { return log.DEV })
-	err := mongo.InitMGO()
-	if err != nil {
-		log.Error("Test", "Init", err, "Test : Init : Error")
+
+	if err := mongo.InitMGO(); err != nil {
+		log.Error("Test", "Init", err, "Completed")
 		DisplayLog()
 		os.Exit(1)
 	}
-}
-
-// initConfig initializes tests configuration for mongo.
-func initConfig() {
-	os.Setenv("SHELF_MONGO_HOST", "ds053894.mongolab.com:53894")
-	os.Setenv("SHELF_MONGO_AUTHDB", "monsterbox")
-	os.Setenv("SHELF_MONGO_DB", "monsterbox")
-	os.Setenv("SHELF_MONGO_USER", "monsterbox")
-	os.Setenv("SHELF_MONGO_PASS", "box")
 }
