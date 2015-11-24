@@ -38,22 +38,6 @@ func removeSessions(ses *mgo.Session) error {
 	return nil
 }
 
-// retrieveSession is used to validate sessions are being saved
-// correctly.
-func retrieveSession(ses *mgo.Session, sessionID string) (*session.Session, error) {
-	var s session.Session
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"session_id": sessionID}
-		return c.Find(q).One(&s)
-	}
-
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		return nil, err
-	}
-
-	return &s, nil
-}
-
 // TestCreate tests the creation of sessions.
 func TestCreate(t *testing.T) {
 	tests.ResetLog()
@@ -77,7 +61,7 @@ func TestCreate(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
-			s2, err := retrieveSession(ses, s1.SessionID)
+			s2, err := session.Get(context, ses, s1.SessionID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
 			}
@@ -99,6 +83,26 @@ func TestCreate(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
+		}
+	}
+}
+
+// TestGetNotFound tests when a session is not found.
+func TestGetNotFound(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to test finding a session and it is not found.")
+	{
+		t.Logf("\tWhen using SessionID %s", "NOT EXISTS")
+		{
+			ses := mongo.GetSession()
+			defer ses.Close()
+
+			if _, err := session.Get(context, ses, "NOT EXISTS"); err == nil {
+				t.Fatalf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 		}
 	}
 }
