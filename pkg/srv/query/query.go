@@ -21,7 +21,7 @@ func CreateSet(context interface{}, ses *mgo.Session, qs Set) error {
 	log.Dev(context, "CreateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "CreateSet", "MGO :\n\ndb.%s.Insert(%s)\n", collection, mongo.Query(qs))
+		log.Dev(context, "CreateSet", "MGO : db.%s.Insert(%s)", collection, mongo.Query(qs))
 		return c.Insert(&qs)
 	}
 
