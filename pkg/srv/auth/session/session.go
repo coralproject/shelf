@@ -12,7 +12,7 @@ import (
 )
 
 // collections contains the name of the user collection.
-const collection = "session"
+const collection = "sessions"
 
 //==============================================================================
 
