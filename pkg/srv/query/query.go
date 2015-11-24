@@ -95,12 +95,26 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 func Update(context interface{}, ses *mgo.Session, rs Set) error {
 	log.Dev(context, "Update", "Started : Name[%s]", rs.Name)
 
+	getid := func(c *mgo.Collection) error {
+		q := bson.M{"name": rs.Name}
+		qs := bson.M{"_id": 1}
+
+		log.Dev(context, "Update", "MGO :\n\ndb.%s.find(%s).select(%s)\n", collection, mongo.Query(q), mongo.Query(qs))
+		id := make(map[string]bson.ObjectId)
+		if err := c.Find(q).Select(qs).One(&id); err != nil {
+			return err
+		}
+
+		rs.ID = id["_id"]
+		return nil
+	}
+
+	if err := mongo.ExecuteDB(context, ses, collection, getid); err != nil {
+		rs.ID = bson.NewObjectId()
+	}
+
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
-
-		if len(rs.ID) == 0 {
-			rs.ID = bson.NewObjectId()
-		}
 
 		log.Dev(context, "Update", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
 		_, err := c.Upsert(q, &rs)

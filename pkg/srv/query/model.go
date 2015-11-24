@@ -45,7 +45,7 @@ type SetParam struct {
 // TODO: Should we consider adding the ObjectId as a
 // parameter to Set?
 type Set struct {
-	ID          bson.ObjectId `bson:"id" json:"id,omitempty"` // ObjectId of the RuleSet.
+	ID          bson.ObjectId `bson:"_id" json:"-"`           // ObjectId of the RuleSet.
 	Name        string        `bson:"name" json:"name"`       // Name of the RuleSet.
 	Description string        `bson:"desc" json:"desc"`       // Description of the RuleSet.
 	Enabled     bool          `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
