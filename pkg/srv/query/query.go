@@ -14,7 +14,7 @@ import (
 // collections contains the name of the rules collection.
 const collection = "queries"
 
-// ==============================================================
+// =============================================================================
 
 // Create is used to create Set document/record in the db.
 func Create(context interface{}, ses *mgo.Session, rs Set) error {
@@ -35,7 +35,7 @@ func Create(context interface{}, ses *mgo.Session, rs Set) error {
 	return nil
 }
 
-// ==============================================================
+// =============================================================================
 
 // GetSetNames retrieves a list of rule names.
 func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
@@ -67,7 +67,7 @@ func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	return rsn, nil
 }
 
-// ==============================================================
+// =============================================================================
 
 // GetSetByName retrieves the configuration for the specified Set.
 func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
@@ -89,7 +89,7 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 	return &rs, nil
 }
 
-// ==============================================================
+// =============================================================================
 
 // Update is used to update existing Set documents.
 func Update(context interface{}, ses *mgo.Session, rs Set) error {
@@ -130,7 +130,7 @@ func Update(context interface{}, ses *mgo.Session, rs Set) error {
 	return nil
 }
 
-// ==============================================================
+// =============================================================================
 
 // Delete is used to remove an existing Set documents.
 func Delete(context interface{}, ses *mgo.Session, name string) error {
@@ -151,4 +151,4 @@ func Delete(context interface{}, ses *mgo.Session, name string) error {
 	return nil
 }
 
-// ==============================================================
+// =============================================================================
