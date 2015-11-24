@@ -9,6 +9,7 @@ import (
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
 	"github.com/coralproject/shelf/cli/shelf/cmduser"
 	"github.com/coralproject/shelf/pkg/cfg"
+	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"github.com/spf13/cobra"
@@ -20,6 +21,8 @@ var shelf = &cobra.Command{
 }
 
 func main() {
+	log.Init(os.Stdout, func() int { return log.DEV })
+
 	if err := cfg.Init("SHELF"); err != nil {
 		shelf.Println("Unable to initialize configuration")
 		os.Exit(1)
