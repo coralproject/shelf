@@ -1,3 +1,4 @@
+// Package query_test tests the query CRUD API.
 package query_test
 
 import (
@@ -41,16 +42,16 @@ func TestQueryAPI(t *testing.T) {
 		t.Logf("\t\tShould load File[%q] without error %s", qFile, tests.Success)
 	}
 
-	queryCreate(&qs, t)
+	queryCreate(qs, t)
 	queryGetNames(t)
-	queryGetByName(qs.Name, &qs, t)
-	queryUpdate(&qs, t)
-	queryDelete(&qs, t)
+	queryGetByName(qs.Name, qs, t)
+	queryUpdate(qs, t)
+	queryDelete(qs.Name, t)
 	tearDown(t)
 }
 
 // queryCreate validates the creation of a query in the databae.
-func queryCreate(q *query.Set, t *testing.T) {
+func queryCreate(q query.Set, t *testing.T) {
 	t.Log("Given the need to save a query into the database")
 	{
 		t.Log("\tWhen giving a query object to save")
@@ -79,7 +80,7 @@ func queryGetNames(t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			names, err := query.GetNames("Test", ses)
+			names, err := query.GetSetNames("Test", ses)
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved query record names successfully %s", tests.Failed)
 			} else {
@@ -103,7 +104,7 @@ func queryGetNames(t *testing.T) {
 }
 
 // queryGetByName validates the retrieval of a query using its name.
-func queryGetByName(name string, q *query.Set, t *testing.T) {
+func queryGetByName(name string, q query.Set, t *testing.T) {
 	t.Log("Given the need to retrieve a query from the database")
 	{
 		t.Log("\tWhen giving a query record's name")
@@ -111,7 +112,7 @@ func queryGetByName(name string, q *query.Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			qs, err := query.Get("Tests", ses, name)
+			qs, err := query.GetSetByName("Tests", ses, name)
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved query record name[%s] successfully %s", name, tests.Failed)
 			} else {
@@ -153,7 +154,7 @@ func queryGetByName(name string, q *query.Set, t *testing.T) {
 }
 
 // queryUpdate validates the updating of a query's content in the database.
-func queryUpdate(q *query.Set, t *testing.T) {
+func queryUpdate(q query.Set, t *testing.T) {
 	t.Log("Given the need to update a query record in the database")
 	{
 		t.Log("\tWhen giving an updated query")
@@ -175,7 +176,7 @@ func queryUpdate(q *query.Set, t *testing.T) {
 				getSes := mongo.GetSession()
 				defer getSes.Close()
 
-				qs, err := query.Get("Tests", getSes, q.Name)
+				qs, err := query.GetSetByName("Tests", getSes, q.Name)
 				if err != nil {
 					t.Errorf("\t\tShould have retrieved query record name[%s] successfully %s", q.Name, tests.Failed)
 				} else {
@@ -195,7 +196,7 @@ func queryUpdate(q *query.Set, t *testing.T) {
 }
 
 // queryDelete validates the removal of a query from the database.
-func queryDelete(q *query.Set, t *testing.T) {
+func queryDelete(name string, t *testing.T) {
 	t.Log("Given the need to remove a query record in the database")
 	{
 		t.Log("\tWhen giving an query")
@@ -203,11 +204,11 @@ func queryDelete(q *query.Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			_, err := query.Delete("Tests", ses, q.Name)
+			err := query.Delete("Tests", ses, name)
 			if err != nil {
-				t.Errorf("\t\tShould have removed query record name[%s] successfully %s", q.Name, tests.Failed)
+				t.Errorf("\t\tShould have removed query record name[%s] successfully %s", name, tests.Failed)
 			} else {
-				t.Logf("\t\tShould have removed query record name[%s] successfully %s", q.Name, tests.Success)
+				t.Logf("\t\tShould have removed query record name[%s] successfully %s", name, tests.Success)
 			}
 
 		}
