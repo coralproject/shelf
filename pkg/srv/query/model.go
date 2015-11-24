@@ -1,4 +1,3 @@
-// Package query provides CRUD API methods for handling database operations for query records.
 package query
 
 import "gopkg.in/mgo.v2/bson"

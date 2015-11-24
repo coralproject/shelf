@@ -1,4 +1,3 @@
-// TODO: add package description
 package comment
 
 // Taxonomy holds all name-value pairs.

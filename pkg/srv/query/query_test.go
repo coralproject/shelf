@@ -1,4 +1,3 @@
-// Package query_test tests the database API.
 package query_test
 
 import (
