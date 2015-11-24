@@ -1,3 +1,4 @@
+// TODO: add package description
 package comment
 
 import (
@@ -6,7 +7,7 @@ import (
 
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
-	"github.com/github.com/pborman/uuid"
+	"github.com/pborman/uuid"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -39,8 +40,8 @@ func GetCommentByID(context interface{}, session *mgo.Session, id string) (*User
 // CreateComment creates a new comment
 func CreateComment(context interface{}, session *mgo.Session, comment Comment) (*Comment, error) {
 
-	if comment.Id == "" {
-		comment.Id = uuid.New()
+	if comment.ID == "" {
+		comment.ID = uuid.New()
 	}
 	comment.CreatedDate = time.Now()
 	comment.Status = "New"
@@ -106,8 +107,8 @@ func CreateUser(context interface{}, session *mgo.Session, user User) (*User, er
 		return dbUser, nil
 	}
 
-	if user.Id == "" {
-		user.Id = uuid.New()
+	if user.ID == "" {
+		user.ID = uuid.New()
 	}
 	user.MemberSince = time.Now()
 
