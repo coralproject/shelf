@@ -2,6 +2,8 @@
 *.o
 *.a
 *.so
+config/dev.bat
+config/dev.cfg
 
 # Folders
 _obj
