@@ -1,4 +1,3 @@
-// Package comment provides database CRUD API for comments, assets and category structs.
 package comment
 
 import "time"
