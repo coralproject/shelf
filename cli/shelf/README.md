@@ -156,7 +156,7 @@
           	# 2. To update the 'email' of a giving record. Simple set the update type to "email",
           	# and supply the current email and new email.
 
-          	>	shelf user update -t email -e shou.lou@gmail.com -n shou.lou.fengzhu@gmail.com
+          	> shelf user update -t email -e shou.lou@gmail.com -n shou.lou.fengzhu@gmail.com
 
           	# 3. To update the 'password' of a giving record. Simple set the update type to "auth",
           	# and supply the current email of the record, the current password of the record and
@@ -189,7 +189,8 @@
 
           ```
 
-      - `auth`
+
+    - `auth`
         Auth provides the means of authenticating user credentials from the CLI.
         It provides authentication either using the `Username and Password` combination or
         using the records access `Token and PublicID` information.
