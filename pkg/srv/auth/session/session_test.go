@@ -30,8 +30,7 @@ func removeSessions(ses *mgo.Session) error {
 		return c.Remove(q)
 	}
 
-	err := mongo.ExecuteDB(context, ses, collection, f)
-	if err != mgo.ErrNotFound {
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != mgo.ErrNotFound {
 		return err
 	}
 

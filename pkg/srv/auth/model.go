@@ -2,6 +2,7 @@
 package auth
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
@@ -24,6 +25,11 @@ const (
 	StatusInvalid
 )
 
+// Set of user type codes.
+const (
+	TypeAPI = iota + 1
+)
+
 //==============================================================================
 
 // LoginUser model used for when a user logs in.
@@ -44,7 +50,6 @@ type User struct {
 	FullName     string        `bson:"full_name" json:"full_name"`
 	Email        string        `bson:"email" json:"email"`
 	Password     string        `bson:"password" json:"-"`
-	Token        string        `bson:"-" json:"token"`
 	IsDeleted    bool          `bson:"is_deleted" json:"-"`
 	DateModified time.Time     `bson:"date_modified" json:"-"`
 	DateCreated  time.Time     `bson:"date_created" json:"-"`
@@ -70,9 +75,20 @@ func (u *User) Salt() ([]byte, error) {
 	return []byte(s), nil
 }
 
-// AuthenticateToken authenticates a User entities token.
-func (u *User) AuthenticateToken(token string) error {
-	if err := crypto.IsTokenValid(u, token); err != nil {
+// WebToken returns a token ready for web use.
+func (u *User) WebToken(sessionID string) (string, error) {
+	t, err := crypto.GenerateToken(u)
+	if err != nil {
+		return "", err
+	}
+
+	token := base64.StdEncoding.EncodeToString([]byte(sessionID + ":" + base64.StdEncoding.EncodeToString(t)))
+	return token, nil
+}
+
+// AuthenticateWebToken authenticates a User entities token.
+func (u *User) AuthenticateWebToken(webToken string) error {
+	if err := crypto.IsTokenValid(u, webToken); err != nil {
 		return err
 	}
 
@@ -110,27 +126,26 @@ func (nu *NewUser) validate(context interface{}) error {
 
 	var v validation.Validation
 
-	v.Required(nu.FullName, "full_name")
-	v.AlphaNumeric(nu.FullName, "full_name")
-	v.MinSize(nu.FullName, 2, "full_name")
+	v.Required(nu.FullName, "FullName")
+	v.MinSize(nu.FullName, 2, "FullName")
 
-	v.Required(nu.Email, "email")
-	v.Email(nu.Email, "email")
-	v.MaxSize(nu.Email, 100, "email")
+	v.Required(nu.Email, "Email")
+	v.Email(nu.Email, "Email")
+	v.MaxSize(nu.Email, 100, "Email")
 
-	v.Required(nu.Password, "password")
-	v.MinSize(nu.Password, 8, "password")
-
-	if v.HasErrors() {
-		return fmt.Errorf("%v", v.Errors)
-	}
+	v.Required(nu.Password, "Password")
+	v.MinSize(nu.Password, 8, "Password")
 
 	log.Dev(context, "NewUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
+
+	if v.HasErrors() {
+		return fmt.Errorf("%v", v.ErrorsMap)
+	}
 	return nil
 }
 
-// create takes a new user and creates a valid User value.
-func (nu *NewUser) create(context interface{}) (*User, error) {
+// new takes a new user and creates a valid User value.
+func (nu *NewUser) new(context interface{}) (*User, error) {
 	log.Dev(context, "NewUser.Create", "Started : Email[%s]", nu.Email)
 
 	u := User{
@@ -182,10 +197,11 @@ func (uu *UpdUser) validate(context interface{}) error {
 	v.Email(uu.Email, "email")
 	v.MaxSize(uu.Email, 100, "email")
 
+	log.Dev(context, "UpdUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
+
 	if v.HasErrors() {
 		return fmt.Errorf("%v", v.Errors)
 	}
 
-	log.Dev(context, "UpdUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
 	return nil
 }

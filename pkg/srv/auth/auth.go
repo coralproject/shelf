@@ -8,7 +8,6 @@ import (
 
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
-	"github.com/coralproject/shelf/pkg/srv/auth/session"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
@@ -16,56 +15,36 @@ import (
 )
 
 // collections contains the name of the user collection.
-const collection = "user"
+const collection = "users"
 
 //==============================================================================
 
-// Create adds a new user to the database.
-func Create(context interface{}, ses *mgo.Session, nu NewUser) (*User, error) {
-	log.Dev(context, "Create", "Started : Email[%s]", nu.Email)
+// CreateUser adds a new user to the database.
+func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error) {
+	log.Dev(context, "CreateUser", "Started : Email[%s]", nu.Email)
 
 	if err := nu.validate(context); err != nil {
-		log.Error(context, "Create", err, "Completed")
+		log.Error(context, "CreateUser", err, "Completed")
 		return nil, err
 	}
 
-	u, err := nu.create(context)
+	u, err := nu.new(context)
 	if err != nil {
-		log.Error(context, "Create", err, "Completed")
-		return nil, err
-	}
-
-	// Sessions are good for 6 months.
-	// TODO: May need configuration.
-	const expires = 24 * 160 * time.Hour
-
-	// We need a session for this user account. Sessions provide a
-	// token with a TTL.
-	s, err := session.Create(context, ses, u.PublicID, expires)
-	if err != nil {
-		log.Error(context, "Create", err, "Completed")
-		return nil, err
-	}
-
-	// Set this token into the user account. This is the token used
-	// to authenticate API calls.
-	u.Token, err = crypto.GenerateWebToken(u, s.SessionID)
-	if err != nil {
-		log.Error(context, "Create", err, "Completed")
+		log.Error(context, "CreateUser", err, "Completed")
 		return nil, err
 	}
 
 	f := func(col *mgo.Collection) error {
-		// DO NOT LOG THIS QUERY!
-		return col.Insert(&u)
+		log.Dev(context, "CreateUser", "MGO : db.%s.insert(CAN'T SHOW)", collection)
+		return col.Insert(u)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Create", err, "Completed")
+		log.Error(context, "CreateUser", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "Create", "Completed")
+	log.Dev(context, "CreateUser", "Completed")
 	return u, nil
 }
 
@@ -174,26 +153,10 @@ func UpdateCredentials(context interface{}, ses *mgo.Session, u *User, password 
 		return err
 	}
 
-	// Sessions are good for 6 months.
-	// TODO: May need configuration.
-	const expires = 24 * 160 * time.Hour
-
-	// We need a new session for this updated user account. Sessions provide
-	// a token with a TTL.
-	s, err := session.Create(context, ses, u.PublicID, expires)
-	if err != nil {
-		log.Error(context, "UpdateCredentials", err, "Completed")
-		return err
-	}
-
-	// Set this token into the user account. This is the token used
-	// to authenticate API calls.
-	token, err := crypto.GenerateWebToken(u, s.SessionID)
-
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": u.PublicID}
-		upd := bson.M{"$set": bson.M{"password": newPassHash, "token": token, "modified_at": time.Now().UTC()}}
-		// DO NOT LOG THIS QUERY!
+		upd := bson.M{"$set": bson.M{"password": newPassHash, "modified_at": time.Now().UTC()}}
+		log.Dev(context, "Create", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
 		return c.Update(q, upd)
 	}
 
