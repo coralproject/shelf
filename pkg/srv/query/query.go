@@ -22,6 +22,7 @@ func Create(context interface{}, ses *mgo.Session, rs Set) error {
 
 	f := func(c *mgo.Collection) error {
 		log.Dev(context, "Create", "MGO :\n\ndb.%s.Insert(%s)\n", collection, mongo.Query(rs))
+		rs.ID = bson.NewObjectId()
 		return c.Insert(&rs)
 	}
 
@@ -96,6 +97,10 @@ func Update(context interface{}, ses *mgo.Session, rs Set) error {
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
+
+		if len(rs.ID) == 0 {
+			rs.ID = bson.NewObjectId()
+		}
 
 		log.Dev(context, "Update", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
 		_, err := c.Upsert(q, &rs)

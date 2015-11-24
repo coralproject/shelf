@@ -1,4 +1,4 @@
-// Package query_test tests the query CRUD API.
+// Package query_test tests the database API.
 package query_test
 
 import (
@@ -169,7 +169,7 @@ func queryUpdate(q query.Set, t *testing.T) {
 			err := query.Update("Tests", ses, q)
 
 			if err != nil {
-				t.Errorf("\t\tShould have updated query record name[%s] successfully %s", q.Name, tests.Failed)
+				t.Errorf("\t\tShould have updated query record name[%s] Error[%s] successfully %s", q.Name, err, tests.Failed)
 			} else {
 				t.Logf("\t\tShould have updated query record name[%s] successfully %s", q.Name, tests.Success)
 
