@@ -8,6 +8,7 @@ import (
 
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
+	"github.com/coralproject/shelf/pkg/srv/auth/session"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
@@ -46,6 +47,37 @@ func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error
 
 	log.Dev(context, "CreateUser", "Completed")
 	return u, nil
+}
+
+// CreateWebToken return a token and session that can be used to authenticate a user.
+func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time.Duration) (token string, sessionID string, err error) {
+	log.Dev(context, "CreateWebToken", "Started : PublicID[%s]", u.PublicID)
+
+	// Do we have a valid session right now?
+	s, err := session.GetLatest(context, ses, u.PublicID)
+	if err != nil && err != mgo.ErrNotFound {
+		log.Error(context, "CreateUser", err, "Completed")
+		return "", "", err
+	}
+
+	// If we don't have one or it has been expired.
+	if err == mgo.ErrNotFound || s.IsExpired() {
+		if s, err = session.Create(context, ses, u.PublicID, expires); err != nil {
+			log.Error(context, "CreateUser", err, "Completed")
+			return "", "", err
+		}
+	}
+
+	// Set the return arguments though we will explicitly
+	// return them. Don't want any confusion.
+	sessionID = s.SessionID
+	if token, err = u.WebToken(sessionID); err != nil {
+		log.Error(context, "CreateUser", err, "Completed")
+		return "", "", err
+	}
+
+	log.Dev(context, "CreateWebToken", "Completed")
+	return token, sessionID, nil
 }
 
 //==============================================================================

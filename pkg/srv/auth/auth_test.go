@@ -98,3 +98,7 @@ func TestCreateUser(t *testing.T) {
 		}
 	}
 }
+
+// TestCreateWebToken tests create a web token and a pairing session.
+func TestCreateWebToken(t *testing.T) {
+}
