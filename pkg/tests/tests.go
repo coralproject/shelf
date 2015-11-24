@@ -43,7 +43,7 @@ func Init() {
 
 	if err := mongo.InitMGO(); err != nil {
 		log.Error("Test", "Init", err, "Completed")
-		DisplayLog()
+		logdash.WriteTo(os.Stdout)
 		os.Exit(1)
 	}
 }
