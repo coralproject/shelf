@@ -13,7 +13,7 @@ import (
 )
 
 // collection used for testing the query CRUD API
-var collection = "query"
+var collection = "queries"
 
 // TestQueryAPI validates the operations of the query database and file loading API.
 func TestQueryAPI(t *testing.T) {
