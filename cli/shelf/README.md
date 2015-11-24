@@ -31,11 +31,13 @@
 
 ## Tools
 
-  - Query
+  - **Query**
+  
     The `query` command provides CRUD based subcommands for interfacing with the
     query database API. These commands are:
 
-    - `create`
+    - **`create`**
+    
         Create allows the creation of a new query record into to the system, by
         loading the query records content from a json file.
 
@@ -47,8 +49,9 @@
 
           ```
 
-    - `get`
-        Create allows the retrieval of a query record from the system using the
+    - **`get`**
+    
+        Get allows the retrieval of a query record from the system using the
         giving name of the record. It returns a json response of the contents of
         the record.
 
@@ -60,7 +63,8 @@
 
           ```
 
-    - `update`
+    - **`update`**
+    
         Update provides the means of updating a giving query record in the query
         database using a file.
 
@@ -72,7 +76,8 @@
 
           ```
 
-    - `delete`
+    - **`delete`**
+    
         Delete provides the means of remove a giving query record in the query
         database using its giving name.
 
@@ -84,7 +89,8 @@
 
           ```
 
-    - `execute`
+    - **`execute`**
+    
         Execute provides the means of remove a executing a query record in the query
         database using its name and a optional parameter of map contain key value pairs.
 
@@ -99,11 +105,13 @@
           ```
 
 
-  - Users
+  - **Users**
+  
     The `user` command provides CRUD based subcommands for interfacing with the
     user database and authentication API. These commands are:
 
-    - `create`
+    - **`create`**
+    
         Create allows the creation of a new user record into to the system, with the
         provided record data.
 
@@ -115,8 +123,9 @@
 
           ```
 
-    - `get`
-        Create allows the retrieval of a user record from the system using the
+    - **`get`**
+      
+        Get allows the retrieval of a user record from the system using the
         giving name of the record. It returns a json response of the contents of
         the record.
 
@@ -138,7 +147,8 @@
 
           ```
 
-    - `update`
+    - **`update`**
+        
         Update provides the means of updating a giving user record in the user
         database. It provides update to basic information(FullName, Email) and
         allows password change updates.
@@ -156,7 +166,7 @@
           	# 2. To update the 'email' of a giving record. Simple set the update type to "email",
           	# and supply the current email and new email.
 
-          	> shelf user update -t email -e shou.lou@gmail.com -n shou.lou.fengzhu@gmail.com
+          	>	shelf user update -t email -e shou.lou@gmail.com -n shou.lou.fengzhu@gmail.com
 
           	# 3. To update the 'password' of a giving record. Simple set the update type to "auth",
           	# and supply the current email of the record, the current password of the record and
@@ -166,7 +176,8 @@
 
           ```
 
-    - `delete`
+    - **`delete`**
+      
         Delete provides the means of remove a giving user record in the user
         database using specific identification information such as the users Email,
         PublicID or FullName.
@@ -189,8 +200,8 @@
 
           ```
 
-
-    - `auth`
+      - **`auth`**
+      
         Auth provides the means of authenticating user credentials from the CLI.
         It provides authentication either using the `Username and Password` combination or
         using the records access `Token and PublicID` information.
