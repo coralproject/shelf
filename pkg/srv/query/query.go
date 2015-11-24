@@ -1,3 +1,5 @@
+// TODO: Package documentation.
+
 package query
 
 import (
@@ -43,23 +45,23 @@ func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	return rsn, nil
 }
 
-// Get retrieves the configuration for the specified Set.
-func Get(context interface{}, ses *mgo.Session, name string) (*Set, error) {
-	log.Dev(context, "Get", "Started : Name[%s]", name)
+// GetSetByName retrieves the configuration for the specified Set.
+func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+	log.Dev(context, "GetSetByName", "Started : Name[%s]", name)
 
 	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "Get", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetSetByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&rs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Get", err, "Completed")
+		log.Error(context, "GetSetByName", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "Get", "Completed : RS[%+v]", rs)
+	log.Dev(context, "GetSetByName", "Completed : RS[%+v]", rs)
 	return &rs, nil
 }
 

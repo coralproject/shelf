@@ -24,11 +24,15 @@ const (
 	StatusInvalid
 )
 
+//==============================================================================
+
 // LoginUser model used for when a user logs in.
 type LoginUser struct {
 	Email    string `json:"email" form:"email" valid:"Required;Email;MaxSize(150)"`
 	Password string `json:"password" form:"email" valid:"Required;"`
 }
+
+//==============================================================================
 
 // User model denotes a user entity for a tenant.
 type User struct {
@@ -100,6 +104,8 @@ func (u *User) IsPasswordValid(password string) bool {
 	return true
 }
 
+//==============================================================================
+
 // NewUser is provided to create new users in the system.
 type NewUser struct {
 	UserType int    `bson:"type" json:"type"`
@@ -157,4 +163,40 @@ func (nu *NewUser) create(context interface{}) (*User, error) {
 
 	log.Dev(context, "NewUser.Create", "Completed")
 	return &u, nil
+}
+
+//==============================================================================
+
+// UpdUser is provided to update an existing user in the system.
+type UpdUser struct {
+	PublicID string `bson:"public_id" json:"public_id"`
+	UserType int    `bson:"type" json:"type"`
+	Status   int    `bson:"status" json:"status"`
+	FullName string `bson:"full_name" json:"full_name"`
+	Email    string `bson:"email" json:"email"`
+}
+
+// validate performs validation on a NewUser value before it is processed.
+func (uu *UpdUser) validate(context interface{}) error {
+	log.Dev(context, "UpdUser.Validate", "Started")
+
+	var v validation.Validation
+
+	v.Required(uu.PublicID, "public_id")
+	v.MinSize(uu.PublicID, 2, "public_id")
+
+	v.Required(uu.FullName, "full_name")
+	v.AlphaNumeric(uu.FullName, "full_name")
+	v.MinSize(uu.FullName, 2, "full_name")
+
+	v.Required(uu.Email, "email")
+	v.Email(uu.Email, "email")
+	v.MaxSize(uu.Email, 100, "email")
+
+	if v.HasErrors() {
+		return fmt.Errorf("%v", v.Errors)
+	}
+
+	log.Dev(context, "UpdUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
+	return nil
 }
