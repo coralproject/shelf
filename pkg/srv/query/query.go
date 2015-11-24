@@ -13,8 +13,8 @@ import (
 // collections contains the name of the rules collection.
 const collection = "rules"
 
-// GetSetNames retrieves a list of rule names.
-func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
+// GetNames retrieves a list of rule names.
+func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	log.Dev(context, "GetSetNames", "Started")
 
 	var names []bson.M
@@ -43,8 +43,8 @@ func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 	return rsn, nil
 }
 
-// GetSet retrieves the configuration for the specified Set.
-func GetSet(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+// Get retrieves the configuration for the specified Set.
+func Get(context interface{}, ses *mgo.Session, name string) (*Set, error) {
 	log.Dev(context, "GetSet", "Started : Name[%s]", name)
 
 	var rs Set
@@ -81,8 +81,8 @@ func Create(context interface{}, ses *mgo.Session, rs *Set) error {
 	return nil
 }
 
-// UpdateSet is used to create or update existing Set documents.
-func UpdateSet(context interface{}, ses *mgo.Session, rs *Set) error {
+// Update is used to create or update existing Set documents.
+func Update(context interface{}, ses *mgo.Session, rs *Set) error {
 	log.Dev(context, "UpdateSet", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
@@ -102,8 +102,8 @@ func UpdateSet(context interface{}, ses *mgo.Session, rs *Set) error {
 	return nil
 }
 
-// DeleteSet is used to remove an existing Set documents.
-func DeleteSet(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+// Delete is used to remove an existing Set documents.
+func Delete(context interface{}, ses *mgo.Session, name string) (*Set, error) {
 	log.Dev(context, "RemoveSet", "Started : Name[%s]", name)
 
 	var rs Set

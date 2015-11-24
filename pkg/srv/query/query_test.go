@@ -57,7 +57,7 @@ func queryCreate(q *Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			err := UpdateSet("Tests", ses, q)
+			err := Create("Tests", ses, q)
 			if err != nil {
 				t.Errorf("\t\tShould have added new query record %s", tests.Failed)
 			} else {
@@ -109,7 +109,7 @@ func queryGetByName(name string, q *Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			qs, err := GetSet("Tests", ses, name)
+			qs, err := Get("Tests", ses, name)
 			if err != nil {
 				t.Errorf("\t\tShould have retrieved query record name[%s] successfully %s", name, tests.Failed)
 			} else {
@@ -163,7 +163,7 @@ func queryUpdate(q *Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			err := UpdateSet("Tests", ses, q)
+			err := Update("Tests", ses, q)
 
 			if err != nil {
 				t.Errorf("\t\tShould have updated query record name[%s] successfully %s", q.Name, tests.Failed)
@@ -201,7 +201,7 @@ func queryDelete(q *Set, t *testing.T) {
 			ses := mongo.GetSession()
 			defer ses.Close()
 
-			qs, err := RemoveSet("Tests", ses, q.Name)
+			qs, err := Delete("Tests", ses, q.Name)
 			if err != nil {
 				t.Errorf("\t\tShould have removed query record name[%s] successfully %s", q.Name, tests.Failed)
 			} else {
