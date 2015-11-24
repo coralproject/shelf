@@ -50,8 +50,8 @@ func Get(context interface{}, ses *mgo.Session, sessionID string) (*Session, err
 	var s Session
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"session_id": sessionID}
-		log.Dev(context, "Get", "MGO : db.%s.find(%s).sort({\"date_created\": 1}).limit(1)", collection, mongo.Query(q))
-		return c.Find(q).Sort("date_created").Limit(1).One(&s)
+		log.Dev(context, "Get", "MGO : db.%s.find(%s).limit(1)", collection, mongo.Query(q))
+		return c.Find(q).One(&s)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {

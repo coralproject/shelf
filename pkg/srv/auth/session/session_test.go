@@ -38,18 +38,57 @@ func removeSessions(ses *mgo.Session) error {
 	return nil
 }
 
+func TestIsExpired(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to validate a session has expired.")
+	{
+		s := session.Session{
+			DateExpires: time.Now().Add(-time.Hour),
+		}
+
+		t.Log("\tWhen using an expired session.")
+		{
+			if !s.IsExpired() {
+				t.Fatalf("\t%s\tShould be expired.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be expired", tests.Success)
+		}
+
+		s = session.Session{
+			DateExpires: time.Now().Add(time.Hour),
+		}
+
+		t.Log("\tWhen using an valid session")
+		{
+			if s.IsExpired() {
+				t.Fatalf("\t%s\tShould Not be expired.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be expired", tests.Success)
+		}
+	}
+}
+
 // TestCreate tests the creation of sessions.
 func TestCreate(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	defer func() {
+		if err := removeSessions(ses); err != nil {
+			t.Errorf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
+	}()
+
 	t.Log("Given the need to create sessions in the DB.")
 	{
 		t.Logf("\tWhen using PublicID %s", publicID)
 		{
-			ses := mongo.GetSession()
-			defer ses.Close()
-
 			if err := removeSessions(ses); err != nil {
 				t.Fatalf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
 			}
@@ -78,11 +117,6 @@ func TestCreate(t *testing.T) {
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same user.", tests.Success)
 			}
-
-			if err := removeSessions(ses); err != nil {
-				t.Fatalf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
 		}
 	}
 }
@@ -92,15 +126,37 @@ func TestGetNotFound(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	ses := mongo.GetSession()
+	defer ses.Close()
+
 	t.Log("Given the need to test finding a session and it is not found.")
 	{
 		t.Logf("\tWhen using SessionID %s", "NOT EXISTS")
 		{
-			ses := mongo.GetSession()
-			defer ses.Close()
-
 			if _, err := session.Get(context, ses, "NOT EXISTS"); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
+		}
+	}
+}
+
+// TestNoSession tests when a nil session is used.
+func TestNoSession(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to test calls with a bad session.")
+	{
+		t.Log("\tWhen using a nil session")
+		{
+			if _, err := session.Create(context, nil, publicID, 10*time.Second); err == nil {
+				t.Errorf("\t%s\tShould be able to create a session : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
+
+			if _, err := session.Get(context, nil, "NOT EXISTS"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 		}

@@ -14,3 +14,11 @@ type Session struct {
 	DateExpires time.Time     `bson:"date_expires" json:"date_expires"`
 	DateCreated time.Time     `bson:"date_created" json:"date_created"`
 }
+
+// IsExpired returns true if the session is expired.
+func (s *Session) IsExpired() bool {
+	if s.DateExpires.Before(time.Now()) {
+		return true
+	}
+	return false
+}
