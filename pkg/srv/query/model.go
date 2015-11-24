@@ -1,4 +1,7 @@
+// Package query provides CRUD API methods for handling database operations for query records.
 package query
+
+import "gopkg.in/mgo.v2/bson"
 
 // ScriptOption contains options for processing the scripts.
 type ScriptOption struct {
@@ -39,12 +42,15 @@ type SetParam struct {
 }
 
 // Set contains the configuration details for a rule set.
+// TODO: Should we consider adding the ObjectId as a
+// parameter to Set?
 type Set struct {
-	Name        string     `bson:"name" json:"name"`       // Name of the RuleSet.
-	Description string     `bson:"desc" json:"desc"`       // Description of the RuleSet.
-	Enabled     bool       `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
-	Params      []SetParam `bson:"params" json:"params"`   // Collection of parameters.
-	Rules       []Query    `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
+	ID          bson.ObjectId `bson:"id" json:"id,omitempty"` // ObjectId of the RuleSet.
+	Name        string        `bson:"name" json:"name"`       // Name of the RuleSet.
+	Description string        `bson:"desc" json:"desc"`       // Description of the RuleSet.
+	Enabled     bool          `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
+	Params      []SetParam    `bson:"params" json:"params"`   // Collection of parameters.
+	Rules       []Query       `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
 }
 
 // Result contains the result of an ruleset execution.
