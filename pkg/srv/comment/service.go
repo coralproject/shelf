@@ -120,3 +120,15 @@ func CreateUser(context interface{}, session *mgo.Session, user User) (*User, er
 	log.Dev(context, "CreateUser", "Completed")
 	return &user, nil
 }
+
+// AddUsers adds an array of users to user collection
+func AddUsers(context interface{}, session *mgo.Session, users []User) error {
+
+	return mongo.GetCollection(session, collectionUser).Insert(users)
+}
+
+// AddComments adds an array of comments to comment collection
+func AddComments(context interface{}, session *mgo.Session, comments []Comment) error {
+
+	return mongo.GetCollection(session, collectionComment).Insert(comments)
+}
