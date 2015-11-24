@@ -7,8 +7,8 @@ import (
 	"testing"
 
 	"github.com/coralproject/shelf/pkg/cfg"
-	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
 )
 
 // Success is a unicode codepoint for a check mark.
@@ -43,14 +43,19 @@ func Init() {
 
 	// TODO: read current log mode from configuration.
 	log.Init(&logdash, func() int { return log.DEV })
-	mongo.InitMGO()
+	err := mongo.InitMGO()
+	if err != nil {
+		log.Error("Test", "Init", err, "Test : Init : Error")
+		DisplayLog()
+		os.Exit(1)
+	}
 }
 
 // initConfig initializes tests configuration for mongo.
 func initConfig() {
-	os.Setenv("SHELF_MONGO_HOST", "ds035428.mongolab.com:35428")
-	os.Setenv("SHELF_MONGO_AUTHDB", "goinggo")
-	os.Setenv("SHELF_MONGO_DB", "guest")
-	os.Setenv("SHELF_MONGO_USER", "welcome")
-	os.Setenv("SHELF_MONGO_PASS", "goinggo")
+	os.Setenv("SHELF_MONGO_HOST", "ds053894.mongolab.com:53894")
+	os.Setenv("SHELF_MONGO_AUTHDB", "monsterbox")
+	os.Setenv("SHELF_MONGO_DB", "monsterbox")
+	os.Setenv("SHELF_MONGO_USER", "monsterbox")
+	os.Setenv("SHELF_MONGO_PASS", "box")
 }

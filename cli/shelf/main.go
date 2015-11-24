@@ -16,7 +16,7 @@ import (
 
 var shelf = &cobra.Command{
 	Use:   "shelf",
-	Short: "Shelf provides the central cli housing shelf's various cli tools",
+	Short: "Shelf provides the central cli housing of various cli tools that interface with the API",
 }
 
 func main() {

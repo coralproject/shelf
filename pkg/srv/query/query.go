@@ -11,21 +11,21 @@ import (
 )
 
 // collections contains the name of the rules collection.
-const collection = "rules"
+const collection = "queries"
 
 // GetNames retrieves a list of rule names.
 func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
-	log.Dev(context, "GetSetNames", "Started")
+	log.Dev(context, "GetNames", "Started")
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": 1}
-		log.Dev(context, "GetSetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", collection, mongo.Query(q))
+		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", collection, mongo.Query(q))
 		return c.Find(nil).Select(q).Sort("name").All(&names)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetSetNames", err, "Completed")
+		log.Error(context, "GetNames", err, "Completed")
 		return nil, err
 	}
 
@@ -39,27 +39,27 @@ func GetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 		rsn = append(rsn, name)
 	}
 
-	log.Dev(context, "GetSetNames", "Completed : RSN[%+v]", rsn)
+	log.Dev(context, "GetNames", "Completed : RSN[%+v]", rsn)
 	return rsn, nil
 }
 
 // Get retrieves the configuration for the specified Set.
 func Get(context interface{}, ses *mgo.Session, name string) (*Set, error) {
-	log.Dev(context, "GetSet", "Started : Name[%s]", name)
+	log.Dev(context, "Get", "Started : Name[%s]", name)
 
 	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "GetSet", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "Get", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&rs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetSet", err, "Completed")
+		log.Error(context, "Get", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "GetSet", "Completed : RS[%+v]", rs)
+	log.Dev(context, "Get", "Completed : RS[%+v]", rs)
 	return &rs, nil
 }
 
@@ -83,41 +83,41 @@ func Create(context interface{}, ses *mgo.Session, rs *Set) error {
 
 // Update is used to create or update existing Set documents.
 func Update(context interface{}, ses *mgo.Session, rs *Set) error {
-	log.Dev(context, "UpdateSet", "Started : Name[%s]", rs.Name)
+	log.Dev(context, "Update", "Started : Name[%s]", rs.Name)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rs.Name}
 
-		log.Dev(context, "UpdateSet", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
+		log.Dev(context, "Update", "MGO :\n\ndb.%s.upsert(%s, %s)\n", collection, mongo.Query(q), mongo.Query(rs))
 		_, err := c.Upsert(q, rs)
 		return err
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "UpdateSet", err, "Completed")
+		log.Error(context, "Update", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "UpdateSet", "Completed")
+	log.Dev(context, "Update", "Completed")
 	return nil
 }
 
 // Delete is used to remove an existing Set documents.
 func Delete(context interface{}, ses *mgo.Session, name string) (*Set, error) {
-	log.Dev(context, "RemoveSet", "Started : Name[%s]", name)
+	log.Dev(context, "Delete", "Started : Name[%s]", name)
 
 	var rs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "DeleteSet", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
+		log.Dev(context, "Delete", "MGO :\n\ndb.%s.remove(%s)\n", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "DeleteSet", err, "Completed")
+		log.Error(context, "Delete", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "DeleteSet", "Completed")
+	log.Dev(context, "Delete", "Completed")
 	return &rs, nil
 }
