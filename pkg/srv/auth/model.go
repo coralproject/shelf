@@ -2,7 +2,6 @@
 package auth
 
 import (
-	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
@@ -73,21 +72,10 @@ func (u *User) Salt() ([]byte, error) {
 
 // AuthenticateToken authenticates a User entities token.
 func (u *User) AuthenticateToken(token string) error {
-	if err := crypto.IsTokenValidForEntity(u, token); err != nil {
+	if err := crypto.IsTokenValid(u, token); err != nil {
 		return err
 	}
 
-	return nil
-}
-
-// SetToken sets the Token for the User.
-func (u *User) SetToken(sessionID string) error {
-	t, err := crypto.TokenforEntity(u)
-	if err != nil {
-		return err
-	}
-
-	u.Token = base64.StdEncoding.EncodeToString([]byte(sessionID + ":" + base64.StdEncoding.EncodeToString(t)))
 	return nil
 }
 
