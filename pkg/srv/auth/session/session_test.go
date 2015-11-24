@@ -1,7 +1,6 @@
 package session_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
@@ -20,7 +19,6 @@ var (
 )
 
 func init() {
-	fmt.Println("*****>", testing.Verbose())
 	tests.Init()
 }
 
@@ -32,7 +30,12 @@ func removeSessions(ses *mgo.Session) error {
 		return c.Remove(q)
 	}
 
-	return mongo.ExecuteDB(context, ses, collection, f)
+	err := mongo.ExecuteDB(context, ses, collection, f)
+	if err != mgo.ErrNotFound {
+		return err
+	}
+
+	return nil
 }
 
 // retrieveSession is used to validate sessions are being saved
@@ -53,6 +56,9 @@ func retrieveSession(ses *mgo.Session, sessionID string) (*session.Session, erro
 
 // TestCreate tests the creation of sessions.
 func TestCreate(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
 	t.Log("Given the need to create sessions in the DB.")
 	{
 		t.Logf("\tWhen using PublicID %s", publicID)
@@ -61,19 +67,19 @@ func TestCreate(t *testing.T) {
 			defer ses.Close()
 
 			if err := removeSessions(ses); err != nil {
-				t.Fatalf("\t%s\tShould be able to remove all sessions.", tests.Failed)
+				t.Fatalf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
 
 			s1, err := session.Create(context, ses, publicID, 10*time.Second)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to create a session.", tests.Failed)
+				t.Fatalf("\t%s\tShould be able to create a session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
 			s2, err := retrieveSession(ses, s1.SessionID)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to retrieve the session.", tests.Failed)
+				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the session.", tests.Success)
 
@@ -88,6 +94,11 @@ func TestCreate(t *testing.T) {
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same user.", tests.Success)
 			}
+
+			if err := removeSessions(ses); err != nil {
+				t.Fatalf("\t%s\tShould be able to remove all sessions : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
 		}
 	}
 }

@@ -2,33 +2,31 @@ package comment
 
 import "time"
 
+// Action denotes an action taken by someone/something on someone/something.
 type Action struct {
-	Type    string 		`json:"type" bson:"type"`
-	UserId  string 		`json:"userId" bson:"userId"`
-	Value   string 		`json:"value" bson:"value"`
-	Date    time.Time 	`json:"date" bson:"date"`
+	Type   string    `json:"type" bson:"type"`
+	UserID string    `json:"userId" bson:"userId"`
+	Value  string    `json:"value" bson:"value"`
+	Date   time.Time `json:"date" bson:"date"`
 }
-type ActionArray []Action
 
-
+// Note denotes a note by a user in the system.
 type Note struct {
-	UserId  string 		`json:"userId" bson:"userId"`
-	Body    string 		`json:"body" bson:"body"`
-	Date    time.Time 	`json:"date" bson:"date"`
+	UserID string    `json:"userId" bson:"userId"`
+	Body   string    `json:"body" bson:"body"`
+	Date   time.Time `json:"date" bson:"date"`
 }
-type NoteArray []Note
 
-
+// Comment denotes a comment by a user in the system.
 type Comment struct {
-	Id              string 			`json:"id" bson:"_id"`
-	Body            string 			`json:"body" bson:"body"`
-	ParentId    	string 			`json:"parentId" bson:"parentId"`
-	AssetId    	string 			`json:"assetId" bson:"assetId"`
-	Status    	string 			`json:"status" bson:"status"`
-	CreatedDate    	time.Time 		`json:"createdDate" bson:"createdDate"`
-	UpdatedDate    	time.Time 		`json:"updatedDate" bson:"updatedDate"`
-	ApprovedDate    time.Time 		`json:"approvedDate" bson:"approvedDate"`
-	Actions		ActionArray		`json:"actions" bson:"actions"`
-	Notes		NoteArray		`json:"notes" bson:"notes"`
+	ID           string    `json:"id" bson:"_id"`
+	Body         string    `json:"body" bson:"body"`
+	ParentID     string    `json:"parentId" bson:"parentId"`
+	AssetID      string    `json:"assetId" bson:"assetId"`
+	Status       string    `json:"status" bson:"status"`
+	CreatedDate  time.Time `json:"createdDate" bson:"createdDate"`
+	UpdatedDate  time.Time `json:"updatedDate" bson:"updatedDate"`
+	ApprovedDate time.Time `json:"approvedDate" bson:"approvedDate"`
+	Actions      []Action  `json:"actions" bson:"actions"`
+	Notes        []Note    `json:"notes" bson:"notes"`
 }
-type CommentArray []Comment

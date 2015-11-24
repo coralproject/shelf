@@ -97,7 +97,7 @@ func ExecuteDB(context interface{}, session *mgo.Session, collectionName string,
 	}
 
 	// Execute the MongoDB call.
-	if err := f(col); err != nil {
+	if err := f(col); err != nil && err != mgo.ErrNotFound {
 		log.Error(context, "ExecuteDB", err, "Completed")
 		return err
 	}

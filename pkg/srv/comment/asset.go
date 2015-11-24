@@ -1,15 +1,14 @@
 package comment
 
+// Taxonomy holds all name-value pairs.
 type Taxonomy struct {
-	Name       	string 			`json:"name" bson:"name"`
-	Value    	string 			`json:"value" bson:"value"`
+	Name  string `json:"name" bson:"name"`
+	Value string `json:"value" bson:"value"`
 }
-type TaxonomyArray []Taxonomy
 
+// Asset denotes an asset in the system e.g. an article or a blog etc.
 type Asset struct {
-	Id       	string 			`json:"id" bson:"_id"`
-	Url    		string 			`json:"url" bson:"url"`
-	Taxonomy 	TaxonomyArray 	`json:"taxonomy" bson:"taxonomy"`
+	ID         string     `json:"id" bson:"_id"`
+	URL        string     `json:"url" bson:"url"`
+	Taxonomies []Taxonomy `json:"taxonomies" bson:"taxonomies"`
 }
-
-type AssetArray []Asset

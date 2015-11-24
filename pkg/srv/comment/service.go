@@ -1,12 +1,12 @@
 package comment
 
 import (
-	"time"
 	"strings"
+	"time"
 
-	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/vendor/github.com/pborman/uuid"
+	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/github.com/pborman/uuid"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,8 +16,8 @@ import (
 const collectionUser = "user"
 const collectionComment = "comment"
 
-// GetUser retrieves an individual user resource
-func GetCommentById(context interface{}, session *mgo.Session, id string) (*User, error) {
+// GetCommentByID retrieves an individual comment by ID
+func GetCommentByID(context interface{}, session *mgo.Session, id string) (*User, error) {
 	log.Dev(context, "GetCommentById", "Started : Id[%s]", id)
 
 	var user User
@@ -54,8 +54,8 @@ func CreateComment(context interface{}, session *mgo.Session, comment Comment) (
 	return &comment, nil
 }
 
-// GetUser retrieves an individual user resource
-func GetUserById(context interface{}, session *mgo.Session, id string) (*User, error) {
+// GetUserByID retrieves an individual user by ID
+func GetUserByID(context interface{}, session *mgo.Session, id string) (*User, error) {
 	log.Dev(context, "GetUserById", "Started : Id[%s]", id)
 
 	var user User
@@ -74,7 +74,7 @@ func GetUserById(context interface{}, session *mgo.Session, id string) (*User, e
 	return &user, nil
 }
 
-// GetUser retrieves an individual user resource
+// GetUserByEmail retrieves an individual user by email
 func GetUserByEmail(context interface{}, session *mgo.Session, email string) (*User, error) {
 	log.Dev(context, "GetUserByEmail", "Started : Email[%s]", email)
 
