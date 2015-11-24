@@ -7,6 +7,7 @@ import (
 
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
+	"github.com/coralproject/shelf/pkg/srv/auth/session"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
@@ -33,8 +34,28 @@ func Create(context interface{}, ses *mgo.Session, nu NewUser) (*User, error) {
 		return nil, err
 	}
 
+	// Sessions are good for 6 months.
+	// TODO: May need configuration.
+	const expires = 24 * 160 * time.Hour
+
+	// We need a session for this user account. Sessions provide a
+	// token with a TTL.
+	s, err := session.Create(context, ses, u.PublicID, expires)
+	if err != nil {
+		log.Error(context, "Create", err, "Completed")
+		return nil, err
+	}
+
+	// Set this token into the user account. This is the token used
+	// to authenticate API calls.
+	u.Token, err = crypto.GenerateWebToken(u, s.SessionID)
+	if err != nil {
+		log.Error(context, "Create", err, "Completed")
+		return nil, err
+	}
+
 	f := func(col *mgo.Collection) error {
-		log.Dev(context, "Create", "MGO : db.%s.insert(%s)", collection, mongo.Query(&u))
+		// DO NOT LOG THIS QUERY!
 		return col.Insert(&u)
 	}
 
@@ -48,6 +69,26 @@ func Create(context interface{}, ses *mgo.Session, nu NewUser) (*User, error) {
 }
 
 //==============================================================================
+
+// GetUserByPublicID retrieves a user record by using the provided PublicID.
+func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error) {
+	log.Dev(context, "GetUserByPublicID", "Started : PID[%s]", publicID)
+
+	var user User
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		log.Dev(context, "GetUserByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		return c.Find(q).One(&user)
+	}
+
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+		log.Error(context, "GetUserByPublicID", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetUserByPublicID", "Completed")
+	return &user, nil
+}
 
 // GetUserByEmail retrieves a user record by using the provided email.
 func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error) {
@@ -89,26 +130,6 @@ func GetUserByName(context interface{}, ses *mgo.Session, fullName string) (*Use
 	return &user, nil
 }
 
-// GetUserByPublicID retrieves a user record by using the provided PublicID.
-func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error) {
-	log.Dev(context, "GetUserByPublicID", "Started : PID[%s]", publicID)
-
-	var user User
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
-		log.Dev(context, "GetUserByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
-		return c.Find(q).One(&user)
-	}
-
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetUserByPublicID", err, "Completed")
-		return nil, err
-	}
-
-	log.Dev(context, "GetUserByPublicID", "Completed")
-	return &user, nil
-}
-
 //==============================================================================
 
 // Update updates an existing user to the database.
@@ -136,35 +157,51 @@ func Update(context interface{}, ses *mgo.Session, uu UpdUser) error {
 	return nil
 }
 
-// UpdatePassword updates an existing user's password in the database.
-func UpdatePassword(context interface{}, ses *mgo.Session, publicID, privateID string, password string) error {
-	log.Dev(context, "UpdatePassword", "Started : PublicID[%s]", publicID)
+// UpdateCredentials updates an existing user's password and token in the database.
+func UpdateCredentials(context interface{}, ses *mgo.Session, u *User, password string) error {
+	log.Dev(context, "UpdateCredentials", "Started : PublicID[%s]", u.PublicID)
 
 	if len(password) < 8 {
 		err := errors.New("Invalid password length")
-		log.Error(context, "UpdatePassword", err, "Completed")
+		log.Error(context, "UpdateCredentials", err, "Completed")
 		return err
 	}
 
-	newPassHash, err := crypto.BcryptPassword(privateID + password)
+	newPassHash, err := crypto.BcryptPassword(u.PrivateID + password)
 	if err != nil {
-		log.Error(context, "UpdatePassword", err, "Completed")
+		log.Error(context, "UpdateCredentials", err, "Completed")
 		return err
 	}
+
+	// Sessions are good for 6 months.
+	// TODO: May need configuration.
+	const expires = 24 * 160 * time.Hour
+
+	// We need a new session for this updated user account. Sessions provide
+	// a token with a TTL.
+	s, err := session.Create(context, ses, u.PublicID, expires)
+	if err != nil {
+		log.Error(context, "UpdateCredentials", err, "Completed")
+		return err
+	}
+
+	// Set this token into the user account. This is the token used
+	// to authenticate API calls.
+	token, err := crypto.GenerateWebToken(u, s.SessionID)
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
-		upd := bson.M{"$set": bson.M{"password": newPassHash, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdatePassword", "MGO : db.%s.update(%s, %s)", collection, mongo.Query(q), mongo.Query(upd))
+		q := bson.M{"public_id": u.PublicID}
+		upd := bson.M{"$set": bson.M{"password": newPassHash, "token": token, "modified_at": time.Now().UTC()}}
+		// DO NOT LOG THIS QUERY!
 		return c.Update(q, upd)
 	}
 
 	if err = mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "UpdatePassword", err, "Completed")
+		log.Error(context, "UpdateCredentials", err, "Completed")
 		return nil
 	}
 
-	log.Dev(context, "UpdatePassword", "Completed")
+	log.Dev(context, "UpdateCredentials", "Completed")
 	return nil
 }
 

@@ -44,8 +44,8 @@ func SignedHash(pwd []byte, salt []byte) ([]byte, error) {
 	return h.Sum(nil), nil
 }
 
-// TokenforEntity returns a hash for secureentity interface.
-func TokenforEntity(entity SecureEntity) ([]byte, error) {
+// GenerateToken returns a hash for SecureEntity interface.
+func GenerateToken(entity SecureEntity) ([]byte, error) {
 	pwd, err := entity.Pwd()
 	if err != nil {
 		return nil, err
@@ -59,14 +59,25 @@ func TokenforEntity(entity SecureEntity) ([]byte, error) {
 	return SignedHash(pwd, salt)
 }
 
-// IsTokenValidForEntity checks whether a hash is valid for a Secure Entity.
-func IsTokenValidForEntity(entity SecureEntity, hash string) error {
+// GenerateWebToken returns a token ready for web use.
+func GenerateWebToken(entity SecureEntity, sessionID string) (string, error) {
+	t, err := GenerateToken(entity)
+	if err != nil {
+		return "", err
+	}
+
+	token := base64.StdEncoding.EncodeToString([]byte(sessionID + ":" + base64.StdEncoding.EncodeToString(t)))
+	return token, nil
+}
+
+// IsTokenValid checks whether a hash is valid.
+func IsTokenValid(entity SecureEntity, hash string) error {
 	decodedHash, err := base64.StdEncoding.DecodeString(hash)
 	if err != nil {
 		return err
 	}
 
-	eHash, hErr := TokenforEntity(entity)
+	eHash, hErr := GenerateToken(entity)
 	if hErr != nil {
 		return hErr
 	}
