@@ -1,7 +1,5 @@
 package query
 
-import "gopkg.in/mgo.v2/bson"
-
 // ScriptOption contains options for processing the scripts.
 type ScriptOption struct {
 	Collection  string `bson:"collection,omitempty" json:"collection,omitempty"`     // Name of the collection to use for processing the rule.
@@ -41,15 +39,12 @@ type SetParam struct {
 }
 
 // Set contains the configuration details for a rule set.
-// TODO: Should we consider adding the ObjectId as a
-// parameter to Set?
 type Set struct {
-	ID          bson.ObjectId `bson:"_id" json:"-"`           // ObjectId of the RuleSet.
-	Name        string        `bson:"name" json:"name"`       // Name of the RuleSet.
-	Description string        `bson:"desc" json:"desc"`       // Description of the RuleSet.
-	Enabled     bool          `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
-	Params      []SetParam    `bson:"params" json:"params"`   // Collection of parameters.
-	Rules       []Query       `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
+	Name        string     `bson:"name" json:"name"`       // Name of the RuleSet.
+	Description string     `bson:"desc" json:"desc"`       // Description of the RuleSet.
+	Enabled     bool       `bson:"enabled" json:"enabled"` // If the RuleSet is enabled to run.
+	Params      []SetParam `bson:"params" json:"params"`   // Collection of parameters.
+	Rules       []Query    `bson:"rules" json:"rules"`     // Collection of Rules for the Rule Group.
 }
 
 // Result contains the result of an ruleset execution.

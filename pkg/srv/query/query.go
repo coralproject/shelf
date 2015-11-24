@@ -1,3 +1,5 @@
+// Package query provides CRUD API methods for handling database operations
+// for query records.
 package query
 
 import (
@@ -13,28 +15,27 @@ import (
 // collections contains the name of the rules collection.
 const collection = "queries"
 
-// ==============================================================
+//==============================================================================
 
-// Create is used to create Set document/record in the db.
-func Create(context interface{}, ses *mgo.Session, rs Set) error {
-	log.Dev(context, "Create", "Started : Name[%s]", rs.Name)
+// CreateSet is used to create Set documents in the db.
+func CreateSet(context interface{}, ses *mgo.Session, qs Set) error {
+	log.Dev(context, "CreateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "Create", "MGO :\n\ndb.%s.Insert(%s)\n", collection, mongo.Query(rs))
-		rs.ID = bson.NewObjectId()
-		return c.Insert(&rs)
+		log.Dev(context, "CreateSet", "MGO :\n\ndb.%s.Insert(%s)\n", collection, mongo.Query(qs))
+		return c.Insert(&qs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Create", err, "Completed")
+		log.Error(context, "CreateSet", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "Create", "Completed")
+	log.Dev(context, "CreateSet", "Completed")
 	return nil
 }
 
-// ==============================================================
+//==============================================================================
 
 // GetSetNames retrieves a list of rule names.
 func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
@@ -52,31 +53,29 @@ func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 		return nil, err
 	}
 
-	var rsn []string
+	var qsn []string
 	for _, doc := range names {
 		name := doc["name"].(string)
 		if strings.HasPrefix(name, "test") {
 			continue
 		}
 
-		rsn = append(rsn, name)
+		qsn = append(qsn, name)
 	}
 
-	log.Dev(context, "GetNames", "Completed : RSN[%+v]", rsn)
-	return rsn, nil
+	log.Dev(context, "GetNames", "Completed : QSN[%+v]", qsn)
+	return qsn, nil
 }
-
-// ==============================================================
 
 // GetSetByName retrieves the configuration for the specified Set.
 func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
 	log.Dev(context, "Get", "Started : Name[%s]", name)
 
-	var rs Set
+	var qs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
 		log.Dev(context, "Get", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
-		return c.Find(q).One(&rs)
+		return c.Find(q).One(&qs)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
@@ -84,11 +83,11 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 		return nil, err
 	}
 
-	log.Dev(context, "Get", "Completed : RS[%+v]", rs)
-	return &rs, nil
+	log.Dev(context, "Get", "Completed : QS[%+v]", qs)
+	return &qs, nil
 }
 
-// ==============================================================
+//==============================================================================
 
 // Update is used to update existing Set documents.
 func Update(context interface{}, ses *mgo.Session, rs Set) error {
