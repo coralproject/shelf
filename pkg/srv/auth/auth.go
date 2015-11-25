@@ -176,46 +176,6 @@ func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (
 	return &user, nil
 }
 
-// GetUserByEmail retrieves a user record by using the provided email.
-func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error) {
-	log.Dev(context, "GetUserByEmail", "Started : Email[%s]", email)
-
-	var user User
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"email": strings.ToLower(email)}
-		log.Dev(context, "GetUserByEmail", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
-		return c.Find(q).One(&user)
-	}
-
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetUserByEmail", err, "Completed")
-		return nil, err
-	}
-
-	log.Dev(context, "GetUserByEmail", "Completed")
-	return &user, nil
-}
-
-// GetUserByName retrieves a user record by using the provided name.
-func GetUserByName(context interface{}, ses *mgo.Session, fullName string) (*User, error) {
-	log.Dev(context, "GetUserByName", "Started : FullName[%s]", fullName)
-
-	var user User
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"full_name": fullName}
-		log.Dev(context, "GetUserByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
-		return c.Find(q).One(&user)
-	}
-
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "GetUserByName", err, "Completed")
-		return nil, err
-	}
-
-	log.Dev(context, "GetUserByName", "Completed")
-	return &user, nil
-}
-
 //==============================================================================
 
 // Update updates an existing user to the database.

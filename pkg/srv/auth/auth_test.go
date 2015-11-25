@@ -107,6 +107,8 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+// TODO: Write tests for Update and Delete
+
 // TestCreateWebToken tests create a web token and a pairing session.
 func TestCreateWebToken(t *testing.T) {
 	tests.ResetLog()
@@ -240,4 +242,36 @@ func TestExpiredWebToken(t *testing.T) {
 			}
 		}
 	}
+}
+
+// TestInvalidWebTokens tests create an invalid web token and tests it fails.
+func TestInvalidWebTokens(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	tokens := []string{
+		"",
+		"6dcda2da-92c3-11e5-8994-feff819cdc9f",
+		"OGY4OGI3YWQtZjc5Ny00ODI1LWI0MmUtMjIwZTY5ZDQxYjMzOmFKT2U1b0pFZlZ4cWUrR0JONEl0WlhmQTY0K3JsN2VGcmM2MVNQMkV1WVE9",
+	}
+
+	t.Log("Given the need to validate bad web tokens don't validate.")
+	{
+		for _, token := range tokens {
+			t.Logf("\tWhen using token [%s]", token)
+			{
+				if _, err := auth.ValidateWebToken(context, ses, token); err == nil {
+					t.Fatalf("\t%s\tShould Not be able to validate the web token : %v", tests.Failed, err)
+				} else {
+					t.Logf("\t%s\tShould Not be able to validate the web token.", tests.Success)
+				}
+			}
+		}
+	}
+
+	// TODO: Create a valid user/session and token.
+	// TODO: Then update the private data and test the token.
 }
