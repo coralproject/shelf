@@ -1,3 +1,5 @@
+// Package crypto provides support for encrypting passwords and generating
+// tokens for authentication support.
 package crypto
 
 import (
