@@ -46,67 +46,82 @@ func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error
 		return nil, err
 	}
 
-	log.Dev(context, "CreateUser", "Completed")
+	log.Dev(context, "CreateUser", "Completed : PublicID[%s]", u.PublicID)
 	return u, nil
 }
 
 // CreateWebToken return a token and session that can be used to authenticate a user.
-func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time.Duration) (token string, sessionID string, err error) {
+func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time.Duration) (string, error) {
 	log.Dev(context, "CreateWebToken", "Started : PublicID[%s]", u.PublicID)
 
 	// Do we have a valid session right now?
 	s, err := session.GetByLatest(context, ses, u.PublicID)
 	if err != nil && err != mgo.ErrNotFound {
 		log.Error(context, "CreateUser", err, "Completed")
-		return "", "", err
+		return "", err
 	}
 
 	// If we don't have one or it has been expired create
 	// a new one.
-	if err == mgo.ErrNotFound || s.IsExpired() {
+	if err == mgo.ErrNotFound || s.IsExpired(context) {
 		if s, err = session.Create(context, ses, u.PublicID, expires); err != nil {
 			log.Error(context, "CreateUser", err, "Completed")
-			return "", "", err
+			return "", err
 		}
 	}
 
 	// Set the return arguments though we will explicitly
 	// return them. Don't want any confusion.
-	sessionID = s.SessionID
-	if token, err = u.WebToken(sessionID); err != nil {
+	token, err := u.WebToken(s.SessionID)
+	if err != nil {
 		log.Error(context, "CreateUser", err, "Completed")
-		return "", "", err
+		return "", err
 	}
 
-	log.Dev(context, "CreateWebToken", "Completed")
-	return token, sessionID, nil
+	log.Dev(context, "CreateWebToken", "Completed : WebToken[%s]", token)
+	return token, nil
 }
 
 //==============================================================================
 
-// ValidateWebToken accepts a web token and validates its credibility. Returns
-// a User value is the token is valid.
-func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*User, error) {
-	log.Dev(context, "ValidateWebToken", "Started : WebToken[%s]", webToken)
+// DecodeWebToken breaks a web token into its parts.
+func DecodeWebToken(context interface{}, webToken string) (sessionID string, token string, err error) {
+	log.Dev(context, "DecodeWebToken", "Started : WebToken[%s]", webToken)
 
 	// Decode the web token to break it into its parts.
 	data, err := base64.StdEncoding.DecodeString(webToken)
 	if err != nil {
-		log.Error(context, "ValidateWebToken", err, "Completed")
-		return nil, err
+		log.Error(context, "DecodeWebToken", err, "Completed")
+		return "", "", err
 	}
 
 	// Split the web token.
 	str := strings.Split(string(data), ":")
 	if len(str) != 2 {
 		err := errors.New("Invalid token")
-		log.Error(context, "ValidateWebToken", err, "Completed")
-		return nil, err
+		log.Error(context, "DecodeWebToken", err, "Completed")
+		return "", "", err
 	}
 
 	// Pull out the session and token.
-	sessionID := str[0]
-	token := str[1]
+	sessionID = str[0]
+	token = str[1]
+
+	log.Dev(context, "DecodeWebToken", "Completed : SessionID[%s] Token[%s]", sessionID, token)
+	return sessionID, token, nil
+}
+
+// ValidateWebToken accepts a web token and validates its credibility. Returns
+// a User value is the token is valid.
+func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*User, error) {
+	log.Dev(context, "ValidateWebToken", "Started : WebToken[%s]", webToken)
+
+	// Extract the sessionID and token from the web token.
+	sessionID, token, err := DecodeWebToken(context, webToken)
+	if err != nil {
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
 
 	// Find the session in the database.
 	s, err := session.GetBySessionID(context, ses, sessionID)
@@ -116,7 +131,7 @@ func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*
 	}
 
 	// Validate the session has not expired.
-	if s.IsExpired() {
+	if s.IsExpired(context) {
 		err := errors.New("Expired token")
 		log.Error(context, "ValidateWebToken", err, "Completed")
 		return nil, err
@@ -135,7 +150,7 @@ func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*
 		return nil, err
 	}
 
-	log.Dev(context, "ValidateWebToken", "Completed")
+	log.Dev(context, "ValidateWebToken", "Completed : PublicID[%s]", u.PublicID)
 	return u, nil
 }
 

@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
 
 	"github.com/astaxie/beego/validation"
@@ -113,8 +112,6 @@ type NewUser struct {
 
 // validate performs validation on a NewUser value before it is processed.
 func (nu *NewUser) validate(context interface{}) error {
-	log.Dev(context, "NewUser.Validate", "Started")
-
 	var v validation.Validation
 
 	v.Required(nu.FullName, "FullName")
@@ -127,18 +124,15 @@ func (nu *NewUser) validate(context interface{}) error {
 	v.Required(nu.Password, "Password")
 	v.MinSize(nu.Password, 8, "Password")
 
-	log.Dev(context, "NewUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
-
 	if v.HasErrors() {
 		return fmt.Errorf("%v", v.ErrorsMap)
 	}
+
 	return nil
 }
 
 // new takes a new user and creates a valid User value.
 func (nu *NewUser) new(context interface{}) (*User, error) {
-	log.Dev(context, "NewUser.Create", "Started : Email[%s]", nu.Email)
-
 	u := User{
 		PublicID:     uuid.New(),
 		PrivateID:    uuid.New(),
@@ -152,11 +146,9 @@ func (nu *NewUser) new(context interface{}) (*User, error) {
 
 	var err error
 	if u.Password, err = crypto.BcryptPassword(u.PrivateID + nu.Password); err != nil {
-		log.Error(context, "NewUser.Create", err, "Generating Password Hash")
 		return nil, err
 	}
 
-	log.Dev(context, "NewUser.Create", "Completed")
 	return &u, nil
 }
 
@@ -173,8 +165,6 @@ type UpdUser struct {
 
 // validate performs validation on a NewUser value before it is processed.
 func (uu *UpdUser) validate(context interface{}) error {
-	log.Dev(context, "UpdUser.Validate", "Started")
-
 	var v validation.Validation
 
 	v.Required(uu.PublicID, "public_id")
@@ -187,8 +177,6 @@ func (uu *UpdUser) validate(context interface{}) error {
 	v.Required(uu.Email, "email")
 	v.Email(uu.Email, "email")
 	v.MaxSize(uu.Email, 100, "email")
-
-	log.Dev(context, "UpdUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
 
 	if v.HasErrors() {
 		return fmt.Errorf("%v", v.Errors)

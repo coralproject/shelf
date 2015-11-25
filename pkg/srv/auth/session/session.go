@@ -37,7 +37,7 @@ func Create(context interface{}, ses *mgo.Session, publicID string, expires time
 		return nil, err
 	}
 
-	log.Dev(context, "Create", "Completed")
+	log.Dev(context, "Create", "Completed : SessionID[%s]", s.SessionID)
 	return &s, nil
 }
 

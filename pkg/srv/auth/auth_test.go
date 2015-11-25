@@ -144,7 +144,7 @@ func TestCreateWebToken(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			webTok, sId, err := auth.CreateWebToken(context, ses, u1, time.Hour)
+			webTok, err := auth.CreateWebToken(context, ses, u1, 250*time.Millisecond)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
 			}
@@ -155,6 +155,12 @@ func TestCreateWebToken(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
+
+			sId, _, err := auth.DecodeWebToken(context, webTok)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to decode the web token : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to decode the web token.", tests.Success)
 
 			s2, err := session.GetBySessionID(context, ses, sId)
 			if err != nil {
@@ -179,6 +185,58 @@ func TestCreateWebToken(t *testing.T) {
 				t.Fatalf("\t%s\tShould have the right user for the token.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould have the right user for the token.", tests.Success)
+			}
+		}
+	}
+}
+
+// TestExpiredWebToken tests create a web token and tests when it expires.
+func TestExpiredWebToken(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Errorf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
+	t.Log("Given the need to validate web tokens expire.")
+	{
+		t.Log("\tWhen using a new user.")
+		{
+			nu := auth.NewUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			}
+
+			u1, err := auth.CreateUser(context, ses, nu)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
+
+			webTok, err := auth.CreateWebToken(context, ses, u1, 1*time.Millisecond)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
+
+			if _, err := auth.ValidateWebToken(context, ses, webTok); err == nil {
+				t.Fatalf("\t%s\tShould Not be able to validate the web token : %v", tests.Failed, err)
+			} else {
+				t.Logf("\t%s\tShould Not be able to validate the web token.", tests.Success)
 			}
 		}
 	}
