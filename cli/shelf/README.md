@@ -34,15 +34,30 @@
 
     Using the environment variables, set up the mongo connection configuration
 
-    ```bash
+    Unix/Linux:
 
-      export SHELF_MONGO_HOST="ds04353434.mongolab.com:53894"
-      export SHELF_MONGO_AUTHDB="shelf"
-      export SHELF_MONGO_DB="shelfbox"
-      export SHELF_MONGO_USER="box"
-      export SHELF_MONGO_PASS="box"
+      ```bash
 
-    ```
+        export SHELF_MONGO_HOST="ds04353434.mongolab.com:53894"
+        export SHELF_MONGO_AUTHDB="shelf"
+        export SHELF_MONGO_DB="shelfbox"
+        export SHELF_MONGO_USER="box"
+        export SHELF_MONGO_PASS="box"
+
+      ```
+
+    Windows:
+
+      ```bash
+
+        set SHELF_MONGO_HOST="ds04353434.mongolab.com:53894"
+        set SHELF_MONGO_AUTHDB="shelf"
+        set SHELF_MONGO_DB="shelfbox"
+        set SHELF_MONGO_USER="box"
+        set SHELF_MONGO_PASS="box"
+
+      ```
+
 
 ## Tools
 
