@@ -6,7 +6,9 @@ import (
 	"testing"
 
 	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 
+	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/coralproject/shelf/pkg/tests"
@@ -14,11 +16,30 @@ import (
 
 // collection used for testing the query CRUD API
 var collection = "queries"
+var record = "spending_advice"
+
+func removeSession(context interface{}, session *mgo.Session) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": record}
+		log.Dev(context, "removeSession", "db.queries.remove(%s)", mongo.Query(q))
+		return c.Remove(q)
+	}
+
+	err := mongo.ExecuteDB("Tests", session, collection, f)
+	if err != mgo.ErrNotFound {
+		return err
+	}
+
+	return nil
+}
+
+func init() {
+	// Initialize the test environment.
+	tests.Init()
+}
 
 // TestQueryAPI validates the operations of the query database and file loading API.
 func TestQueryAPI(t *testing.T) {
-	// Initialize the test environment.
-	tests.Init()
 
 	tests.ResetLog()
 	defer tests.DisplayLog()
