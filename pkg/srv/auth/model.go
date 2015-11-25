@@ -10,14 +10,14 @@ import (
 
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
 
-	"github.com/astaxie/beego/validation"
 	"github.com/pborman/uuid"
+	"gopkg.in/bluesuncorp/validator.v6"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // Set of user status codes.
 const (
-	StatusUnknown = iota
+	StatusUnknown = iota + 1
 	StatusActive
 	StatusDisabled
 	StatusDeleted
@@ -28,6 +28,19 @@ const (
 const (
 	TypeAPI = iota + 1
 )
+
+//==============================================================================
+
+var validate *validator.Validate
+
+func init() {
+	config := validator.Config{
+		TagName:         "validate",
+		ValidationFuncs: validator.BakedInValidators,
+	}
+
+	validate = validator.New(config)
+}
 
 //==============================================================================
 
@@ -103,29 +116,18 @@ func (u *User) IsPasswordValid(password string) bool {
 
 // NewUser is provided to create new users in the system.
 type NewUser struct {
-	UserType int    `bson:"type" json:"type"`
-	Status   int    `bson:"status" json:"status"`
-	FullName string `bson:"full_name" json:"full_name"`
-	Email    string `bson:"email" json:"email"`
-	Password string `bson:"password" json:"-"`
+	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
+	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
+	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
+	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
+	Password string `bson:"password" json:"-" validate:"required,min=8"`
 }
 
 // validate performs validation on a NewUser value before it is processed.
 func (nu *NewUser) validate(context interface{}) error {
-	var v validation.Validation
-
-	v.Required(nu.FullName, "FullName")
-	v.MinSize(nu.FullName, 2, "FullName")
-
-	v.Required(nu.Email, "Email")
-	v.Email(nu.Email, "Email")
-	v.MaxSize(nu.Email, 100, "Email")
-
-	v.Required(nu.Password, "Password")
-	v.MinSize(nu.Password, 8, "Password")
-
-	if v.HasErrors() {
-		return fmt.Errorf("%v", v.ErrorsMap)
+	errs := validate.Struct(nu)
+	if errs != nil {
+		return fmt.Errorf("%v", errs)
 	}
 
 	return nil
@@ -156,30 +158,18 @@ func (nu *NewUser) new(context interface{}) (*User, error) {
 
 // UpdUser is provided to update an existing user in the system.
 type UpdUser struct {
-	PublicID string `bson:"public_id" json:"public_id"`
-	UserType int    `bson:"type" json:"type"`
-	Status   int    `bson:"status" json:"status"`
-	FullName string `bson:"full_name" json:"full_name"`
-	Email    string `bson:"email" json:"email"`
+	PublicID string `bson:"public_id" json:"public_id" validate:"required,uuid"`
+	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
+	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
+	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
+	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
 }
 
 // validate performs validation on a NewUser value before it is processed.
 func (uu *UpdUser) validate(context interface{}) error {
-	var v validation.Validation
-
-	v.Required(uu.PublicID, "public_id")
-	v.MinSize(uu.PublicID, 2, "public_id")
-
-	v.Required(uu.FullName, "full_name")
-	v.AlphaNumeric(uu.FullName, "full_name")
-	v.MinSize(uu.FullName, 2, "full_name")
-
-	v.Required(uu.Email, "email")
-	v.Email(uu.Email, "email")
-	v.MaxSize(uu.Email, 100, "email")
-
-	if v.HasErrors() {
-		return fmt.Errorf("%v", v.Errors)
+	errs := validate.Struct(uu)
+	if errs != nil {
+		return fmt.Errorf("%v", errs)
 	}
 
 	return nil
