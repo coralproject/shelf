@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/srv/auth"
+	"github.com/coralproject/shelf/pkg/srv/auth/session"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/tests"
 
@@ -13,10 +14,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var (
-	collection = "users"
-	context    = "testing"
-)
+var context = "testing"
 
 func init() {
 	tests.Init()
@@ -29,7 +27,17 @@ func removeUser(ses *mgo.Session, publicID string) error {
 		return c.Remove(q)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != mgo.ErrNotFound {
+	if err := mongo.ExecuteDB(context, ses, "users", f); err != nil {
+		return err
+	}
+
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := mongo.ExecuteDB(context, ses, "sessions", f); err != nil {
 		return err
 	}
 
@@ -54,16 +62,16 @@ func TestCreateUser(t *testing.T) {
 
 	t.Log("Given the need to create users in the DB.")
 	{
-		nu := auth.NewUser{
-			UserType: auth.TypeAPI,
-			Status:   auth.StatusActive,
-			FullName: "Test Kennedy",
-			Email:    "bill@ardanlabs.com",
-			Password: "_Password124",
-		}
-
 		t.Log("\tWhen using a test user.")
 		{
+			nu := auth.NewUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			}
+
 			u1, err := auth.CreateUser(context, ses, nu)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
@@ -101,4 +109,77 @@ func TestCreateUser(t *testing.T) {
 
 // TestCreateWebToken tests create a web token and a pairing session.
 func TestCreateWebToken(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Errorf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
+	t.Log("Given the need to create a web token.")
+	{
+		t.Log("\tWhen using a new user.")
+		{
+			nu := auth.NewUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			}
+
+			u1, err := auth.CreateUser(context, ses, nu)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
+
+			webTok, sId, err := auth.CreateWebToken(context, ses, u1, time.Hour)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
+
+			u2, err := auth.GetUserByPublicID(context, ses, u1.PublicID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
+
+			s2, err := session.GetBySessionID(context, ses, sId)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the session.", tests.Success)
+
+			if u2.PublicID != s2.PublicID {
+				t.Fatalf("\t%s\tShould have the right session for user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould have the right session for user.", tests.Success)
+			}
+
+			u3, err := auth.ValidateWebToken(context, ses, webTok)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to validate the web token : %v", tests.Failed, err)
+			} else {
+				t.Logf("\t%s\tShould be able to validate the web token.", tests.Success)
+			}
+
+			if u1.PublicID != u3.PublicID {
+				t.Fatalf("\t%s\tShould have the right user for the token.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould have the right user for the token.", tests.Success)
+			}
+		}
+	}
 }

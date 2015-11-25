@@ -86,15 +86,6 @@ func (u *User) WebToken(sessionID string) (string, error) {
 	return token, nil
 }
 
-// AuthenticateWebToken authenticates a User entities token.
-func (u *User) AuthenticateWebToken(webToken string) error {
-	if err := crypto.IsTokenValid(u, webToken); err != nil {
-		return err
-	}
-
-	return nil
-}
-
 // IsPasswordValid compares the user provided password with what is in the db.
 func (u *User) IsPasswordValid(password string) bool {
 	if u.Password == "" {

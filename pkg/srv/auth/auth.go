@@ -2,6 +2,7 @@
 package auth
 
 import (
+	"encoding/base64"
 	"errors"
 	"strings"
 	"time"
@@ -54,13 +55,14 @@ func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time
 	log.Dev(context, "CreateWebToken", "Started : PublicID[%s]", u.PublicID)
 
 	// Do we have a valid session right now?
-	s, err := session.GetLatest(context, ses, u.PublicID)
+	s, err := session.GetByLatest(context, ses, u.PublicID)
 	if err != nil && err != mgo.ErrNotFound {
 		log.Error(context, "CreateUser", err, "Completed")
 		return "", "", err
 	}
 
-	// If we don't have one or it has been expired.
+	// If we don't have one or it has been expired create
+	// a new one.
 	if err == mgo.ErrNotFound || s.IsExpired() {
 		if s, err = session.Create(context, ses, u.PublicID, expires); err != nil {
 			log.Error(context, "CreateUser", err, "Completed")
@@ -82,6 +84,63 @@ func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time
 
 //==============================================================================
 
+// ValidateWebToken accepts a web token and validates its credibility. Returns
+// a User value is the token is valid.
+func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*User, error) {
+	log.Dev(context, "ValidateWebToken", "Started : WebToken[%s]", webToken)
+
+	// Decode the web token to break it into its parts.
+	data, err := base64.StdEncoding.DecodeString(webToken)
+	if err != nil {
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	// Split the web token.
+	str := strings.Split(string(data), ":")
+	if len(str) != 2 {
+		err := errors.New("Invalid token")
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	// Pull out the session and token.
+	sessionID := str[0]
+	token := str[1]
+
+	// Find the session in the database.
+	s, err := session.GetBySessionID(context, ses, sessionID)
+	if err != nil {
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	// Validate the session has not expired.
+	if s.IsExpired() {
+		err := errors.New("Expired token")
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	// Pull the user for this session.
+	u, err := GetUserByPublicID(context, ses, s.PublicID)
+	if err != nil {
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	// Validate the token against this user.
+	if err := crypto.IsTokenValid(u, token); err != nil {
+		log.Error(context, "ValidateWebToken", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "ValidateWebToken", "Completed")
+	return u, nil
+}
+
+//==============================================================================
+
 // GetUserByPublicID retrieves a user record by using the provided PublicID.
 func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error) {
 	log.Dev(context, "GetUserByPublicID", "Started : PID[%s]", publicID)
@@ -89,7 +148,7 @@ func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": publicID}
-		log.Dev(context, "GetUserByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetUserByPublicID", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 

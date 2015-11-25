@@ -13,9 +13,8 @@ import (
 )
 
 var (
-	collection = "sessions"
-	publicID   = "6dcda2da-92c3-11e5-8994-feff819cdc9f"
-	context    = "testing"
+	publicID = "6dcda2da-92c3-11e5-8994-feff819cdc9f"
+	context  = "testing"
 )
 
 func init() {
@@ -31,7 +30,7 @@ func removeSessions(ses *mgo.Session) error {
 		return err
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != mgo.ErrNotFound {
+	if err := mongo.ExecuteDB(context, ses, "sessions", f); err != nil {
 		return err
 	}
 
@@ -102,7 +101,7 @@ func TestCreate(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
-			s2, err := session.Get(context, ses, s1.SessionID)
+			s2, err := session.GetBySessionID(context, ses, s1.SessionID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
 			}
@@ -160,7 +159,7 @@ func TestGetLatest(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create another session.", tests.Success)
 
-			s3, err := session.GetLatest(context, ses, publicID)
+			s3, err := session.GetByLatest(context, ses, publicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the latest session : %v", tests.Failed, err)
 			}
@@ -187,7 +186,7 @@ func TestGetNotFound(t *testing.T) {
 	{
 		t.Logf("\tWhen using SessionID %s", "NOT EXISTS")
 		{
-			if _, err := session.Get(context, ses, "NOT EXISTS"); err == nil {
+			if _, err := session.GetBySessionID(context, ses, "NOT EXISTS"); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
@@ -209,12 +208,12 @@ func TestNoSession(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
-			if _, err := session.Get(context, nil, "NOT EXISTS"); err == nil {
+			if _, err := session.GetBySessionID(context, nil, "NOT EXISTS"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 
-			if _, err := session.GetLatest(context, nil, publicID); err == nil {
+			if _, err := session.GetByLatest(context, nil, publicID); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
