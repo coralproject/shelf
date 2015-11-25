@@ -91,8 +91,6 @@ If any of these steps fail, authorization fails.
 ### User Login
 This has not been coded yet.
 
-Package auth provides CRUD methods for the auth user API.
-
 
 
 

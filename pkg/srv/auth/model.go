@@ -1,4 +1,3 @@
-// Package auth provides CRUD methods for the auth user API.
 package auth
 
 import (
