@@ -1,9 +1,7 @@
-// This program provides the coral project shelf central CLI
-// platform.
+// This program provides the coral project shelf central CLI platform.
 package main
 
 import (
-	"bytes"
 	"os"
 
 	"github.com/coralproject/shelf/cli/shelf/cmddb"
@@ -21,30 +19,16 @@ var shelf = &cobra.Command{
 	Short: "Shelf provides the central cli housing of various cli tools that interface with the API",
 }
 
-var logdash bytes.Buffer
-
-func displayLog() {
-	defer logdash.Reset()
-	logdash.WriteTo(os.Stdout)
-}
-
-func verbosity() {
-	verbose, err := cfg.Int("LOGGING")
-	if err != nil {
-		//default is to logg out
-		displayLog()
-		return
-	}
-
-	if verbose == 1 {
-		displayLog()
-	}
-}
-
 func main() {
-	defer verbosity()
+	logLevel := func() int {
+		ll, err := cfg.Int("LOGGING_LEVEL")
+		if err != nil {
+			return log.DEV
+		}
+		return ll
+	}
 
-	log.Init(&logdash, func() int { return log.DEV })
+	log.Init(os.Stderr, logLevel)
 
 	if err := cfg.Init("SHELF"); err != nil {
 		shelf.Println("Unable to initialize configuration")
