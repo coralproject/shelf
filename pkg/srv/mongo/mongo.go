@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/cfg"
-	"github.com/coralproject/shelf/pkg/log"
 
 	"gopkg.in/mgo.v2"
 )
@@ -70,8 +69,8 @@ func GetSession() *mgo.Session {
 }
 
 // GetDatabase returns a mgo database value based on configuration.
-func GetDatabase(session *mgo.Session) *mgo.Database {
-	return session.DB(m.dbName)
+func GetDatabase(ses *mgo.Session) *mgo.Database {
+	return ses.DB(m.dbName)
 }
 
 // GetDatabaseName returns the name of the database being used.
@@ -80,39 +79,42 @@ func GetDatabaseName() string {
 }
 
 // GetCollection returns a mgo collection value based on configuration.
-func GetCollection(session *mgo.Session, colName string) *mgo.Collection {
-	return session.DB(m.dbName).C(colName)
+func GetCollection(ses *mgo.Session, colName string) *mgo.Collection {
+	return ses.DB(m.dbName).C(colName)
 }
 
 // ExecuteDB the MongoDB literal function.
-func ExecuteDB(context interface{}, session *mgo.Session, collectionName string, f func(*mgo.Collection) error) error {
-	log.Dev(context, "ExecuteDB", "Started : Collection[%s]", collectionName)
+func ExecuteDB(context interface{}, ses *mgo.Session, collectionName string, f func(*mgo.Collection) error) error {
+	// Validate we have a valid session.
+	if ses == nil {
+		return errors.New("Invalid session provided")
+	}
 
 	// Capture the specified collection.
-	col := session.DB(m.dbName).C(collectionName)
+	col := ses.DB(m.dbName).C(collectionName)
 	if col == nil {
 		err := fmt.Errorf("Collection %s does not exist", collectionName)
-		log.Error(context, "ExecuteDB", err, "Completed")
 		return err
 	}
 
 	// Execute the MongoDB call.
-	if err := f(col); err != nil && err != mgo.ErrNotFound {
-		log.Error(context, "ExecuteDB", err, "Completed")
-		return err
-	}
-
-	log.Dev(context, "ExecuteDB", "Completed")
-	return nil
+	return f(col)
 }
 
 // CollectionExists returns true if the collection name exists in the specified database.
-func CollectionExists(context interface{}, session *mgo.Session, useCollection string) bool {
-	cols, err := session.DB(m.dbName).CollectionNames()
+func CollectionExists(context interface{}, ses *mgo.Session, useCollection string) bool {
+	// Validate we have a valid session.
+	if ses == nil {
+		return false
+	}
+
+	// Capture the list of collection names.
+	cols, err := ses.DB(m.dbName).CollectionNames()
 	if err != nil {
 		return false
 	}
 
+	// Find it in the list.
 	for _, col := range cols {
 		if col == useCollection {
 			return true

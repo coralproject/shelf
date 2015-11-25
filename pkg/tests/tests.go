@@ -4,7 +4,7 @@ package tests
 import (
 	"bytes"
 	"os"
-	_ "testing"
+	"testing"
 
 	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
@@ -28,9 +28,9 @@ func ResetLog() {
 // DisplayLog writes the logdash data to standand out, if testing in verbose mode
 // was turned on.
 func DisplayLog() {
-	// if !testing.Verbose() {
-	// 	return
-	// }
+	if !testing.Verbose() {
+		return
+	}
 
 	logdash.WriteTo(os.Stdout)
 }
@@ -43,7 +43,7 @@ func Init() {
 
 	if err := mongo.InitMGO(); err != nil {
 		log.Error("Test", "Init", err, "Completed")
-		DisplayLog()
+		logdash.WriteTo(os.Stdout)
 		os.Exit(1)
 	}
 }

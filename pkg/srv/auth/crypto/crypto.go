@@ -59,17 +59,6 @@ func GenerateToken(entity SecureEntity) ([]byte, error) {
 	return SignedHash(pwd, salt)
 }
 
-// GenerateWebToken returns a token ready for web use.
-func GenerateWebToken(entity SecureEntity, sessionID string) (string, error) {
-	t, err := GenerateToken(entity)
-	if err != nil {
-		return "", err
-	}
-
-	token := base64.StdEncoding.EncodeToString([]byte(sessionID + ":" + base64.StdEncoding.EncodeToString(t)))
-	return token, nil
-}
-
 // IsTokenValid checks whether a hash is valid.
 func IsTokenValid(entity SecureEntity, hash string) error {
 	decodedHash, err := base64.StdEncoding.DecodeString(hash)

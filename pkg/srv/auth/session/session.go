@@ -37,28 +37,48 @@ func Create(context interface{}, ses *mgo.Session, publicID string, expires time
 		return nil, err
 	}
 
-	log.Dev(context, "Create", "Completed")
+	log.Dev(context, "Create", "Completed : SessionID[%s]", s.SessionID)
 	return &s, nil
 }
 
 //==============================================================================
 
-// Get retrieves a session from the session store.
-func Get(context interface{}, ses *mgo.Session, sessionID string) (*Session, error) {
-	log.Dev(context, "Get", "Started : SessionID[%s]", sessionID)
+// GetBySessionID retrieves a session from the session store.
+func GetBySessionID(context interface{}, ses *mgo.Session, sessionID string) (*Session, error) {
+	log.Dev(context, "GetBySessionID", "Started : SessionID[%s]", sessionID)
 
 	var s Session
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"session_id": sessionID}
-		log.Dev(context, "Get", "MGO : db.%s.find(%s).sort({\"date_created\": 1}).limit(1)", collection, mongo.Query(q))
-		return c.Find(q).Sort("date_created").Limit(1).One(&s)
+		log.Dev(context, "GetBySessionID", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		return c.Find(q).One(&s)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Get", err, "Completed")
+		log.Error(context, "GetBySessionID", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "Get", "Completed")
+	log.Dev(context, "GetBySessionID", "Completed")
+	return &s, nil
+}
+
+// GetByLatest retrieves the latest session for the specified user.
+func GetByLatest(context interface{}, ses *mgo.Session, publicID string) (*Session, error) {
+	log.Dev(context, "GetByLatest", "Started : PublicID[%s]", publicID)
+
+	var s Session
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		log.Dev(context, "GetByLatest", "MGO : db.%s.find(%s).sort({\"date_created\": -1}).limit(1)", collection, mongo.Query(q))
+		return c.Find(q).Sort("-date_created").One(&s)
+	}
+
+	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+		log.Error(context, "GetByLatest", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetByLatest", "Completed")
 	return &s, nil
 }

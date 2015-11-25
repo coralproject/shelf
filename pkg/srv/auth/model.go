@@ -2,12 +2,12 @@
 package auth
 
 import (
+	"encoding/base64"
 	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
 
 	"github.com/astaxie/beego/validation"
@@ -22,6 +22,11 @@ const (
 	StatusDisabled
 	StatusDeleted
 	StatusInvalid
+)
+
+// Set of user type codes.
+const (
+	TypeAPI = iota + 1
 )
 
 //==============================================================================
@@ -44,7 +49,6 @@ type User struct {
 	FullName     string        `bson:"full_name" json:"full_name"`
 	Email        string        `bson:"email" json:"email"`
 	Password     string        `bson:"password" json:"-"`
-	Token        string        `bson:"-" json:"token"`
 	IsDeleted    bool          `bson:"is_deleted" json:"-"`
 	DateModified time.Time     `bson:"date_modified" json:"-"`
 	DateCreated  time.Time     `bson:"date_created" json:"-"`
@@ -70,13 +74,15 @@ func (u *User) Salt() ([]byte, error) {
 	return []byte(s), nil
 }
 
-// AuthenticateToken authenticates a User entities token.
-func (u *User) AuthenticateToken(token string) error {
-	if err := crypto.IsTokenValid(u, token); err != nil {
-		return err
+// WebToken returns a token ready for web use.
+func (u *User) WebToken(sessionID string) (string, error) {
+	t, err := crypto.GenerateToken(u)
+	if err != nil {
+		return "", err
 	}
 
-	return nil
+	token := base64.StdEncoding.EncodeToString([]byte(sessionID + ":" + base64.StdEncoding.EncodeToString(t)))
+	return token, nil
 }
 
 // IsPasswordValid compares the user provided password with what is in the db.
@@ -106,33 +112,27 @@ type NewUser struct {
 
 // validate performs validation on a NewUser value before it is processed.
 func (nu *NewUser) validate(context interface{}) error {
-	log.Dev(context, "NewUser.Validate", "Started")
-
 	var v validation.Validation
 
-	v.Required(nu.FullName, "full_name")
-	v.AlphaNumeric(nu.FullName, "full_name")
-	v.MinSize(nu.FullName, 2, "full_name")
+	v.Required(nu.FullName, "FullName")
+	v.MinSize(nu.FullName, 2, "FullName")
 
-	v.Required(nu.Email, "email")
-	v.Email(nu.Email, "email")
-	v.MaxSize(nu.Email, 100, "email")
+	v.Required(nu.Email, "Email")
+	v.Email(nu.Email, "Email")
+	v.MaxSize(nu.Email, 100, "Email")
 
-	v.Required(nu.Password, "password")
-	v.MinSize(nu.Password, 8, "password")
+	v.Required(nu.Password, "Password")
+	v.MinSize(nu.Password, 8, "Password")
 
 	if v.HasErrors() {
-		return fmt.Errorf("%v", v.Errors)
+		return fmt.Errorf("%v", v.ErrorsMap)
 	}
 
-	log.Dev(context, "NewUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
 	return nil
 }
 
-// create takes a new user and creates a valid User value.
-func (nu *NewUser) create(context interface{}) (*User, error) {
-	log.Dev(context, "NewUser.Create", "Started : Email[%s]", nu.Email)
-
+// new takes a new user and creates a valid User value.
+func (nu *NewUser) new(context interface{}) (*User, error) {
 	u := User{
 		PublicID:     uuid.New(),
 		PrivateID:    uuid.New(),
@@ -146,11 +146,9 @@ func (nu *NewUser) create(context interface{}) (*User, error) {
 
 	var err error
 	if u.Password, err = crypto.BcryptPassword(u.PrivateID + nu.Password); err != nil {
-		log.Error(context, "NewUser.Create", err, "Generating Password Hash")
 		return nil, err
 	}
 
-	log.Dev(context, "NewUser.Create", "Completed")
 	return &u, nil
 }
 
@@ -167,8 +165,6 @@ type UpdUser struct {
 
 // validate performs validation on a NewUser value before it is processed.
 func (uu *UpdUser) validate(context interface{}) error {
-	log.Dev(context, "UpdUser.Validate", "Started")
-
 	var v validation.Validation
 
 	v.Required(uu.PublicID, "public_id")
@@ -186,6 +182,5 @@ func (uu *UpdUser) validate(context interface{}) error {
 		return fmt.Errorf("%v", v.Errors)
 	}
 
-	log.Dev(context, "UpdUser.Validate", "Completed : HasErrors[%v]", v.HasErrors())
 	return nil
 }
