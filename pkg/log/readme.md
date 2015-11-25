@@ -84,7 +84,7 @@ Fatal logs trace information for users and terminates the app.
 
 ## func Init
 ``` go
-func Init(w io.Writer, level func() int)
+func Init(w io.Writer, level func() int) error
 ```
 Init must be called to initialize the logging system. This function should
 only be called once.
