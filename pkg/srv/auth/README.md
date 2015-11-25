@@ -46,7 +46,7 @@ The PublicID, PrivateID, DateCreated fields are used to create a Salt that is co
 
 ## Web Token Authentication
 
-To make things as secure as possible, database lookups are performed as part of web token authentication. The user must keep their token secure.
+To make sure things as secure as possible, database lookups are performed as part of web token authentication. The user must keep their token secure.
 
 Here are the steps to web token authentication:
 
@@ -55,7 +55,7 @@ Here are the steps to web token authentication:
 * Retrieve the user document from the PublicID in the session document.
 * Validate the Token is valid by generating a new token from the retrieved user document.
 
-If any of these steps fail, authorization fails. 
+If any of these steps fail, authorization fails.
 
 ## User Login
 
