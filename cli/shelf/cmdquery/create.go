@@ -51,9 +51,6 @@ func runCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	// Initialize the mongodb session.
-	mongo.InitMGO()
-
 	session := mongo.GetSession()
 	defer session.Close()
 
