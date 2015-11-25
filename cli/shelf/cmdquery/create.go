@@ -57,7 +57,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 	session := mongo.GetSession()
 	defer session.Close()
 
-	err2 := query.Create("commands", session, q)
+	err2 := query.CreateSet("commands", session, *(q))
 	if err2 != nil {
 		log.Error("commands", "runCreate", err, "Completed")
 		return
