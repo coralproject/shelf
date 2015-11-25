@@ -67,7 +67,7 @@ func runUpdate(cmd *cobra.Command, args []string) {
 	// persist the name of the record
 	// q.Name = update.name
 
-	err2 := query.Update("commands", session, q)
+	err2 := query.UpdateSet("commands", session, *(q))
 	if err2 != nil {
 		log.Error("commands", "runUpdate", err, "Completed")
 		return

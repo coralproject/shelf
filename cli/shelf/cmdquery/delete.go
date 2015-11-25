@@ -46,7 +46,7 @@ func runDelete(cmd *cobra.Command, args []string) {
 	session := mongo.GetSession()
 	defer session.Close()
 
-	_, err := query.Delete("commands", session, delete.name)
+	err := query.DeleteSet("commands", session, delete.name)
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return

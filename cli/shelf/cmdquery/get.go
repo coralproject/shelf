@@ -49,7 +49,7 @@ func runGet(cmd *cobra.Command, args []string) {
 	session := mongo.GetSession()
 	defer session.Close()
 
-	user, err := query.Get("commands", session, get.name)
+	user, err := query.GetSetByName("commands", session, get.name)
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return

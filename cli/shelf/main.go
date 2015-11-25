@@ -3,6 +3,7 @@
 package main
 
 import (
+	"bytes"
 	"os"
 
 	"github.com/coralproject/shelf/cli/shelf/cmddb"
@@ -20,8 +21,30 @@ var shelf = &cobra.Command{
 	Short: "Shelf provides the central cli housing of various cli tools that interface with the API",
 }
 
+var logdash bytes.Buffer
+
+func displayLog() {
+	defer logdash.Reset()
+	logdash.WriteTo(os.Stdout)
+}
+
+func verbosity() {
+	verbose, err := cfg.Int("LOGGING")
+	if err != nil {
+		//default is to logg out
+		displayLog()
+		return
+	}
+
+	if verbose == 1 {
+		displayLog()
+	}
+}
+
 func main() {
-	log.Init(os.Stdout, func() int { return log.DEV })
+	defer verbosity()
+
+	log.Init(&logdash, func() int { return log.DEV })
 
 	if err := cfg.Init("SHELF"); err != nil {
 		shelf.Println("Unable to initialize configuration")
