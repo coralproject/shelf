@@ -2,7 +2,6 @@ package query_test
 
 import (
 	"encoding/json"
-	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -10,31 +9,29 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/coralproject/shelf/pkg/tests"
 )
 
-// collection used for testing the query CRUD API
-var collection = "queries"
-var record = "spending_advice"
-var testRecord = "test_spending_advice"
+var context = "testing"
 
 func init() {
-
-	// Initialize the test environment.
 	tests.Init()
 }
 
-func removeSession(session *mgo.Session) error {
+//==============================================================================
+
+// removeSets is used to clear out all the test sets from the collection.
+// All test query sets must start with QSTEST in their name.
+func removeSets(ses *mgo.Session) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": record}
-		log.Dev("Test", "removeSession", "db.queries.remove(%s)", mongo.Query(q))
-		return c.Remove(q)
+		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
+		_, err := c.RemoveAll(q)
+		return err
 	}
 
-	err := mongo.ExecuteDB("Tests", session, collection, f)
+	err := mongo.ExecuteDB(context, ses, "query_sets", f)
 	if err != mgo.ErrNotFound {
 		return err
 	}
@@ -42,136 +39,77 @@ func removeSession(session *mgo.Session) error {
 	return nil
 }
 
-func removeTestSession(session *mgo.Session) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": testRecord}
-		log.Dev("Test", "removeSession", "db.queries.remove(%s)", mongo.Query(q))
-		return c.Remove(q)
+// getFixture retrieves a query record from the filesystem.
+func getFixture(filePath string) (*query.Set, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
 	}
 
-	err := mongo.ExecuteDB("Tests", session, collection, f)
-	if err != mgo.ErrNotFound {
-		return err
-	}
-
-	return nil
-}
-
-func recordThoseNotExists(session *mgo.Session) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": record}
-		log.Dev("Test", "recordThoseNotExists", "db.queries.remove(%s)", mongo.Query(q))
-		n, err := c.Find(q).Count()
-		if err != nil {
-			return err
-		}
-
-		if n != 0 {
-			return errors.New("Record Found")
-		}
-
-		return nil
-	}
-
-	err := mongo.ExecuteDB("Tests", session, collection, f)
-	if err != mgo.ErrNotFound {
-		return err
-	}
-
-	return nil
-}
-
-func recordThoseExists(session *mgo.Session) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": record}
-		log.Dev("Test", "recordThoseExists", "db.queries.find(%s).count()", mongo.Query(q))
-
-		n, err := c.Find(q).Count()
-		if err != nil {
-			return err
-		}
-
-		if n == 0 {
-			return errors.New("No Record Found")
-		}
-
-		return nil
-	}
-
-	err := mongo.ExecuteDB("Tests", session, collection, f)
-	if err != mgo.ErrNotFound {
-		return err
-	}
-
-	return nil
-}
-
-// getQuery retrieves a query record from the filesystem.
-func getQuery() (query.Set, error) {
-	qFile := "./fixtures/spending_advice.json"
+	defer file.Close()
 
 	var qs query.Set
-
-	file, err := os.Open(qFile)
-	if err != nil {
-		return qs, err
-	}
-
 	err = json.NewDecoder(file).Decode(&qs)
 	if err != nil {
-		return qs, err
+		return nil, err
 	}
 
-	return qs, nil
+	return &qs, nil
 }
+
+//==============================================================================
 
 // TestCreateQuery tests if we can create a query record in the db.
 func TestCreateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	q, err := getQuery()
+	const fixture = "./fixtures/spending_advice.json"
+	qs1, err := getFixture(fixture)
 	if err != nil {
-		t.Fatalf("%s\t\tShould load query record from file : %v", tests.Failed, err)
+		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	} else {
-		t.Logf("%s\t\tShould load query record from file", tests.Success)
+		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
-		if err := removeSession(ses); err != nil {
-			t.Errorf("%s\t\tShould have removed query record from dbs : %v", tests.Failed, err)
+		if err := removeSets(ses); err != nil {
+			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		} else {
-			t.Logf("%s\t\tShould have removed query record from db ", tests.Success)
+			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 		}
 	}()
 
-	t.Log("Given the need to save a query into the database")
+	t.Log("Given the need to save a query set into the database.")
 	{
-		t.Log("\tWhen giving a query object to save")
+		t.Log("\tWhen using fixture", fixture)
 		{
+			if err := query.CreateSet(context, ses, *qs1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
+			} else {
+				t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
+			}
 
-			err := query.CreateSet("Tests", ses, q)
+			qs2, err := query.GetSetByName(context, ses, qs1.Name)
 			if err != nil {
-				t.Errorf("%s\t\tShould have added new query record : %s", tests.Failed, err)
+				t.Errorf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)
 			} else {
-				t.Logf("%s\t\tShould have added new query record ", tests.Success)
+				t.Logf("\t%s\tShould be able to retrieve the query set.", tests.Success)
 			}
 
-			if err := recordThoseExists(ses); err != nil {
-				t.Errorf("%s\t\tShould have found a query record : %v", tests.Failed, err)
+			// TODO: WE NEED TO CHECK THE ENTIRE VALUE
+			// Try using reflect.DeepEqual but you have pointers so you might
+			// need to check the larger parts. This is a place holder.
+			if qs1.Name != qs2.Name {
+				t.Errorf("\t%s\tShould be able to get back the same query set.", tests.Failed)
+				t.Logf("\t%+v", *qs1)
+				t.Logf("\t%+v", *qs2)
 			} else {
-				t.Logf("%s\t\tShould have found a query record ", tests.Success)
+				t.Logf("\t%s\tShould be able to get back the same query set.", tests.Success)
 			}
-
-			if err := recordThoseNotExists(ses); err == nil {
-				t.Errorf("%s\t\tShould have found a query record : %v", tests.Failed, err)
-			} else {
-				t.Logf("%s\t\tShould have found a query record ", tests.Success)
-			}
-
 		}
 	}
 }
@@ -181,77 +119,69 @@ func TestGetSetNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	q, err := getQuery()
+	qsName := "spending_advice"
+
+	const fixture = "./fixtures/spending_advice.json"
+	qs, err := getFixture(fixture)
 	if err != nil {
-		t.Fatalf("%s\t\tShould load query record from file : %v", tests.Failed, err)
+		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	} else {
-		t.Logf("%s\t\tShould load query record from file", tests.Success)
+		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
-		if err := removeSession(ses); err != nil {
-			t.Errorf("%s\t\tShould have removed query record from dbs : %v", tests.Failed, err)
+		if err := removeSets(ses); err != nil {
+			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		} else {
-			t.Logf("%s\t\tShould have removed query record from db ", tests.Success)
-		}
-
-		if err := removeTestSession(ses); err != nil {
-			t.Errorf("%s\t\tShould have removed query test record from dbs : %v", tests.Failed, err)
-		} else {
-			t.Logf("%s\t\tShould have removed query test record from db ", tests.Success)
+			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 		}
 	}()
 
-	t.Log("Given the need to retrieve a query from the database")
+	t.Log("Given the need to retrieve a list of query sets.")
 	{
-		t.Log("\tWhen giving the need to retrieve all names")
+		t.Log("\tWhen using fixture", fixture)
 		{
-
-			err := query.CreateSet("Tests", ses, q)
-			if err != nil {
-				t.Errorf("%s\t\tShould have added new query record : %s", tests.Failed, err)
+			if err := query.CreateSet(context, ses, *qs); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			} else {
-				t.Logf("%s\t\tShould have added new query record ", tests.Success)
+				t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 			}
 
-			testQuery := q
-			testQuery.Name = testRecord
-			err = query.CreateSet("Tests", ses, testQuery)
-			if err != nil {
-				t.Errorf("%s\t\tShould have added new query record with name %s : %s", testQuery.Name, tests.Failed, err)
+			qs.Name = qs.Name + "2"
+			if err := query.CreateSet(context, ses, *qs); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			} else {
-				t.Logf("%s\t\tShould have added new query record with name %s : %s", testQuery.Name, tests.Success, err)
+				t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
 			}
 
-			ses := mongo.GetSession()
-			defer ses.Close()
-
-			names, err := query.GetSetNames("Test", ses)
+			names, err := query.GetSetNames(context, ses)
 			if err != nil {
-				t.Errorf("%s\t\tShould have retrieved query record names successfully : %v", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve the query set names : %v", tests.Failed, err)
 			} else {
-				t.Logf("%s\t\tShould have retrieved query record names successfully", tests.Success)
-
-				if len(names) == 0 {
-					t.Errorf("%s\t\tShould have atleast one query record name: %s", tests.Failed, names)
-				} else {
-					t.Logf("%s\t\tShould have atleast one query record name: %s", tests.Success, names)
-				}
-
-				expectedName := "spending_advice"
-				if names[0] != expectedName {
-					t.Errorf("%s\t\tShould have first name equal %q", tests.Failed, expectedName)
-				} else {
-					t.Logf("%s\t\tShould have first name equal %q", tests.Success, expectedName)
-				}
+				t.Logf("\t%s\tShould be able to retrieve the query set names", tests.Success)
 			}
 
+			if len(names) != 2 {
+				t.Errorf("\t%s\tShould have two query sets : %s", tests.Failed, names)
+			} else {
+				t.Logf("\t%s\tShould have atleast one query record name: %s", tests.Success, names)
+			}
+
+			if !strings.Contains(names[0], qsName) || !strings.Contains(names[1], qsName) {
+				t.Errorf("\t%s\tShould have \"%s\" in the name.", tests.Failed, qsName)
+			} else {
+				t.Logf("\t%s\tShould have \"%s\" in the name.", tests.Success, qsName)
+			}
 		}
 	}
 }
+
+/*
+DON'T THINK WE NEED THIS TEST. TRY TO USE THE API EXCEPT FOR REMOVING EVERYTHING IN THE END.
+THAT IS MY FAULT BECAUSE I WAS WRONG BEFORE. I THOUGHT I HAD TOLD YOU THIS IN THE MORNING.
 
 // TestSetNamesList validates the accuracy of the names list returned.
 func TestSetNamesList(t *testing.T) {
@@ -327,6 +257,11 @@ func TestSetNamesList(t *testing.T) {
 		}
 	}
 }
+*/
+
+/*
+DON'T THINK WE NEED THIS TEST. TRY TO USE THE API EXCEPT FOR REMOVING EVERYTHING IN THE END.
+THAT IS MY FAULT BECAUSE I WAS WRONG BEFORE. I THOUGHT I HAD TOLD YOU THIS IN THE MORNING.
 
 // TestGetSetByName validates the retrieval of a query.Set record using its name.
 func TestGetSetByName(t *testing.T) {
@@ -411,6 +346,11 @@ func TestGetSetByName(t *testing.T) {
 		}
 	}
 }
+*/
+
+/*
+LET'S FIX THIS TESTS TO FOLLOW THE PATTERNS IN THE FIRST TWO TESTS. STUDY THE CODE.
+ALSO STUDY THE CODE IN AUTH_TEST.
 
 // TestUpdateSet set validates update operation of a given record.
 func TestUpdateSet(t *testing.T) {
@@ -462,6 +402,11 @@ func TestUpdateSet(t *testing.T) {
 		}
 	}
 }
+*/
+
+/*
+LET'S FIX THIS TESTS TO FOLLOW THE PATTERNS IN THE FIRST TWO TESTS. STUDY THE CODE.
+ALSO STUDY THE CODE IN AUTH_TEST.
 
 // TestDeleteSet validates the removal of a query from the database.
 func TestDeleteSet(t *testing.T) {
@@ -518,6 +463,11 @@ func TestDeleteSet(t *testing.T) {
 		}
 	}
 }
+*/
+
+/*
+LET'S FIX THIS TESTS TO FOLLOW THE PATTERNS IN THE FIRST TWO TESTS. STUDY THE CODE.
+ALSO STUDY THE CODE IN AUTH_TEST.
 
 // TestNoSession tests the when a nil session is used.
 func TestNoSession(t *testing.T) {
@@ -564,3 +514,4 @@ func TestNoSession(t *testing.T) {
 		}
 	}
 }
+*/

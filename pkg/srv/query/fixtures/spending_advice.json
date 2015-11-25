@@ -1,5 +1,5 @@
 {
-  "name":"spending_advice",
+  "name":"QTEST_spending_advice",
   "description":"tests against user spending rate and provides adequate advice on saving more",
   "enabled": true,
   "params":[

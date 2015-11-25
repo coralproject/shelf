@@ -12,7 +12,7 @@ import (
 )
 
 // collections contains the name of the rules collection.
-const collection = "queries"
+const collection = "query_sets"
 
 // =============================================================================
 

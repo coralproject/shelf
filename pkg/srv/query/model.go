@@ -31,7 +31,7 @@ type Query struct {
 	Scripts       []string      `bson:"scripts" json:"scripts"`                                   // Scripts to process for the query.
 }
 
-// SetParam contains meta-data about a required parameter for the rule.
+// SetParam contains meta-data about a required parameter for the query.
 type SetParam struct {
 	Name    string `bson:"name" json:"name"`       // Name of the parameter.
 	Default string `bson:"default" json:"default"` // Default value for the parameter.

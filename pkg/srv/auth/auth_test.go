@@ -20,6 +20,8 @@ func init() {
 	tests.Init()
 }
 
+//==============================================================================
+
 // removeUser is used to clear out all the test user from the collection.
 func removeUser(ses *mgo.Session, publicID string) error {
 	f := func(c *mgo.Collection) error {
@@ -43,6 +45,8 @@ func removeUser(ses *mgo.Session, publicID string) error {
 
 	return nil
 }
+
+//==============================================================================
 
 // TestCreateUser tests the creation of a user.
 func TestCreateUser(t *testing.T) {
