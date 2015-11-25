@@ -1,3 +1,4 @@
+// Package mongo provides support for using MongoDB.
 package mongo
 
 import (

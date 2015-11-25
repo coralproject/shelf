@@ -1,17 +1,21 @@
-// Package cfg provides a package level configuration loader which loaders a
-// given set of configuration options using a given namespace and a map as the
-// storage endpoint.
-//		os.Setenv("MYAPP_PROC_ID", "322")
-//		os.Setenv("MYAPP_SOCKET", "./tmp/sockets.po")
-//		os.Setenv("MYAPP_PORT", "4034")
-//		os.Setenv("MYAPP_Stamp", "2013-10-03 10:43:32.200")
-// To load the set of configuration values from your environment, simple do:
+// Package cfg provides configuration options that are loaded from the environment.
+// Configuration is then stored in memory and can be retrieved by its proper
+// type.
 //
-//      cfg.Init("myapp")
+// To initialize the configuration system from your environment, call Init:
 //
-// To Retrieve keys:
+//		cfg.Init("myapp")
 //
-//  porc := cfg.String("proc_id")
-//  port := cfg.Int("port")
-//  ms := cfg.Time("stamp")
+// To retrieve values from configuration:
+//
+//  	porc, err := cfg.String("proc_id")
+//  	port, err := cfg.Int("port")
+//  	ms, err := cfg.Time("stamp")
+//
+// Use the Must set of function to retrieve a single value but these calls
+// will panic if the key does not exist:
+//
+//  	porc := cfg.MustString("proc_id")
+//  	port := cfg.MustInt("port")
+//  	ms := cfg.MustTime("stamp")
 package cfg

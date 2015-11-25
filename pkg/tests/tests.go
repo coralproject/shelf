@@ -1,4 +1,4 @@
-// Package tests provides testing support.
+// Package tests provides the generic support all tests require.
 package tests
 
 import (
