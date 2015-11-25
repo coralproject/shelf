@@ -18,6 +18,10 @@ var c struct {
 // Init is to be called only once, to load up the giving namespace if found,
 // in the environment variables. All keys will be made lowercase.
 func Init(namespace string) error {
+	if c.m != nil {
+		return errors.New("Config already initialized")
+	}
+
 	c.m = make(map[string]string)
 
 	// Get the lists of available environment variables.

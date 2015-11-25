@@ -1,6 +1,7 @@
 package log
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -21,9 +22,15 @@ var l struct {
 
 // Init must be called to initialize the logging system. This function should
 // only be called once.
-func Init(w io.Writer, level func() int) {
+func Init(w io.Writer, level func() int) error {
+	if l.Logger != nil {
+		return errors.New("Logger already initialized")
+	}
+
 	l.Logger = log.New(w, "", log.Ldate|log.Ltime|log.Lshortfile)
 	l.level = level
+
+	return nil
 }
 
 // Dev logs trace information for developers.
