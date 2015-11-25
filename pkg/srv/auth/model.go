@@ -31,6 +31,7 @@ const (
 
 //==============================================================================
 
+// validate is used to perform model field validation.
 var validate *validator.Validate
 
 func init() {
