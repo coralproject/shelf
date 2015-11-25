@@ -3,7 +3,6 @@ package query_test
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -20,6 +19,7 @@ import (
 // collection used for testing the query CRUD API
 var collection = "queries"
 var record = "spending_advice"
+var testRecord = "test_spending_advice"
 
 func init() {
 
@@ -30,6 +30,21 @@ func init() {
 func removeSession(session *mgo.Session) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": record}
+		log.Dev("Test", "removeSession", "db.queries.remove(%s)", mongo.Query(q))
+		return c.Remove(q)
+	}
+
+	err := mongo.ExecuteDB("Tests", session, collection, f)
+	if err != mgo.ErrNotFound {
+		return err
+	}
+
+	return nil
+}
+
+func removeTestSession(session *mgo.Session) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": testRecord}
 		log.Dev("Test", "removeSession", "db.queries.remove(%s)", mongo.Query(q))
 		return c.Remove(q)
 	}
@@ -182,6 +197,12 @@ func TestGetSetNames(t *testing.T) {
 		} else {
 			t.Logf("%s\t\tShould have removed query record from db ", tests.Success)
 		}
+
+		if err := removeTestSession(ses); err != nil {
+			t.Errorf("%s\t\tShould have removed query test record from dbs : %v", tests.Failed, err)
+		} else {
+			t.Logf("%s\t\tShould have removed query test record from db ", tests.Success)
+		}
 	}()
 
 	t.Log("Given the need to retrieve a query from the database")
@@ -197,7 +218,7 @@ func TestGetSetNames(t *testing.T) {
 			}
 
 			testQuery := q
-			testQuery.Name = fmt.Sprintf("test_%s", testQuery.Name)
+			testQuery.Name = testRecord
 			err = query.CreateSet("Tests", ses, testQuery)
 			if err != nil {
 				t.Errorf("%s\t\tShould have added new query record with name %s : %s", testQuery.Name, tests.Failed, err)
