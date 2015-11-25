@@ -1,3 +1,7 @@
+// Package session provides a level of security for web tokens by giving them an
+// expiration date and a lookup point for the user accessing the API. The session
+// is what is used to look up the user performing the web call. Though the user's
+// PublicID is not private, it is not used directly.
 package session
 
 import (
