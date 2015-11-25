@@ -107,7 +107,14 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-// TODO: Write tests for Update and Delete
+// TODO: Test validation of NewUser and UpdUser.
+
+// TestUpdateUser tests we can update user information.
+func TestUpdateUser(t *testing.T) {
+}
+
+func TestDeleteUser(t *testing.T) {
+}
 
 // TestCreateWebToken tests create a web token and a pairing session.
 func TestCreateWebToken(t *testing.T) {
