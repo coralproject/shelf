@@ -18,6 +18,7 @@
 //
 // QuerySet Sample:
 //
+// ```json
 // {
 //   "name":"spending_advice",
 //   "description":"tests against user spending rate and provides adequate advice on saving more",
@@ -52,4 +53,6 @@
 //     ]
 //    }]
 // }
+//```
+//
 package query
