@@ -443,7 +443,6 @@ func TestAPIFailure(t *testing.T) {
 
 	t.Log("Given the need to to validate failure of API with bad session.")
 	{
-
 		t.Log("When giving a nil session")
 		{
 			if err := query.CreateSet(context, nil, *qs1); err == nil {
