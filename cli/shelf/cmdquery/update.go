@@ -35,6 +35,7 @@ func addUpd() {
 
 	// cmd.Flags().StringVarP(&update.name, "name", "n", "", "name of query record")
 	cmd.Flags().StringVarP(&update.file, "file", "f", "", "file path of query json file")
+	cmd.Flags().StringVarP(&update.dir, "dir", "d", "", "dir to load updated json files from")
 
 	queryCmd.AddCommand(cmd)
 }
@@ -59,7 +60,7 @@ func runUpdate(cmd *cobra.Command, args []string) {
 	}
 
 	// Attempt to load directory path.
-	if err := loadDir(create.dir, session, loadUpdate); err != nil {
+	if err := loadDir(update.dir, session, loadUpdate); err != nil {
 		log.Error("commands", "runUpdate", err, "Completed")
 		return
 	}
