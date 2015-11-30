@@ -262,7 +262,6 @@ func TestUpdateSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-
 			if err := query.CreateSet(context, ses, *qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 				t.Logf("\t%+v", *qs1)
@@ -270,7 +269,7 @@ func TestUpdateSet(t *testing.T) {
 				t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 			}
 
-			qs2 := (*qs1)
+			qs2 := *qs1
 			qs2.Params = append(qs2.Params, query.SetParam{
 				Name:    "group",
 				Default: "1",
@@ -349,7 +348,6 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-
 			if err := query.CreateSet(context, ses, *qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 				t.Logf("\t%+v", *qs1)

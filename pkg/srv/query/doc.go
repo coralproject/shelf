@@ -1,5 +1,5 @@
-//Package query provides API's for managing querysets which will be used in
-//executing different aggregation tests against their respective data collection.
+// Package query provides API's for managing querysets which will be used in
+// executing different aggregation tests against their respective data collection.
 //
 // QuerySet
 // In query, records are required to follow specific formatting and are at this
