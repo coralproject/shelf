@@ -263,7 +263,7 @@ func TestUpdateSet(t *testing.T) {
 		t.Log("\tWhen using fixture", fixture)
 		{
 			if err := query.CreateSet(context, ses, *qs1); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
+				t.Errorf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 				t.Logf("\t%+v", *qs1)
 			} else {
 				t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -349,7 +349,7 @@ func TestDeleteSet(t *testing.T) {
 		t.Log("\tWhen using fixture", fixture)
 		{
 			if err := query.CreateSet(context, ses, *qs1); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
+				t.Errorf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 				t.Logf("\t%+v", *qs1)
 			} else {
 				t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -372,9 +372,9 @@ func TestDeleteSet(t *testing.T) {
 	}
 }
 
-// TestBadDataAndSession tests the when incorrect data is being used and when
-// a mongodb session is invalid.
-func TestBadDataAndSession(t *testing.T) {
+// TestUnknownName validates the behaviour of the query API when using a invalid/
+// unknown query name.
+func TestUnknownName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -423,34 +423,55 @@ func TestBadDataAndSession(t *testing.T) {
 			}
 		}
 
-		t.Log("Given the need to validate bad mongo session response.")
+	}
+}
+
+// TestAPIFailure validates the failure of the api using a nil session.
+func TestAPIFailure(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	qsName := "QTEST_spending_desire"
+
+	const fixture = "./fixtures/spending_advice.json"
+	qs1, err := getFixture(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
+	} else {
+		t.Logf("\t%s\tShould load query record from file.", tests.Success)
+	}
+
+	t.Log("Given the need to to validate failure of API with bad session.")
+	{
+
+		t.Log("When giving a nil session")
 		{
 			if err := query.CreateSet(context, nil, *qs1); err == nil {
-				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
+				t.Errorf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 			}
 
 			if err := query.UpdateSet(context, nil, *qs1); err == nil {
-				t.Fatalf("\t%s\tShould be refused update by api with bad session", tests.Failed)
+				t.Errorf("\t%s\tShould be refused update by api with bad session", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be refused update by api with bad session: %s", tests.Success, err)
 			}
 
 			if _, err := query.GetSetByName(context, nil, qsName); err == nil {
-				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+				t.Errorf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 			}
 
 			if _, err := query.GetSetNames(context, nil); err == nil {
-				t.Fatalf("\t%s\tShould be refused names request by api with bad session", tests.Failed)
+				t.Errorf("\t%s\tShould be refused names request by api with bad session", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be refused names request by api with bad session: %s", tests.Success, err)
 			}
 
 			if err := query.DeleteSet(context, nil, qsName); err == nil {
-				t.Fatalf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
+				t.Errorf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
 			}
