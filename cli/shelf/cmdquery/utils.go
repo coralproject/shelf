@@ -2,10 +2,14 @@ package cmdquery
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 
+	"gopkg.in/mgo.v2"
+
+	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/query"
 )
@@ -117,4 +121,54 @@ func queriesFromDir(context interface{}, dirPath string) ([]query.Query, error) 
 
 	log.Dev(context, "queriesFromDir", "Completed : Load getQuerys : Dir %s", dirPath)
 	return getQuerys, nil
+}
+
+// LoadDir loadsup a given directory, calling a load function for each valid
+// json file found.
+func loadDir(cdir string, ses *mgo.Session, loader func(string, *mgo.Session) error) error {
+	if loader == nil {
+		return errors.New("No Loader provided")
+	}
+
+	var dir string
+
+	// If we have a empty directory argument.
+	if cdir == "" {
+		if envdir, err := cfg.String(envKey); err == nil {
+			dir = envdir
+		} else {
+			dir = "rules"
+		}
+	} else {
+		dir = cdir
+	}
+
+	_, err := os.Stat(dir)
+	if err != nil && err == os.ErrNotExist {
+		return err
+	}
+
+	err2 := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if info == nil {
+			return nil
+		}
+
+		if info.IsDir() {
+			return nil
+		}
+
+		ext := filepath.Ext(path)
+
+		if ext != ".json" {
+			return nil
+		}
+
+		return loader(path, ses)
+	})
+
+	if err2 != nil {
+		return err2
+	}
+
+	return nil
 }

@@ -1,10 +1,6 @@
 package cmdquery
 
 import (
-	"os"
-	"path/filepath"
-
-	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
@@ -39,10 +35,6 @@ var create struct {
 	dir  string
 }
 
-// envKey defines the environment variable to be looked for, to load rules
-// from if provided.
-var envKey = "RULES_DIR"
-
 // addCreate handles the creation of users.
 func addCreate() {
 	cmd := &cobra.Command{
@@ -71,70 +63,26 @@ func runCreate(cmd *cobra.Command, args []string) {
 	// If the file option is not an empty string, then
 	// try to load file path.
 	if create.file != "" {
-		if err := loadFile(create.file, session); err != nil {
+		if err := loadNew(create.file, session); err != nil {
 			log.Error("commands", "runCreate", err, "Completed")
 			return
 		}
 	}
 
 	// Attempt to load directory path.
-	if err := loadDir(session); err != nil {
+	if err := loadDir(create.dir, session, loadNew); err != nil {
 		log.Error("commands", "runCreate", err, "Completed")
 		return
 	}
 
 }
 
-// loadFile loads a given file path
-func loadFile(file string, ses *mgo.Session) error {
+// loadNew loads a given file path and attempts to save into the query db.
+func loadNew(file string, ses *mgo.Session) error {
 	q, err := setFromFile("commands", file)
 	if err != nil {
 		return err
 	}
 
 	return query.CreateSet("commands", ses, *(q))
-}
-
-func loadDir(ses *mgo.Session) error {
-	var dir string
-
-	// If we have a empty directory argument.
-	if create.dir == "" {
-		if envdir, err := cfg.String(envKey); err == nil {
-			dir = envdir
-		} else {
-			dir = "rules"
-		}
-	} else {
-		dir = create.dir
-	}
-
-	_, err := os.Stat(dir)
-	if err != nil && err == os.ErrNotExist {
-		return err
-	}
-
-	err2 := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if info == nil {
-			return nil
-		}
-
-		if info.IsDir() {
-			return nil
-		}
-
-		ext := filepath.Ext(path)
-
-		if ext != ".json" {
-			return nil
-		}
-
-		return loadFile(path, ses)
-	})
-
-	if err2 != nil {
-		return err2
-	}
-
-	return nil
 }

@@ -5,6 +5,7 @@ import (
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/spf13/cobra"
+	"gopkg.in/mgo.v2"
 )
 
 var updateLong = `Updates a query in the system using the giving file and  name.
@@ -20,7 +21,7 @@ Example:
 // update contains the state for this command.
 var update struct {
 	file string
-	// name string
+	dir  string
 }
 
 // addUpd handles the update of query record.
@@ -40,7 +41,7 @@ func addUpd() {
 
 // runUpdate is the code that implements the create command.
 func runUpdate(cmd *cobra.Command, args []string) {
-	if update.file == "" {
+	if update.file == "" && update.dir == "" {
 		cmd.Help()
 		return
 	}
@@ -48,25 +49,28 @@ func runUpdate(cmd *cobra.Command, args []string) {
 	session := mongo.GetSession()
 	defer session.Close()
 
-	// // check if the record exists with the giving name
-	// _, err := query.Get("commands", session, update.name)
-	// if err != nil {
-	// 	log.Error("commands", "runUpdate", err, "Completed")
-	// 	return
-	// }
+	// If the file option is not an empty string, then
+	// try to load file path.
+	if update.file != "" {
+		if err := loadUpdate(update.file, session); err != nil {
+			log.Error("commands", "runUpdate", err, "Completed")
+			return
+		}
+	}
 
-	q, err := setFromFile("commands", update.file)
+	// Attempt to load directory path.
+	if err := loadDir(create.dir, session, loadUpdate); err != nil {
+		log.Error("commands", "runUpdate", err, "Completed")
+		return
+	}
+}
+
+// loadUpdate loads a given file path and attempts to update the query db.
+func loadUpdate(file string, ses *mgo.Session) error {
+	q, err := setFromFile("commands", file)
 	if err != nil {
-		log.Error("commands", "runUpdate", err, "Completed")
-		return
+		return err
 	}
 
-	// persist the name of the record
-	// q.Name = update.name
-
-	err2 := query.UpdateSet("commands", session, *(q))
-	if err2 != nil {
-		log.Error("commands", "runUpdate", err, "Completed")
-		return
-	}
+	return query.UpdateSet("commands", ses, *(q))
 }

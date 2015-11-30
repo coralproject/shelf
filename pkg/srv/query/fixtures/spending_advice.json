@@ -9,7 +9,7 @@
       "desc":"provides the user_id to check against the collection"
     }
   ],
-  "rules": [
+  "queries": [
   {
     "desc":"match spending rate over 20 dollars",
     "type":"pipeline",
