@@ -71,19 +71,17 @@ func TestCreateQuery(t *testing.T) {
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
 		if err := removeSets(ses); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		} else {
-			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
 
 	t.Log("Given the need to save a query set into the database.")
@@ -164,7 +162,6 @@ func TestCreateQuery(t *testing.T) {
 					}
 				}
 			}
-
 		}
 	}
 }
@@ -177,22 +174,20 @@ func TestGetSetNames(t *testing.T) {
 	qsName := "spending_advice"
 
 	const fixture = "./fixtures/spending_advice.json"
-	qs, err := getFixture(fixture)
+	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
 		if err := removeSets(ses); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		} else {
-			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
 
 	t.Log("Given the need to retrieve a list of query sets.")
@@ -243,19 +238,17 @@ func TestUpdateSet(t *testing.T) {
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
 		if err := removeSets(ses); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		} else {
-			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
 
 	t.Log("Given the need to update a query set into the database.")
@@ -329,19 +322,17 @@ func TestDeleteSet(t *testing.T) {
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
 		if err := removeSets(ses); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		} else {
-			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
 
 	t.Log("Given the need to delete a query set in the database.")
@@ -384,19 +375,17 @@ func TestUnknownName(t *testing.T) {
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	ses := mongo.GetSession()
 	defer ses.Close()
 
 	defer func() {
 		if err := removeSets(ses); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		} else {
-			t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
 
 	t.Log("Given the need to validate bad query name response.")
@@ -437,9 +426,8 @@ func TestAPIFailure(t *testing.T) {
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	} else {
-		t.Logf("\t%s\tShould load query record from file.", tests.Success)
 	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	t.Log("Given the need to to validate failure of API with bad session.")
 	{
