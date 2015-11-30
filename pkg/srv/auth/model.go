@@ -26,6 +26,7 @@ const (
 // Set of user type codes.
 const (
 	TypeAPI = iota + 1
+	TypeUSER
 )
 
 //==============================================================================

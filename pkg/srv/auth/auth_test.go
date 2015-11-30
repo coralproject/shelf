@@ -59,7 +59,7 @@ func TestCreateUser(t *testing.T) {
 	var publicID string
 	defer func() {
 		if err := removeUser(ses, publicID); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
 	}()
@@ -115,9 +115,129 @@ func TestCreateUser(t *testing.T) {
 
 // TestUpdateUser tests we can update user information.
 func TestUpdateUser(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
+	t.Log("Given the need to update a user.")
+	{
+		t.Log("\tWhen using an existing user.")
+		{
+			nu := auth.NewUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			}
+
+			u1, err := auth.CreateUser(context, ses, nu)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
+
+			uu := auth.UpdUser{
+				PublicID: publicID,
+				UserType: auth.TypeUSER,
+				Status:   auth.StatusInvalid,
+				FullName: "Update Kennedy",
+				Email:    "upt@ardanlabs.com",
+			}
+
+			if err := auth.UpdateUser(context, ses, uu); err != nil {
+				t.Fatalf("\t%s\tShould be able to update a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to update a user.", tests.Success)
+
+			u2, err := auth.GetUserByPublicID(context, ses, u1.PublicID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
+
+			// Remove the objectid to be able to compare the values.
+			u2.ID = ""
+
+			// Need to remove the nanoseconds to be able to compare the values.
+			u1.DateModified = u1.DateModified.Add(-time.Duration(u1.DateModified.Nanosecond()))
+			u1.DateCreated = u1.DateCreated.Add(-time.Duration(u1.DateCreated.Nanosecond()))
+			u2.DateModified = u2.DateModified.Add(-time.Duration(u2.DateModified.Nanosecond()))
+			u2.DateCreated = u2.DateCreated.Add(-time.Duration(u2.DateCreated.Nanosecond()))
+
+			// Update the fields that changed
+			u1.UserType = u2.UserType
+			u1.Status = u2.Status
+			u1.FullName = u2.FullName
+			u1.Email = u2.Email
+
+			if !reflect.DeepEqual(*u1, *u2) {
+				t.Errorf("\t%s\tShould be able to get back the same user with changes.", tests.Failed)
+				t.Logf("\t%+v", *u1)
+				t.Logf("\t%+v", *u2)
+			} else {
+				t.Logf("\t%s\tShould be able to get back the same user with changes.", tests.Success)
+			}
+		}
+	}
 }
 
+// TestDeleteUser test the deleting of a user.
 func TestDeleteUser(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	t.Log("Given the need to update a user.")
+	{
+		t.Log("\tWhen using an existing user.")
+		{
+			nu := auth.NewUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			}
+
+			u1, err := auth.CreateUser(context, ses, nu)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			u2, err := auth.GetUserByPublicID(context, ses, u1.PublicID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
+
+			if err := auth.DeleteUser(context, ses, u2.PublicID); err != nil {
+				t.Fatalf("\t%s\tShould be able to delete the user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to delete the user.", tests.Success)
+
+			if _, err := auth.GetUserByPublicID(context, ses, u1.PublicID); err == nil {
+				t.Fatalf("\t%s\tShould Not be able to retrieve the user by PublicID.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be able to retrieve the user by PublicID.", tests.Success)
+		}
+	}
 }
 
 // TestCreateWebToken tests create a web token and a pairing session.
@@ -131,7 +251,7 @@ func TestCreateWebToken(t *testing.T) {
 	var publicID string
 	defer func() {
 		if err := removeUser(ses, publicID); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
 	}()
@@ -214,7 +334,7 @@ func TestExpiredWebToken(t *testing.T) {
 	var publicID string
 	defer func() {
 		if err := removeUser(ses, publicID); err != nil {
-			t.Errorf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
 	}()

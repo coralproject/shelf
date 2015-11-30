@@ -197,80 +197,80 @@ func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User,
 
 //==============================================================================
 
-// Update updates an existing user to the database.
-func Update(context interface{}, ses *mgo.Session, uu UpdUser) error {
-	log.Dev(context, "Update", "Started : PublicID[%s]", uu.PublicID)
+// UpdateUser updates an existing user to the database.
+func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
+	log.Dev(context, "UpdateUser", "Started : PublicID[%s]", uu.PublicID)
 
 	if err := uu.validate(context); err != nil {
-		log.Error(context, "Update", err, "Completed")
+		log.Error(context, "UpdateUser", err, "Completed")
 		return err
 	}
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": uu.PublicID}
 		upd := bson.M{"$set": bson.M{"full_name": uu.FullName, "email": uu.Email, "type": uu.UserType, "status": uu.Status, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "Update", "MGO : db.%s.update(%s)", collection, mongo.Query(upd))
+		log.Dev(context, "UpdateUser", "MGO : db.%s.update(%s)", collection, mongo.Query(upd))
 		return c.Update(q, upd)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Update", err, "Completed")
+		log.Error(context, "UpdateUser", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "Update", "Completed")
+	log.Dev(context, "UpdateUser", "Completed")
 	return nil
 }
 
-// UpdateCredentials updates an existing user's password and token in the database.
-func UpdateCredentials(context interface{}, ses *mgo.Session, u *User, password string) error {
-	log.Dev(context, "UpdateCredentials", "Started : PublicID[%s]", u.PublicID)
+// UpdateUserCredentials updates an existing user's password and token in the database.
+func UpdateUserCredentials(context interface{}, ses *mgo.Session, u *User, password string) error {
+	log.Dev(context, "UpdateUserCredentials", "Started : PublicID[%s]", u.PublicID)
 
 	if len(password) < 8 {
 		err := errors.New("Invalid password length")
-		log.Error(context, "UpdateCredentials", err, "Completed")
+		log.Error(context, "UpdateUserCredentials", err, "Completed")
 		return err
 	}
 
 	newPassHash, err := crypto.BcryptPassword(u.PrivateID + password)
 	if err != nil {
-		log.Error(context, "UpdateCredentials", err, "Completed")
+		log.Error(context, "UpdateUserCredentials", err, "Completed")
 		return err
 	}
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": u.PublicID}
 		upd := bson.M{"$set": bson.M{"password": newPassHash, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "Create", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
+		log.Dev(context, "UpdateUserCredentials", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
 		return c.Update(q, upd)
 	}
 
 	if err = mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "UpdateCredentials", err, "Completed")
+		log.Error(context, "UpdateUserCredentials", err, "Completed")
 		return nil
 	}
 
-	log.Dev(context, "UpdateCredentials", "Completed")
+	log.Dev(context, "UpdateUserCredentials", "Completed")
 	return nil
 }
 
 //==============================================================================
 
-// Delete removes an existing user from the database.
-func Delete(context interface{}, ses *mgo.Session, publicID string) error {
-	log.Dev(context, "Delete", "Started : PublicID[%s]", publicID)
+// DeleteUser removes an existing user from the database.
+func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error {
+	log.Dev(context, "DeleteUser", "Started : PublicID[%s]", publicID)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": publicID}
-		log.Dev(context, "Delete", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
+		log.Dev(context, "DeleteUser", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "Delete", err, "Completed")
+		log.Error(context, "DeleteUser", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "Delete", "Completed")
+	log.Dev(context, "DeleteUser", "Completed")
 	return nil
 }
