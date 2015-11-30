@@ -403,7 +403,6 @@ func TestBadDataAndSession(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-
 			if err := query.CreateSet(context, ses, *qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 				t.Logf("\t%+v", *qs1)
@@ -422,12 +421,10 @@ func TestBadDataAndSession(t *testing.T) {
 			} else {
 				t.Logf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted.", tests.Success, qsName)
 			}
-
 		}
 
 		t.Log("Given the need to validate bad mongo session response.")
 		{
-
 			if err := query.CreateSet(context, nil, *qs1); err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			} else {
@@ -457,7 +454,6 @@ func TestBadDataAndSession(t *testing.T) {
 			} else {
 				t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
 			}
-
 		}
 	}
 }
