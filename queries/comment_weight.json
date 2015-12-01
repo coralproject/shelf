@@ -1,0 +1,40 @@
+{
+  "name":"weighted_comments",
+  "description":"provides a mongo script for getting relevancy weights on comments",
+  "enabled": true,
+  "params":[
+    {
+      "name":"base_weight",
+      "default":"3",
+      "desc":"base level weight to use"
+    },
+    {
+      "name":"base_trust_level",
+      "default":"1",
+      "desc":"base trust level to use with user comment trust"
+    }
+  ],
+  "queries": [
+    {
+      "desc":"retrieve all comments with base trust level",
+      "type":"pipeline",
+      "continue": true,
+      "script_options": {
+        "collection":"user_product_comments",
+        "has_date":true,
+        "has_objectid": false
+      },
+      "save_options": {
+        "save_as":"comment_weights",
+        "variables": true,
+        "to_json": true
+      },
+      "var_options":{},
+      "scripts":[
+        "{ \"$match\" : { \"trust_level\" : \"#base_trust_level#\", \"category\" : \"$comments\" }}",
+        "{ \"$match\" : { \"weight\" : { \"$gt\" : \"#base_weight#\"}}}",
+        "{\"$group\": {\"_id\": $trust_level, \"comments\": {\"user\":\"$user\", \"comment\":\"$comment\"} }}"
+      ]
+     }
+  ]
+}
