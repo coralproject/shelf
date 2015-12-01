@@ -114,8 +114,13 @@ func UpdateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 func DeleteSet(context interface{}, ses *mgo.Session, name string) error {
 	log.Dev(context, "DeleteSet", "Started : Name[%s]", name)
 
+	qs, err := GetSetByName(context, ses, name)
+	if err != nil {
+		return err
+	}
+
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": name}
+		q := bson.M{"name": qs.Name}
 		log.Dev(context, "DeleteSet", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
