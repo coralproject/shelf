@@ -347,6 +347,7 @@ func TestDeleteSet(t *testing.T) {
 	defer tests.DisplayLog()
 
 	qsName := "QTEST_spending_advice"
+	qsBadName := "QTEST_brod_advice"
 
 	const fixture = "./fixtures/spending_advice.json"
 	qs1, err := getFixture(fixture)
@@ -370,17 +371,22 @@ func TestDeleteSet(t *testing.T) {
 		t.Log("\tWhen using fixture", fixture)
 		{
 			if err := query.CreateSet(context, ses, qs1); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
+				t.Errorf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			if err := query.DeleteSet(context, ses, qsName); err != nil {
-				t.Fatalf("\t%s\tShould be able to delete a query set using its name[%s]: %s", tests.Failed, qsName, err)
+				t.Errorf("\t%s\tShould be able to delete a query set using its name[%s]: %s", tests.Failed, qsName, err)
 			}
 			t.Logf("\t%s\tShould be able to delete a query set using its name[%s]:", tests.Success, qsName)
 
+			if err := query.DeleteSet(context, ses, qsBadName); err == nil {
+				t.Errorf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Failed, qsBadName)
+			}
+			t.Logf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Success, qsBadName)
+
 			if _, err := query.GetSetByName(context, ses, qsName); err == nil {
-				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
+				t.Errorf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists:", tests.Success, qsName)
 		}

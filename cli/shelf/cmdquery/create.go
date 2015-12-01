@@ -84,5 +84,5 @@ func loadNew(file string, ses *mgo.Session) error {
 		return err
 	}
 
-	return query.CreateSet("commands", ses, *(q))
+	return query.CreateSet("commands", ses, q)
 }

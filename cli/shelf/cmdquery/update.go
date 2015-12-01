@@ -73,5 +73,5 @@ func loadUpdate(file string, ses *mgo.Session) error {
 		return err
 	}
 
-	return query.UpdateSet("commands", ses, *(q))
+	return query.UpdateSet("commands", ses, q)
 }
