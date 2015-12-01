@@ -134,3 +134,10 @@ func DeleteSet(context interface{}, ses *mgo.Session, name string) error {
 	log.Dev(context, "DeleteSet", "Completed")
 	return nil
 }
+
+// =============================================================================
+
+// ExecuteSet is used to execute an existing Set document.
+func ExecuteSet(context interface{}, ses *mgo.Session, name string) error {
+	return nil
+}
