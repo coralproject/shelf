@@ -74,7 +74,6 @@ func runCreate(cmd *cobra.Command, args []string) {
 		log.Error("commands", "runCreate", err, "Completed")
 		return
 	}
-
 }
 
 // loadNew loads a given file path and attempts to save into the query db.
