@@ -220,6 +220,11 @@ func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password string) error {
 	log.Dev(context, "UpdateUserPassword", "Started : PublicID[%s]", u.PublicID)
 
+	if err := u.Validate(); err != nil {
+		log.Error(context, "UpdateUserPassword", err, "Completed")
+		return err
+	}
+
 	if len(password) < 8 {
 		err := errors.New("Invalid password length")
 		log.Error(context, "UpdateUserPassword", err, "Completed")
@@ -254,8 +259,13 @@ func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password
 func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error {
 	log.Dev(context, "DeleteUser", "Started : PublicID[%s]", publicID)
 
+	u, err := GetUserByPublicID(context, ses, publicID)
+	if err != nil {
+		return err
+	}
+
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
+		q := bson.M{"public_id": u.PublicID}
 		log.Dev(context, "DeleteUser", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
 		return c.Remove(q)
 	}
