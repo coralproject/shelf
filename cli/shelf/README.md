@@ -79,6 +79,18 @@
 
           ```
 
+    - **`list`**
+
+        List returns a full list of all record names currently in the query database.
+
+        Example:
+
+          ```bash
+
+          	> shelf query list
+
+          ```
+
     - **`get`**
 
         Get allows the retrieval of a query record from the system using the
@@ -105,7 +117,7 @@
           	> shelf query update  -p user_advice_update.json
 
           	> shelf query update  -p scripts
-              
+
           ```
 
     - **`delete`**
@@ -130,9 +142,6 @@
 
           ```bash
 
-            > shelf query execute -n user_advice
-
-            >	shelf query execute -n user_advice -p {"name":"john"}
 
           ```
 
