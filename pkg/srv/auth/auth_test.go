@@ -114,7 +114,54 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
-// TODO: Creating the same user twice.
+// TestCreateUserTwice tests the creation of the same user fails. This test
+// requires an index on the collection.
+func TestCreateUserTwice(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
+	t.Log("Given the need to make sure the same user can't be created twice.")
+	{
+		t.Log("\tWhen using a test user.")
+		{
+			u1, err := auth.NewUser(auth.NUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			})
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
+
+			if err := auth.CreateUser(context, ses, u1); err == nil {
+				t.Fatalf("\t%s\tShould Not be able to create a user", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
+		}
+	}
+}
 
 // TestCreateUserValidation tests the creation of a user that is not valid.
 func TestCreateUserValidation(t *testing.T) {
