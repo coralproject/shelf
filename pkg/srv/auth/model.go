@@ -53,19 +53,76 @@ type LoginUser struct {
 
 //==============================================================================
 
+// NUser is provided to create a new user value for use.
+type NUser struct {
+	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
+	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
+	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
+	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
+	Password string `bson:"password" json:"-" validate:"required,min=8"`
+}
+
+// Validate performs validation on a NUser value before it is processed.
+func (nu *NUser) Validate() error {
+	errs := validate.Struct(nu)
+	if errs != nil {
+		return fmt.Errorf("%v", errs)
+	}
+
+	return nil
+}
+
+//==============================================================================
+
 // User model denotes a user entity for a tenant.
 type User struct {
 	ID           bson.ObjectId `bson:"_id,omitempty" json:"-"`
-	PublicID     string        `bson:"public_id" json:"public_id"`
-	PrivateID    string        `bson:"private_id" json:"-"`
-	UserType     int           `bson:"type" json:"type"`
-	Status       int           `bson:"status" json:"status"`
-	FullName     string        `bson:"full_name" json:"full_name"`
-	Email        string        `bson:"email" json:"email"`
-	Password     string        `bson:"password" json:"-"`
+	PublicID     string        `bson:"public_id" json:"public_id" validate:"required,uuid"`
+	PrivateID    string        `bson:"private_id" json:"-" validate:"required,uuid"`
+	UserType     int           `bson:"type" json:"type" validate:"required,ne=0"`
+	Status       int           `bson:"status" json:"status" validate:"required,ne=0"`
+	FullName     string        `bson:"full_name" json:"full_name" validate:"required,min=8"`
+	Email        string        `bson:"email" json:"email" validate:"required,max=100,email"`
+	Password     string        `bson:"password" json:"-" validate:"required,min=8"`
 	IsDeleted    bool          `bson:"is_deleted" json:"-"`
 	DateModified time.Time     `bson:"date_modified" json:"-"`
 	DateCreated  time.Time     `bson:"date_created" json:"-"`
+}
+
+// NewUser creates a new user from a NewUser value.
+func NewUser(nu NUser) (*User, error) {
+	if err := nu.Validate(); err != nil {
+		return nil, err
+	}
+
+	u := User{
+		PublicID:     uuid.New(),
+		PrivateID:    uuid.New(),
+		UserType:     nu.UserType,
+		Status:       StatusActive,
+		FullName:     nu.FullName,
+		Email:        strings.ToLower(nu.Email),
+		DateModified: time.Now(),
+		DateCreated:  time.Now(),
+		IsDeleted:    false,
+	}
+
+	var err error
+	if u.Password, err = crypto.BcryptPassword(u.PrivateID + nu.Password); err != nil {
+		return nil, err
+	}
+
+	return &u, nil
+}
+
+// Validate performs validation on a CrtUser value before it is processed.
+func (u *User) Validate() error {
+	errs := validate.Struct(u)
+	if errs != nil {
+		return fmt.Errorf("%v", errs)
+	}
+
+	return nil
 }
 
 // Pwd implements the secure entity interface.
@@ -115,48 +172,6 @@ func (u *User) IsPasswordValid(password string) bool {
 
 //==============================================================================
 
-// NewUser is provided to create new users in the system.
-type NewUser struct {
-	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
-	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
-	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
-	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
-	Password string `bson:"password" json:"-" validate:"required,min=8"`
-}
-
-// validate performs validation on a NewUser value before it is processed.
-func (nu *NewUser) validate(context interface{}) error {
-	errs := validate.Struct(nu)
-	if errs != nil {
-		return fmt.Errorf("%v", errs)
-	}
-
-	return nil
-}
-
-// new takes a new user and creates a valid User value.
-func (nu *NewUser) new(context interface{}) (*User, error) {
-	u := User{
-		PublicID:     uuid.New(),
-		PrivateID:    uuid.New(),
-		Status:       StatusActive,
-		FullName:     nu.FullName,
-		Email:        strings.ToLower(nu.Email),
-		DateModified: time.Now(),
-		DateCreated:  time.Now(),
-		IsDeleted:    false,
-	}
-
-	var err error
-	if u.Password, err = crypto.BcryptPassword(u.PrivateID + nu.Password); err != nil {
-		return nil, err
-	}
-
-	return &u, nil
-}
-
-//==============================================================================
-
 // UpdUser is provided to update an existing user in the system.
 type UpdUser struct {
 	PublicID string `bson:"public_id" json:"public_id" validate:"required,uuid"`
@@ -166,8 +181,8 @@ type UpdUser struct {
 	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
 }
 
-// validate performs validation on a NewUser value before it is processed.
-func (uu *UpdUser) validate(context interface{}) error {
+// Validate performs validation on a NewUser value before it is processed.
+func (uu *UpdUser) Validate() error {
 	errs := validate.Struct(uu)
 	if errs != nil {
 		return fmt.Errorf("%v", errs)

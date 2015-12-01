@@ -68,16 +68,19 @@ func TestCreateUser(t *testing.T) {
 	{
 		t.Log("\tWhen using a test user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -111,6 +114,8 @@ func TestCreateUser(t *testing.T) {
 	}
 }
 
+// TODO: Creating the same user twice.
+
 // TestCreateUserValidation tests the creation of a user that is not valid.
 func TestCreateUserValidation(t *testing.T) {
 	tests.ResetLog()
@@ -131,71 +136,81 @@ func TestCreateUserValidation(t *testing.T) {
 	{
 		t.Log("\tWhen using a test user.")
 		{
-			nu := auth.NewUser{
-				UserType: 0,
+			u, _ := auth.NewUser(auth.NUser{
+				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
+			})
 
-			if _, err := auth.CreateUser(context, ses, nu); err == nil {
+			u.UserType = 0
+
+			if err := auth.CreateUser(context, ses, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid UserType", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid UserType.", tests.Success)
 			}
 
-			nu = auth.NewUser{
+			u, _ = auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
-				Status:   0,
+				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
+			})
 
-			if _, err := auth.CreateUser(context, ses, nu); err == nil {
+			u.Status = 0
+
+			if err := auth.CreateUser(context, ses, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Status", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Status.", tests.Success)
 			}
 
-			nu = auth.NewUser{
+			u, _ = auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
-				FullName: "1234567",
+				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
+			})
 
-			if _, err := auth.CreateUser(context, ses, nu); err == nil {
+			u.FullName = "1234567"
+
+			if err := auth.CreateUser(context, ses, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid FullName", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid FullName.", tests.Success)
 			}
 
-			nu = auth.NewUser{
+			u, _ = auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
-				Email:    "bill",
+				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
+			})
 
-			if _, err := auth.CreateUser(context, ses, nu); err == nil {
+			u.Email = "bill"
+
+			if err := auth.CreateUser(context, ses, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Email", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Email.", tests.Success)
 			}
 
-			nu = auth.NewUser{
+			u, _ = auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
-				Password: "1234567",
-			}
+				Password: "_Password124",
+			})
 
-			if _, err := auth.CreateUser(context, ses, nu); err == nil {
+			u.Password = "1234567"
+
+			if err := auth.CreateUser(context, ses, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Password", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Password.", tests.Success)
@@ -224,16 +239,19 @@ func TestUpdateUser(t *testing.T) {
 	{
 		t.Log("\tWhen using an existing user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -407,16 +425,19 @@ func TestUpdateUserPassword(t *testing.T) {
 	{
 		t.Log("\tWhen using an existing user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -485,16 +506,19 @@ func TestDeleteUser(t *testing.T) {
 	{
 		t.Log("\tWhen using an existing user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -538,16 +562,19 @@ func TestCreateWebToken(t *testing.T) {
 	{
 		t.Log("\tWhen using a new user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -635,16 +662,19 @@ func TestExpiredWebToken(t *testing.T) {
 	{
 		t.Log("\tWhen using a new user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -715,16 +745,19 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 	{
 		t.Log("\tWhen using a new user.")
 		{
-			nu := auth.NewUser{
+			u1, err := auth.NewUser(auth.NUser{
 				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
 				Password: "_Password124",
-			}
-
-			u1, err := auth.CreateUser(context, ses, nu)
+			})
 			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -760,6 +793,35 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 				t.Fatalf("\t%s\tShould Not be able to validate the org web token.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to validate the org web token.", tests.Success)
+		}
+	}
+}
+
+// TestNoSession tests when a nil session is used.
+func TestNoSession(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to test calls with a bad session.")
+	{
+		t.Log("\tWhen using a nil session")
+		{
+			u1, err := auth.NewUser(auth.NUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			})
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, nil, u1); err == nil {
+				t.Errorf("\t%s\tShould Not be able to create a user.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
 		}
 	}
 }

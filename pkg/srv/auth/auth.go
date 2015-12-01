@@ -21,18 +21,12 @@ const collection = "users"
 //==============================================================================
 
 // CreateUser adds a new user to the database.
-func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error) {
-	log.Dev(context, "CreateUser", "Started : Email[%s]", nu.Email)
+func CreateUser(context interface{}, ses *mgo.Session, u *User) error {
+	log.Dev(context, "CreateUser", "Started : PublicID[%s]", u.PublicID)
 
-	if err := nu.validate(context); err != nil {
+	if err := u.Validate(); err != nil {
 		log.Error(context, "CreateUser", err, "Completed")
-		return nil, err
-	}
-
-	u, err := nu.new(context)
-	if err != nil {
-		log.Error(context, "CreateUser", err, "Completed")
-		return nil, err
+		return err
 	}
 
 	f := func(col *mgo.Collection) error {
@@ -42,11 +36,11 @@ func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
 		log.Error(context, "CreateUser", err, "Completed")
-		return nil, err
+		return err
 	}
 
-	log.Dev(context, "CreateUser", "Completed : PublicID[%s]", u.PublicID)
-	return u, nil
+	log.Dev(context, "CreateUser", "Completed")
+	return nil
 }
 
 // CreateWebToken return a token and session that can be used to authenticate a user.
@@ -201,7 +195,7 @@ func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User,
 func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 	log.Dev(context, "UpdateUser", "Started : PublicID[%s]", uu.PublicID)
 
-	if err := uu.validate(context); err != nil {
+	if err := uu.Validate(); err != nil {
 		log.Error(context, "UpdateUser", err, "Completed")
 		return err
 	}

@@ -109,10 +109,18 @@ Set of user status codes.
 ``` go
 const (
     TypeAPI = iota + 1
+    TypeUSER
 )
 ```
 Set of user type codes.
 
+
+
+## func CreateUser
+``` go
+func CreateUser(context interface{}, ses *mgo.Session, u *User) error
+```
+CreateUser adds a new user to the database.
 
 
 ## func CreateWebToken
@@ -129,25 +137,25 @@ func DecodeWebToken(context interface{}, webToken string) (sessionID string, tok
 DecodeWebToken breaks a web token into its parts.
 
 
-## func Delete
+## func DeleteUser
 ``` go
-func Delete(context interface{}, ses *mgo.Session, publicID string) error
+func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error
 ```
-Delete removes an existing user from the database.
+DeleteUser removes an existing user from the database.
 
 
-## func Update
+## func UpdateUser
 ``` go
-func Update(context interface{}, ses *mgo.Session, uu UpdUser) error
+func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error
 ```
-Update updates an existing user to the database.
+UpdateUser updates an existing user to the database.
 
 
-## func UpdateCredentials
+## func UpdateUserPassword
 ``` go
-func UpdateCredentials(context interface{}, ses *mgo.Session, u *User, password string) error
+func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password string) error
 ```
-UpdateCredentials updates an existing user's password and token in the database.
+UpdateUserPassword updates an existing user's password and token in the database.
 
 
 
@@ -170,9 +178,9 @@ LoginUser model used for when a user logs in.
 
 
 
-## type NewUser
+## type NUser
 ``` go
-type NewUser struct {
+type NUser struct {
     UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
     Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
     FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
@@ -180,7 +188,7 @@ type NewUser struct {
     Password string `bson:"password" json:"-" validate:"required,min=8"`
 }
 ```
-NewUser is provided to create new users in the system.
+NUser is provided to create a new user value for use.
 
 
 
@@ -189,6 +197,14 @@ NewUser is provided to create new users in the system.
 
 
 
+
+
+
+### func (\*NUser) Validate
+``` go
+func (nu *NUser) Validate() error
+```
+Validate performs validation on a NUser value before it is processed.
 
 
 
@@ -214,17 +230,25 @@ UpdUser is provided to update an existing user in the system.
 
 
 
+### func (\*UpdUser) Validate
+``` go
+func (uu *UpdUser) Validate() error
+```
+Validate performs validation on a NewUser value before it is processed.
+
+
+
 ## type User
 ``` go
 type User struct {
     ID           bson.ObjectId `bson:"_id,omitempty" json:"-"`
-    PublicID     string        `bson:"public_id" json:"public_id"`
-    PrivateID    string        `bson:"private_id" json:"-"`
-    UserType     int           `bson:"type" json:"type"`
-    Status       int           `bson:"status" json:"status"`
-    FullName     string        `bson:"full_name" json:"full_name"`
-    Email        string        `bson:"email" json:"email"`
-    Password     string        `bson:"password" json:"-"`
+    PublicID     string        `bson:"public_id" json:"public_id" validate:"required,uuid"`
+    PrivateID    string        `bson:"private_id" json:"-" validate:"required,uuid"`
+    UserType     int           `bson:"type" json:"type" validate:"required,ne=0"`
+    Status       int           `bson:"status" json:"status" validate:"required,ne=0"`
+    FullName     string        `bson:"full_name" json:"full_name" validate:"required,min=8"`
+    Email        string        `bson:"email" json:"email" validate:"required,max=100,email"`
+    Password     string        `bson:"password" json:"-" validate:"required,min=8"`
     IsDeleted    bool          `bson:"is_deleted" json:"-"`
     DateModified time.Time     `bson:"date_modified" json:"-"`
     DateCreated  time.Time     `bson:"date_created" json:"-"`
@@ -240,13 +264,6 @@ User model denotes a user entity for a tenant.
 
 
 
-### func CreateUser
-``` go
-func CreateUser(context interface{}, ses *mgo.Session, nu NewUser) (*User, error)
-```
-CreateUser adds a new user to the database.
-
-
 ### func GetUserByEmail
 ``` go
 func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error)
@@ -259,6 +276,13 @@ GetUserByEmail retrieves a user record by using the provided email.
 func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error)
 ```
 GetUserByPublicID retrieves a user record by using the provided PublicID.
+
+
+### func NewUser
+``` go
+func NewUser(nu NUser) (*User, error)
+```
+NewUser creates a new user from a NewUser value.
 
 
 ### func ValidateWebToken
@@ -292,6 +316,14 @@ Pwd implements the secure entity interface.
 func (u *User) Salt() ([]byte, error)
 ```
 Salt implements the secure entity interface.
+
+
+
+### func (\*User) Validate
+``` go
+func (u *User) Validate() error
+```
+Validate performs validation on a CrtUser value before it is processed.
 
 
 
