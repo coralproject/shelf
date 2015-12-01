@@ -4,7 +4,7 @@ import "github.com/spf13/cobra"
 
 // envKey defines the environment variable to be looked for, to load rules
 // from if provided.
-var envKey = "RULES_DIR"
+var envKey = "SCRIPT_DIR"
 
 // queryCmd represents the parent for all query cli commands.
 var queryCmd = &cobra.Command{
