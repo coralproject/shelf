@@ -12,13 +12,11 @@ structure.
 
 The query set execution supports the following types:
 
+  - Pipeline
+    Pipeline query set types take advantage of MongoDB's aggregation API
+  (the currently supported data backend), which allows insightful use of its
+  internal query language, in providing context against data sets within the database.
 
-        - Pipeline
-          Pipeline query set types take advantage of MongoDB's aggregation API
-        (the currently supported data backend), which allows insightful use of its
-        internal query language, in providing context against data sets within the database.
-
-        - Template
 
 QuerySet Sample:
 

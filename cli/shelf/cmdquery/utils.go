@@ -3,7 +3,6 @@ package cmdquery
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -67,60 +66,6 @@ func queriesFromList(context interface{}, getQueryFilePaths []string) ([]query.Q
 
 	log.Dev(context, "queriesFromList", "Completed : Paths %s", getQueryFilePaths)
 	return queries, nil
-}
-
-// queriesFromDir loads sets of getQuerys from the giving files in the directory path,
-// only reading the current directory level and not sub-directories.
-// Returns a list of getQuery pointers, each serialized with the contents of it's file.
-// If any of the paths are invalid or there was a failure to load their content,
-// a non-nil error is returned.
-func queriesFromDir(context interface{}, dirPath string) ([]query.Query, error) {
-	log.Dev(context, "queriesFromDir", "Started : Load getQuerys : Dir %s", dirPath)
-
-	stat, err := os.Stat(dirPath)
-	if err != nil {
-		log.Error(context, "queriesFromDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
-		return nil, err
-	}
-
-	if !stat.IsDir() {
-		log.Error(context, "queriesFromDir", fmt.Errorf("Path[%s] is not a Directory", dirPath), "Completed : Load getQuerys : Dir %s", dirPath)
-		return nil, err
-	}
-
-	//open up the filepath since its a directory, read and sort
-	dir, err := os.Open(dirPath)
-	if err != nil {
-		log.Error(context, "queriesFromDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
-		return nil, err
-	}
-
-	filesInfo, err := dir.Readdir(0)
-	if err != nil {
-		log.Error(context, "queriesFromDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
-		return nil, err
-	}
-
-	dir.Close()
-
-	var files []string
-
-	for _, info := range filesInfo {
-		if info.IsDir() {
-			continue
-		}
-
-		files = append(files, filepath.Join(dirPath, info.Name()))
-	}
-
-	getQuerys, err := queriesFromList(context, files)
-	if err != nil {
-		log.Error(context, "queriesFromDir", err, "Completed : Load getQuerys : Dir %s", dirPath)
-		return nil, err
-	}
-
-	log.Dev(context, "queriesFromDir", "Completed : Load getQuerys : Dir %s", dirPath)
-	return getQuerys, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

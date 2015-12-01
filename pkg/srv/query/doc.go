@@ -13,7 +13,7 @@
 //    (the currently supported data backend), which allows insightful use of its
 //    internal query language, in providing context against data sets within the database.
 //
-// - Template
+//
 //
 //
 // QuerySet Sample:

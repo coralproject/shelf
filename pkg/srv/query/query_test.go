@@ -149,10 +149,59 @@ func TestCreateQuery(t *testing.T) {
 				t.Logf("\t%s\tShould be able to get back the same number of Query values.", tests.Success)
 			}
 
-			// TODO: YOU HAVE POINTERS HERE. YOU CAN'T USE DEEPEQUAL
-			// for ind, qu := range qs1.Queries {
-			// 	qu2 := qs2.Queries[ind]
-			// }
+			for ind, qu := range qs1.Queries {
+				qu2 := qs2.Queries[ind]
+
+				if qu.Type != qu2.Type {
+					t.Errorf("\t%s\tShould have matching Type for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching Type for query at index %d", tests.Success, ind)
+				}
+
+				if qu.Description != qu2.Description {
+					t.Errorf("\t%s\tShould have matching description for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching description for query at index %d", tests.Success, ind)
+				}
+
+				if qu.Continue != qu2.Continue {
+					t.Errorf("\t%s\tShould have matching continue flag for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching continue flag for query at index %d", tests.Success, ind)
+				}
+
+				if !reflect.DeepEqual(*qu.SaveOptions, *qu2.SaveOptions) {
+					t.Errorf("\t%s\tShould have matching save_options for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching save_options for query at index %d", tests.Success, ind)
+				}
+
+				if !reflect.DeepEqual(*qu.ScriptOptions, *qu2.ScriptOptions) {
+					t.Errorf("\t%s\tShould have matching script_options for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching script_options for query at index %d", tests.Success, ind)
+				}
+
+				if !reflect.DeepEqual(*qu.VarOptions, *qu2.VarOptions) {
+					t.Errorf("\t%s\tShould have matching script_options for query at index %d", tests.Failed, ind)
+				} else {
+					t.Logf("\t%s\tShould have matching script_options for query at index %d", tests.Success, ind)
+				}
+
+				for sindex, src := range qu.Scripts {
+					csrc := qu2.Scripts[sindex]
+
+					if csrc != src {
+						t.Logf("Script Src(Index: %d): %s", sindex, src)
+						t.Logf("Script Src(Index: %d): %s", sindex, csrc)
+						t.Errorf("\t%s\tShould have matching src for query index: %d at scripts index %d", tests.Failed, ind, sindex)
+					} else {
+						t.Logf("\t%s\tShould have matching src for query index: %d at scripts index %d", tests.Success, ind, sindex)
+					}
+
+				}
+
+			}
 		}
 	}
 }
@@ -259,40 +308,35 @@ func TestUpdateSet(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			// TODO: updSet was being set but needed to remove for now.
-			_, err := query.GetSetByName(context, ses, qs2.Name)
+			updSet, err := query.GetSetByName(context, ses, qs2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve a query set record.", tests.Success)
 
-			// TODO: Break these tests up. You are checking too much per check.
-			// TODO: Show err variable when there is no new err
+			if updSet.Name != qs1.Name {
+				t.Errorf("\t%s\tShould be able to get back the same query set name.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould be able to get back the same query set name.", tests.Success)
+			}
 
-			// if updSet.Name != qs2.Name && updSet.Name != qs1.Name {
-			// 	t.Errorf("\t%s\tShould be able to get back the same query set: %s", tests.Failed, err)
-			// } else {
-			// 	t.Logf("\t%s\tShould be able to get back the same query set", tests.Success)
-			// }
+			if lendiff := len(updSet.Params) - len(qs1.Params); lendiff != 1 {
+				t.Errorf("\t%s\tShould have one more parameter in set record: %d", tests.Failed, lendiff)
+			} else {
+				t.Logf("\t%s\tShould have one more parameter in set record.", tests.Success)
+			}
 
-			// if l1, l2, l3 := len(qs1.Params), len(qs2.Params), len(updSet.Params); l1 == l2 && (l3 < l1) {
-			// 	t.Errorf("\t%s\tShould have unequal one large param list in updated query set: %s", tests.Failed, err)
-			// } else {
-			// 	t.Logf("\t%s\tShould have unequal one large param list in updated query set.", tests.Success)
-			// }
+			oparam := qs1.Params[0]
+			uparam := updSet.Params[0]
 
-			// param1 := qs1.Params[0]
-			// param2 := qs2.Params[0]
-			// uParam := updSet.Params[0]
+			if !reflect.DeepEqual(oparam, uparam) {
+				t.Logf("\t%+v", oparam)
+				t.Logf("\t%+v", uparam)
+				t.Errorf("\t%s\tShould be abe to validate the query param values in db.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould be abe to validate the query param values in db.", tests.Success)
+			}
 
-			// if !reflect.DeepEqual(uParam, param1) || !reflect.DeepEqual(uParam, param2) {
-			// 	t.Logf("\t%+v", param1)
-			// 	t.Logf("\t%+v", param2)
-			// 	t.Logf("\t%+v", uParam)
-			// 	t.Errorf("\t%s\tShould be abe to validate the query param at index 0: %s", tests.Failed, err)
-			// } else {
-			// 	t.Logf("\t%s\tShould be abe to validate the query param at index 0.", tests.Success)
-			// }
 		}
 	}
 }
