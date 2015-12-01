@@ -48,6 +48,66 @@ func removeUser(ses *mgo.Session, publicID string) error {
 
 //==============================================================================
 
+// TestModelInvalidation tests things that can fail with model validation.
+func TestModelInvalidation(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to validate models will invalidate with bad data.")
+	{
+		t.Log("\tWhen using a test user.")
+		{
+			var nu auth.NUser
+
+			if err := nu.Validate(); err == nil {
+				t.Errorf("\t%s\tShould Not be able to validate NUser value.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to validate NUser value.", tests.Success)
+			}
+
+			if _, err := auth.NewUser(nu); err == nil {
+				t.Errorf("\t%s\tShould Not be able to create a new user value.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to create a new user value.", tests.Success)
+			}
+
+			var u auth.User
+
+			if _, err := u.Pwd(); err == nil {
+				t.Errorf("\t%s\tShould Not be able to call Pwd is empty password.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to call Pwd is empty password.", tests.Success)
+			}
+
+			if _, err := u.Salt(); err == nil {
+				t.Errorf("\t%s\tShould Not be able to call Salt with bad values.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to call Salt with bad values.", tests.Success)
+			}
+
+			if _, err := u.WebToken(""); err == nil {
+				t.Errorf("\t%s\tShould Not be able to call WebToken with bad values.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to call WebToken with bad values.", tests.Success)
+			}
+
+			if ok := u.IsPasswordValid(""); ok {
+				t.Errorf("\t%s\tShould Not be able to call IsPasswordValid with empty password.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to call IsPasswordValid with empty password.", tests.Success)
+			}
+
+			u.Password = "123"
+
+			if ok := u.IsPasswordValid(""); ok {
+				t.Errorf("\t%s\tShould Not be able to call IsPasswordValid with bad password.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to call IsPasswordValid with bad password.", tests.Success)
+			}
+		}
+	}
+}
+
 // TestCreateUser tests the creation of a user.
 func TestCreateUser(t *testing.T) {
 	tests.ResetLog()
@@ -106,6 +166,27 @@ func TestCreateUser(t *testing.T) {
 			if !reflect.DeepEqual(*u1, *u2) {
 				t.Logf("\t%+v", *u1)
 				t.Logf("\t%+v", *u2)
+				t.Fatalf("\t%s\tShould be able to get back the same user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould be able to get back the same user.", tests.Success)
+			}
+
+			u3, err := auth.GetUserByEmail(context, ses, u1.Email)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the user by Email : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the user by Email.", tests.Success)
+
+			// Remove the objectid to be able to compare the values.
+			u3.ID = ""
+
+			// Need to remove the nanoseconds to be able to compare the values.
+			u3.DateModified = u3.DateModified.Add(-time.Duration(u3.DateModified.Nanosecond()))
+			u3.DateCreated = u3.DateCreated.Add(-time.Duration(u3.DateCreated.Nanosecond()))
+
+			if !reflect.DeepEqual(*u1, *u3) {
+				t.Logf("\t%+v", *u1)
+				t.Logf("\t%+v", *u3)
 				t.Fatalf("\t%s\tShould be able to get back the same user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same user.", tests.Success)
@@ -541,6 +622,47 @@ func TestUpdateUserPassword(t *testing.T) {
 	}
 }
 
+// TestUpdateInvalidUserPassword tests we can't update user password.
+func TestUpdateInvalidUserPassword(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	t.Log("Given the need to validate an invalid update to a user.")
+	{
+		t.Log("\tWhen using an existing user.")
+		{
+			u1, err := auth.NewUser(auth.NUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			})
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.UpdateUserPassword(context, ses, u1, "_Pass"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to update a user with bad password.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to update a user with bad password.", tests.Success)
+			}
+
+			u1.UserType = 0
+
+			if err := auth.UpdateUserPassword(context, ses, u1, "_Password789"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to update a user with bad user value.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to update a user with bad user value.", tests.Success)
+			}
+		}
+	}
+}
+
 // TestDeleteUser test the deleting of a user.
 func TestDeleteUser(t *testing.T) {
 	tests.ResetLog()
@@ -867,8 +989,61 @@ func TestNoSession(t *testing.T) {
 
 			if err := auth.CreateUser(context, nil, u1); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
 			}
-			t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
+
+			if _, err := auth.CreateWebToken(context, nil, u1, time.Second); err == nil {
+				t.Errorf("\t%s\tShould Not be able to create a web token.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to create a web token.", tests.Success)
+			}
+
+			webTok := "OGY4OGI3YWQtZjc5Ny00ODI1LWI0MmUtMjIwZTY5ZDQxYjMzOmFKT2U1b0pFZlZ4cWUrR0JONEl0WlhmQTY0K3JsN2VGcmM2MVNQMkV1WVE9"
+
+			if _, err := auth.ValidateWebToken(context, nil, webTok); err == nil {
+				t.Errorf("\t%s\tShould Not be able to validate a web token.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to validate a web token.", tests.Success)
+			}
+
+			if _, err := auth.GetUserByPublicID(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to get a user by PublicID.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to get a user by PublicID.", tests.Success)
+			}
+
+			if _, err := auth.GetUserByEmail(context, nil, "bill@ardanlabs.com"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to get a user by Email.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to get a user by Email.", tests.Success)
+			}
+
+			uu := auth.UpdUser{
+				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
+				UserType: auth.TypeUSER,
+				Status:   auth.StatusInvalid,
+				FullName: "Update Kennedy",
+				Email:    "upt@ardanlabs.com",
+			}
+
+			if err := auth.UpdateUser(context, nil, uu); err == nil {
+				t.Errorf("\t%s\tShould Not be able to update a user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to update a user.", tests.Success)
+			}
+
+			if err := auth.UpdateUserPassword(context, nil, u1, "password890"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to update a user pasword.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to update a user password.", tests.Success)
+			}
+
+			if err := auth.DeleteUser(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to delete a user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to delete a user.", tests.Success)
+			}
 		}
 	}
 }

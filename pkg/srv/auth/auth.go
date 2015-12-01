@@ -246,7 +246,7 @@ func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password
 
 	if err = mongo.ExecuteDB(context, ses, collection, f); err != nil {
 		log.Error(context, "UpdateUserPassword", err, "Completed")
-		return nil
+		return err
 	}
 
 	log.Dev(context, "UpdateUserPassword", "Completed")

@@ -205,18 +205,21 @@ func TestNoSession(t *testing.T) {
 		{
 			if _, err := session.Create(context, nil, publicID, 10*time.Second); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a session.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to create a session.", tests.Success)
 			}
-			t.Logf("\t%s\tShould Not be able to create a session.", tests.Success)
 
 			if _, err := session.GetBySessionID(context, nil, "NOT EXISTS"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 			}
-			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 
 			if _, err := session.GetByLatest(context, nil, publicID); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 			}
-			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 		}
 	}
 }
