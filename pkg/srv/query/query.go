@@ -16,7 +16,7 @@ const collection = "query_sets"
 // =============================================================================
 
 // CreateSet is used to create Set documents in the db.
-func CreateSet(context interface{}, ses *mgo.Session, qs Set) error {
+func CreateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 	log.Dev(context, "CreateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
@@ -88,7 +88,7 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 // =============================================================================
 
 // UpdateSet is used to update an existing Set document.
-func UpdateSet(context interface{}, ses *mgo.Session, qs Set) error {
+func UpdateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 	log.Dev(context, "UpdateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
