@@ -52,7 +52,7 @@ func runUpdate(cmd *cobra.Command, args []string) {
 		if err != nil {
 			update.path = defDir
 		} else {
-			update.path = dir
+			update.path = filepath.Join(dir, defDir)
 		}
 	}
 

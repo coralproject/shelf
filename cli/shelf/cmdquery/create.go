@@ -54,7 +54,7 @@ func runCreate(cmd *cobra.Command, args []string) {
 		if err != nil {
 			create.path = defDir
 		} else {
-			create.path = dir
+			create.path = filepath.Join(dir, defDir)
 		}
 	}
 

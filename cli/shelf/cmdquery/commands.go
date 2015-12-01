@@ -4,7 +4,7 @@ import "github.com/spf13/cobra"
 
 // envKey defines the environment variable to be looked for, to load rules
 // from if provided.
-var envKey = "SCRIPT_DIR"
+var envKey = "SHELF_PATH"
 
 // defDir defines the default directory to search for.
 var defDir = "queries"
