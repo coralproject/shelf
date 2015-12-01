@@ -42,7 +42,7 @@ func CreateComment(context interface{}, session *mgo.Session, comment Comment) (
 	if comment.ID == "" {
 		comment.ID = uuid.New()
 	}
-	comment.CreatedDate = time.Now()
+	comment.DateCreated = time.Now()
 	comment.Status = "New"
 
 	// Write the user to mongo
@@ -74,25 +74,25 @@ func GetUserByID(context interface{}, session *mgo.Session, id string) (*User, e
 	return &user, nil
 }
 
-// GetUserByEmail retrieves an individual user by email
-func GetUserByEmail(context interface{}, session *mgo.Session, email string) (*User, error) {
-	log.Dev(context, "GetUserByEmail", "Started : Email[%s]", email)
+// GetUserByUserName retrieves an individual user by email
+func GetUserByUserName(context interface{}, session *mgo.Session, userName string) (*User, error) {
+	log.Dev(context, "GetUserByUserName", "Started : User[%s]", userName)
 
-	email = strings.ToLower(email)
+	userName = strings.ToLower(userName)
 
 	var user User
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"email": email}
-		log.Dev(context, "GetUserByEmail", "MGO : db.%s.findOne(%s)", collectionUser, mongo.Query(q))
+		q := bson.M{"user_name": userName}
+		log.Dev(context, "GetUserByUserName", "MGO : db.%s.findOne(%s)", collectionUser, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
 	if err := mongo.ExecuteDB(context, session, collectionUser, f); err != nil {
-		log.Error(context, "GetUserByEmail", err, "Completed")
+		log.Error(context, "GetUserByUserName", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "GetUserByEmail", "Completed")
+	log.Dev(context, "GetUserByUserName", "Completed")
 	return &user, nil
 }
 
@@ -100,7 +100,7 @@ func GetUserByEmail(context interface{}, session *mgo.Session, email string) (*U
 func CreateUser(context interface{}, session *mgo.Session, user User) (*User, error) {
 	log.Dev(context, "CreateUser", "Started : User: ", user)
 
-	dbUser, err := GetUserByEmail(context, session, user.Email)
+	dbUser, err := GetUserByUserName(context, session, user.UserName)
 	if dbUser != nil {
 		log.Error(context, "CreateUser", err, "User exists")
 		return dbUser, nil
