@@ -5,9 +5,9 @@ import (
 	"testing"
 	"time"
 
+	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/auth"
 	"github.com/coralproject/shelf/pkg/srv/auth/session"
-	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/tests"
 
 	"gopkg.in/mgo.v2"

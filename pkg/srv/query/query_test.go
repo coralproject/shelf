@@ -11,7 +11,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/coralproject/shelf/pkg/tests"
 )

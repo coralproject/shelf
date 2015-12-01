@@ -7,9 +7,9 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
 	"github.com/coralproject/shelf/pkg/srv/auth/session"
-	"github.com/coralproject/shelf/pkg/srv/mongo"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

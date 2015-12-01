@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/mongo"
 
 	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"

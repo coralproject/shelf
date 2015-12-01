@@ -1,6 +1,6 @@
 
 # mongo
-    import "github.com/coralproject/shelf/pkg/srv/mongo"
+    import "github.com/coralproject/shelf/pkg/mongo"
 
 Package mongo provides support for using MongoDB.
 

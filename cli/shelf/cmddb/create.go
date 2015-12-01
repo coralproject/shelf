@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/mongo"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/mgo.v2"

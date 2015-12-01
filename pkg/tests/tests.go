@@ -8,7 +8,7 @@ import (
 
 	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/srv/mongo"
+	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 // Success is a unicode codepoint for a check mark.
