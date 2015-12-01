@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
@@ -32,7 +33,7 @@ var create struct {
 	path string
 }
 
-// addCreate handles the creation of users.
+// addCreate handles the creation of query records into the db.
 func addCreate() {
 	cmd := &cobra.Command{
 		Use:   "create [-p filename/dirname]",
@@ -49,8 +50,12 @@ func addCreate() {
 // runCreate is the code that implements the create command.
 func runCreate(cmd *cobra.Command, args []string) {
 	if create.path == "" {
-		cmd.Help()
-		return
+		dir, err := cfg.String(envKey)
+		if err != nil {
+			create.path = defDir
+		} else {
+			create.path = dir
+		}
 	}
 
 	session := mongo.GetSession()

@@ -4,6 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
@@ -39,7 +40,6 @@ func addUpd() {
 		Run:   runUpdate,
 	}
 
-	// cmd.Flags().StringVarP(&update.name, "name", "n", "", "name of query record")
 	cmd.Flags().StringVarP(&update.path, "path", "p", "", "path of file or directory")
 
 	queryCmd.AddCommand(cmd)
@@ -48,8 +48,12 @@ func addUpd() {
 // runUpdate is the code that implements the create command.
 func runUpdate(cmd *cobra.Command, args []string) {
 	if update.path == "" {
-		cmd.Help()
-		return
+		dir, err := cfg.String(envKey)
+		if err != nil {
+			update.path = defDir
+		} else {
+			update.path = dir
+		}
 	}
 
 	session := mongo.GetSession()

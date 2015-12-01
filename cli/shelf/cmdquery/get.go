@@ -13,7 +13,7 @@ import (
 var getLong = `Retrieves a query record from the system using the supplied name.
 Example:
 
-		user get -n user_advice
+		query get -n user_advice
 
 `
 
@@ -22,7 +22,7 @@ var get struct {
 	name string
 }
 
-// addGet handles the retrival users records, displayed in json formatted response.
+// addGet handles the retrival query records, displayed in json formatted response.
 func addGet() {
 	cmd := &cobra.Command{
 		Use:   "get [-n name]",

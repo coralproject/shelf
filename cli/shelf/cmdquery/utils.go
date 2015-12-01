@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/query"
 )
@@ -38,22 +37,9 @@ func setFromFile(context interface{}, path string) (*query.Set, error) {
 
 // LoadDir loadsup a given directory, calling a load function for each valid
 // json file found.
-func loadDir(cdir string, loader func(string) error) error {
+func loadDir(dir string, loader func(string) error) error {
 	if loader == nil {
 		return errors.New("No Loader provided")
-	}
-
-	var dir string
-
-	// If we have a empty directory argument.
-	if cdir == "" {
-		if envdir, err := cfg.String(envKey); err == nil {
-			dir = envdir
-		} else {
-			dir = "rules"
-		}
-	} else {
-		dir = cdir
 	}
 
 	_, err := os.Stat(dir)

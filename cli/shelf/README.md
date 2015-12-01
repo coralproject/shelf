@@ -75,7 +75,7 @@
 
           ```bash
 
-          	> shelf query create -f ./queries/user_advice.json
+          	> shelf query create -p user_advice.json
 
           ```
 
@@ -102,8 +102,10 @@
 
           ```bash
 
-          	> shelf query update  -f ./queries/user_advice_update.json
+          	> shelf query update  -p user_advice_update.json
 
+          	> shelf query update  -p scripts
+              
           ```
 
     - **`delete`**

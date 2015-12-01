@@ -10,7 +10,7 @@ import (
 var deleteLong = `Removes a query record from the system using the supplied name.
 Example:
 
-		user delete -n user_advice
+		query delete -n user_advice
 
 `
 
@@ -19,7 +19,7 @@ var delete struct {
 	name string
 }
 
-// addDel handles the retrival users records, displayed in json formatted response.
+// addDel handles the retrival query records, displayed in json formatted response.
 func addDel() {
 	cmd := &cobra.Command{
 		Use:   "delete [-n name]",

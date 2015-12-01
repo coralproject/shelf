@@ -6,6 +6,9 @@ import "github.com/spf13/cobra"
 // from if provided.
 var envKey = "SCRIPT_DIR"
 
+// defDir defines the default directory to search for.
+var defDir = "queries"
+
 // queryCmd represents the parent for all query cli commands.
 var queryCmd = &cobra.Command{
 	Use:   "query",
@@ -19,5 +22,6 @@ func GetCommands() *cobra.Command {
 	addDel()
 	addExecute()
 	addUpd()
+	addList()
 	return queryCmd
 }
