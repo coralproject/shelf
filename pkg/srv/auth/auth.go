@@ -222,35 +222,35 @@ func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 	return nil
 }
 
-// UpdateUserCredentials updates an existing user's password and token in the database.
-func UpdateUserCredentials(context interface{}, ses *mgo.Session, u *User, password string) error {
-	log.Dev(context, "UpdateUserCredentials", "Started : PublicID[%s]", u.PublicID)
+// UpdateUserPassword updates an existing user's password and token in the database.
+func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password string) error {
+	log.Dev(context, "UpdateUserPassword", "Started : PublicID[%s]", u.PublicID)
 
 	if len(password) < 8 {
 		err := errors.New("Invalid password length")
-		log.Error(context, "UpdateUserCredentials", err, "Completed")
+		log.Error(context, "UpdateUserPassword", err, "Completed")
 		return err
 	}
 
 	newPassHash, err := crypto.BcryptPassword(u.PrivateID + password)
 	if err != nil {
-		log.Error(context, "UpdateUserCredentials", err, "Completed")
+		log.Error(context, "UpdateUserPassword", err, "Completed")
 		return err
 	}
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": u.PublicID}
 		upd := bson.M{"$set": bson.M{"password": newPassHash, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdateUserCredentials", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
+		log.Dev(context, "UpdateUserPassword", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
 		return c.Update(q, upd)
 	}
 
 	if err = mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "UpdateUserCredentials", err, "Completed")
+		log.Error(context, "UpdateUserPassword", err, "Completed")
 		return nil
 	}
 
-	log.Dev(context, "UpdateUserCredentials", "Completed")
+	log.Dev(context, "UpdateUserPassword", "Completed")
 	return nil
 }
 

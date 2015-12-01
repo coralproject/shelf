@@ -79,11 +79,11 @@ func (u *User) Pwd() ([]byte, error) {
 
 // Salt implements the secure entity interface.
 func (u *User) Salt() ([]byte, error) {
-	if (u.PublicID == "" || u.PrivateID == "" || u.DateCreated == time.Time{}) {
+	if u.PublicID == "" || u.PrivateID == "" || u.Email == "" {
 		return nil, errors.New("Unable to generate user token, missing data")
 	}
 
-	s := u.PublicID + ":" + u.PrivateID + ":" + fmt.Sprintf("%d", u.DateCreated.UTC().Unix())
+	s := u.PublicID + ":" + u.PrivateID + ":" + u.Email
 
 	return []byte(s), nil
 }
