@@ -32,8 +32,8 @@ func addGet() {
 		Run:   runGet,
 	}
 
-	cmd.Flags().StringVarP(&get.pid, "public_id", "p", "", "publicId of the user record")
-	cmd.Flags().StringVarP(&get.email, "email", "e", "", "email of the user")
+	cmd.Flags().StringVarP(&get.pid, "pid", "p", "", "Public Id of the user.")
+	cmd.Flags().StringVarP(&get.email, "email", "e", "", "Email of the user.")
 
 	userCmd.AddCommand(cmd)
 }

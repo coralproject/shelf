@@ -30,9 +30,9 @@ func addCreate() {
 		Run:   runCreate,
 	}
 
-	cmd.Flags().StringVarP(&create.name, "name", "n", "", "Full name of the user")
-	cmd.Flags().StringVarP(&create.email, "email", "e", "", "Email for the user")
-	cmd.Flags().StringVarP(&create.pass, "pass", "p", "", "Password for the user")
+	cmd.Flags().StringVarP(&create.name, "name", "n", "", "Full name for the user.")
+	cmd.Flags().StringVarP(&create.email, "email", "e", "", "Email for the user.")
+	cmd.Flags().StringVarP(&create.pass, "pass", "p", "", "Password for the user.")
 
 	userCmd.AddCommand(cmd)
 }
