@@ -17,11 +17,10 @@ var queryCmd = &cobra.Command{
 
 // GetCommands returns the query commands.
 func GetCommands() *cobra.Command {
-	addCreate()
+	addUpsert()
 	addGet()
 	addDel()
 	addExecute()
-	addUpd()
 	addList()
 	return queryCmd
 }

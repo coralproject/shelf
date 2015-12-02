@@ -2,7 +2,6 @@ package cmdquery
 
 import (
 	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -35,6 +34,8 @@ func addDel() {
 
 // runDelete is the code that implements the delete command.
 func runDelete(cmd *cobra.Command, args []string) {
+	cmd.Printf("Deleting Query : Path[%s]\n", upsert.path)
+
 	if delete.name == "" {
 		cmd.Help()
 		return
@@ -43,11 +44,11 @@ func runDelete(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	err := query.DeleteSet("commands", db, delete.name)
+	err := query.DeleteSet("", db, delete.name)
 	if err != nil {
-		log.Error("commands", "runGet", err, "Completed")
+		cmd.Println("Deleting Query : ", err)
 		return
 	}
 
-	return
+	cmd.Println("Deleting Query : Deleted")
 }

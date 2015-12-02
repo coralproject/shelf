@@ -70,6 +70,6 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cmd.Printf("\n\n%s\n\n", string(data))
+	cmd.Printf("\n%s\n\n", string(data))
 	return
 }

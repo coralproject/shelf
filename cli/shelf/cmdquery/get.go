@@ -2,10 +2,8 @@ package cmdquery
 
 import (
 	"encoding/json"
-	"fmt"
 
 	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -38,6 +36,8 @@ func addGet() {
 
 // runGet is the code that implements the get command.
 func runGet(cmd *cobra.Command, args []string) {
+	cmd.Printf("Getting Query : Name[%s]\n", get.name)
+
 	if get.name == "" {
 		cmd.Help()
 		return
@@ -46,23 +46,18 @@ func runGet(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	user, err := query.GetSetByName("commands", db, get.name)
+	set, err := query.GetSetByName("commands", db, get.name)
 	if err != nil {
-		log.Error("commands", "runGet", err, "Completed")
+		cmd.Println("Getting Query : ", err)
 		return
 	}
 
-	res, err := json.MarshalIndent(user, "", "\t")
+	data, err := json.MarshalIndent(&set, "", "    ")
 	if err != nil {
-		log.Error("commands", "runGet", err, "Completed")
+		cmd.Println("Getting Query : ", err)
 		return
 	}
 
-	// TODO: What are you doing with doc
-	fmt.Printf(`
-Result of Query(%s):
-	%s
-`, get.name, string(res))
-
+	cmd.Printf("\n%s\n\n", string(data))
 	return
 }
