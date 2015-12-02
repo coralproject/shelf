@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var listLong = `Retrieves the list of all available record names.
+var listLong = `Retrieves a list of all available query names.
 
 Example:
 	query list
@@ -21,7 +21,7 @@ Example:
 func addList() {
 	cmd := &cobra.Command{
 		Use:   "list",
-		Short: "Retrieves all query record names",
+		Short: "Retrieves a list of all available query names.",
 		Long:  listLong,
 		Run:   runList,
 	}

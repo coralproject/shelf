@@ -19,13 +19,13 @@ Note: Create will check for a $SHELF_PATH environment variable of which it
 appends a './queries' to, when no dirPath or fileName is given.
 
 Example:
-1. To load a single file
+	To create a single query:
 	query create -p user_advice.json
 
-2. To load a directory
+	To create all the queries in a directory:
 	query create -p ./queries
 
-3. To load using the environment variable path
+	To create all the queries in the env directory:
 	query create
 `
 
@@ -37,13 +37,13 @@ var create struct {
 // addCreate handles the creation of query records into the db.
 func addCreate() {
 	cmd := &cobra.Command{
-		Use:   "create [-p filename/dirname]",
-		Short: "Creates a new query from a file",
+		Use:   "create",
+		Short: "Creates add a new query from a file or directory.",
 		Long:  createLong,
 		Run:   runCreate,
 	}
 
-	cmd.Flags().StringVarP(&create.path, "path", "p", "", "path of query file or directory")
+	cmd.Flags().StringVarP(&create.path, "path", "p", "", "Path of query file or directory.")
 
 	queryCmd.AddCommand(cmd)
 }
@@ -104,5 +104,4 @@ func runCreate(cmd *cobra.Command, args []string) {
 		log.Error("commands", "runCreate", err, "Completed")
 		return
 	}
-
 }

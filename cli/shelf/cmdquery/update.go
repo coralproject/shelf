@@ -12,20 +12,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updateLong = `Use update to update a giving query record in the system.
+var updateLong = `Use update to change a query in the system.
 Updating can be done per file or per directory.
 
 Note: Update will check for a $SHELF_PATH environment variable of which it
 appends a './queries' to, when no dirPath or fileName is given.
 
 Example:
-1. To update a single file
+	To update a single file:
 	query update -p user_advice.json
 
-2. To update using a directory
+	To update using a directory:
 	query update -p ./queries
 
-3. To load using the environment variable path
+	To load using the environment variable path:
 	query update
 `
 
@@ -37,13 +37,13 @@ var update struct {
 // addUpd handles the update of query record.
 func addUpd() {
 	cmd := &cobra.Command{
-		Use:   "update [-p filename/dirname]",
-		Short: "Updates a query in the system from a file or given path",
+		Use:   "update",
+		Short: "Updates a query from a file or directory.",
 		Long:  updateLong,
 		Run:   runUpdate,
 	}
 
-	cmd.Flags().StringVarP(&update.path, "path", "p", "", "path of file or directory")
+	cmd.Flags().StringVarP(&update.path, "path", "p", "", "Path of file or directory.")
 
 	queryCmd.AddCommand(cmd)
 }

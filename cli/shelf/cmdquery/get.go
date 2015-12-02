@@ -25,13 +25,13 @@ var get struct {
 // addGet handles the retrival query records, displayed in json formatted response.
 func addGet() {
 	cmd := &cobra.Command{
-		Use:   "get [-n name]",
-		Short: "Retrieves a query record",
+		Use:   "get",
+		Short: "Retrieves a query record by name.",
 		Long:  getLong,
 		Run:   runGet,
 	}
 
-	cmd.Flags().StringVarP(&get.name, "name", "n", "", "name of the user record")
+	cmd.Flags().StringVarP(&get.name, "name", "n", "", "Name of the query.")
 
 	queryCmd.AddCommand(cmd)
 }
