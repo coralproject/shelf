@@ -12,19 +12,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updateLong = `Updates updates the given query record in the system by using
-a supplied file/dir name, else falls back to using a path set in the environment
-variable "SHELF_SCRIPT_DIR".
+var updateLong = `Use update to update a giving query record in the system.
+Updating can be done per file or per directory.
+
+Note: Update will check for a $SHELF_PATH environment variable of which it
+appends a './queries' to, when no dirPath or fileName is given.
 
 Example:
-
 1. To update a single file
-
 	query update -p user_advice.json
 
-2. To load a directory of query scripts
+2. To update using a directory
+	query update -p ./queries
 
-	query update -p {dir_name}
+3. To load using the environment variable path
+	query update
 `
 
 // update contains the state for this command.

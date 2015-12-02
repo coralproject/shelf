@@ -11,11 +11,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var getLong = `Retrieves a query record from the system using the supplied name.
+var getLong = `Retrieves a query record from the system with the supplied name.
+
 Example:
-
-		query get -n user_advice
-
+	query get -n user_advice
 `
 
 // get contains the state for this command.

@@ -12,10 +12,9 @@ import (
 )
 
 var listLong = `Retrieves the list of all available record names.
+
 Example:
-
 	query list
-
 `
 
 // addList handles the retrival query records names.

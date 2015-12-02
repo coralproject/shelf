@@ -8,11 +8,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var deleteLong = `Removes a query record from the system using the supplied name.
+var deleteLong = `Removes a query from the system using the supplied name.
+
 Example:
-
-		query delete -n user_advice
-
+	query delete -n user_advice
 `
 
 // delete contains the state for this command.

@@ -6,15 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var executeLong = `Executes a giving query using the name and a map of parameters.
-If the map is provided, it will be converted to a map object else ignored.
+var executeLong = `Executes a query using the supplied name if it exists.
 
 Example:
-
 	query execute -n user_advice
-
-	query execute -n user_advice -p {"name":"john"}
-
 `
 
 // execute contains the state for this command.
