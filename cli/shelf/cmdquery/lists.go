@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -31,10 +31,10 @@ func addList() {
 
 // runList is the code that implements the lists command.
 func runList(cmd *cobra.Command, args []string) {
-	session := mongo.GetSession()
-	defer session.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
-	names, err := query.GetSetNames("commands", session)
+	names, err := query.GetSetNames("commands", db)
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return

@@ -7,8 +7,9 @@ package session
 import (
 	"time"
 
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 
 	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"
@@ -21,7 +22,7 @@ const collection = "sessions"
 //==============================================================================
 
 // Create adds a new session for the specified user to the database.
-func Create(context interface{}, ses *mgo.Session, publicID string, expires time.Duration) (*Session, error) {
+func Create(context interface{}, db *db.DB, publicID string, expires time.Duration) (*Session, error) {
 	log.Dev(context, "Create", "Started : PublicID[%s]", publicID)
 
 	s := Session{
@@ -36,7 +37,7 @@ func Create(context interface{}, ses *mgo.Session, publicID string, expires time
 		return col.Insert(&s)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
 		return nil, err
 	}
@@ -48,7 +49,7 @@ func Create(context interface{}, ses *mgo.Session, publicID string, expires time
 //==============================================================================
 
 // GetBySessionID retrieves a session from the session store.
-func GetBySessionID(context interface{}, ses *mgo.Session, sessionID string) (*Session, error) {
+func GetBySessionID(context interface{}, db *db.DB, sessionID string) (*Session, error) {
 	log.Dev(context, "GetBySessionID", "Started : SessionID[%s]", sessionID)
 
 	var s Session
@@ -58,7 +59,7 @@ func GetBySessionID(context interface{}, ses *mgo.Session, sessionID string) (*S
 		return c.Find(q).One(&s)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetBySessionID", err, "Completed")
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func GetBySessionID(context interface{}, ses *mgo.Session, sessionID string) (*S
 }
 
 // GetByLatest retrieves the latest session for the specified user.
-func GetByLatest(context interface{}, ses *mgo.Session, publicID string) (*Session, error) {
+func GetByLatest(context interface{}, db *db.DB, publicID string) (*Session, error) {
 	log.Dev(context, "GetByLatest", "Started : PublicID[%s]", publicID)
 
 	var s Session
@@ -78,7 +79,7 @@ func GetByLatest(context interface{}, ses *mgo.Session, publicID string) (*Sessi
 		return c.Find(q).Sort("-date_created").One(&s)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetByLatest", err, "Completed")
 		return nil, err
 	}

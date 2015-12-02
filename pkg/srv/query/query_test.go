@@ -8,12 +8,12 @@ import (
 	"strings"
 	"testing"
 
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
-
-	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/coralproject/shelf/pkg/tests"
+
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
 var context = "testing"
@@ -26,15 +26,14 @@ func init() {
 
 // removeSets is used to clear out all the test sets from the collection.
 // All test query sets must start with QSTEST in their name.
-func removeSets(ses *mgo.Session) error {
+func removeSets(db *db.DB) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
 
-	err := mongo.ExecuteDB(context, ses, "query_sets", f)
-	if err != mgo.ErrNotFound {
+	if err := db.ExecuteMGO(context, "query_sets", f); err != nil {
 		return err
 	}
 
@@ -73,11 +72,11 @@ func TestCreateQuery(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(ses); err != nil {
+		if err := removeSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -87,12 +86,12 @@ func TestCreateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs2, err := query.GetSetByName(context, ses, qs1.Name)
+			qs2, err := query.GetSetByName(context, db, qs1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)
 			}
@@ -220,11 +219,11 @@ func TestGetSetNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(ses); err != nil {
+		if err := removeSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -234,18 +233,18 @@ func TestGetSetNames(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			qs1.Name += "2"
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
 
-			names, err := query.GetSetNames(context, ses)
+			names, err := query.GetSetNames(context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set names : %v", tests.Failed, err)
 			}
@@ -277,11 +276,11 @@ func TestUpdateSet(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(ses); err != nil {
+		if err := removeSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -291,7 +290,7 @@ func TestUpdateSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -303,12 +302,12 @@ func TestUpdateSet(t *testing.T) {
 				Desc:    "provides the group number for the query script",
 			})
 
-			if err := query.UpdateSet(context, ses, &qs2); err != nil {
+			if err := query.UpdateSet(context, db, &qs2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			updSet, err := query.GetSetByName(context, ses, qs2.Name)
+			updSet, err := query.GetSetByName(context, db, qs2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a query set record: %s", tests.Failed, err)
 			}
@@ -356,11 +355,11 @@ func TestDeleteSet(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(ses); err != nil {
+		if err := removeSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -370,22 +369,22 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if err := query.DeleteSet(context, ses, qsName); err != nil {
+			if err := query.DeleteSet(context, db, qsName); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete a query set using its name[%s]: %s", tests.Failed, qsName, err)
 			}
 			t.Logf("\t%s\tShould be able to delete a query set using its name[%s]:", tests.Success, qsName)
 
-			if err := query.DeleteSet(context, ses, qsBadName); err == nil {
+			if err := query.DeleteSet(context, db, qsBadName); err == nil {
 				t.Fatalf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Failed, qsBadName)
 			}
 			t.Logf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Success, qsBadName)
 
-			if _, err := query.GetSetByName(context, ses, qsName); err == nil {
+			if _, err := query.GetSetByName(context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists:", tests.Success, qsName)
@@ -408,11 +407,11 @@ func TestUnknownName(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(ses); err != nil {
+		if err := removeSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -422,17 +421,17 @@ func TestUnknownName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, ses, qs1); err != nil {
+			if err := query.CreateSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if _, err := query.GetSetByName(context, ses, qsName); err == nil {
+			if _, err := query.GetSetByName(context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists.", tests.Success, qsName)
 
-			if err := query.DeleteSet(context, ses, qsName); err == nil {
+			if err := query.DeleteSet(context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted.", tests.Success, qsName)

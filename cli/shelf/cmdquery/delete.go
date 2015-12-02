@@ -1,8 +1,8 @@
 package cmdquery
 
 import (
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -41,10 +41,10 @@ func runDelete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	session := mongo.GetSession()
-	defer session.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
-	err := query.DeleteSet("commands", session, delete.name)
+	err := query.DeleteSet("commands", db, delete.name)
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return

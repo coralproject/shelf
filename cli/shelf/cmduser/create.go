@@ -1,7 +1,7 @@
 package cmduser
 
 import (
-	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/srv/auth"
 
 	"github.com/spf13/cobra"
@@ -53,10 +53,10 @@ func runCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	ses := mongo.GetSession()
-	defer ses.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
-	if err := auth.CreateUser("", ses, u); err != nil {
+	if err := auth.CreateUser("", db, u); err != nil {
 		cmd.Println("Creating User : ", err)
 		return
 	}

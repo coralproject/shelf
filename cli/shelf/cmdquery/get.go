@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -44,10 +44,10 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	session := mongo.GetSession()
-	defer session.Close()
+	db := db.NewMGO()
+	defer db.CloseMGO()
 
-	user, err := query.GetSetByName("commands", session, get.name)
+	user, err := query.GetSetByName("commands", db, get.name)
 	if err != nil {
 		log.Error("commands", "runGet", err, "Completed")
 		return

@@ -3,8 +3,9 @@ package query
 import (
 	"strings"
 
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,7 +17,7 @@ const collection = "query_sets"
 // =============================================================================
 
 // CreateSet is used to create Set documents in the db.
-func CreateSet(context interface{}, ses *mgo.Session, qs *Set) error {
+func CreateSet(context interface{}, db *db.DB, qs *Set) error {
 	log.Dev(context, "CreateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
@@ -24,7 +25,7 @@ func CreateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 		return c.Insert(&qs)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "CreateSet", err, "Completed")
 		return err
 	}
@@ -36,7 +37,7 @@ func CreateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 // =============================================================================
 
 // GetSetNames retrieves a list of rule names.
-func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
+func GetSetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "GetSetNames", "Started")
 
 	var names []bson.M
@@ -46,7 +47,7 @@ func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 		return c.Find(nil).Select(q).Sort("name").All(&names)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetSetNames", err, "Completed")
 		return nil, err
 	}
@@ -66,7 +67,7 @@ func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error) {
 }
 
 // GetSetByName retrieves the configuration for the specified Set.
-func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, error) {
+func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "GetSetByName", "Started : Name[%s]", name)
 
 	var qs Set
@@ -76,7 +77,7 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 		return c.Find(q).One(&qs)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetSetByName", err, "Completed")
 		return nil, err
 	}
@@ -88,18 +89,17 @@ func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, err
 // =============================================================================
 
 // UpdateSet is used to update an existing Set document.
-func UpdateSet(context interface{}, ses *mgo.Session, qs *Set) error {
+func UpdateSet(context interface{}, db *db.DB, qs *Set) error {
 	log.Dev(context, "UpdateSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
-
 		log.Dev(context, "UpdateSet", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(&qs))
 		_, err := c.Upsert(q, &qs)
 		return err
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "UpdateSet", err, "Completed")
 		return err
 	}
@@ -111,10 +111,10 @@ func UpdateSet(context interface{}, ses *mgo.Session, qs *Set) error {
 // =============================================================================
 
 // DeleteSet is used to remove an existing Set document.
-func DeleteSet(context interface{}, ses *mgo.Session, name string) error {
+func DeleteSet(context interface{}, db *db.DB, name string) error {
 	log.Dev(context, "DeleteSet", "Started : Name[%s]", name)
 
-	qs, err := GetSetByName(context, ses, name)
+	qs, err := GetSetByName(context, db, name)
 	if err != nil {
 		return err
 	}
@@ -125,7 +125,7 @@ func DeleteSet(context interface{}, ses *mgo.Session, name string) error {
 		return c.Remove(q)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "DeleteSet", err, "Completed")
 		return err
 	}
@@ -137,6 +137,6 @@ func DeleteSet(context interface{}, ses *mgo.Session, name string) error {
 // =============================================================================
 
 // ExecuteSet is used to execute an existing Set document.
-func ExecuteSet(context interface{}, ses *mgo.Session, name string) error {
+func ExecuteSet(context interface{}, db *db.DB, name string) error {
 	return nil
 }

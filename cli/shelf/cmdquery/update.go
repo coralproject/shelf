@@ -5,8 +5,8 @@ import (
 	"path/filepath"
 
 	"github.com/coralproject/shelf/pkg/cfg"
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
@@ -57,9 +57,6 @@ func runUpdate(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	session := mongo.GetSession()
-	defer session.Close()
-
 	pwd, err := os.Getwd()
 	if err != nil {
 		log.Error("commands", "runUpdate", err, "Completed")
@@ -74,6 +71,9 @@ func runUpdate(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
 	if !stat.IsDir() {
 		q, err := setFromFile("commands", file)
 		if err != nil {
@@ -81,7 +81,7 @@ func runUpdate(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := query.CreateSet("commands", session, q); err != nil {
+		if err := query.CreateSet("commands", db, q); err != nil {
 			log.Error("commands", "runUpdate", err, "Completed")
 			return
 		}
@@ -95,7 +95,7 @@ func runUpdate(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		return query.CreateSet("commands", session, q)
+		return query.CreateSet("commands", db, q)
 	})
 
 	if err2 != nil {

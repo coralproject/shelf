@@ -6,8 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/coralproject/shelf/pkg/srv/auth/crypto"
 	"github.com/coralproject/shelf/pkg/srv/auth/session"
 
@@ -21,7 +22,7 @@ const collection = "users"
 //==============================================================================
 
 // CreateUser adds a new user to the database.
-func CreateUser(context interface{}, ses *mgo.Session, u *User) error {
+func CreateUser(context interface{}, db *db.DB, u *User) error {
 	log.Dev(context, "CreateUser", "Started : PublicID[%s]", u.PublicID)
 
 	if err := u.Validate(); err != nil {
@@ -34,7 +35,7 @@ func CreateUser(context interface{}, ses *mgo.Session, u *User) error {
 		return col.Insert(u)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "CreateUser", err, "Completed")
 		return err
 	}
@@ -44,11 +45,11 @@ func CreateUser(context interface{}, ses *mgo.Session, u *User) error {
 }
 
 // CreateWebToken return a token and session that can be used to authenticate a user.
-func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time.Duration) (string, error) {
+func CreateWebToken(context interface{}, db *db.DB, u *User, expires time.Duration) (string, error) {
 	log.Dev(context, "CreateWebToken", "Started : PublicID[%s]", u.PublicID)
 
 	// Do we have a valid session right now?
-	s, err := session.GetByLatest(context, ses, u.PublicID)
+	s, err := session.GetByLatest(context, db, u.PublicID)
 	if err != nil && err != mgo.ErrNotFound {
 		log.Error(context, "CreateUser", err, "Completed")
 		return "", err
@@ -57,7 +58,7 @@ func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time
 	// If we don't have one or it has been expired create
 	// a new one.
 	if err == mgo.ErrNotFound || s.IsExpired(context) {
-		if s, err = session.Create(context, ses, u.PublicID, expires); err != nil {
+		if s, err = session.Create(context, db, u.PublicID, expires); err != nil {
 			log.Error(context, "CreateUser", err, "Completed")
 			return "", err
 		}
@@ -106,7 +107,7 @@ func DecodeWebToken(context interface{}, webToken string) (sessionID string, tok
 
 // ValidateWebToken accepts a web token and validates its credibility. Returns
 // a User value is the token is valid.
-func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*User, error) {
+func ValidateWebToken(context interface{}, db *db.DB, webToken string) (*User, error) {
 	log.Dev(context, "ValidateWebToken", "Started : WebToken[%s]", webToken)
 
 	// Extract the sessionID and token from the web token.
@@ -117,7 +118,7 @@ func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*
 	}
 
 	// Find the session in the database.
-	s, err := session.GetBySessionID(context, ses, sessionID)
+	s, err := session.GetBySessionID(context, db, sessionID)
 	if err != nil {
 		log.Error(context, "ValidateWebToken", err, "Completed")
 		return nil, err
@@ -131,7 +132,7 @@ func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*
 	}
 
 	// Pull the user for this session.
-	u, err := GetUserByPublicID(context, ses, s.PublicID)
+	u, err := GetUserByPublicID(context, db, s.PublicID)
 	if err != nil {
 		log.Error(context, "ValidateWebToken", err, "Completed")
 		return nil, err
@@ -150,7 +151,7 @@ func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*
 //==============================================================================
 
 // GetUserByPublicID retrieves a user record by using the provided PublicID.
-func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error) {
+func GetUserByPublicID(context interface{}, db *db.DB, publicID string) (*User, error) {
 	log.Dev(context, "GetUserByPublicID", "Started : PID[%s]", publicID)
 
 	var user User
@@ -160,7 +161,7 @@ func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (
 		return c.Find(q).One(&user)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetUserByPublicID", err, "Completed")
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (
 }
 
 // GetUserByEmail retrieves a user record by using the provided email.
-func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error) {
+func GetUserByEmail(context interface{}, db *db.DB, email string) (*User, error) {
 	log.Dev(context, "GetUserByEmail", "Started : Email[%s]", email)
 
 	var user User
@@ -180,7 +181,7 @@ func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User,
 		return c.Find(q).One(&user)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "GetUserByEmail", err, "Completed")
 		return nil, err
 	}
@@ -192,7 +193,7 @@ func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User,
 //==============================================================================
 
 // UpdateUser updates an existing user to the database.
-func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
+func UpdateUser(context interface{}, db *db.DB, uu UpdUser) error {
 	log.Dev(context, "UpdateUser", "Started : PublicID[%s]", uu.PublicID)
 
 	if err := uu.Validate(); err != nil {
@@ -207,7 +208,7 @@ func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 		return c.Update(q, upd)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "UpdateUser", err, "Completed")
 		return err
 	}
@@ -217,7 +218,7 @@ func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 }
 
 // UpdateUserPassword updates an existing user's password and token in the database.
-func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password string) error {
+func UpdateUserPassword(context interface{}, db *db.DB, u *User, password string) error {
 	log.Dev(context, "UpdateUserPassword", "Started : PublicID[%s]", u.PublicID)
 
 	if err := u.Validate(); err != nil {
@@ -244,7 +245,7 @@ func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password
 		return c.Update(q, upd)
 	}
 
-	if err = mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "UpdateUserPassword", err, "Completed")
 		return err
 	}
@@ -254,11 +255,13 @@ func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password
 }
 
 // UpdateUserStatus changes the status of a user to make them active or disabled.
-func UpdateUserStatus(context interface{}, ses *mgo.Session, publicID string, status int) error {
+func UpdateUserStatus(context interface{}, db *db.DB, publicID string, status int) error {
 	log.Dev(context, "UpdateUserStatus", "Started : PublicID[%s] Status[%d]", publicID, status)
 
 	if status != StatusActive && status != StatusDisabled {
-		return errors.New("Invalid status code")
+		err := errors.New("Invalid status code")
+		log.Error(context, "LoginUser", err, "Completed")
+		return err
 	}
 
 	f := func(c *mgo.Collection) error {
@@ -268,7 +271,7 @@ func UpdateUserStatus(context interface{}, ses *mgo.Session, publicID string, st
 		return c.Update(q, upd)
 	}
 
-	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
 		log.Error(context, "UpdateUserStatus", err, "Completed")
 		return err
 	}
@@ -280,16 +283,19 @@ func UpdateUserStatus(context interface{}, ses *mgo.Session, publicID string, st
 //==============================================================================
 
 // LoginUser authenticates the user and if successful returns the User value.
-func LoginUser(context interface{}, ses *mgo.Session, email string, password string) (*User, error) {
+func LoginUser(context interface{}, db *db.DB, email string, password string) (*User, error) {
 	log.Dev(context, "LoginUser", "Started : Email[%s]", email)
 
-	u, err := GetUserByEmail(context, ses, email)
+	u, err := GetUserByEmail(context, db, email)
 	if err != nil {
+		log.Error(context, "LoginUser", err, "Completed")
 		return nil, err
 	}
 
 	if ok := u.IsPasswordValid(password); !ok {
-		return nil, errors.New("Invalid password")
+		err := errors.New("Invalid password")
+		log.Error(context, "LoginUser", err, "Completed")
+		return nil, err
 	}
 
 	log.Dev(context, "LoginUser", "Completed")
