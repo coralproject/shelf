@@ -45,14 +45,6 @@ func init() {
 
 //==============================================================================
 
-// LoginUser model used for when a user logs in.
-type LoginUser struct {
-	Email    string `json:"email" form:"email" validate:"required,max=100,email"`
-	Password string `json:"password" form:"email" validate:"required,min=8"`
-}
-
-//==============================================================================
-
 // NUser is provided to create a new user value for use.
 type NUser struct {
 	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`

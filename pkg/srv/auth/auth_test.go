@@ -966,6 +966,65 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 	}
 }
 
+func TestLoginUser(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
+	t.Log("Given the need to test user login.")
+	{
+		t.Log("\tWhen using a new user")
+		{
+			u1, err := auth.NewUser(auth.NUser{
+				UserType: auth.TypeAPI,
+				Status:   auth.StatusActive,
+				FullName: "Test Kennedy",
+				Email:    "bill@ardanlabs.com",
+				Password: "_Password124",
+			})
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to build a new user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
+
+			if err := auth.CreateUser(context, ses, u1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
+
+			if _, err := auth.LoginUser(context, ses, u1.Email, "_Password124"); err != nil {
+				t.Errorf("\t%s\tShould be able to login the user : %v", tests.Failed, err)
+			} else {
+				t.Logf("\t%s\tShould be able to login the user.", tests.Success)
+			}
+
+			if err := auth.UpdateUserPassword(context, ses, u1, "password890"); err != nil {
+				t.Fatalf("\t%s\tShould be able to update the user password : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to update the user password.", tests.Success)
+
+			if _, err := auth.LoginUser(context, ses, u1.Email, "_Password124"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to login the user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to login the user.", tests.Success)
+			}
+		}
+	}
+}
+
 // TestNoSession tests when a nil session is used.
 func TestNoSession(t *testing.T) {
 	tests.ResetLog()
@@ -1043,6 +1102,12 @@ func TestNoSession(t *testing.T) {
 				t.Errorf("\t%s\tShould Not be able to delete a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to delete a user.", tests.Success)
+			}
+
+			if _, err := auth.LoginUser(context, nil, "bill@email.com", "_pass"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to login a user.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to login a user.", tests.Success)
 			}
 		}
 	}

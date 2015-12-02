@@ -278,3 +278,22 @@ func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error {
 	log.Dev(context, "DeleteUser", "Completed")
 	return nil
 }
+
+//==============================================================================
+
+// LoginUser authenticates the user and if successful returns the User value.
+func LoginUser(context interface{}, ses *mgo.Session, email string, password string) (*User, error) {
+	log.Dev(context, "LoginUser", "Started : Email[%s]", email)
+
+	u, err := GetUserByEmail(context, ses, email)
+	if err != nil {
+		return nil, err
+	}
+
+	if ok := u.IsPasswordValid(password); !ok {
+		return nil, errors.New("Invalid password")
+	}
+
+	log.Dev(context, "LoginUser", "Completed")
+	return u, nil
+}
