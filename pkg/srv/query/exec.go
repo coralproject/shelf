@@ -2,7 +2,6 @@ package query
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -10,23 +9,59 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// ExecuteQueryPipeline executes the giving query set, If found by its name and
+// ExecuteQuerySet executes the giving query set, If found by its name and
 // if the Set is a pipeline Type.
-// Returns a Result if successfull else returns an non-nil error.
+func ExecuteQuerySet(context interface{}, db *db.DB, name string) ([]Result, error) {
+	log.Dev(context, "ExecuteQuerySet", "Started : Query Set[%s]", name)
+	var res []Result
+
+	set, err := GetSetByName(context, db, name)
+	if err != nil {
+		log.Error(context, "ExecuteQuerySet", err, "Completed : Query Set[%s]", name)
+		return nil, err
+	}
+
+	// TODO: there is more to do here than just iterating the query list,
+	// for now assume we are not needing a feedback of last result, but
+	// just packing results from each query in the list.
+	for _, q := range set.Queries {
+		switch strings.ToLower(q.Type) {
+		// TODO: do we need to standardize some type for these?
+		case "pipeline":
+			result, err := ExecuteQueryPipeline(context, db, q, set)
+			if err != nil {
+				// TODO: do we return the error or just pack in the result and set Result.Error
+				// to true?
+				// For now, lets return error.
+				log.Error(context, "ExecuteQuerySet", err, "Completed : Query Set[%s]", name)
+				return res, err
+			}
+
+			res = append(res, result)
+		case "template":
+			// No implementation yet
+			continue
+		}
+	}
+
+	log.Dev(context, "ExecuteQuerySet", "Completed : Query Set[%s]", name)
+	return res, nil
+}
+
+// ExecuteQueryPipeline executes the giving PipelineType query from a supplied Set.
+// Returns a Result type if successfull else returns an non-nil error.
 func ExecuteQueryPipeline(context interface{}, db *db.DB, q Query, set *Set) (Result, error) {
 	log.Dev(context, "ExecuteQueryPipeline", "Started : Query Set[%s] : Collect[%s]", set.Name, q.ScriptOptions.Collection)
 	var res Result
 
 	// TODO: Decide if we really need to check this?
-	if q.Type != PipelineType {
-		return res, errors.New("Invalid Execution Type")
-	}
 
 	res.FeedName = set.Name
 	res.QueryType = q.Type
@@ -64,11 +99,9 @@ func ExecuteQueryPipeline(context interface{}, db *db.DB, q Query, set *Set) (Re
 		return res, err
 	}
 
-	resultData := renderBSONList(response, q.VarOptions)
+	res.Results = renderBSONList(response, q.VarOptions)
 
-	res.Results = resultData
-
-	log.Dev(context, "ExecuteQueryPipeline", "Completed : Query Set[%s] : Collect[%s]", set.Name, q.ScriptOptions.Collection)
+	log.Dev(context, "ExecuteQueryPipeline", "Completed : Query Set[%s] : Collect[%s] : %s", set.Name, q.ScriptOptions.Collection, fmt.Sprintf("\n%s", mongo.Query(res)))
 	return res, nil
 }
 

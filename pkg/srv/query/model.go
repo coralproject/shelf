@@ -1,11 +1,5 @@
 package query
 
-// const values defines the current support query types.
-const (
-	PipelineType = "Pipeline"
-	TemplateType = "Template"
-)
-
 // ScriptOption contains options for processing the scripts.
 type ScriptOption struct {
 	Collection  string `bson:"collection,omitempty" json:"collection,omitempty"`     // Name of the collection to use for processing the query.
