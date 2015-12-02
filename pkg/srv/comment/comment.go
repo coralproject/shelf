@@ -1,35 +1,132 @@
 package comment
 
 import (
+	"strings"
 	"time"
+
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
+	"github.com/coralproject/shelf/pkg/log"
+	"github.com/pborman/uuid"
+
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 )
 
-// Action denotes an action taken by someone/something on someone/something.
-type Action struct {
-	Type   string    `json:"type" bson:"type"`
-	UserID string    `json:"user_id" bson:"user_id"`
-	Value  string    `json:"value" bson:"value"`
-	Date   time.Time `json:"date" bson:"date"`
+// collection contains the name of the comments collection.
+const collection = "comments"
+
+//==============================================================================
+
+// CreateComment adds a new comment in the database.
+func CreateComment(context interface{}, db *db.DB, com *Comment) error {
+	if com.CommentID == "" {
+		com.CommentID = uuid.New()
+	}
+	com.DateCreated = time.Now()
+	com.Status = "New"
+
+	// Write the user to mongo
+	if err := mongo.GetCollection(db.MGOConn, collection).Insert(com); err != nil {
+		return err
+	}
+
+	return nil
 }
 
-// Note denotes a note by a user in the system.
-type Note struct {
-	UserID string    `json:"user_id" bson:"user_id"`
-	Body   string    `json:"body" bson:"body"`
-	Date   time.Time `json:"date" bson:"date"`
+// GetCommentByID retrieves an individual comment by ID
+func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
+	log.Dev(context, "GetCommentById", "Started : Id[%s]", id)
+
+	var user User
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"_id": id}
+		log.Dev(context, "GetCommentById", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		return c.Find(q).One(&user)
+	}
+
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
+		log.Error(context, "GetUserById", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetCommentById", "Completed")
+	return &user, nil
 }
 
-// Comment denotes a comment by a user in the system.
-type Comment struct {
-	ID           string    `json:"id" bson:"_id"`
-	ParentID     string    `json:"parent_id" bson:"parent_d"`
-	AssetID      string    `json:"asset_id" bson:"asset_id"`
-	Path         string    `json:"path" bson:"path"`
-	Body         string    `json:"body" bson:"body"`
-	Status       string    `json:"status" bson:"status"`
-	DateCreated  time.Time `json:"date_created" bson:"date_created"`
-	DateUpdated  time.Time `json:"date_updated" bson:"date_updated"`
-	DateApproved time.Time `json:"date_approved" bson:"date_approved"`
-	Actions      []Action  `json:"actions" bson:"actions"`
-	Notes        []Note    `json:"notes" bson:"notes"`
+// GetUserByID retrieves an individual user by ID
+func GetUserByID(context interface{}, db *db.DB, id string) (*User, error) {
+	log.Dev(context, "GetUserById", "Started : Id[%s]", id)
+
+	var user User
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"_id": id}
+		log.Dev(context, "GetUserById", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		return c.Find(q).One(&user)
+	}
+
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
+		log.Error(context, "GetUserById", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetUserById", "Completed")
+	return &user, nil
+}
+
+// GetUserByUserName retrieves an individual user by email
+func GetUserByUserName(context interface{}, db *db.DB, userName string) (*User, error) {
+	log.Dev(context, "GetUserByUserName", "Started : User[%s]", userName)
+
+	userName = strings.ToLower(userName)
+
+	var user User
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"user_name": userName}
+		log.Dev(context, "GetUserByUserName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		return c.Find(q).One(&user)
+	}
+
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
+		log.Error(context, "GetUserByUserName", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetUserByUserName", "Completed")
+	return &user, nil
+}
+
+// CreateUser creates a new user resource
+func CreateUser(context interface{}, db *db.DB, user User) (*User, error) {
+	log.Dev(context, "CreateUser", "Started : User: ", user)
+
+	dbUser, err := GetUserByUserName(context, db, user.UserName)
+	if dbUser != nil {
+		log.Error(context, "CreateUser", err, "User exists")
+		return dbUser, nil
+	}
+
+	if user.UserID == "" {
+		user.UserID = uuid.New()
+	}
+	user.MemberSince = time.Now()
+
+	// Write the user to mongo
+	err1 := mongo.GetCollection(db.MGOConn, collection).Insert(user)
+	if err1 != nil {
+		return nil, err1
+	}
+
+	log.Dev(context, "CreateUser", "Completed")
+	return &user, nil
+}
+
+// AddUsers adds an array of users to user collection
+func AddUsers(context interface{}, db *db.DB, users []User) error {
+	return mongo.GetCollection(db.MGOConn, collection).Insert(users)
+}
+
+// AddComments adds an array of comments to comment collection
+func AddComments(context interface{}, db *db.DB, comments []Comment) error {
+	return mongo.GetCollection(db.MGOConn, collection).Insert(comments)
 }

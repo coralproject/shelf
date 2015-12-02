@@ -4,27 +4,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var updLong = `Updates a existing user's information in the system.
-When updating a user record, a update type is required, to determine what values
-are to be expected including the records email which is used as the record search point.
+var updLong = `Use create to add a new user to the system. The user email
+must be unique for every user.
 
-Examples:
-
-	1. To update the 'name' of a giving record. Simple set the update type to "name",
-	and supply the email and new name.
-
-		user update -t name -e shou.lou@gmail.com -n "Shou Lou FengZhu"
-
-	2. To update the 'email' of a giving record. Simple set the update type to "email",
-	and supply the current email and new email.
-
-		user update -t email -e shou.lou@gmail.com -n shou.lou.fengzhu@gmail.com
-
-	3. To update the 'password' of a giving record. Simple set the update type to "auth",
-	and supply the current email of the record, the current password of the record and
-	the new password
-
-		user update -t auth -e shou.lou@gmail.com -o oldPassword -n newPassword
+Example:
+  ./shelf user update -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "yefc*7fdf92"
 `
 
 // upd contains the state for this command.

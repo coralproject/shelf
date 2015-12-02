@@ -11,7 +11,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// collections contains the name of the rules collection.
+// collection contains the name of the query_sets collection.
 const collection = "query_sets"
 
 // =============================================================================

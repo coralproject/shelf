@@ -16,7 +16,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// collections contains the name of the user collection.
+// collection contains the name of the users collection.
 const collection = "users"
 
 //==============================================================================
