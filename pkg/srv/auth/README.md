@@ -97,35 +97,25 @@ This has not been coded yet.
 ## Constants
 ``` go
 const (
-    StatusUnknown = iota + 1
+    StatusUnknown = iota
     StatusActive
     StatusDisabled
-    StatusDeleted
-    StatusInvalid
 )
 ```
 Set of user status codes.
-
-``` go
-const (
-    TypeAPI = iota + 1
-    TypeUSER
-)
-```
-Set of user type codes.
 
 
 
 ## func CreateUser
 ``` go
-func CreateUser(context interface{}, ses *mgo.Session, u *User) error
+func CreateUser(context interface{}, db *db.DB, u *User) error
 ```
 CreateUser adds a new user to the database.
 
 
 ## func CreateWebToken
 ``` go
-func CreateWebToken(context interface{}, ses *mgo.Session, u *User, expires time.Duration) (string, error)
+func CreateWebToken(context interface{}, db *db.DB, u *User, expires time.Duration) (string, error)
 ```
 CreateWebToken return a token and session that can be used to authenticate a user.
 
@@ -137,51 +127,31 @@ func DecodeWebToken(context interface{}, webToken string) (sessionID string, tok
 DecodeWebToken breaks a web token into its parts.
 
 
-## func DeleteUser
-``` go
-func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error
-```
-DeleteUser removes an existing user from the database.
-
-
 ## func UpdateUser
 ``` go
-func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error
+func UpdateUser(context interface{}, db *db.DB, uu UpdUser) error
 ```
 UpdateUser updates an existing user to the database.
 
 
 ## func UpdateUserPassword
 ``` go
-func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password string) error
+func UpdateUserPassword(context interface{}, db *db.DB, u *User, password string) error
 ```
 UpdateUserPassword updates an existing user's password and token in the database.
 
 
-
-## type LoginUser
+## func UpdateUserStatus
 ``` go
-type LoginUser struct {
-    Email    string `json:"email" form:"email" valid:"Required;Email;MaxSize(150)"`
-    Password string `json:"password" form:"email" valid:"Required;"`
-}
+func UpdateUserStatus(context interface{}, db *db.DB, publicID string, status int) error
 ```
-LoginUser model used for when a user logs in.
-
-
-
-
-
-
-
-
+UpdateUserStatus changes the status of a user to make them active or disabled.
 
 
 
 ## type NUser
 ``` go
 type NUser struct {
-    UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
     Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
     FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
     Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
@@ -212,7 +182,6 @@ Validate performs validation on a NUser value before it is processed.
 ``` go
 type UpdUser struct {
     PublicID string `bson:"public_id" json:"public_id" validate:"required,uuid"`
-    UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
     Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
     FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
     Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
@@ -244,11 +213,10 @@ type User struct {
     ID           bson.ObjectId `bson:"_id,omitempty" json:"-"`
     PublicID     string        `bson:"public_id" json:"public_id" validate:"required,uuid"`
     PrivateID    string        `bson:"private_id" json:"-" validate:"required,uuid"`
-    UserType     int           `bson:"type" json:"type" validate:"required,ne=0"`
     Status       int           `bson:"status" json:"status" validate:"required,ne=0"`
     FullName     string        `bson:"full_name" json:"full_name" validate:"required,min=8"`
     Email        string        `bson:"email" json:"email" validate:"required,max=100,email"`
-    Password     string        `bson:"password" json:"-" validate:"required,min=8"`
+    Password     string        `bson:"password" json:"-" validate:"required,min=55"`
     IsDeleted    bool          `bson:"is_deleted" json:"-"`
     DateModified time.Time     `bson:"date_modified" json:"-"`
     DateCreated  time.Time     `bson:"date_created" json:"-"`
@@ -266,16 +234,23 @@ User model denotes a user entity for a tenant.
 
 ### func GetUserByEmail
 ``` go
-func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User, error)
+func GetUserByEmail(context interface{}, db *db.DB, email string) (*User, error)
 ```
 GetUserByEmail retrieves a user record by using the provided email.
 
 
 ### func GetUserByPublicID
 ``` go
-func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (*User, error)
+func GetUserByPublicID(context interface{}, db *db.DB, publicID string) (*User, error)
 ```
 GetUserByPublicID retrieves a user record by using the provided PublicID.
+
+
+### func LoginUser
+``` go
+func LoginUser(context interface{}, db *db.DB, email string, password string) (*User, error)
+```
+LoginUser authenticates the user and if successful returns the User value.
 
 
 ### func NewUser
@@ -287,7 +262,7 @@ NewUser creates a new user from a NewUser value.
 
 ### func ValidateWebToken
 ``` go
-func ValidateWebToken(context interface{}, ses *mgo.Session, webToken string) (*User, error)
+func ValidateWebToken(context interface{}, db *db.DB, webToken string) (*User, error)
 ```
 ValidateWebToken accepts a web token and validates its credibility. Returns
 a User value is the token is valid.

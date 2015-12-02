@@ -1,6 +1,6 @@
 
 # query
-    import "github.com\coralproject\shelf\pkg\srv\query"
+    import "github.com/coralproject/shelf/pkg/srv/query"
 
 Package query provides API's for managing querysets which will be used in
 executing different aggregation tests against their respective data collection.
@@ -12,52 +12,53 @@ structure.
 
 The query set execution supports the following types:
 
-  - Pipeline
-    Pipeline query set types take advantage of MongoDB's aggregation API
-  (the currently supported data backend), which allows insightful use of its
-  internal query language, in providing context against data sets within the database.
+- Pipeline
 
+
+	  Pipeline query set types take advantage of MongoDB's aggregation API
+	(the currently supported data backend), which allows insightful use of its
+	internal query language, in providing context against data sets within the database.
 
 QuerySet Sample:
 
 ```json
-  {
+{
 
 
-          "name":"spending_advice",
-          "description":"tests against user spending rate and provides adequate advice on saving more",
-          "enabled": true,
-          "params":[
-            {
-              "name":"user_id",
-              "default":"396bc782-6ac6-4183-a671-6e75ca5989a5",
-              "desc":"provides the user_id to check against the collection"
-            }
-          ],
-          "rules": [
-          {
-            "desc":"match spending rate over 20 dollars",
-            "type":"pipeline",
-            "continue": true,
-            "script_options": {
-              "collection":"demo_user_transactions",
-              "has_date":false,
-              "has_objectid": false
-            },
-            "save_options": {
-              "save_as":"high_dollar_users",
-              "variables": true,
-              "to_json": true
-            },
-            "var_options":{},
-            "scripts":[
-              "{ \"$match\" : { \"user_id\" : \"#userId#\", \"category\" : \"gas\" }}",
-              "{ \"$group\" : { \"_id\" : { \"category\" : \"$category\" }, \"amount\" : { \"$sum\" : \"$amount\" }}}",
-              "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00} }}"
-            ]
-           }]
+	"name":"spending_advice",
+	"description":"tests against user spending rate and provides adequate advice on saving more",
+	"enabled": true,
+	"params":[
+	  {
+	    "name":"user_id",
+	    "default":"396bc782-6ac6-4183-a671-6e75ca5989a5",
+	    "desc":"provides the user_id to check against the collection"
+	  }
+	],
+	"rules": [
+	{
+	  "desc":"match spending rate over 20 dollars",
+	  "type":"pipeline",
+	  "continue": true,
+	  "script_options": {
+	    "collection":"demo_user_transactions",
+	    "has_date":false,
+	    "has_objectid": false
+	  },
+	  "save_options": {
+	    "save_as":"high_dollar_users",
+	    "variables": true,
+	    "to_json": true
+	  },
+	  "var_options":{},
+	  "scripts":[
+	    "{ \"$match\" : { \"user_id\" : \"#userId#\", \"category\" : \"gas\" }}",
+	    "{ \"$group\" : { \"_id\" : { \"category\" : \"$category\" }, \"amount\" : { \"$sum\" : \"$amount\" }}}",
+	    "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00} }}"
+	  ]
+	 }]
 
-  }
+}
 ```
 
 
@@ -67,28 +68,35 @@ QuerySet Sample:
 
 ## func CreateSet
 ``` go
-func CreateSet(context interface{}, ses *mgo.Session, qs Set) error
+func CreateSet(context interface{}, db *db.DB, qs *Set) error
 ```
 CreateSet is used to create Set documents in the db.
 
 
 ## func DeleteSet
 ``` go
-func DeleteSet(context interface{}, ses *mgo.Session, name string) error
+func DeleteSet(context interface{}, db *db.DB, name string) error
 ```
 DeleteSet is used to remove an existing Set document.
 
 
+## func ExecuteSet
+``` go
+func ExecuteSet(context interface{}, db *db.DB, name string) error
+```
+ExecuteSet is used to execute an existing Set document.
+
+
 ## func GetSetNames
 ``` go
-func GetSetNames(context interface{}, ses *mgo.Session) ([]string, error)
+func GetSetNames(context interface{}, db *db.DB) ([]string, error)
 ```
 GetSetNames retrieves a list of rule names.
 
 
 ## func UpdateSet
 ``` go
-func UpdateSet(context interface{}, ses *mgo.Session, qs Set) error
+func UpdateSet(context interface{}, db *db.DB, qs *Set) error
 ```
 UpdateSet is used to update an existing Set document.
 
@@ -204,7 +212,7 @@ Set contains the configuration details for a rule set.
 
 ### func GetSetByName
 ``` go
-func GetSetByName(context interface{}, ses *mgo.Session, name string) (*Set, error)
+func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
 GetSetByName retrieves the configuration for the specified Set.
 
@@ -238,6 +246,19 @@ type VarOption struct {
 }
 ```
 VarOption contains options for processing variables.
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

@@ -35,21 +35,21 @@ Session denotes a user's session within the system.
 
 ### func Create
 ``` go
-func Create(context interface{}, ses *mgo.Session, publicID string, expires time.Duration) (*Session, error)
+func Create(context interface{}, db *db.DB, publicID string, expires time.Duration) (*Session, error)
 ```
 Create adds a new session for the specified user to the database.
 
 
 ### func GetByLatest
 ``` go
-func GetByLatest(context interface{}, ses *mgo.Session, publicID string) (*Session, error)
+func GetByLatest(context interface{}, db *db.DB, publicID string) (*Session, error)
 ```
 GetByLatest retrieves the latest session for the specified user.
 
 
 ### func GetBySessionID
 ``` go
-func GetBySessionID(context interface{}, ses *mgo.Session, sessionID string) (*Session, error)
+func GetBySessionID(context interface{}, db *db.DB, sessionID string) (*Session, error)
 ```
 GetBySessionID retrieves a session from the session store.
 
