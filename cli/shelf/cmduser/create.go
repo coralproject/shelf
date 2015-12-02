@@ -1,15 +1,17 @@
 package cmduser
 
 import (
+	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/pkg/srv/auth"
+
 	"github.com/spf13/cobra"
 )
 
-var createLong = `Creates adds a new user to the system.
-When creating a new user, the name(-n), email(-e) and password(-p) must all be supplied.
+var createLong = `Use create to add a new user to the system. The user email
+must be unique for every user.
 
 Example:
-
-	user create -n "Alex Boulder" -e alex.boulder@gmail.com -p yefc*7fdf92
+  ./shelf user create -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "yefc*7fdf92"
 `
 
 // create contains the state for this command.
@@ -22,19 +24,42 @@ var create struct {
 // addCreate handles the creation of users.
 func addCreate() {
 	cmd := &cobra.Command{
-		Use:   "create [-n name -p password -e email]",
-		Short: "Creates a new user",
+		Use:   "create",
+		Short: "Add a new user to the system.",
 		Long:  createLong,
 		Run:   runCreate,
 	}
 
-	cmd.Flags().StringVarP(&create.name, "name", "n", "", "name of user")
-	cmd.Flags().StringVarP(&create.pass, "pass", "p", "", "password for user")
-	cmd.Flags().StringVarP(&create.email, "email", "e", "", "email of user")
+	cmd.Flags().StringVarP(&create.name, "name", "n", "", "Full name of the user")
+	cmd.Flags().StringVarP(&create.email, "email", "e", "", "Email for the user")
+	cmd.Flags().StringVarP(&create.pass, "pass", "p", "", "Password for the user")
 
 	userCmd.AddCommand(cmd)
 }
 
 // runCreate is the code that implements the create command.
 func runCreate(cmd *cobra.Command, args []string) {
+	cmd.Printf("Creating User : Name[%s] Email[%s] Pass[%s]\n", create.name, create.email, create.pass)
+
+	u, err := auth.NewUser(auth.NUser{
+		Status:   auth.StatusActive,
+		FullName: create.name,
+		Email:    create.email,
+		Password: create.pass,
+	})
+	if err != nil {
+		cmd.Println("Creating User : ", err)
+		cmd.Help()
+		return
+	}
+
+	ses := mongo.GetSession()
+	defer ses.Close()
+
+	if err := auth.CreateUser("", ses, u); err != nil {
+		cmd.Println("Creating User : ", err)
+		return
+	}
+
+	cmd.Println("Creating User : Created")
 }

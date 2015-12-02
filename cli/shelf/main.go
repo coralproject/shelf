@@ -23,7 +23,7 @@ func main() {
 	logLevel := func() int {
 		ll, err := cfg.Int("LOGGING_LEVEL")
 		if err != nil {
-			return log.DEV
+			return log.USER
 		}
 		return ll
 	}
