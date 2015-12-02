@@ -41,6 +41,11 @@ func addCreate() {
 func runCreate(cmd *cobra.Command, args []string) {
 	cmd.Printf("Creating User : Name[%s] Email[%s] Pass[%s]\n", create.name, create.email, create.pass)
 
+	if create.name == "" && create.email == "" && create.pass == "" {
+		cmd.Help()
+		return
+	}
+
 	u, err := auth.NewUser(auth.NUser{
 		Status:   auth.StatusActive,
 		FullName: create.name,
@@ -49,7 +54,6 @@ func runCreate(cmd *cobra.Command, args []string) {
 	})
 	if err != nil {
 		cmd.Println("Creating User : ", err)
-		cmd.Help()
 		return
 	}
 

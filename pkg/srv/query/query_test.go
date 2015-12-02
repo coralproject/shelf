@@ -60,8 +60,8 @@ func getFixture(filePath string) (*query.Set, error) {
 
 //==============================================================================
 
-// TestCreateQuery tests if we can create a query record in the db.
-func TestCreateQuery(t *testing.T) {
+// TestUpsertCreateQuery tests if we can create a query record in the db.
+func TestUpsertCreateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -86,7 +86,7 @@ func TestCreateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -233,13 +233,13 @@ func TestGetSetNames(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			qs1.Name += "2"
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
@@ -264,8 +264,8 @@ func TestGetSetNames(t *testing.T) {
 	}
 }
 
-// TestUpdateSet set validates update operation of a given record.
-func TestUpdateSet(t *testing.T) {
+// TestUpsertUpdateQuery set validates update operation of a given record.
+func TestUpsertUpdateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -290,7 +290,7 @@ func TestUpdateSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -302,7 +302,7 @@ func TestUpdateSet(t *testing.T) {
 				Desc:    "provides the group number for the query script",
 			})
 
-			if err := query.UpdateSet(context, db, &qs2); err != nil {
+			if err := query.UpsertSet(context, db, &qs2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
@@ -369,7 +369,7 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -421,7 +421,7 @@ func TestUnknownName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.CreateSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -457,12 +457,12 @@ func TestAPIFailure(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			if err := query.CreateSet(context, nil, qs1); err == nil {
+			if err := query.UpsertSet(context, nil, qs1); err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			if err := query.UpdateSet(context, nil, qs1); err == nil {
+			if err := query.UpsertSet(context, nil, qs1); err == nil {
 				t.Fatalf("\t%s\tShould be refused update by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused update by api with bad session: %s", tests.Success, err)

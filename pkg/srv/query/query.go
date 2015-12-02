@@ -16,21 +16,23 @@ const collection = "query_sets"
 
 // =============================================================================
 
-// CreateSet is used to create Set documents in the db.
-func CreateSet(context interface{}, db *db.DB, qs *Set) error {
-	log.Dev(context, "CreateSet", "Started : Name[%s]", qs.Name)
+// UpsertSet is used to create or update an existing Set document.
+func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
+	log.Dev(context, "UpsertSet", "Started : Name[%s]", qs.Name)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "CreateSet", "MGO : db.%s.insert(%s)", collection, mongo.Query(qs))
-		return c.Insert(&qs)
-	}
-
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
-		log.Error(context, "CreateSet", err, "Completed")
+		q := bson.M{"name": qs.Name}
+		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(&qs))
+		_, err := c.Upsert(q, &qs)
 		return err
 	}
 
-	log.Dev(context, "CreateSet", "Completed")
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
+		log.Error(context, "UpsertSet", err, "Completed")
+		return err
+	}
+
+	log.Dev(context, "UpsertSet", "Completed")
 	return nil
 }
 
@@ -84,28 +86,6 @@ func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 
 	log.Dev(context, "GetSetByName", "Completed : QS[%+v]", qs)
 	return &qs, nil
-}
-
-// =============================================================================
-
-// UpdateSet is used to update an existing Set document.
-func UpdateSet(context interface{}, db *db.DB, qs *Set) error {
-	log.Dev(context, "UpdateSet", "Started : Name[%s]", qs.Name)
-
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": qs.Name}
-		log.Dev(context, "UpdateSet", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(&qs))
-		_, err := c.Upsert(q, &qs)
-		return err
-	}
-
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
-		log.Error(context, "UpdateSet", err, "Completed")
-		return err
-	}
-
-	log.Dev(context, "UpdateSet", "Completed")
-	return nil
 }
 
 // =============================================================================

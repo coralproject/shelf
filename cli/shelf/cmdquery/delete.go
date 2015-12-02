@@ -2,13 +2,12 @@ package cmdquery
 
 import (
 	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/query"
 
 	"github.com/spf13/cobra"
 )
 
-var deleteLong = `Removes a query from the system using the supplied name.
+var deleteLong = `Removes a query from the system using the query name.
 
 Example:
 	query delete -n user_advice
@@ -22,19 +21,21 @@ var delete struct {
 // addDel handles the retrival query records, displayed in json formatted response.
 func addDel() {
 	cmd := &cobra.Command{
-		Use:   "delete [-n name]",
-		Short: "Removes a query record",
+		Use:   "delete",
+		Short: "Removes a query record by name.",
 		Long:  deleteLong,
 		Run:   runDelete,
 	}
 
-	cmd.Flags().StringVarP(&delete.name, "name", "n", "", "name of the user record")
+	cmd.Flags().StringVarP(&delete.name, "name", "n", "", "Name of the user record.")
 
 	queryCmd.AddCommand(cmd)
 }
 
 // runDelete is the code that implements the delete command.
 func runDelete(cmd *cobra.Command, args []string) {
+	cmd.Printf("Deleting Query : Path[%s]\n", upsert.path)
+
 	if delete.name == "" {
 		cmd.Help()
 		return
@@ -43,11 +44,11 @@ func runDelete(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	err := query.DeleteSet("commands", db, delete.name)
+	err := query.DeleteSet("", db, delete.name)
 	if err != nil {
-		log.Error("commands", "runGet", err, "Completed")
+		cmd.Println("Deleting Query : ", err)
 		return
 	}
 
-	return
+	cmd.Println("Deleting Query : Deleted")
 }

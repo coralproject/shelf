@@ -11,9 +11,8 @@ import (
 )
 
 // setFromFile serializes the content of a getSet from a file using the
-// given file path.
-// Returns the serialized query.getSet, else returns a non-nil error if
-// the operation failed.
+// given file path. Returns the serialized query.getSet, else returns a
+// non-nil error if the operation failed.
 func setFromFile(context interface{}, path string) (*query.Set, error) {
 	log.Dev(context, "setFromFile", "Started : Load getSet : File %s", path)
 
