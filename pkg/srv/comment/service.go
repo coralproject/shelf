@@ -4,8 +4,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 	"github.com/pborman/uuid"
 
 	"gopkg.in/mgo.v2"
@@ -17,7 +18,7 @@ const collectionUser = "user"
 const collectionComment = "comment"
 
 // GetCommentByID retrieves an individual comment by ID
-func GetCommentByID(context interface{}, session *mgo.Session, id string) (*User, error) {
+func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
 	log.Dev(context, "GetCommentById", "Started : Id[%s]", id)
 
 	var user User
@@ -27,7 +28,7 @@ func GetCommentByID(context interface{}, session *mgo.Session, id string) (*User
 		return c.Find(q).One(&user)
 	}
 
-	if err := mongo.ExecuteDB(context, session, collectionComment, f); err != nil {
+	if err := db.ExecuteMGO(context, collectionComment, f); err != nil {
 		log.Error(context, "GetUserById", err, "Completed")
 		return nil, err
 	}
@@ -37,8 +38,7 @@ func GetCommentByID(context interface{}, session *mgo.Session, id string) (*User
 }
 
 // CreateComment creates a new comment
-func CreateComment(context interface{}, session *mgo.Session, comment Comment) (*Comment, error) {
-
+func CreateComment(context interface{}, db *db.DB, comment Comment) (*Comment, error) {
 	if comment.ID == "" {
 		comment.ID = uuid.New()
 	}
@@ -46,7 +46,7 @@ func CreateComment(context interface{}, session *mgo.Session, comment Comment) (
 	comment.Status = "New"
 
 	// Write the user to mongo
-	err1 := mongo.GetCollection(session, collectionComment).Insert(comment)
+	err1 := mongo.GetCollection(db.MGOConn, collectionComment).Insert(comment)
 	if err1 != nil {
 		return nil, err1
 	}
@@ -55,7 +55,7 @@ func CreateComment(context interface{}, session *mgo.Session, comment Comment) (
 }
 
 // GetUserByID retrieves an individual user by ID
-func GetUserByID(context interface{}, session *mgo.Session, id string) (*User, error) {
+func GetUserByID(context interface{}, db *db.DB, id string) (*User, error) {
 	log.Dev(context, "GetUserById", "Started : Id[%s]", id)
 
 	var user User
@@ -65,7 +65,7 @@ func GetUserByID(context interface{}, session *mgo.Session, id string) (*User, e
 		return c.Find(q).One(&user)
 	}
 
-	if err := mongo.ExecuteDB(context, session, collectionUser, f); err != nil {
+	if err := db.ExecuteMGO(context, collectionUser, f); err != nil {
 		log.Error(context, "GetUserById", err, "Completed")
 		return nil, err
 	}
@@ -75,7 +75,7 @@ func GetUserByID(context interface{}, session *mgo.Session, id string) (*User, e
 }
 
 // GetUserByUserName retrieves an individual user by email
-func GetUserByUserName(context interface{}, session *mgo.Session, userName string) (*User, error) {
+func GetUserByUserName(context interface{}, db *db.DB, userName string) (*User, error) {
 	log.Dev(context, "GetUserByUserName", "Started : User[%s]", userName)
 
 	userName = strings.ToLower(userName)
@@ -87,7 +87,7 @@ func GetUserByUserName(context interface{}, session *mgo.Session, userName strin
 		return c.Find(q).One(&user)
 	}
 
-	if err := mongo.ExecuteDB(context, session, collectionUser, f); err != nil {
+	if err := db.ExecuteMGO(context, collectionUser, f); err != nil {
 		log.Error(context, "GetUserByUserName", err, "Completed")
 		return nil, err
 	}
@@ -97,10 +97,10 @@ func GetUserByUserName(context interface{}, session *mgo.Session, userName strin
 }
 
 // CreateUser creates a new user resource
-func CreateUser(context interface{}, session *mgo.Session, user User) (*User, error) {
+func CreateUser(context interface{}, db *db.DB, user User) (*User, error) {
 	log.Dev(context, "CreateUser", "Started : User: ", user)
 
-	dbUser, err := GetUserByUserName(context, session, user.UserName)
+	dbUser, err := GetUserByUserName(context, db, user.UserName)
 	if dbUser != nil {
 		log.Error(context, "CreateUser", err, "User exists")
 		return dbUser, nil
@@ -112,7 +112,7 @@ func CreateUser(context interface{}, session *mgo.Session, user User) (*User, er
 	user.MemberSince = time.Now()
 
 	// Write the user to mongo
-	err1 := mongo.GetCollection(session, collectionUser).Insert(user)
+	err1 := mongo.GetCollection(db.MGOConn, collectionUser).Insert(user)
 	if err1 != nil {
 		return nil, err1
 	}
@@ -122,13 +122,11 @@ func CreateUser(context interface{}, session *mgo.Session, user User) (*User, er
 }
 
 // AddUsers adds an array of users to user collection
-func AddUsers(context interface{}, session *mgo.Session, users []User) error {
-
-	return mongo.GetCollection(session, collectionUser).Insert(users)
+func AddUsers(context interface{}, db *db.DB, users []User) error {
+	return mongo.GetCollection(db.MGOConn, collectionUser).Insert(users)
 }
 
 // AddComments adds an array of comments to comment collection
-func AddComments(context interface{}, session *mgo.Session, comments []Comment) error {
-
-	return mongo.GetCollection(session, collectionComment).Insert(comments)
+func AddComments(context interface{}, db *db.DB, comments []Comment) error {
+	return mongo.GetCollection(db.MGOConn, collectionComment).Insert(comments)
 }
