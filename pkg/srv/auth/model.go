@@ -65,7 +65,7 @@ type User struct {
 	Status       int           `bson:"status" json:"status" validate:"required,ne=0"`
 	FullName     string        `bson:"full_name" json:"full_name" validate:"required,min=8"`
 	Email        string        `bson:"email" json:"email" validate:"required,max=100,email"`
-	Password     string        `bson:"password" json:"-" validate:"required,min=8"`
+	Password     string        `bson:"password" json:"-" validate:"required,min=55"`
 	IsDeleted    bool          `bson:"is_deleted" json:"-"`
 	DateModified time.Time     `bson:"date_modified" json:"-"`
 	DateCreated  time.Time     `bson:"date_created" json:"-"`

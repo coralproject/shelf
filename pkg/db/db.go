@@ -29,7 +29,7 @@ func (db *DB) CloseMGO() {
 
 // ExecuteMGO is used to execute MongoDB commands.
 func (db *DB) ExecuteMGO(context interface{}, collection string, f func(*mgo.Collection) error) error {
-	if db == nil {
+	if db == nil || db.MGOConn == nil {
 		return errors.New("Invalid DB provided")
 	}
 
