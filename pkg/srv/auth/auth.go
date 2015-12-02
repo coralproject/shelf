@@ -155,7 +155,7 @@ func GetUserByPublicID(context interface{}, ses *mgo.Session, publicID string) (
 
 	var user User
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
+		q := bson.M{"public_id": publicID, "status": StatusActive}
 		log.Dev(context, "GetUserByPublicID", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
@@ -175,7 +175,7 @@ func GetUserByEmail(context interface{}, ses *mgo.Session, email string) (*User,
 
 	var user User
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"email": strings.ToLower(email)}
+		q := bson.M{"email": strings.ToLower(email), "status": StatusActive}
 		log.Dev(context, "GetUserByEmail", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
@@ -202,8 +202,8 @@ func UpdateUser(context interface{}, ses *mgo.Session, uu UpdUser) error {
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": uu.PublicID}
-		upd := bson.M{"$set": bson.M{"full_name": uu.FullName, "email": uu.Email, "type": uu.UserType, "status": uu.Status, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdateUser", "MGO : db.%s.update(%s)", collection, mongo.Query(upd))
+		upd := bson.M{"$set": bson.M{"full_name": uu.FullName, "email": uu.Email, "status": uu.Status, "modified_at": time.Now().UTC()}}
+		log.Dev(context, "UpdateUser", "MGO : db.%s.Update(%s, %s)", collection, mongo.Query(q), mongo.Query(upd))
 		return c.Update(q, upd)
 	}
 
@@ -253,29 +253,27 @@ func UpdateUserPassword(context interface{}, ses *mgo.Session, u *User, password
 	return nil
 }
 
-//==============================================================================
+// UpdateUserStatus changes the status of a user to make them active or disabled.
+func UpdateUserStatus(context interface{}, ses *mgo.Session, publicID string, status int) error {
+	log.Dev(context, "UpdateUserStatus", "Started : PublicID[%s] Status[%d]", publicID, status)
 
-// DeleteUser removes an existing user from the database.
-func DeleteUser(context interface{}, ses *mgo.Session, publicID string) error {
-	log.Dev(context, "DeleteUser", "Started : PublicID[%s]", publicID)
-
-	u, err := GetUserByPublicID(context, ses, publicID)
-	if err != nil {
-		return err
+	if status != StatusActive && status != StatusDisabled {
+		return errors.New("Invalid status code")
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": u.PublicID}
-		log.Dev(context, "DeleteUser", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
-		return c.Remove(q)
+		q := bson.M{"public_id": publicID}
+		upd := bson.M{"$set": bson.M{"status": status, "modified_at": time.Now().UTC()}}
+		log.Dev(context, "UpdateUserStatus", "MGO : db.%s.Update(%s, %s)", collection, mongo.Query(q), mongo.Query(upd))
+		return c.Update(q, upd)
 	}
 
 	if err := mongo.ExecuteDB(context, ses, collection, f); err != nil {
-		log.Error(context, "DeleteUser", err, "Completed")
+		log.Error(context, "UpdateUserStatus", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "DeleteUser", "Completed")
+	log.Dev(context, "UpdateUserStatus", "Completed")
 	return nil
 }
 

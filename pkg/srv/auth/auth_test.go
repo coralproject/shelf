@@ -129,7 +129,6 @@ func TestCreateUser(t *testing.T) {
 		t.Log("\tWhen using a test user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -217,7 +216,6 @@ func TestCreateUserTwice(t *testing.T) {
 		t.Log("\tWhen using a test user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -265,23 +263,6 @@ func TestCreateUserValidation(t *testing.T) {
 		t.Log("\tWhen using a test user.")
 		{
 			u, _ := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
-				Status:   auth.StatusActive,
-				FullName: "Test Kennedy",
-				Email:    "bill@ardanlabs.com",
-				Password: "_Password124",
-			})
-
-			u.UserType = 0
-
-			if err := auth.CreateUser(context, ses, u); err == nil {
-				t.Errorf("\t%s\tShould Not be able to create a user with invalid UserType", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould Not be able to create a user with invalid UserType.", tests.Success)
-			}
-
-			u, _ = auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -297,7 +278,6 @@ func TestCreateUserValidation(t *testing.T) {
 			}
 
 			u, _ = auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -313,7 +293,6 @@ func TestCreateUserValidation(t *testing.T) {
 			}
 
 			u, _ = auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -329,7 +308,6 @@ func TestCreateUserValidation(t *testing.T) {
 			}
 
 			u, _ = auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -368,7 +346,6 @@ func TestUpdateUser(t *testing.T) {
 		t.Log("\tWhen using an existing user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -389,8 +366,7 @@ func TestUpdateUser(t *testing.T) {
 
 			uu := auth.UpdUser{
 				PublicID: publicID,
-				UserType: auth.TypeUSER,
-				Status:   auth.StatusInvalid,
+				Status:   auth.StatusActive,
 				FullName: "Update Kennedy",
 				Email:    "upt@ardanlabs.com",
 			}
@@ -416,7 +392,6 @@ func TestUpdateUser(t *testing.T) {
 			u2.DateCreated = u2.DateCreated.Add(-time.Duration(u2.DateCreated.Nanosecond()))
 
 			// Update the fields that changed
-			u1.UserType = u2.UserType
 			u1.Status = u2.Status
 			u1.FullName = u2.FullName
 			u1.Email = u2.Email
@@ -454,7 +429,6 @@ func TestUpdateUserValidation(t *testing.T) {
 		{
 			uu := auth.UpdUser{
 				PublicID: "asdasdasd",
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -468,21 +442,6 @@ func TestUpdateUserValidation(t *testing.T) {
 
 			uu = auth.UpdUser{
 				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: 0,
-				Status:   auth.StatusActive,
-				FullName: "Test Kennedy",
-				Email:    "bill@ardanlabs.com",
-			}
-
-			if err := auth.UpdateUser(context, ses, uu); err == nil {
-				t.Errorf("\t%s\tShould Not be able to update a user with invalid UserType", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould Not be able to update a user with invalid UserType.", tests.Success)
-			}
-
-			uu = auth.UpdUser{
-				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: auth.TypeAPI,
 				Status:   0,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -496,7 +455,6 @@ func TestUpdateUserValidation(t *testing.T) {
 
 			uu = auth.UpdUser{
 				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "1234567",
 				Email:    "bill@ardanlabs.com",
@@ -510,7 +468,6 @@ func TestUpdateUserValidation(t *testing.T) {
 
 			uu = auth.UpdUser{
 				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "ardanlabs.com",
@@ -524,7 +481,6 @@ func TestUpdateUserValidation(t *testing.T) {
 
 			uu = auth.UpdUser{
 				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -554,7 +510,6 @@ func TestUpdateUserPassword(t *testing.T) {
 		t.Log("\tWhen using an existing user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -635,7 +590,6 @@ func TestUpdateInvalidUserPassword(t *testing.T) {
 		t.Log("\tWhen using an existing user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -652,7 +606,7 @@ func TestUpdateInvalidUserPassword(t *testing.T) {
 				t.Logf("\t%s\tShould Not be able to update a user with bad password.", tests.Success)
 			}
 
-			u1.UserType = 0
+			u1.Status = auth.StatusDisabled
 
 			if err := auth.UpdateUserPassword(context, ses, u1, "_Password789"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with bad user value.", tests.Failed)
@@ -663,8 +617,8 @@ func TestUpdateInvalidUserPassword(t *testing.T) {
 	}
 }
 
-// TestDeleteUser test the deleting of a user.
-func TestDeleteUser(t *testing.T) {
+// TestDisableUser test the disabling of a user.
+func TestDisableUser(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -676,7 +630,6 @@ func TestDeleteUser(t *testing.T) {
 		t.Log("\tWhen using an existing user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -698,10 +651,10 @@ func TestDeleteUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
 
-			if err := auth.DeleteUser(context, ses, u2.PublicID); err != nil {
-				t.Fatalf("\t%s\tShould be able to delete the user : %v", tests.Failed, err)
+			if err := auth.UpdateUserStatus(context, ses, u2.PublicID, auth.StatusDisabled); err != nil {
+				t.Fatalf("\t%s\tShould be able to disable the user : %v", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to delete the user.", tests.Success)
+			t.Logf("\t%s\tShould be able to disable the user.", tests.Success)
 
 			if _, err := auth.GetUserByPublicID(context, ses, u1.PublicID); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to retrieve the user by PublicID.", tests.Failed)
@@ -732,7 +685,6 @@ func TestCreateWebToken(t *testing.T) {
 		t.Log("\tWhen using a new user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -832,7 +784,6 @@ func TestExpiredWebToken(t *testing.T) {
 		t.Log("\tWhen using a new user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -915,7 +866,6 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 		t.Log("\tWhen using a new user.")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -947,8 +897,7 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 
 			uu := auth.UpdUser{
 				PublicID: publicID,
-				UserType: auth.TypeUSER,
-				Status:   auth.StatusInvalid,
+				Status:   auth.StatusActive,
 				FullName: "Update Kennedy",
 				Email:    "change@ardanlabs.com",
 			}
@@ -986,7 +935,6 @@ func TestLoginUser(t *testing.T) {
 		t.Log("\tWhen using a new user")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -1035,7 +983,6 @@ func TestNoSession(t *testing.T) {
 		t.Log("\tWhen using a nil session")
 		{
 			u1, err := auth.NewUser(auth.NUser{
-				UserType: auth.TypeAPI,
 				Status:   auth.StatusActive,
 				FullName: "Test Kennedy",
 				Email:    "bill@ardanlabs.com",
@@ -1080,8 +1027,7 @@ func TestNoSession(t *testing.T) {
 
 			uu := auth.UpdUser{
 				PublicID: "6dcda2da-92c3-11e5-8994-feff819cdc9f",
-				UserType: auth.TypeUSER,
-				Status:   auth.StatusInvalid,
+				Status:   auth.StatusActive,
 				FullName: "Update Kennedy",
 				Email:    "upt@ardanlabs.com",
 			}
@@ -1098,10 +1044,10 @@ func TestNoSession(t *testing.T) {
 				t.Logf("\t%s\tShould Not be able to update a user password.", tests.Success)
 			}
 
-			if err := auth.DeleteUser(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
-				t.Errorf("\t%s\tShould Not be able to delete a user.", tests.Failed)
+			if err := auth.UpdateUserStatus(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f", auth.StatusDisabled); err == nil {
+				t.Errorf("\t%s\tShould Not be able to disable a user.", tests.Failed)
 			} else {
-				t.Logf("\t%s\tShould Not be able to delete a user.", tests.Success)
+				t.Logf("\t%s\tShould Not be able to disable a user.", tests.Success)
 			}
 
 			if _, err := auth.LoginUser(context, nil, "bill@email.com", "_pass"); err == nil {

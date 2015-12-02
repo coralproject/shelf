@@ -16,17 +16,9 @@ import (
 
 // Set of user status codes.
 const (
-	StatusUnknown = iota + 1
+	StatusUnknown = iota
 	StatusActive
 	StatusDisabled
-	StatusDeleted
-	StatusInvalid
-)
-
-// Set of user type codes.
-const (
-	TypeAPI = iota + 1
-	TypeUSER
 )
 
 //==============================================================================
@@ -47,7 +39,6 @@ func init() {
 
 // NUser is provided to create a new user value for use.
 type NUser struct {
-	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
 	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
 	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
 	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
@@ -71,7 +62,6 @@ type User struct {
 	ID           bson.ObjectId `bson:"_id,omitempty" json:"-"`
 	PublicID     string        `bson:"public_id" json:"public_id" validate:"required,uuid"`
 	PrivateID    string        `bson:"private_id" json:"-" validate:"required,uuid"`
-	UserType     int           `bson:"type" json:"type" validate:"required,ne=0"`
 	Status       int           `bson:"status" json:"status" validate:"required,ne=0"`
 	FullName     string        `bson:"full_name" json:"full_name" validate:"required,min=8"`
 	Email        string        `bson:"email" json:"email" validate:"required,max=100,email"`
@@ -90,7 +80,6 @@ func NewUser(nu NUser) (*User, error) {
 	u := User{
 		PublicID:     uuid.New(),
 		PrivateID:    uuid.New(),
-		UserType:     nu.UserType,
 		Status:       StatusActive,
 		FullName:     nu.FullName,
 		Email:        strings.ToLower(nu.Email),
@@ -167,7 +156,6 @@ func (u *User) IsPasswordValid(password string) bool {
 // UpdUser is provided to update an existing user in the system.
 type UpdUser struct {
 	PublicID string `bson:"public_id" json:"public_id" validate:"required,uuid"`
-	UserType int    `bson:"type" json:"type" validate:"required,ne=0"`
 	Status   int    `bson:"status" json:"status" validate:"required,ne=0"`
 	FullName string `bson:"full_name" json:"full_name" validate:"required,min=8"`
 	Email    string `bson:"email" json:"email" validate:"required,max=100,email"`
