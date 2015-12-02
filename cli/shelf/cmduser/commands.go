@@ -13,7 +13,7 @@ func GetCommands() *cobra.Command {
 	addAuth()
 	addCreate()
 	addGet()
+	addStatus()
 	addUpd()
-	addDel()
 	return userCmd
 }
