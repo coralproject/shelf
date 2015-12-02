@@ -14,6 +14,5 @@ func GetCommands() *cobra.Command {
 	addCreate()
 	addGet()
 	addStatus()
-	addUpd()
 	return userCmd
 }
