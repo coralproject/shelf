@@ -625,6 +625,14 @@ func TestDisableUser(t *testing.T) {
 	ses := mongo.GetSession()
 	defer ses.Close()
 
+	var publicID string
+	defer func() {
+		if err := removeUser(ses, publicID); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the test user : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the test user.", tests.Success)
+	}()
+
 	t.Log("Given the need to update a user.")
 	{
 		t.Log("\tWhen using an existing user.")
@@ -644,6 +652,9 @@ func TestDisableUser(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
+
+			// We need to do this so we can clean up after.
+			publicID = u1.PublicID
 
 			u2, err := auth.GetUserByPublicID(context, ses, u1.PublicID)
 			if err != nil {
