@@ -29,7 +29,7 @@ func removeUser(db *db.DB, publicID string) error {
 		return c.Remove(q)
 	}
 
-	if err := db.ExecuteMGO(context, "users", f); err != nil {
+	if err := db.ExecuteMGO(context, "auth", f); err != nil {
 		return err
 	}
 
