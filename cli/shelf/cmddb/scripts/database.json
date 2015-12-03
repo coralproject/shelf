@@ -16,7 +16,7 @@
                 ]
         },
         {
-            "name": "users",
+            "name": "auth",
             "indexes":
                 [
                     {   "name" : "public_id",

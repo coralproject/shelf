@@ -4,9 +4,9 @@ package main
 import (
 	"os"
 
+	"github.com/coralproject/shelf/cli/shelf/cmdauth"
 	"github.com/coralproject/shelf/cli/shelf/cmddb"
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
-	"github.com/coralproject/shelf/cli/shelf/cmduser"
 	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
@@ -41,6 +41,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	shelf.AddCommand(cmduser.GetCommands(), cmdquery.GetCommands(), cmddb.GetCommands())
+	shelf.AddCommand(cmdauth.GetCommands(), cmdquery.GetCommands(), cmddb.GetCommands())
 	shelf.Execute()
 }

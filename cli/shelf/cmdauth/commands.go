@@ -1,16 +1,15 @@
-package cmduser
+package cmdauth
 
 import "github.com/spf13/cobra"
 
 // userCmd represents the parent for all cli commands.
 var userCmd = &cobra.Command{
-	Use:   "user",
-	Short: "user provides a shelf CLI for managing user records.",
+	Use:   "auth",
+	Short: "auth provides a shelf CLI for managing user records.",
 }
 
 // GetCommands returns the user commands.
 func GetCommands() *cobra.Command {
-	addAuth()
 	addCreate()
 	addGet()
 	addStatus()

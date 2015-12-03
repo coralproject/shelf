@@ -1,4 +1,4 @@
-package cmduser
+package cmdauth
 
 import (
 	"github.com/coralproject/shelf/pkg/db"
@@ -12,7 +12,7 @@ var statusLong = `Use status to change the status of a user to active or disable
 Note: Not including the status results in the user being disabled.
 
 Example:
-  ./shelf user status -e "bill@ardanlabs.com" -a true
+  ./shelf auth status -e "bill@ardanlabs.com" -a true
 `
 
 // status contains the state for this command.

@@ -1,4 +1,4 @@
-package cmduser
+package cmdauth
 
 import (
 	"github.com/coralproject/shelf/pkg/db"
@@ -11,7 +11,7 @@ var createLong = `Use create to add a new user to the system. The user email
 must be unique for every user.
 
 Example:
-  ./shelf user create -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "yefc*7fdf92"
+  ./shelf auth create -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "yefc*7fdf92"
 `
 
 // create contains the state for this command.

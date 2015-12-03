@@ -1,4 +1,4 @@
-package cmduser
+package cmdauth
 
 import (
 	"encoding/json"
@@ -12,9 +12,9 @@ import (
 var getLong = `Use get to retreive a user record from the system.
 
 Example:
-  ./shelf user get -p "6dcda2da-92c3-11e5-8994-feff819cdc9f"
+  ./shelf auth get -p "6dcda2da-92c3-11e5-8994-feff819cdc9f"
 
-  ./shelf user get -e "bill@ardanlabs.com"
+  ./shelf auth get -e "bill@ardanlabs.com"
 `
 
 // get contains the state for this command.
