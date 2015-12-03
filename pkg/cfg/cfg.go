@@ -179,7 +179,7 @@ func Bool(key string) (bool, error) {
 
 // MustBool returns the bool balue of a given key as a bool, else it will panic
 // if the key was not found or the value can't be convered to a bool.
-func MustBool(key string) (bool, error) {
+func MustBool(key string) bool {
 	c.mu.RLock()
 	defer c.mu.RUnlock()
 
@@ -190,8 +190,8 @@ func MustBool(key string) (bool, error) {
 
 	val, err := strconv.ParseBool(value)
 	if err != nil {
-		return false, err
+		return false
 	}
 
-	return val, nil
+	return val
 }
