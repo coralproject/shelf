@@ -32,6 +32,7 @@ func TestQueryNames(t *testing.T) {
 
 	r := tests.NewRequest("GET", "/1.0/query/names", nil)
 	w := httptest.NewRecorder()
+
 	a.ServeHTTP(w, r)
 
 	t.Log("Given the need get a list of query names.")
@@ -40,6 +41,6 @@ func TestQueryNames(t *testing.T) {
 		if w.Code == 404 {
 			t.Fatalf("\t%s\tShould be able to retrieve the query list : %v", tests.Failed, w.Code)
 		}
-		t.Fatalf("\t%s\tShould be able to retrieve the query list.", tests.Success)
+		t.Logf("\t%s\tShould be able to retrieve the query list.", tests.Success)
 	}
 }

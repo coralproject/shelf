@@ -5,15 +5,12 @@ import (
 
 	"github.com/coralproject/shelf/app/xenia/app"
 	"github.com/coralproject/shelf/app/xenia/handlers"
-	"github.com/coralproject/shelf/app/xenia/middleware"
+	"github.com/coralproject/shelf/app/xenia/midware"
 )
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	a := app.New(middleware.Logger)
-
-	// TODO: Look at how 404 is handled.
-	// a.TreeMux.NotFoundHandler = http.FileServer(http.Dir("views")).ServeHTTP
+	a := app.New(midware.Auth)
 
 	// Initialize the routes for the API.
 	a.Handle("GET", "/1.0/query/names", handlers.Query.List)

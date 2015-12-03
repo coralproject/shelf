@@ -3,31 +3,40 @@ package app
 import (
 	"errors"
 	"net/http"
+	"time"
 
 	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/log"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"
 )
 
-// ErrNotFound is abstracting the mgo not found error.
-var ErrNotFound = errors.New("Entity Not found")
+var (
+	// ErrNotAuthorized occurs when the call is not authorized.
+	ErrNotAuthorized = errors.New("Not authorized")
 
-// ErrInvalidID occurs when an ID is not in a valid form.
-var ErrInvalidID = errors.New("ID is not in it's proper form")
+	// ErrNotFound is abstracting the mgo not found error.
+	ErrNotFound = errors.New("Entity Not found")
 
-// ErrValidation occurs when there are validation errors.
-var ErrValidation = errors.New("Validation errors occurred")
+	// ErrInvalidID occurs when an ID is not in a valid form.
+	ErrInvalidID = errors.New("ID is not in it's proper form")
 
-// A Handler is a type that handles an http request within our own little mini
-// framework. The fun part is that our context is fully controlled and
-// configured by us so we can extend the functionality of the Context whenever
-// we want.
-type Handler func(*Context) error
+	// ErrValidation occurs when there are validation errors.
+	ErrValidation = errors.New("Validation errors occurred")
+)
 
-// A Middleware is a type that wraps a handler to remove boilerplate or other
-// concerns not direct to any given Handler.
-type Middleware func(Handler) Handler
+type (
+	// A Handler is a type that handles an http request within our own little mini
+	// framework. The fun part is that our context is fully controlled and
+	// configured by us so we can extend the functionality of the Context whenever
+	// we want.
+	Handler func(*Context) error
+
+	// A Middleware is a type that wraps a handler to remove boilerplate or other
+	// concerns not direct to any given Handler.
+	Middleware func(Handler) Handler
+)
 
 // App is the entrypoint into our application and what configures our context
 // object for each of our http handlers. Feel free to add any configuration
@@ -52,6 +61,8 @@ func New(mw ...Middleware) *App {
 func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	// The function to execute for each request.
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
+		start := time.Now()
+
 		c := Context{
 			DB:             db.NewMGO(),
 			ResponseWriter: w,
@@ -60,6 +71,8 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 			SessionID:      uuid.New(),
 		}
 		defer c.DB.CloseMGO()
+
+		log.User(c.SessionID, "Request", "Started : Method[%s] URL[%s] RADDR[%s]", c.Request.Method, c.Request.URL.Path, c.Request.RemoteAddr)
 
 		// Wrap the handler in all associated middleware.
 		wrap := func(h Handler) Handler {
@@ -80,6 +93,8 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 		if err := wrap(handler)(&c); err != nil {
 			c.Error(err)
 		}
+
+		log.User(c.SessionID, "Request", "Completed : Status[%d] Duration[%s]", c.Status, time.Since(start))
 	}
 
 	// Add this handler for the specified verb and route.

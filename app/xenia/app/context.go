@@ -14,6 +14,7 @@ import (
 
 	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
+	"github.com/coralproject/shelf/pkg/srv/auth"
 )
 
 // Invalid describes a validation error belonging to a specific field.
@@ -35,6 +36,7 @@ type Context struct {
 	Request   *http.Request
 	Params    map[string]string
 	SessionID string
+	User      *auth.User
 	Status    int
 }
 
@@ -68,7 +70,7 @@ func (c *Context) Respond(data interface{}, code int) {
 	c.WriteHeader(code)
 	json.NewEncoder(c).Encode(data)
 
-	log.Dev(c.SessionID, "api : Respond", "Completed")
+	log.User(c.SessionID, "api : Respond", "Completed")
 }
 
 // RespondInvalid sends JSON describing field validation errors.
