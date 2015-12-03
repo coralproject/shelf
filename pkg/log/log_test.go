@@ -44,8 +44,8 @@ func TestLogLevelUSER(t *testing.T) {
 
 			dt := time.Now().Format("2006/01/02 15:04:05")
 
-			log1 := fmt.Sprintf("%s log_test.go:51: context : FuncName : USER : Message 2 with format: A, B\n", dt)
-			log2 := fmt.Sprintf("%s log_test.go:52: context : FuncName : ERROR : An error : Message 3 no format\n", dt)
+			log1 := fmt.Sprintf("%s log_test.go:51: USER : context : FuncName : Message 2 with format: A, B\n", dt)
+			log2 := fmt.Sprintf("%s log_test.go:52: ERROR : context : FuncName : An error : Message 3 no format\n", dt)
 
 			log.Dev("context", "FuncName", "Message 1 no format")
 			log.User("context", "FuncName", "Message 2 with format: %s, %s", "A", "B")
@@ -74,9 +74,9 @@ func TestLogLevelDEV(t *testing.T) {
 
 			dt := time.Now().Format("2006/01/02 15:04:05")
 
-			log1 := fmt.Sprintf("%s log_test.go:81: context : FuncName : DEV : Message 1 no format\n", dt)
-			log2 := fmt.Sprintf("%s log_test.go:82: context : FuncName : USER : Message 2 with format: A, B\n", dt)
-			log3 := fmt.Sprintf("%s log_test.go:83: context : FuncName : ERROR : An error : Message 3 with format: C, D\n", dt)
+			log1 := fmt.Sprintf("%s log_test.go:81: DEV : context : FuncName : Message 1 no format\n", dt)
+			log2 := fmt.Sprintf("%s log_test.go:82: USER : context : FuncName : Message 2 with format: A, B\n", dt)
+			log3 := fmt.Sprintf("%s log_test.go:83: ERROR : context : FuncName : An error : Message 3 with format: C, D\n", dt)
 
 			log.Dev("context", "FuncName", "Message 1 no format")
 			log.User("context", "FuncName", "Message 2 with format: %s, %s", "A", "B")

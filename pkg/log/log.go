@@ -10,7 +10,7 @@ import (
 
 // Level constants that define the supported usable LogLevel.
 const (
-	DEV int = iota
+	DEV int = iota + 1
 	USER
 )
 
