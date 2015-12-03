@@ -8,8 +8,8 @@ import (
 	"os/signal"
 
 	"github.com/coralproject/shelf/app/xenia/routes"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 func init() {
