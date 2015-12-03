@@ -6,23 +6,26 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 )
 
 // c represents the configuration store, with a map to store the loaded keys
 // from the environment.
 var c struct {
-	m map[string]string
+	m  map[string]string
+	mu sync.RWMutex
 }
 
 // Init is to be called only once, to load up the giving namespace if found,
 // in the environment variables. All keys will be made lowercase.
 func Init(namespace string) error {
-	if c.m != nil {
-		return errors.New("Config already initialized")
-	}
+	c.mu.Lock()
+	defer c.mu.Unlock()
 
-	c.m = make(map[string]string)
+	if c.m == nil {
+		c.m = make(map[string]string)
+	}
 
 	// Get the lists of available environment variables.
 	envs := os.Environ()
@@ -54,6 +57,9 @@ func Init(namespace string) error {
 // String returns the value of the giving key as a string, else it will return
 // an error if key was not found.
 func String(key string) (string, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		return "", fmt.Errorf("Unknown key %s !", key)
@@ -65,6 +71,9 @@ func String(key string) (string, error) {
 // MustString returns the value of the giving key as a string, else it will panic
 // if the key was not found.
 func MustString(key string) string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown key %s !", key))
@@ -76,6 +85,9 @@ func MustString(key string) string {
 // Int returns the value of the giving key as an int, else it will return
 // an error, if the key was not found or the value can't be convered to an int.
 func Int(key string) (int, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		return 0, fmt.Errorf("Unknown Key %s !", key)
@@ -92,6 +104,9 @@ func Int(key string) (int, error) {
 // MustInt returns the value of the giving key as an int, else it will panic
 // if the key was not found or the value can't be convered to an int.
 func MustInt(key string) int {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown Key %s !", key))
@@ -108,6 +123,9 @@ func MustInt(key string) int {
 // Time returns the value of the giving key as a Time, else it will return an
 // error, if the key was not found or the value can't be convered to a Time.
 func Time(key string) (time.Time, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		return time.Time{}, fmt.Errorf("Unknown Key %s !", key)
@@ -124,6 +142,9 @@ func Time(key string) (time.Time, error) {
 // MustTime returns the value of the giving key as a Time, else it will panic
 // if the key was not found or the value can't be convered to a Time.
 func MustTime(key string) time.Time {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown Key %s !", key))

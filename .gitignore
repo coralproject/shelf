@@ -25,3 +25,7 @@ _testmain.go
 
 # Config files
 *.cfg
+
+# Build files
+app/xenia/gib-bin
+app/xenia/xenia

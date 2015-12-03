@@ -17,9 +17,7 @@ func ExampleDev() {
 		10, 15, 0, 0, 0, time.UTC).UTC().Format(time.UnixDate))
 
 	// Init() must be called only once with the given namespace to load.
-	cfg.Init("dock")
-
-	// NOTE: All keys must be in lowercase.
+	cfg.Init("DOCK")
 
 	// To get the ip.
 	fmt.Println(cfg.MustString("IP"))

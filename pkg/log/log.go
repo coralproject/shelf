@@ -1,16 +1,16 @@
 package log
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"log"
 	"os"
+	"sync"
 )
 
 // Level constants that define the supported usable LogLevel.
 const (
-	DEV int = iota + 1
+	DEV int = iota
 	USER
 )
 
@@ -18,56 +18,74 @@ const (
 var l struct {
 	*log.Logger
 	level func() int
+	mu    sync.RWMutex
 }
 
 // Init must be called to initialize the logging system. This function should
 // only be called once.
 func Init(w io.Writer, level func() int) error {
-	if l.Logger != nil {
-		return errors.New("Logger already initialized")
+	l.mu.Lock()
+	{
+		l.Logger = log.New(w, "", log.Ldate|log.Ltime|log.Lshortfile)
+		l.level = level
 	}
-
-	l.Logger = log.New(w, "", log.Ldate|log.Ltime|log.Lshortfile)
-	l.level = level
+	l.mu.Unlock()
 
 	return nil
 }
 
 // Dev logs trace information for developers.
 func Dev(context interface{}, funcName string, format string, a ...interface{}) {
-	if l.level() == DEV {
-		if a != nil {
-			format = fmt.Sprintf(format, a...)
-		}
+	l.mu.RLock()
+	{
+		if l.level() == DEV {
+			if a != nil {
+				format = fmt.Sprintf(format, a...)
+			}
 
-		l.Output(2, fmt.Sprintf("%s : %s : DEV : %s", context, funcName, format))
+			l.Output(2, fmt.Sprintf("%s : %s : DEV : %s", context, funcName, format))
+		}
 	}
+	l.mu.RUnlock()
 }
 
 // User logs trace information for users.
 func User(context interface{}, funcName string, format string, a ...interface{}) {
-	if a != nil {
-		format = fmt.Sprintf(format, a...)
-	}
+	l.mu.RLock()
+	{
+		if a != nil {
+			format = fmt.Sprintf(format, a...)
+		}
 
-	l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
+		l.Output(2, fmt.Sprintf("%s : %s : USER : %s", context, funcName, format))
+	}
+	l.mu.RUnlock()
 }
 
 // Error logs trace information that are errors.
 func Error(context interface{}, funcName string, err error, format string, a ...interface{}) {
-	if a != nil {
-		format = fmt.Sprintf(format, a...)
-	}
+	l.mu.RLock()
+	{
+		if a != nil {
+			format = fmt.Sprintf(format, a...)
+		}
 
-	l.Output(2, fmt.Sprintf("%s : %s : ERROR : %s : %s", context, funcName, err, format))
+		l.Output(2, fmt.Sprintf("%s : %s : ERROR : %s : %s", context, funcName, err, format))
+	}
+	l.mu.RUnlock()
 }
 
 // Fatal logs trace information for users and terminates the app.
 func Fatal(context interface{}, funcName string, format string, a ...interface{}) {
-	if a != nil {
-		format = fmt.Sprintf(format, a...)
-	}
+	l.mu.RLock()
+	{
+		if a != nil {
+			format = fmt.Sprintf(format, a...)
+		}
 
-	l.Output(2, fmt.Sprintf("%s : %s : FATAL : %s", context, funcName, format))
+		l.Output(2, fmt.Sprintf("%s : %s : FATAL : %s", context, funcName, format))
+	}
+	l.mu.RUnlock()
+
 	os.Exit(1)
 }
