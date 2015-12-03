@@ -1,6 +1,6 @@
 // Xenia is a web service for handling query related calls.
-// Use gin during development : // https://github.com/codegangsta/gin
-// gin -p 5000 -a 4000 -i run
+// Use gin during development : // go get github.com/codegangsta/gin
+// Run this command in the xenia folder: gin -p 5000 -a 4000 -i run
 package main
 
 import (
