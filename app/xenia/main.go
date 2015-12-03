@@ -18,7 +18,6 @@ import (
 func init() {
 	logLevel := func() int {
 		ll, err := cfg.Int("LOGGING_LEVEL")
-		fmt.Println("***************>", ll)
 		if err != nil {
 			return log.USER
 		}
