@@ -64,12 +64,17 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	webTok, err := auth.GetUserWebToken("", db, u.PublicID)
+	if err != nil {
+		cmd.Println("Getting User : Unable to retrieve web token : ", err)
+	}
+
 	data, err := json.MarshalIndent(&u, "", "    ")
 	if err != nil {
 		cmd.Println("Getting User : ", err)
 		return
 	}
 
-	cmd.Printf("\n%s\n\n", string(data))
+	cmd.Printf("\n%s\n\nToken: %s\n\n", string(data), webTok)
 	return
 }

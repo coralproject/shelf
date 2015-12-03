@@ -1,6 +1,8 @@
 package cmdauth
 
 import (
+	"time"
+
 	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/srv/auth"
 
@@ -65,5 +67,11 @@ func runCreate(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cmd.Println("Creating User : Created")
+	webTok, err := auth.CreateWebToken("", db, u, 24*365*time.Hour)
+	if err != nil {
+		cmd.Println("Creating User : ", err)
+		return
+	}
+
+	cmd.Printf("\nToken: %s\n\n", webTok)
 }
