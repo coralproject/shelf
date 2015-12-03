@@ -29,7 +29,7 @@ func removeUser(db *db.DB, publicID string) error {
 		return c.Remove(q)
 	}
 
-	if err := db.ExecuteMGO(context, "auth", f); err != nil {
+	if err := db.ExecuteMGO(context, "auth_users", f); err != nil {
 		return err
 	}
 
@@ -770,6 +770,19 @@ func TestCreateWebToken(t *testing.T) {
 				t.Fatalf("\t%s\tShould have the right user for the token.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould have the right user for the token.", tests.Success)
+
+			webTok3, err := auth.GetUserWebToken(context, db, u2.PublicID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to get the web token : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get the web token.", tests.Success)
+
+			if webTok3 != webTok2 {
+				t.Log(webTok3)
+				t.Log(webTok2)
+				t.Fatalf("\t%s\tShould match existing tokens.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould match existing tokens.", tests.Success)
 		}
 	}
 }
@@ -1066,6 +1079,12 @@ func TestNoSession(t *testing.T) {
 				t.Errorf("\t%s\tShould Not be able to login a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to login a user.", tests.Success)
+			}
+
+			if _, err := auth.GetUserWebToken(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
+				t.Errorf("\t%s\tShould Not be able to get user web token.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould Not be able to get user web token.", tests.Success)
 			}
 		}
 	}

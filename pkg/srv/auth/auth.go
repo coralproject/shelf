@@ -16,8 +16,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// collection contains the name of the auth collection.
-const collection = "auth"
+// collection contains the name of the auth_users collection.
+const collection = "auth_users"
 
 //==============================================================================
 
@@ -31,7 +31,7 @@ func CreateUser(context interface{}, db *db.DB, u *User) error {
 	}
 
 	f := func(col *mgo.Collection) error {
-		log.Dev(context, "CreateUser", "MGO : db.%s.insert(CAN'T SHOW)", collection)
+		log.Dev(context, "CreateUser", "MGO : db.%s.insert(%s)", collection, mongo.Query(&u))
 		return col.Insert(u)
 	}
 
@@ -188,6 +188,42 @@ func GetUserByEmail(context interface{}, db *db.DB, email string) (*User, error)
 
 	log.Dev(context, "GetUserByEmail", "Completed")
 	return &user, nil
+}
+
+// GetUserWebToken return a token if one exists and is valid.
+func GetUserWebToken(context interface{}, db *db.DB, publicID string) (string, error) {
+	log.Dev(context, "GetUserWebToken", "Started : PublicID[%s]", publicID)
+
+	// Do we have a valid session right now?
+	s, err := session.GetByLatest(context, db, publicID)
+	if err != nil {
+		log.Error(context, "GetUserWebToken", err, "Completed")
+		return "", err
+	}
+
+	// If it is expired return failure.
+	if s.IsExpired(context) {
+		err := errors.New("Session expired.")
+		log.Error(context, "GetUserWebToken", err, "Completed")
+		return "", err
+	}
+
+	// Pull the user information.
+	u, err := GetUserByPublicID(context, db, publicID)
+	if err != nil {
+		log.Error(context, "GetUserWebToken", err, "Completed")
+		return "", err
+	}
+
+	// Generate a token that works right now.
+	token, err := u.WebToken(s.SessionID)
+	if err != nil {
+		log.Error(context, "GetUserWebToken", err, "Completed")
+		return "", err
+	}
+
+	log.Dev(context, "GetUserWebToken", "Completed : WebToken[%s]", token)
+	return token, nil
 }
 
 //==============================================================================
