@@ -1,5 +1,3 @@
-// USE THIS AS A MODEL FOR NOW.
-
 package routes
 
 import (
@@ -7,23 +5,21 @@ import (
 
 	"github.com/coralproject/shelf/app/xenia/app"
 	"github.com/coralproject/shelf/app/xenia/handlers"
+	"github.com/coralproject/shelf/app/xenia/middleware"
 )
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	a := app.New()
+	a := app.New(middleware.Logger)
 
-	// Setup the file server to serve up static content such as
-	// the index.html page.
-	a.TreeMux.NotFoundHandler = http.FileServer(http.Dir("views")).ServeHTTP
+	// TODO: Look at how 404 is handled.
+	// a.TreeMux.NotFoundHandler = http.FileServer(http.Dir("views")).ServeHTTP
 
-	// Initialize the routes for the API binding the route to the
-	// handler code for each specified verb.
-	a.Handle("GET", "/v1/users", handlers.Users.List)
-	a.Handle("POST", "/v1/users", handlers.Users.Create)
-	a.Handle("GET", "/v1/users/:id", handlers.Users.Retrieve)
-	a.Handle("PUT", "/v1/users/:id", handlers.Users.Update)
-	a.Handle("DELETE", "/v1/users/:id", handlers.Users.Delete)
+	// Initialize the routes for the API.
+	a.Handle("GET", "/1.0/query/names", handlers.Query.List)
+	// a.Handle("GET", "/1.0/:name", handlers.Query.Retrieve)
+	// a.Handle("GET", "/1.0/run", handlers.Query.Execute)
+	// a.Handle("POST", "/1.0/run/custom", handlers.Query.ExecuteCustom)
 
 	return a
 }

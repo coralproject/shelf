@@ -12,9 +12,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/log"
-
-	"gopkg.in/mgo.v2"
 )
 
 // Invalid describes a validation error belonging to a specific field.
@@ -31,7 +30,7 @@ type jsonError struct {
 
 // Context contains data associated with a single request.
 type Context struct {
-	Session *mgo.Session
+	DB *db.DB
 	http.ResponseWriter
 	Request   *http.Request
 	Params    map[string]string

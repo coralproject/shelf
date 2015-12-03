@@ -4,7 +4,7 @@ import (
 	"errors"
 	"net/http"
 
-	"github.com/coralproject/shelf/pkg/mongo"
+	"github.com/coralproject/shelf/pkg/db"
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"
@@ -53,13 +53,13 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	// The function to execute for each request.
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		c := Context{
-			Session:        mongo.GetSession(),
+			DB:             db.NewMGO(),
 			ResponseWriter: w,
 			Request:        r,
 			Params:         p,
 			SessionID:      uuid.New(),
 		}
-		defer c.Session.Close()
+		defer c.DB.CloseMGO()
 
 		// Wrap the handler in all associated middleware.
 		wrap := func(h Handler) Handler {
@@ -68,7 +68,7 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 				h = a.mw[i](h)
 			}
 
-			// and then wrap with our route specific ones.
+			// Then wrap with our route specific ones.
 			for i := len(mw) - 1; i >= 0; i-- {
 				h = mw[i](h)
 			}

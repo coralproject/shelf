@@ -1,5 +1,6 @@
-// This program provides a sample web service that implements a
-// RESTFul CRUD API against a MongoDB database.
+// Xenia is a web service for handling query related calls.
+// Use gin during development : // https://github.com/codegangsta/gin
+// gin -p 5000 -a 4000 -i run
 package main
 
 import (
@@ -8,30 +9,47 @@ import (
 	"os/signal"
 
 	"github.com/coralproject/shelf/app/xenia/routes"
+	"github.com/coralproject/shelf/pkg/cfg"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/mongo"
 )
 
 func init() {
-	// TODO: Need to read configuration.
-	log.Init(os.Stdout, func() int { return log.DEV })
-	mongo.InitMGO()
+	logLevel := func() int {
+		ll, err := cfg.Int("LOGGING_LEVEL")
+		if err != nil {
+			return log.USER
+		}
+		return ll
+	}
+
+	log.Init(os.Stderr, logLevel)
+
+	if err := cfg.Init("SHELF"); err != nil {
+		log.Error("startup", "init", err, "Initializing config")
+		os.Exit(1)
+	}
+
+	err := mongo.InitMGO()
+	if err != nil {
+		log.Error("startup", "init", err, "Initializing MongoDB")
+		os.Exit(1)
+	}
 }
 
 func main() {
 	log.Dev("startup", "main", "Start")
 
-	// Check the environment for a configured port value.
-	// TODO: Need to read configuration.
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "3000"
+	// Check for a configured host value.
+	host, err := cfg.String("XENIA_HOST")
+	if err != nil {
+		host = ":4000"
 	}
 
 	// Create this goroutine to run the web server.
 	go func() {
-		log.Dev("listener", "main-func", "Listening on: http://localhost:%d", port)
-		http.ListenAndServe(":"+port, routes.API())
+		log.Dev("listener", "main", "Listening on: %s", host)
+		http.ListenAndServe(host, routes.API())
 	}()
 
 	// Listen for an interrupt signal from the OS.

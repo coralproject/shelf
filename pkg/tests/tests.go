@@ -3,6 +3,9 @@ package tests
 
 import (
 	"bytes"
+	"io"
+	"net/http"
+	"net/url"
 	"os"
 	"testing"
 
@@ -46,4 +49,13 @@ func Init() {
 		logdash.WriteTo(os.Stdout)
 		os.Exit(1)
 	}
+}
+
+// NewRequest used to setup a request for mocking API calls with httptreemux.
+func NewRequest(method, path string, body io.Reader) *http.Request {
+	r, _ := http.NewRequest(method, path, body)
+	u, _ := url.Parse(path)
+	r.URL = u
+	r.RequestURI = path
+	return r
 }
