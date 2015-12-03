@@ -42,8 +42,8 @@ func Init(namespace string) error {
 			continue
 		}
 
-		part := strings.Split(val, "=")
-		c.m[strings.ToUpper(strings.TrimPrefix(part[0], uspace))] = part[1]
+		idx := strings.Index(val, "=")
+		c.m[strings.ToUpper(strings.TrimPrefix(val[0:idx], uspace))] = val[idx+1:]
 	}
 
 	// Did we find any keys for this namespace?
@@ -156,4 +156,42 @@ func MustTime(key string) time.Time {
 	}
 
 	return tv
+}
+
+// Bool returns the bool balue of a given key as a bool, else it will return an
+// error, if the key was not found or the value can't be convered to a bool.
+func Bool(key string) (bool, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	value, found := c.m[key]
+	if !found {
+		return false, fmt.Errorf("Unknown Key %s !", key)
+	}
+
+	val, err := strconv.ParseBool(value)
+	if err != nil {
+		return false, err
+	}
+
+	return val, nil
+}
+
+// MustBool returns the bool balue of a given key as a bool, else it will panic
+// if the key was not found or the value can't be convered to a bool.
+func MustBool(key string) (bool, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	value, found := c.m[key]
+	if !found {
+		panic(fmt.Sprintf("Unknown Key %s !", key))
+	}
+
+	val, err := strconv.ParseBool(value)
+	if err != nil {
+		return false, err
+	}
+
+	return val, nil
 }

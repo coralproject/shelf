@@ -21,6 +21,7 @@ func TestExists(t *testing.T) {
 		os.Setenv("MYAPP_PROC_ID", "322")
 		os.Setenv("MYAPP_SOCKET", "./tmp/sockets.po")
 		os.Setenv("MYAPP_PORT", "4034")
+		os.Setenv("MYAPP_FLAG", "true")
 
 		cfg.Init("MYAPP")
 
@@ -68,6 +69,19 @@ func TestExists(t *testing.T) {
 				}
 			}
 
+			flag, err := cfg.Bool("FLAG")
+
+			if err != nil {
+				t.Errorf("\t\t%s Should not return error when valid key %q", failed, "FLAG")
+			} else {
+				t.Logf("\t\t%s Should not return error when valid key %q", succeed, "FLAG")
+
+				if flag == false {
+					t.Errorf("\t\t%s Should have key %q with value %v", failed, "FLAG", true)
+				} else {
+					t.Logf("\t\t%s Should have key %q with value %v", succeed, "FLAG", true)
+				}
+			}
 		}
 	}
 }
@@ -81,6 +95,7 @@ func TestNotExists(t *testing.T) {
 		os.Setenv("MYAPP_PROC_ID", "322")
 		os.Setenv("MYAPP_SOCKET", "./tmp/sockets.po")
 		os.Setenv("MYAPP_PORT", "4034")
+		os.Setenv("MYAPP_FLAG", "true")
 
 		cfg.Init("MYAPP")
 
@@ -98,6 +113,9 @@ func TestNotExists(t *testing.T) {
 				cfg.MustString("DEST")
 			})
 
+			shouldPanic(t, "ACTIVE", func() {
+				cfg.MustBool("ACTIVE")
+			})
 		}
 	}
 }
