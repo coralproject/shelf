@@ -21,6 +21,17 @@ const collectionHistory = "query_set_history"
 func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 	log.Dev(context, "UpsertSet", "Started : Name[%s]", qs.Name)
 
+	// TODO: do we need this here, or should we create a custom upsert for this?
+	// We need to keep track of history of upserts, ensuring that the last
+	// we attained was safe before we update.
+	// cqs, err := GetSetByName(context, db, qs.Name)
+	// if err == nil {
+	// 	err2 := UpsertHistory(context, db, cqs)
+	// 	if err2 != nil {
+	// 		return err2
+	// 	}
+	// }
+
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
 		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(&qs))
@@ -113,6 +124,38 @@ func DeleteSet(context interface{}, db *db.DB, name string) error {
 
 	log.Dev(context, "DeleteSet", "Completed")
 	return nil
+}
+
+// =============================================================================
+
+// GetLastSetHistoryByName gets the last written Set within the query_history
+// collection and returns the last one else returns a non-nil error if it fails.
+func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
+	log.Dev(context, "GetLastSetHistoryByName", "Started : Name[%s]", name)
+
+	var qs Set
+
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": name}
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).count()", collection, mongo.Query(q))
+		total, err := c.Find(q).Count()
+		if err != nil {
+			return err
+		}
+
+		beforeLast := total - 1
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).skip(%d).one()", collection, mongo.Query(q), mongo.Query(beforeLast))
+		return c.Find(q).Skip(beforeLast).One(&qs)
+	}
+
+	err := db.ExecuteMGO(context, collectionHistory, f)
+	if err != nil {
+		log.Error(context, "GetLastSetHistoryByName", err, "Complete : Name[%s]", name)
+		return nil, err
+	}
+
+	log.Dev(context, "GetLastSetHistoryByName", "Complete : Name[%s]", name)
+	return &qs, nil
 }
 
 // =============================================================================
