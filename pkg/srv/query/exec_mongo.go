@@ -2,7 +2,6 @@ package query
 
 import (
 	"encoding/json"
-	"regexp"
 	"strings"
 	"time"
 
@@ -72,13 +71,11 @@ func mongoExtensions(op bson.M, so *ScriptOption) bson.M {
 	return op
 }
 
-var reMgoDate = regexp.MustCompile("(\\d+)-(\\d+)-(\\d+)T(\\d+):(\\d+):(\\d+).(\\d+)Z")
-
 // isoDate is a helper function to convert the internal extension for dates
 // into a BSON date. We convert the following string
 // ISODate('2013-01-16T00:00:00.000Z') to a Go time value.
 func isoDate(script string) time.Time {
-	dateTime, err := time.Parse("2006-01-02T15:04:05.999Z", reMgoDate.FindString(script))
+	dateTime, err := time.Parse("2006-01-02T15:04:05.999Z", script[9:len(script)-2])
 	if err != nil {
 		return time.Now().UTC()
 	}
