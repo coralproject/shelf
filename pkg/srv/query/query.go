@@ -117,13 +117,6 @@ func DeleteSet(context interface{}, db *db.DB, name string) error {
 
 // =============================================================================
 
-// ExecuteSet is used to execute an existing Set document.
-func ExecuteSet(context interface{}, db *db.DB, name string) error {
-	return nil
-}
-
-// =============================================================================
-
 // UpsertHistory adds the last query record in the query collection into the
 // list of query collection for that name.
 // Providing a corruption or bad save mitigation tactic.
