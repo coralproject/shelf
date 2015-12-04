@@ -146,7 +146,7 @@ func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set,
 		q := bson.M{"name": name}
 		qu := bson.M{"sets": bson.M{"$slice": -1}}
 
-		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(qu))
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.findOne(%s,%s)", c.Name, mongo.Query(q), mongo.Query(qu))
 		return c.Find(q).Select(qu).One(&qs)
 	}
 
