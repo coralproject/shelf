@@ -91,6 +91,11 @@ func TestUpsertCreateQuery(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
+			if err := query.UpsertHistory(context, db, qs1); err != nil {
+				t.Fatalf("\t%s\tShould be able to add query set into history : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add query set into history : %s", tests.Success, err)
+
 			qs2, err := query.GetSetByName(context, db, qs1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)

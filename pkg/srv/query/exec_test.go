@@ -41,8 +41,8 @@ func TestQueryExecution(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			_, err := query.ExecuteQuerySet(context, db, name)
-			if err != nil {
+			res := query.ExecuteSet(context, db, qs1, nil)
+			if res.Error {
 				t.Fatalf("\t%s\tShould be able to execute query: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to execute query", tests.Success)
