@@ -33,7 +33,17 @@ func removeSets(db *db.DB) error {
 		return err
 	}
 
-	if err := db.ExecuteMGO(context, "query_sets", f); err != nil {
+	if err := db.ExecuteMGO(context, query.Collection, f); err != nil {
+		return err
+	}
+
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(context, query.CollectionHistory, f); err != nil {
 		return err
 	}
 
@@ -252,9 +262,9 @@ func TestGetSetNames(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the query set names", tests.Success)
 
 			if len(names) != 2 {
-				t.Fatalf("\t%s\tShould have two query sets : %s", tests.Failed, names)
+				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, len(names))
 			}
-			t.Logf("\t%s\tShould have atleast one query record name: %s", tests.Success, names)
+			t.Logf("\t%s\tShould have two query sets.", tests.Success)
 
 			if !strings.Contains(names[0], qsName) || !strings.Contains(names[1], qsName) {
 				t.Errorf("\t%s\tShould have \"%s\" in the name.", tests.Failed, qsName)
