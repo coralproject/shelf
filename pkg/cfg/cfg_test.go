@@ -18,10 +18,13 @@ const failed = "\u2717"
 func TestExists(t *testing.T) {
 	t.Log("Given the need to read environment variables.")
 	{
+		uStr := "postgres://root:root@127.0.0.1:8080/postgres?sslmode=disable"
+
 		os.Setenv("MYAPP_PROC_ID", "322")
 		os.Setenv("MYAPP_SOCKET", "./tmp/sockets.po")
 		os.Setenv("MYAPP_PORT", "4034")
 		os.Setenv("MYAPP_FLAG", "true")
+		os.Setenv("MYAPP_DSN", uStr)
 
 		cfg.Init("MYAPP")
 
@@ -82,6 +85,20 @@ func TestExists(t *testing.T) {
 					t.Logf("\t\t%s Should have key %q with value %v", succeed, "FLAG", true)
 				}
 			}
+
+			u, err := cfg.URL("DSN")
+
+			if err != nil {
+				t.Errorf("\t\t%s Should not return error when valid key %q", failed, "DSN")
+			} else {
+				t.Logf("\t\t%s Should not return error when valid key %q", succeed, "DSN")
+
+				if u.String() != uStr {
+					t.Errorf("\t\t%s Should have key %q with value %v", failed, "DSN", true)
+				} else {
+					t.Logf("\t\t%s Should have key %q with value %v", succeed, "DSN", true)
+				}
+			}
 		}
 	}
 }
@@ -115,6 +132,10 @@ func TestNotExists(t *testing.T) {
 
 			shouldPanic(t, "ACTIVE", func() {
 				cfg.MustBool("ACTIVE")
+			})
+
+			shouldPanic(t, "SOCKET_DSN", func() {
+				cfg.MustURL("SOCKET_DSN")
 			})
 		}
 	}

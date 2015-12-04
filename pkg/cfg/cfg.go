@@ -3,6 +3,7 @@ package cfg
 import (
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"strconv"
 	"strings"
@@ -194,4 +195,42 @@ func MustBool(key string) bool {
 	}
 
 	return val
+}
+
+// URL returns the value of the giving key as a URL, else it will return an
+// error, if the key was not found or the value can't be convered to a URL.
+func URL(key string) (*url.URL, error) {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	value, found := c.m[key]
+	if !found {
+		return nil, fmt.Errorf("Unknown Key %s !", key)
+	}
+
+	u, err := url.Parse(value)
+	if err != nil {
+		return u, err
+	}
+
+	return u, nil
+}
+
+// MustURL returns the value of the giving key as a URL, else it will panic
+// if the key was not found or the value can't be convered to a URL.
+func MustURL(key string) *url.URL {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	value, found := c.m[key]
+	if !found {
+		panic(fmt.Sprintf("Unknown Key %s !", key))
+	}
+
+	u, err := url.Parse(value)
+	if err != nil {
+		panic(fmt.Sprintf("Key %q value is not a URL", key))
+	}
+
+	return u
 }
