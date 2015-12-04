@@ -13,6 +13,7 @@ import (
 
 // collection contains the name of the query_sets collection.
 const collection = "query_sets"
+const collectionHistory = "query_set_history"
 
 // =============================================================================
 
@@ -118,5 +119,38 @@ func DeleteSet(context interface{}, db *db.DB, name string) error {
 
 // ExecuteSet is used to execute an existing Set document.
 func ExecuteSet(context interface{}, db *db.DB, name string) error {
+	return nil
+}
+
+// =============================================================================
+
+// UpsertHistory adds the last query record in the query collection into the
+// list of query collection for that name.
+// Providing a corruption or bad save mitigation tactic.
+// Returns an error if the query was not found in the db records or if the
+// update was not successful.
+func UpsertHistory(context interface{}, db *db.DB, qs *Set) error {
+	log.Dev(context, "upsertHistory", "Started : Name[%s]", qs.Name)
+
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": qs.Name}
+		qu := bson.M{
+			"$push": bson.M{
+				"history": qs,
+			},
+		}
+
+		log.Dev(context, "upsertHistory", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(qu))
+		_, err := c.Upsert(q, qu)
+		return err
+	}
+
+	err := db.ExecuteMGO(context, collectionHistory, f)
+	if err != nil {
+		log.Error(context, "upsertHistory", err, "Complete : Name[%s]", qs.Name)
+		return err
+	}
+
+	log.Dev(context, "upsertHistory", "Complete : Name[%s]", qs.Name)
 	return nil
 }
