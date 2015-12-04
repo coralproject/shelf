@@ -66,7 +66,7 @@ func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 		q := bson.M{"name": qs.Name}
 		qu := bson.M{
 			"$push": bson.M{
-				"history": qs,
+				"sets": qs,
 			},
 		}
 
