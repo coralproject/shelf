@@ -49,10 +49,6 @@ type Set struct {
 
 // Result contains the result of an query set execution.
 type Result struct {
-	FeedName   string      `json:"feed_name"`
-	Collection string      `json:"collection"`
-	QueryType  string      `json:"query_type"`
-	Results    interface{} `json:"results"`
-	Valid      bool        `json:"valid"`
-	Error      bool        `json:"-"`
+	Results interface{} `json:"results"`
+	Error   bool        `json:"error"`
 }

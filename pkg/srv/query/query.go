@@ -113,10 +113,3 @@ func DeleteSet(context interface{}, db *db.DB, name string) error {
 	log.Dev(context, "DeleteSet", "Completed")
 	return nil
 }
-
-// =============================================================================
-
-// ExecuteSet is used to execute an existing Set document.
-func ExecuteSet(context interface{}, db *db.DB, name string) error {
-	return nil
-}
