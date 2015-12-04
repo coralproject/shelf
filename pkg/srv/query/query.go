@@ -14,7 +14,7 @@ import (
 // collection contains the name of Mongo collections.
 const (
 	collection        = "query_sets"
-	collectionHistory = "query_set_history"
+	collectionHistory = "query_sets_history"
 )
 
 // =============================================================================
@@ -52,7 +52,7 @@ func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 				"sets": []bson.M{},
 			}
 
-			log.Dev(context, "UpsertSet", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(&qs))
+			log.Dev(context, "UpsertSet", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(&qh))
 			return c.Insert(&qh)
 		}
 
@@ -144,15 +144,10 @@ func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set,
 	var qs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).count()", c.Name, mongo.Query(q))
-		total, err := c.Find(q).Count()
-		if err != nil {
-			return err
-		}
+		qu := bson.M{"sets": bson.M{"$slice": -1}}
 
-		beforeLast := total - 1
-		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).skip(%d).one()", c.Name, mongo.Query(q), mongo.Query(beforeLast))
-		return c.Find(q).Skip(beforeLast).One(&qs)
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(qu))
+		return c.Find(q).Select(qu).One(&qs)
 	}
 
 	err := db.ExecuteMGO(context, collectionHistory, f)

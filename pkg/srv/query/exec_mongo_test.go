@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/coralproject/shelf/pkg/tests"
+	"gopkg.in/mgo.v2/bson"
 )
 
 /*
@@ -20,6 +21,7 @@ import (
 // compareBsonMaps compares two bson maps for equivalence.
 func compareBsonMaps(m1 bson.M, m2 bson.M) bool {
 
+	return false
 }
 
 //==============================================================================
@@ -32,7 +34,7 @@ func TestUmarshalMongoScript(t *testing.T) {
 
 	scripts := []struct {
 		text string
-		so   ScriptOption
+		so   *ScriptOption
 		cmp  bson.M
 	}{
 		{"{\"name\":\"bill\"}", nil, bson.M{"name": "bill"}},
@@ -50,6 +52,7 @@ func TestUmarshalMongoScript(t *testing.T) {
 				}
 				t.Logf("\t%s\tShould be able to convert without an error.", tests.Success)
 
+				_ = doc
 			}
 		}
 	}
