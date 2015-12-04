@@ -114,7 +114,11 @@ func TestUpsertCreateQuery(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			// TODO: We need a test for history.
+			_, err = query.GetLastSetHistoryByName(context, db, qs1.Name)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
 			qs2, err := query.GetSetByName(context, db, qs1.Name)
 			if err != nil {
@@ -434,6 +438,12 @@ func TestUpsertUpdateQuery(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
+
+			_, err = query.GetLastSetHistoryByName(context, db, qs1.Name)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
 			updSet, err := query.GetSetByName(context, db, qs2.Name)
 			if err != nil {
