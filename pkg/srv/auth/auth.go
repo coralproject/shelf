@@ -30,9 +30,9 @@ func CreateUser(context interface{}, db *db.DB, u *User) error {
 		return err
 	}
 
-	f := func(col *mgo.Collection) error {
-		log.Dev(context, "CreateUser", "MGO : db.%s.insert(%s)", collection, mongo.Query(&u))
-		return col.Insert(u)
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "CreateUser", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(&u))
+		return c.Insert(u)
 	}
 
 	if err := db.ExecuteMGO(context, collection, f); err != nil {
@@ -157,7 +157,7 @@ func GetUserByPublicID(context interface{}, db *db.DB, publicID string) (*User, 
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": publicID, "status": StatusActive}
-		log.Dev(context, "GetUserByPublicID", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetUserByPublicID", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
@@ -177,7 +177,7 @@ func GetUserByEmail(context interface{}, db *db.DB, email string) (*User, error)
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"email": strings.ToLower(email), "status": StatusActive}
-		log.Dev(context, "GetUserByEmail", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetUserByEmail", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
@@ -240,7 +240,7 @@ func UpdateUser(context interface{}, db *db.DB, uu UpdUser) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": uu.PublicID}
 		upd := bson.M{"$set": bson.M{"full_name": uu.FullName, "email": uu.Email, "status": uu.Status, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdateUser", "MGO : db.%s.Update(%s, %s)", collection, mongo.Query(q), mongo.Query(upd))
+		log.Dev(context, "UpdateUser", "MGO : db.%s.Update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(upd))
 		return c.Update(q, upd)
 	}
 
@@ -277,7 +277,7 @@ func UpdateUserPassword(context interface{}, db *db.DB, u *User, password string
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": u.PublicID}
 		upd := bson.M{"$set": bson.M{"password": newPassHash, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdateUserPassword", "MGO : db.%s.Update(%s, CAN'T SHOW)", collection, mongo.Query(q))
+		log.Dev(context, "UpdateUserPassword", "MGO : db.%s.Update(%s, CAN'T SHOW)", c.Name, mongo.Query(q))
 		return c.Update(q, upd)
 	}
 
@@ -303,7 +303,7 @@ func UpdateUserStatus(context interface{}, db *db.DB, publicID string, status in
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": publicID}
 		upd := bson.M{"$set": bson.M{"status": status, "modified_at": time.Now().UTC()}}
-		log.Dev(context, "UpdateUserStatus", "MGO : db.%s.Update(%s, %s)", collection, mongo.Query(q), mongo.Query(upd))
+		log.Dev(context, "UpdateUserStatus", "MGO : db.%s.Update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(upd))
 		return c.Update(q, upd)
 	}
 

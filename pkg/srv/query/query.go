@@ -11,8 +11,11 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// collection contains the name of the query_sets collection.
-const collection = "query_sets"
+// collection contains the name of Mongo collections.
+const (
+	collection        = "query_sets"
+	collectionHistory = "query_set_history"
+)
 
 // =============================================================================
 
@@ -20,14 +23,59 @@ const collection = "query_sets"
 func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 	log.Dev(context, "UpsertSet", "Started : Name[%s]", qs.Name)
 
+	// We need to know if this is a new set.
+	var new bool
+	if _, err := GetSetByName(context, db, qs.Name); err != nil {
+		if err != mgo.ErrNotFound {
+			return err
+		}
+
+		new = true
+	}
+
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
-		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", collection, mongo.Query(q), mongo.Query(&qs))
+		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(&qs))
 		_, err := c.Upsert(q, &qs)
 		return err
 	}
 
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, collectionHistory, f); err != nil {
+		log.Error(context, "UpsertSet", err, "Completed")
+		return err
+	}
+
+	if new {
+		f = func(c *mgo.Collection) error {
+			qh := bson.M{
+				"name": qs.Name,
+				"sets": []bson.M{},
+			}
+
+			log.Dev(context, "UpsertSet", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(&qs))
+			return c.Insert(&qh)
+		}
+
+		if err := db.ExecuteMGO(context, collectionHistory, f); err != nil {
+			log.Error(context, "UpsertSet", err, "Completed")
+			return err
+		}
+	}
+
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"name": qs.Name}
+		qu := bson.M{
+			"$push": bson.M{
+				"history": qs,
+			},
+		}
+
+		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(qu))
+		_, err := c.Upsert(q, qu)
+		return err
+	}
+
+	if err := db.ExecuteMGO(context, collectionHistory, f); err != nil {
 		log.Error(context, "UpsertSet", err, "Completed")
 		return err
 	}
@@ -45,7 +93,7 @@ func GetSetNames(context interface{}, db *db.DB) ([]string, error) {
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": 1}
-		log.Dev(context, "GetSetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", collection, mongo.Query(q))
+		log.Dev(context, "GetSetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(q))
 		return c.Find(nil).Select(q).Sort("name").All(&names)
 	}
 
@@ -75,7 +123,7 @@ func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	var qs Set
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "GetSetByName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetSetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&qs)
 	}
 
@@ -85,6 +133,35 @@ func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	}
 
 	log.Dev(context, "GetSetByName", "Completed : QS[%+v]", qs)
+	return &qs, nil
+}
+
+// GetLastSetHistoryByName gets the last written Set within the query_history
+// collection and returns the last one else returns a non-nil error if it fails.
+func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
+	log.Dev(context, "GetLastSetHistoryByName", "Started : Name[%s]", name)
+
+	var qs Set
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": name}
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).count()", c.Name, mongo.Query(q))
+		total, err := c.Find(q).Count()
+		if err != nil {
+			return err
+		}
+
+		beforeLast := total - 1
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).skip(%d).one()", c.Name, mongo.Query(q), mongo.Query(beforeLast))
+		return c.Find(q).Skip(beforeLast).One(&qs)
+	}
+
+	err := db.ExecuteMGO(context, collectionHistory, f)
+	if err != nil {
+		log.Error(context, "GetLastSetHistoryByName", err, "Complete : Name[%s]", name)
+		return nil, err
+	}
+
+	log.Dev(context, "GetLastSetHistoryByName", "Complete : Name[%s]", name)
 	return &qs, nil
 }
 
@@ -101,7 +178,7 @@ func DeleteSet(context interface{}, db *db.DB, name string) error {
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
-		log.Dev(context, "DeleteSet", "MGO : db.%s.remove(%s)", collection, mongo.Query(q))
+		log.Dev(context, "DeleteSet", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
 		return c.Remove(q)
 	}
 

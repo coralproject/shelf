@@ -32,9 +32,9 @@ func Create(context interface{}, db *db.DB, publicID string, expires time.Durati
 		DateCreated: time.Now(),
 	}
 
-	f := func(col *mgo.Collection) error {
-		log.Dev(context, "Create", "MGO : db.%s.insert(%s)", collection, mongo.Query(&s))
-		return col.Insert(&s)
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "Create", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(&s))
+		return c.Insert(&s)
 	}
 
 	if err := db.ExecuteMGO(context, collection, f); err != nil {
@@ -55,7 +55,7 @@ func GetBySessionID(context interface{}, db *db.DB, sessionID string) (*Session,
 	var s Session
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"session_id": sessionID}
-		log.Dev(context, "GetBySessionID", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetBySessionID", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&s)
 	}
 
@@ -75,7 +75,7 @@ func GetByLatest(context interface{}, db *db.DB, publicID string) (*Session, err
 	var s Session
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"public_id": publicID}
-		log.Dev(context, "GetByLatest", "MGO : db.%s.find(%s).sort({\"date_created\": -1}).limit(1)", collection, mongo.Query(q))
+		log.Dev(context, "GetByLatest", "MGO : db.%s.find(%s).sort({\"date_created\": -1}).limit(1)", c.Name, mongo.Query(q))
 		return c.Find(q).Sort("-date_created").One(&s)
 	}
 

@@ -127,14 +127,14 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 
 	// Build the pipeline function for the execution.
 	var results []bson.M
-	f := func(collection *mgo.Collection) error {
+	f := func(c *mgo.Collection) error {
 		var ops string
 		for _, op := range pipeline {
 			ops += mongo.Query(op) + ",\n"
 		}
 
-		log.Dev(context, "executePipeline", "MGO : db.%s.aggregate([\n%s])", collName, ops)
-		return collection.Pipe(pipeline).All(&results)
+		log.Dev(context, "executePipeline", "MGO : db.%s.aggregate([\n%s])", c.Name, ops)
+		return c.Pipe(pipeline).All(&results)
 	}
 
 	// Execute the pipeline.

@@ -23,16 +23,14 @@
                         "unique" : true,
                         "fields" : [{"name" : "public_id", "type":1}]
                     },
-                    {   "name" : "search",
-                        "unique" : false,
-                        "fields" : [
-                        	{"name" : "email", "other":"text"}
-                        ]
+                    {   "name" : "email",
+                        "unique" : true,
+                        "fields" : [{"name" : "email", "type":1}]
                     }
                 ]
         },
         {
-            "name": "rule_sets",
+            "name": "query_sets",
             "indexes":
                 [
                     {   "name" : "name",
