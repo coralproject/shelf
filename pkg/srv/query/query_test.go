@@ -313,11 +313,18 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
+			qs1.Description = "Next Version"
+
+			if err := query.UpsertSet(context, db, qs1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
+
 			qs2, err := query.GetLastSetHistoryByName(context, db, qsName)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to retrieve a query set record from history : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve the last query set from history : %s", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to retrieve a query set record from history", tests.Success)
+			t.Logf("\t%s\tShould be able to retrieve the last query set from history.", tests.Success)
 
 			if qs1.Name != qs2.Name {
 				t.Logf("\t%+v", qs1.Name)
@@ -327,7 +334,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 				t.Logf("\t%s\tShould be able to get back the same Name value.", tests.Success)
 			}
 
-			if qs1.Enabled == qs2.Enabled {
+			if qs1.Enabled != qs2.Enabled {
 				t.Logf("\t%+v", qs1.Enabled)
 				t.Logf("\t%+v", qs2.Enabled)
 				t.Errorf("\t%s\tShould be able to get back the same Enabled value.", tests.Failed)
@@ -335,15 +342,15 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 				t.Logf("\t%s\tShould be able to get back the same Enabled value.", tests.Success)
 			}
 
-			if qs1.Description != qs2.Description {
-				t.Logf("\t%+v", qs1.Description)
+			if qs2.Description != "Next Version" {
 				t.Logf("\t%+v", qs2.Description)
+				t.Logf("\tNext Version")
 				t.Errorf("\t%s\tShould be able to get back the same Description value.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same Description value.", tests.Success)
 			}
 
-			if len(qs1.Params) == len(qs2.Params) {
+			if len(qs1.Params) != len(qs2.Params) {
 				t.Logf("\t%+v", qs1.Params)
 				t.Logf("\t%+v", qs2.Params)
 				t.Errorf("\t%s\tShould be able to get back the same number of Param values.", tests.Failed)
@@ -351,7 +358,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 				t.Logf("\t%s\tShould be able to get back the same number of Param values.", tests.Success)
 			}
 
-			if len(qs1.Queries) == len(qs2.Queries) {
+			if len(qs1.Queries) != len(qs2.Queries) {
 				t.Logf("\t%+v", qs1.Queries)
 				t.Logf("\t%+v", qs2.Queries)
 				t.Errorf("\t%s\tShould be able to get back the same number of Query values.", tests.Failed)
@@ -585,6 +592,10 @@ func TestAPIFailure(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
 
+			if _, err := query.GetLastSetHistoryByName(context, nil, qsName); err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 		}
 	}
 }

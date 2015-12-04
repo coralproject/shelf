@@ -1,6 +1,7 @@
 package query
 
 import (
+	"errors"
 	"strings"
 
 	"github.com/coralproject/shelf/pkg/db"
@@ -34,6 +35,7 @@ func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 		new = true
 	}
 
+	// Insert or update the query set.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
 		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(qs))
@@ -46,6 +48,7 @@ func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 		return err
 	}
 
+	// Add a history record if this query set is new.
 	if new {
 		f = func(c *mgo.Collection) error {
 			qh := bson.M{
@@ -63,15 +66,19 @@ func UpsertSet(context interface{}, db *db.DB, qs *Set) error {
 		}
 	}
 
+	// Add this query set to the beginning of the history.
 	f = func(c *mgo.Collection) error {
 		q := bson.M{"name": qs.Name}
 		qu := bson.M{
 			"$push": bson.M{
-				"sets": qs,
+				"sets": bson.M{
+					"$each":     []*Set{qs},
+					"$position": 0,
+				},
 			},
 		}
 
-		log.Dev(context, "UpsertSet", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(qu))
+		log.Dev(context, "UpsertSet", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(qu))
 		_, err := c.Upsert(q, qu)
 		return err
 	}
@@ -133,7 +140,7 @@ func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 		return nil, err
 	}
 
-	log.Dev(context, "GetSetByName", "Completed : QS[%+v]", qs)
+	log.Dev(context, "GetSetByName", "Completed : QS[%+v]", &qs)
 	return &qs, nil
 }
 
@@ -142,28 +149,33 @@ func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "GetLastSetHistoryByName", "Started : Name[%s]", name)
 
-	var qs Set
+	var result struct {
+		Name string `bson:"name"`
+		Sets []Set  `bson:"sets"`
+	}
+
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).count()", c.Name, mongo.Query(q))
-		total, err := c.Find(q).Count()
-		if err != nil {
-			return err
-		}
+		proj := bson.M{"sets": bson.M{"$slice": 1}}
 
-		beforeLast := total - 1
-		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s).skip(%d).one()", c.Name, mongo.Query(q), mongo.Query(beforeLast))
-		return c.Find(q).Skip(beforeLast).One(&qs)
+		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
+		return c.Find(q).Select(proj).One(&result)
 	}
 
 	err := db.ExecuteMGO(context, CollectionHistory, f)
 	if err != nil {
-		log.Error(context, "GetLastSetHistoryByName", err, "Complete : Name[%s]", name)
+		log.Error(context, "GetLastSetHistoryByName", err, "Complete")
 		return nil, err
 	}
 
-	log.Dev(context, "GetLastSetHistoryByName", "Complete : Name[%s]", name)
-	return &qs, nil
+	if result.Sets == nil {
+		err := errors.New("History not found")
+		log.Error(context, "GetLastSetHistoryByName", err, "Complete")
+		return nil, err
+	}
+
+	log.Dev(context, "GetLastSetHistoryByName", "Completed : QS[%+v]", &result.Sets[0])
+	return &result.Sets[0], nil
 }
 
 // =============================================================================
