@@ -572,30 +572,25 @@ func TestAPIFailure(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			if err := query.UpsertSet(context, nil, qs1); err == nil {
-				t.Fatalf("\t%s\tShould be refused update by api with bad session", tests.Failed)
+			if _, err := query.GetSetNames(context, nil); err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
-			t.Logf("\t%s\tShould be refused update by api with bad session: %s", tests.Success, err)
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
 			if _, err := query.GetSetByName(context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetSetNames(context, nil); err == nil {
-				t.Fatalf("\t%s\tShould be refused names request by api with bad session", tests.Failed)
+			if _, err := query.GetLastSetHistoryByName(context, nil, qsName); err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
-			t.Logf("\t%s\tShould be refused names request by api with bad session: %s", tests.Success, err)
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
 			if err := query.DeleteSet(context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
-
-			if _, err := query.GetLastSetHistoryByName(context, nil, qsName); err == nil {
-				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 		}
 	}
 }
