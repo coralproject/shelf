@@ -26,10 +26,17 @@ func CreateComment(context interface{}, db *db.DB, com *Comment) error {
 	com.DateCreated = time.Now()
 	com.Status = "New"
 
-	// Write the user to mongo
-	if err := mongo.GetCollection(db.MGOConn, collection).Insert(com); err != nil {
+	f := func(col *mgo.Collection) error {
+		log.Dev(context, "CreateComment", "MGO: db.%s.insert()", collection)
+		return col.Insert(com)
+	}
+
+	if err := db.ExecuteMGO(context, collection, f); err != nil {
+		log.Error(context, "CreateComment", err, "Completed")
 		return err
 	}
+
+	log.Dev(context, "CreateComment", "Completed")
 
 	return nil
 }
@@ -53,6 +60,8 @@ func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
 	log.Dev(context, "GetCommentById", "Completed")
 	return &user, nil
 }
+
+//==============================================================================
 
 // GetUserByID retrieves an individual user by ID
 func GetUserByID(context interface{}, db *db.DB, id string) (*User, error) {

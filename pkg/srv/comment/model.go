@@ -43,6 +43,7 @@ type Note struct {
 // Comment denotes a comment by a user in the system.
 type Comment struct {
 	CommentID    string                 `json:"comment_id" bson:"comment_id"`
+	UserId       string                 `json:"user_id" bson:"user_id" validate:"required"`
 	ParentID     string                 `json:"parent_id" bson:"parent_d"`
 	AssetID      string                 `json:"asset_id" bson:"asset_id"`
 	Children     []string               `json:"children" bson:"children"` // experimental
