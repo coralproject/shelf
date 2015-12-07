@@ -38,6 +38,54 @@
                         "fields" : [{"name" : "name", "type":1}]
                     }
                 ]
+        },
+        {
+            "name": "users",
+            "indexes": 
+                [
+                    {
+                        "name" : "email",
+                        "unique" : true,
+                        "fields" : [{"name": "email", "type":1}] 
+                    },
+                    {
+                        "name" : "user_name",
+                        "unique" : true,
+                        "fields" : [{"name": "user_name", "type":1}] 
+                    }
+                ]
+        },
+        {
+            "name": "comments",
+            "indexes": 
+                [
+                    {
+                        "name" : "user",
+                        "unique" : false,
+                        "fields" : [{"name": "user_id", "type":-1}] 
+                    }
+                ]
+        },
+        {
+            "name": "actions",
+            "indexes": 
+                [
+                    {
+                        "name" : "user",
+                        "unique" : false,
+                        "fields" : [{"name": "user_id", "type":-1}] 
+                    },
+                    {
+                        "name" : "comment",
+                        "unique" : false,
+                        "fields" : [{"name": "comment_id", "type":-1}] 
+                    },
+                    {
+                        "name" : "type",
+                        "unique" : false,
+                        "fields" : [{"name": "type", "type":1}] 
+                    }
+                ]
         }
     ]
 }
