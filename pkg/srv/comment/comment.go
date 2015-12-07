@@ -14,7 +14,10 @@ import (
 )
 
 // collection contains the name of the comments collection.
-const collection = "comments"
+const (
+	commentCollection = "comments"
+	userCollection    = "users"
+)
 
 //==============================================================================
 
@@ -27,11 +30,11 @@ func CreateComment(context interface{}, db *db.DB, com *Comment) error {
 	com.Status = "New"
 
 	f := func(col *mgo.Collection) error {
-		log.Dev(context, "CreateComment", "MGO: db.%s.insert()", collection)
+		log.Dev(context, "CreateComment", "MGO: db.%s.insert()", commentCollection)
 		return col.Insert(com)
 	}
 
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, commentCollection, f); err != nil {
 		log.Error(context, "CreateComment", err, "Completed")
 		return err
 	}
@@ -48,11 +51,11 @@ func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"_id": id}
-		log.Dev(context, "GetCommentById", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetCommentById", "MGO : db.%s.findOne(%s)", commentCollection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, commentCollection, f); err != nil {
 		log.Error(context, "GetUserById", err, "Completed")
 		return nil, err
 	}
@@ -70,11 +73,11 @@ func GetUserByID(context interface{}, db *db.DB, id string) (*User, error) {
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"_id": id}
-		log.Dev(context, "GetUserById", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetUserById", "MGO : db.%s.findOne(%s)", userCollection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, userCollection, f); err != nil {
 		log.Error(context, "GetUserById", err, "Completed")
 		return nil, err
 	}
@@ -92,11 +95,11 @@ func GetUserByUserName(context interface{}, db *db.DB, userName string) (*User, 
 	var user User
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"user_name": userName}
-		log.Dev(context, "GetUserByUserName", "MGO : db.%s.findOne(%s)", collection, mongo.Query(q))
+		log.Dev(context, "GetUserByUserName", "MGO : db.%s.findOne(%s)", userCollection, mongo.Query(q))
 		return c.Find(q).One(&user)
 	}
 
-	if err := db.ExecuteMGO(context, collection, f); err != nil {
+	if err := db.ExecuteMGO(context, userCollection, f); err != nil {
 		log.Error(context, "GetUserByUserName", err, "Completed")
 		return nil, err
 	}
@@ -106,31 +109,43 @@ func GetUserByUserName(context interface{}, db *db.DB, userName string) (*User, 
 }
 
 // CreateUser creates a new user resource
-func CreateUser(context interface{}, db *db.DB, user User) (*User, error) {
+func CreateUser(context interface{}, db *db.DB, user *User) error {
 	log.Dev(context, "CreateUser", "Started : User: ", user)
 
+	/* This error condition should be performed by DB indexes
 	dbUser, err := GetUserByUserName(context, db, user.UserName)
 	if dbUser != nil {
 		log.Error(context, "CreateUser", err, "User exists")
-		return dbUser, nil
+		return "CreateUser: user with same UserName already exists"
 	}
+	*/
 
+	// set defaults, may want to move this to a factory method on the User struct
 	if user.UserID == "" {
 		user.UserID = uuid.New()
 	}
 	user.MemberSince = time.Now()
 
+	f := func(col *mgo.Collection) error {
+		log.Dev(context, "CreateUser", "MGO: db.%s.insert()", userCollection)
+		return col.Insert(user)
+	}
+
 	// Write the user to mongo
-	err1 := mongo.GetCollection(db.MGOConn, collection).Insert(user)
-	if err1 != nil {
-		return nil, err1
+	if err := db.ExecuteMGO(context, userCollection, f); err != nil {
+		log.Error(context, "CreateUser", err, "Completed")
+		return err
 	}
 
 	log.Dev(context, "CreateUser", "Completed")
-	return &user, nil
+	return nil
 }
 
-// AddUsers adds an array of users to user collection
+/*
+
+Todo: bulk methods should call individual inserts in a loop
+
+// AddUsers adds an array of users to user collectionollection
 func AddUsers(context interface{}, db *db.DB, users []User) error {
 	return mongo.GetCollection(db.MGOConn, collection).Insert(users)
 }
@@ -139,3 +154,4 @@ func AddUsers(context interface{}, db *db.DB, users []User) error {
 func AddComments(context interface{}, db *db.DB, comments []Comment) error {
 	return mongo.GetCollection(db.MGOConn, collection).Insert(comments)
 }
+*/

@@ -105,8 +105,8 @@ type User struct {
 	Avatar      string                 `json:"avatar" bson:"avatar" validate:"omitempty,url"`
 	LastLogin   time.Time              `json:"last_login" bson:"last_login"`
 	MemberSince time.Time              `json:"member_since" bson:"member_since"`
-	ActionsBy   []Action               `json:"actions" bson:"actions"`
-	ActionsOn   []Action               `json:"actions" bson:"actions"`
+	ActionsBy   []Action               `json:"actions_by" bson:"actions_by"`
+	ActionsOn   []Action               `json:"actions_on" bson:"actions_on"`
 	Notes       []Note                 `json:"notes" bson:"notes"`
 	Stats       map[string]interface{} `json:"stats" bson:"stats"`
 	Source      map[string]interface{} `json:"source" bson:"source"` // source document if imported
