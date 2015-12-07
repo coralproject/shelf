@@ -11,6 +11,7 @@ import (
 
 	"github.com/coralproject/shelf/app/xenia/routes"
 	"github.com/coralproject/shelf/pkg/cfg"
+
 	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 )
