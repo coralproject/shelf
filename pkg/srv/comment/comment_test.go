@@ -19,6 +19,40 @@ func init() {
 }
 
 //==============================================================================
+//=====  The Script
+//==============================================================================
+/*
+
+User
+====
+Test user validation rules
+Test create user
+Test duplicate user rules
+
+Comment
+=======
+Test validation rules
+Test require user to exist
+Test create
+
+Action
+======
+Test validation
+Test require user
+Test require comment
+
+Integration / stats
+===================
+Create user u1
+Create user u2
+
+Check for zero comment count
+Create comment
+Check for comment count = 1
+
+*/
+
+//==============================================================================
 //=====  User tests
 //==============================================================================
 
@@ -65,6 +99,11 @@ func TestCreateUser(t *testing.T) {
 
 	// set ID for the deferred removeUser method
 	ID = u1.UserID
+
+	if err := comment.CreateUser(context, db, &u1); err == nil {
+		t.Fatalf("\t%s\tShould not be able to create a duplicate user", tests.Failed)
+	}
+	t.Logf("\t%s\tShould not be able to create a duplicate user", tests.Success)
 
 }
 
