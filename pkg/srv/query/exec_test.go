@@ -94,8 +94,8 @@ func TestExecuteSet(t *testing.T) {
 
 		defer dropTestData()
 
-		for i, es := range execSet {
-			t.Logf("\tWhen using Execute Set %d", i)
+		for _, es := range execSet {
+			t.Logf("\tWhen using Execute Set %s", es.name)
 			{
 				result := query.ExecuteSet(tests.Context, db, es.set, es.vars)
 				if result.Error {
@@ -119,6 +119,8 @@ func TestExecuteSet(t *testing.T) {
 				t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
 
 				if string(data) != es.result {
+					t.Log(string(data))
+					t.Log(es.result)
 					t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
 					continue
 				}
@@ -132,6 +134,7 @@ func TestExecuteSet(t *testing.T) {
 
 // execSet represents the table for the table test of execution tests.
 type execSet struct {
+	name   string
 	set    *query.Set
 	vars   map[string]string
 	result string
@@ -146,14 +149,15 @@ type docs struct {
 
 // getExecSet returns the table for the testing.
 func getExecSet() []execSet {
-	sets := make([]execSet, 1)
-	sets[0].set, sets[0].result = querySetBasic()
+	sets := make([]execSet, 2)
+	sets[0].name, sets[0].set, sets[0].result = querySetBasic()
+	sets[1].name, sets[1].set, sets[1].result = querySetWithTime()
 
 	return sets
 }
 
 // querySetBasic starts with a simple query set.
-func querySetBasic() (*query.Set, string) {
+func querySetBasic() (string, *query.Set, string) {
 	set := query.Set{
 		Name:    "test",
 		Enabled: true,
@@ -164,7 +168,7 @@ func querySetBasic() (*query.Set, string) {
 				Collection: "test_query",
 				Return:     true,
 				Scripts: []string{
-					`{"$match" : {"station_id" : "42021"}}`,
+					`{"$match": {"station_id" : "42021"}}`,
 					`{"$project": {"_id": 0, "name": 1}}`,
 				},
 			},
@@ -173,7 +177,33 @@ func querySetBasic() (*query.Set, string) {
 
 	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
 
-	return &set, result
+	return "querySetBasic", &set, result
+}
+
+// querySetWithTime creates a simple query set using time.
+func querySetWithTime() (string, *query.Set, string) {
+	set := query.Set{
+		Name:    "test",
+		Enabled: true,
+		Queries: []query.Query{
+			{
+				Name:       "Q1",
+				Type:       "pipeline",
+				Collection: "test_query",
+				Return:     true,
+				HasDate:    true,
+				Scripts: []string{
+					`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
+					`{"$project": {"_id": 0, "name": 1}}`,
+					`{"$limit": 2}`,
+				},
+			},
+		},
+	}
+
+	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`
+
+	return "querySetWithTime", &set, result
 }
 
 //==============================================================================
