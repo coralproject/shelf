@@ -149,9 +149,10 @@ type docs struct {
 
 // getExecSet returns the table for the testing.
 func getExecSet() []execSet {
-	sets := make([]execSet, 2)
+	sets := make([]execSet, 3)
 	sets[0].name, sets[0].set, sets[0].result = querySetBasic()
 	sets[1].name, sets[1].set, sets[1].result = querySetWithTime()
+	sets[2].name, sets[2].set, sets[2].result = querySetWithMultiResults()
 
 	return sets
 }
@@ -204,6 +205,42 @@ func querySetWithTime() (string, *query.Set, string) {
 	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`
 
 	return "querySetWithTime", &set, result
+}
+
+// querySetWithMultiResults creates a simple query set using time.
+func querySetWithMultiResults() (string, *query.Set, string) {
+	set := query.Set{
+		Name:    "test",
+		Enabled: true,
+		Queries: []query.Query{
+			{
+				Name:       "Q1",
+				Type:       "pipeline",
+				Collection: "test_query",
+				Return:     true,
+				Scripts: []string{
+					`{"$match": {"station_id" : "42021"}}`,
+					`{"$project": {"_id": 0, "name": 1}}`,
+				},
+			},
+			{
+				Name:       "Q1",
+				Type:       "pipeline",
+				Collection: "test_query",
+				Return:     true,
+				HasDate:    true,
+				Scripts: []string{
+					`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
+					`{"$project": {"_id": 0, "name": 1}}`,
+					`{"$limit": 2}`,
+				},
+			},
+		},
+	}
+
+	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`
+
+	return "querySetWithMultiResults", &set, result
 }
 
 //==============================================================================
