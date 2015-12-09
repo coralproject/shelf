@@ -79,52 +79,108 @@ func TestExecuteSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	err := generateTestData()
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
+	execSet := getExecSet()
+
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	t.Logf("Given the need to execute mongo commands.")
+	{
+		err := generateTestData(db)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
+
+		defer dropTestData()
+
+		for i, es := range execSet {
+			t.Logf("\tWhen using Execute Set %d", i)
+			{
+				result := query.ExecuteSet(tests.Context, db, es.set, es.vars)
+				if result.Error {
+					t.Errorf("\t%s\tShould be able to execute the query set : %+v", tests.Failed, result.Results)
+					continue
+				}
+				t.Logf("\t%s\tShould be able to execute the query set.", tests.Success)
+
+				data, err := json.Marshal(result)
+				if err != nil {
+					t.Errorf("\t%s\tShould be able to marshal the result : %s", tests.Failed, err)
+					continue
+				}
+				t.Logf("\t%s\tShould be able to marshal the result.", tests.Success)
+
+				var res query.Result
+				if err := json.Unmarshal(data, &res); err != nil {
+					t.Errorf("\t%s\tShould be able to unmarshal the result : %s", tests.Failed, err)
+					continue
+				}
+				t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
+
+				if string(data) != es.result {
+					t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
+					continue
+				}
+				t.Logf("\t%s\tShould have the correct result", tests.Success)
+			}
+		}
 	}
-	t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
+}
 
-	defer dropTestData()
+//==============================================================================
 
-	// sets := []struct {
-	// 	set *query.Set
-	// 	cmp []docs
-	// }{
-	// 	{querySetBasic(), nil},
-	// }
+// execSet represents the table for the table test of execution tests.
+type execSet struct {
+	set    *query.Set
+	vars   map[string]string
+	result string
 }
 
 // docs represents what a user will receive after
 // excuting a successful set.
 type docs struct {
-	name string
-	docs []bson.M
+	Name string
+	Docs []bson.M
+}
+
+// getExecSet returns the table for the testing.
+func getExecSet() []execSet {
+	sets := make([]execSet, 1)
+	sets[0].set, sets[0].result = querySetBasic()
+
+	return sets
 }
 
 // querySetBasic starts with a simple query set.
-func querySetBasic() *query.Set {
-	return &query.Set{
+func querySetBasic() (*query.Set, string) {
+	set := query.Set{
 		Name:    "test",
 		Enabled: true,
 		Queries: []query.Query{
 			{
 				Name:       "Q1",
-				Type:       query.TypePipeline,
-				Collection: "auth_users",
+				Type:       "pipeline",
+				Collection: "test_query",
+				Return:     true,
+				Scripts: []string{
+					`{"$match" : {"station_id" : "42021"}}`,
+					`{"$project": {"_id": 0, "name": 1}}`,
+				},
 			},
 		},
 	}
+
+	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+
+	return &set, result
 }
 
 //==============================================================================
 
 // generateTestData creates a temp collection with data
 // that can be used for testing things.
-func generateTestData() error {
-	db := db.NewMGO()
-	defer db.CloseMGO()
-
+func generateTestData(db *db.DB) error {
 	file, err := os.Open("exec_test_data.json")
 	if err != nil {
 		return err

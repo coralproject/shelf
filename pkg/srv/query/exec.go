@@ -19,8 +19,8 @@ import (
 // docs represents what a user will receive after
 // excuting a successful set.
 type docs struct {
-	name string
-	docs []bson.M
+	Name string
+	Docs []bson.M
 }
 
 // emptyResult is for returning empty runs.
@@ -107,7 +107,7 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 	// Save the final results to be returned.
 	r.Results = results
 
-	log.Dev(context, "executePipeline", "Completed : \n%s\n", mongo.Query(results))
+	log.Dev(context, "ExecuteSet", "Completed : \n%s\n", mongo.Query(results))
 	return &r
 }
 
@@ -152,7 +152,7 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 			ops += mongo.Query(op) + ",\n"
 		}
 
-		log.Dev(context, "executePipeline", "MGO : db.%s.aggregate([\n%s])", c.Name, ops)
+		log.Dev(context, "executePipeline", "MGO :\ndb.%s.aggregate([\n%s])", c.Name, ops)
 		return c.Pipe(pipeline).All(&results)
 	}
 
