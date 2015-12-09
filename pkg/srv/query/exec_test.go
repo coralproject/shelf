@@ -95,14 +95,22 @@ func TestExecuteSet(t *testing.T) {
 		defer dropTestData()
 
 		for _, es := range execSet {
-			t.Logf("\tWhen using Execute Set %s", es.name)
+			t.Logf("\tWhen using Execute Set %s", es.set.Name)
 			{
 				result := query.ExecuteSet(tests.Context, db, es.set, es.vars)
-				if result.Error {
-					t.Errorf("\t%s\tShould be able to execute the query set : %+v", tests.Failed, result.Results)
-					continue
+				if !es.fail {
+					if result.Error {
+						t.Errorf("\t%s\tShould be able to execute the query set : %+v", tests.Failed, result.Results)
+						continue
+					}
+					t.Logf("\t%s\tShould be able to execute the query set.", tests.Success)
+				} else {
+					if !result.Error {
+						t.Errorf("\t%s\tShould Not be able to execute the query set : %+v", tests.Failed, result.Results)
+						continue
+					}
+					t.Logf("\t%s\tShould Not be able to execute the query set.", tests.Success)
 				}
-				t.Logf("\t%s\tShould be able to execute the query set.", tests.Success)
 
 				data, err := json.Marshal(result)
 				if err != nil {
@@ -134,7 +142,7 @@ func TestExecuteSet(t *testing.T) {
 
 // execSet represents the table for the table test of execution tests.
 type execSet struct {
-	name   string
+	fail   bool
 	set    *query.Set
 	vars   map[string]string
 	result string
@@ -149,98 +157,122 @@ type docs struct {
 
 // getExecSet returns the table for the testing.
 func getExecSet() []execSet {
-	sets := make([]execSet, 3)
-	sets[0].name, sets[0].set, sets[0].result = querySetBasic()
-	sets[1].name, sets[1].set, sets[1].result = querySetWithTime()
-	sets[2].name, sets[2].set, sets[2].result = querySetWithMultiResults()
-
-	return sets
+	return []execSet{
+		querySetBasic(),
+		querySetWithTime(),
+		querySetWithMultiResults(),
+		querySetNoResults(),
+	}
 }
 
 // querySetBasic starts with a simple query set.
-func querySetBasic() (string, *query.Set, string) {
-	set := query.Set{
-		Name:    "test",
-		Enabled: true,
-		Queries: []query.Query{
-			{
-				Name:       "Q1",
-				Type:       "pipeline",
-				Collection: "test_query",
-				Return:     true,
-				Scripts: []string{
-					`{"$match": {"station_id" : "42021"}}`,
-					`{"$project": {"_id": 0, "name": 1}}`,
+func querySetBasic() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Basic",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Basic",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "42021"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
 				},
 			},
 		},
+		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
 	}
-
-	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
-
-	return "querySetBasic", &set, result
 }
 
 // querySetWithTime creates a simple query set using time.
-func querySetWithTime() (string, *query.Set, string) {
-	set := query.Set{
-		Name:    "test",
-		Enabled: true,
-		Queries: []query.Query{
-			{
-				Name:       "Q1",
-				Type:       "pipeline",
-				Collection: "test_query",
-				Return:     true,
-				HasDate:    true,
-				Scripts: []string{
-					`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
-					`{"$project": {"_id": 0, "name": 1}}`,
-					`{"$limit": 2}`,
+func querySetWithTime() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Time",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Time",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					HasDate:    true,
+					Scripts: []string{
+						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+						`{"$limit": 2}`,
+					},
 				},
 			},
 		},
+		result: `{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
 	}
-
-	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`
-
-	return "querySetWithTime", &set, result
 }
 
 // querySetWithMultiResults creates a simple query set using time.
-func querySetWithMultiResults() (string, *query.Set, string) {
-	set := query.Set{
-		Name:    "test",
-		Enabled: true,
-		Queries: []query.Query{
-			{
-				Name:       "Q1",
-				Type:       "pipeline",
-				Collection: "test_query",
-				Return:     true,
-				Scripts: []string{
-					`{"$match": {"station_id" : "42021"}}`,
-					`{"$project": {"_id": 0, "name": 1}}`,
+func querySetWithMultiResults() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "MultiResults",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Basic",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "42021"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
 				},
-			},
-			{
-				Name:       "Q1",
-				Type:       "pipeline",
-				Collection: "test_query",
-				Return:     true,
-				HasDate:    true,
-				Scripts: []string{
-					`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
-					`{"$project": {"_id": 0, "name": 1}}`,
-					`{"$limit": 2}`,
+				{
+					Name:       "Time",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					HasDate:    true,
+					Scripts: []string{
+						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+						`{"$limit": 2}`,
+					},
 				},
 			},
 		},
+		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
 	}
+}
 
-	result := `{"results":[{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Q1","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`
-
-	return "querySetWithMultiResults", &set, result
+// querySetNoResults starts with a simple query set with no results.
+func querySetNoResults() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "NoResults",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "NoResults",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "XXXXXX"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
+				},
+			},
+		},
+		result: `{"results":{"error":"No result"},"error":true}`,
+	}
 }
 
 //==============================================================================
