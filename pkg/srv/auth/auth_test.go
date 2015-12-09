@@ -14,36 +14,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var context = "testing"
-
 func init() {
-	tests.Init()
-}
-
-//==============================================================================
-
-// removeUser is used to clear out all the test user from the collection.
-func removeUser(db *db.DB, publicID string) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
-		return c.Remove(q)
-	}
-
-	if err := db.ExecuteMGO(context, "auth_users", f); err != nil {
-		return err
-	}
-
-	f = func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(context, "sessions", f); err != nil {
-		return err
-	}
-
-	return nil
+	tests.InitMGO()
 }
 
 //==============================================================================
@@ -139,7 +111,7 @@ func TestCreateUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -147,7 +119,7 @@ func TestCreateUser(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			u2, err := auth.GetUserByPublicID(context, db, u1.PublicID)
+			u2, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
@@ -170,7 +142,7 @@ func TestCreateUser(t *testing.T) {
 				t.Logf("\t%s\tShould be able to get back the same user.", tests.Success)
 			}
 
-			u3, err := auth.GetUserByEmail(context, db, u1.Email)
+			u3, err := auth.GetUserByEmail(tests.Context, db, u1.Email)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by Email : %v", tests.Failed, err)
 			}
@@ -226,7 +198,7 @@ func TestCreateUserTwice(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -234,7 +206,7 @@ func TestCreateUserTwice(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			if err := auth.CreateUser(context, db, u1); err == nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to create a user", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
@@ -271,7 +243,7 @@ func TestCreateUserValidation(t *testing.T) {
 
 			u.Status = 0
 
-			if err := auth.CreateUser(context, db, u); err == nil {
+			if err := auth.CreateUser(tests.Context, db, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Status", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Status.", tests.Success)
@@ -286,7 +258,7 @@ func TestCreateUserValidation(t *testing.T) {
 
 			u.FullName = "1234567"
 
-			if err := auth.CreateUser(context, db, u); err == nil {
+			if err := auth.CreateUser(tests.Context, db, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid FullName", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid FullName.", tests.Success)
@@ -301,7 +273,7 @@ func TestCreateUserValidation(t *testing.T) {
 
 			u.Email = "bill"
 
-			if err := auth.CreateUser(context, db, u); err == nil {
+			if err := auth.CreateUser(tests.Context, db, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Email", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Email.", tests.Success)
@@ -316,7 +288,7 @@ func TestCreateUserValidation(t *testing.T) {
 
 			u.Password = "1234567"
 
-			if err := auth.CreateUser(context, db, u); err == nil {
+			if err := auth.CreateUser(tests.Context, db, u); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user with invalid Password", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user with invalid Password.", tests.Success)
@@ -356,7 +328,7 @@ func TestUpdateUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -371,12 +343,12 @@ func TestUpdateUser(t *testing.T) {
 				Email:    "upt@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err != nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a user.", tests.Success)
 
-			u2, err := auth.GetUserByPublicID(context, db, u1.PublicID)
+			u2, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
@@ -434,7 +406,7 @@ func TestUpdateUserValidation(t *testing.T) {
 				Email:    "bill@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err == nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with invalid PublicID", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with invalid PublicID.", tests.Success)
@@ -447,7 +419,7 @@ func TestUpdateUserValidation(t *testing.T) {
 				Email:    "bill@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err == nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with invalid Status", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with invalid Status.", tests.Success)
@@ -460,7 +432,7 @@ func TestUpdateUserValidation(t *testing.T) {
 				Email:    "bill@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err == nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with invalid FullName", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with invalid FullName.", tests.Success)
@@ -473,7 +445,7 @@ func TestUpdateUserValidation(t *testing.T) {
 				Email:    "ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err == nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with invalid Email", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with invalid Email.", tests.Success)
@@ -520,7 +492,7 @@ func TestUpdateUserPassword(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -528,29 +500,29 @@ func TestUpdateUserPassword(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			webTok, err := auth.CreateWebToken(context, db, u1, 5*time.Second)
+			webTok, err := auth.CreateWebToken(tests.Context, db, u1, 5*time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
 
-			if err := auth.UpdateUserPassword(context, db, u1, "_Password567"); err != nil {
+			if err := auth.UpdateUserPassword(tests.Context, db, u1, "_Password567"); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a user.", tests.Success)
 
-			if _, err := auth.ValidateWebToken(context, db, webTok); err == nil {
+			if _, err := auth.ValidateWebToken(tests.Context, db, webTok); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to validate the org web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould Not be able to validate the new org token.", tests.Success)
 
-			u2, err := auth.GetUserByPublicID(context, db, u1.PublicID)
+			u2, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
 
-			webTok2, err := auth.CreateWebToken(context, db, u2, 5*time.Second)
+			webTok2, err := auth.CreateWebToken(tests.Context, db, u2, 5*time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a new web token : %v", tests.Failed, err)
 			}
@@ -561,7 +533,7 @@ func TestUpdateUserPassword(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould have different web tokens after the update.", tests.Success)
 
-			u3, err := auth.ValidateWebToken(context, db, webTok2)
+			u3, err := auth.ValidateWebToken(tests.Context, db, webTok2)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to validate the new web token : %v", tests.Failed, err)
 			}
@@ -600,7 +572,7 @@ func TestUpdateInvalidUserPassword(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.UpdateUserPassword(context, db, u1, "_Pass"); err == nil {
+			if err := auth.UpdateUserPassword(tests.Context, db, u1, "_Pass"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with bad password.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with bad password.", tests.Success)
@@ -608,7 +580,7 @@ func TestUpdateInvalidUserPassword(t *testing.T) {
 
 			u1.Status = auth.StatusDisabled
 
-			if err := auth.UpdateUserPassword(context, db, u1, "_Password789"); err == nil {
+			if err := auth.UpdateUserPassword(tests.Context, db, u1, "_Password789"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user with bad user value.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user with bad user value.", tests.Success)
@@ -648,7 +620,7 @@ func TestDisableUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -656,18 +628,18 @@ func TestDisableUser(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			u2, err := auth.GetUserByPublicID(context, db, u1.PublicID)
+			u2, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the user by PublicID.", tests.Success)
 
-			if err := auth.UpdateUserStatus(context, db, u2.PublicID, auth.StatusDisabled); err != nil {
+			if err := auth.UpdateUserStatus(tests.Context, db, u2.PublicID, auth.StatusDisabled); err != nil {
 				t.Fatalf("\t%s\tShould be able to disable the user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to disable the user.", tests.Success)
 
-			if _, err := auth.GetUserByPublicID(context, db, u1.PublicID); err == nil {
+			if _, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to retrieve the user by PublicID.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the user by PublicID.", tests.Success)
@@ -706,7 +678,7 @@ func TestCreateWebToken(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -714,25 +686,25 @@ func TestCreateWebToken(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			webTok, err := auth.CreateWebToken(context, db, u1, time.Second)
+			webTok, err := auth.CreateWebToken(tests.Context, db, u1, time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
 
-			sId, _, err := auth.DecodeWebToken(context, webTok)
+			sId, _, err := auth.DecodeWebToken(tests.Context, webTok)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to decode the web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to decode the web token.", tests.Success)
 
-			s2, err := session.GetBySessionID(context, db, sId)
+			s2, err := session.GetBySessionID(tests.Context, db, sId)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the session.", tests.Success)
 
-			u2, err := auth.GetUserByPublicID(context, db, u1.PublicID)
+			u2, err := auth.GetUserByPublicID(tests.Context, db, u1.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the user by PublicID : %v", tests.Failed, err)
 			}
@@ -758,7 +730,7 @@ func TestCreateWebToken(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create the same web token.", tests.Success)
 
-			u3, err := auth.ValidateWebToken(context, db, webTok2)
+			u3, err := auth.ValidateWebToken(tests.Context, db, webTok2)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to validate the new web token : %v", tests.Failed, err)
 			}
@@ -771,7 +743,7 @@ func TestCreateWebToken(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould have the right user for the token.", tests.Success)
 
-			webTok3, err := auth.GetUserWebToken(context, db, u2.PublicID)
+			webTok3, err := auth.GetUserWebToken(tests.Context, db, u2.PublicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get the web token : %v", tests.Failed, err)
 			}
@@ -818,7 +790,7 @@ func TestExpiredWebToken(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -826,13 +798,13 @@ func TestExpiredWebToken(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			webTok, err := auth.CreateWebToken(context, db, u1, 1*time.Millisecond)
+			webTok, err := auth.CreateWebToken(tests.Context, db, u1, 1*time.Millisecond)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
 
-			if _, err := auth.ValidateWebToken(context, db, webTok); err == nil {
+			if _, err := auth.ValidateWebToken(tests.Context, db, webTok); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to validate the web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould Not be able to validate the web token.", tests.Success)
@@ -859,7 +831,7 @@ func TestInvalidWebTokens(t *testing.T) {
 		for _, token := range tokens {
 			t.Logf("\tWhen using token [%s]", token)
 			{
-				if _, err := auth.ValidateWebToken(context, db, token); err == nil {
+				if _, err := auth.ValidateWebToken(tests.Context, db, token); err == nil {
 					t.Errorf("\t%s\tShould Not be able to validate the web token : %v", tests.Failed, err)
 				} else {
 					t.Logf("\t%s\tShould Not be able to validate the web token.", tests.Success)
@@ -900,7 +872,7 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -908,13 +880,13 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			webTok, err := auth.CreateWebToken(context, db, u1, 5*time.Second)
+			webTok, err := auth.CreateWebToken(tests.Context, db, u1, 5*time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a web token.", tests.Success)
 
-			if _, err := auth.ValidateWebToken(context, db, webTok); err != nil {
+			if _, err := auth.ValidateWebToken(tests.Context, db, webTok); err != nil {
 				t.Fatalf("\t%s\tShould be able to validate the web token : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to validate the web token.", tests.Success)
@@ -926,12 +898,12 @@ func TestInvalidWebTokenUpdateEmail(t *testing.T) {
 				Email:    "change@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, db, uu); err != nil {
+			if err := auth.UpdateUser(tests.Context, db, uu); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a user.", tests.Success)
 
-			if _, err := auth.ValidateWebToken(context, db, webTok); err == nil {
+			if _, err := auth.ValidateWebToken(tests.Context, db, webTok); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to validate the org web token.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to validate the org web token.", tests.Success)
@@ -970,7 +942,7 @@ func TestLoginUser(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, db, u1); err != nil {
+			if err := auth.CreateUser(tests.Context, db, u1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a user.", tests.Success)
@@ -978,18 +950,18 @@ func TestLoginUser(t *testing.T) {
 			// We need to do this so we can clean up after.
 			publicID = u1.PublicID
 
-			if _, err := auth.LoginUser(context, db, u1.Email, "_Password124"); err != nil {
+			if _, err := auth.LoginUser(tests.Context, db, u1.Email, "_Password124"); err != nil {
 				t.Errorf("\t%s\tShould be able to login the user : %v", tests.Failed, err)
 			} else {
 				t.Logf("\t%s\tShould be able to login the user.", tests.Success)
 			}
 
-			if err := auth.UpdateUserPassword(context, db, u1, "password890"); err != nil {
+			if err := auth.UpdateUserPassword(tests.Context, db, u1, "password890"); err != nil {
 				t.Fatalf("\t%s\tShould be able to update the user password : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update the user password.", tests.Success)
 
-			if _, err := auth.LoginUser(context, db, u1.Email, "_Password124"); err == nil {
+			if _, err := auth.LoginUser(tests.Context, db, u1.Email, "_Password124"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to login the user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to login the user.", tests.Success)
@@ -1018,13 +990,13 @@ func TestNoSession(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to build a new user.", tests.Success)
 
-			if err := auth.CreateUser(context, nil, u1); err == nil {
+			if err := auth.CreateUser(tests.Context, nil, u1); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a user.", tests.Success)
 			}
 
-			if _, err := auth.CreateWebToken(context, nil, u1, time.Second); err == nil {
+			if _, err := auth.CreateWebToken(tests.Context, nil, u1, time.Second); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a web token.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a web token.", tests.Success)
@@ -1032,19 +1004,19 @@ func TestNoSession(t *testing.T) {
 
 			webTok := "OGY4OGI3YWQtZjc5Ny00ODI1LWI0MmUtMjIwZTY5ZDQxYjMzOmFKT2U1b0pFZlZ4cWUrR0JONEl0WlhmQTY0K3JsN2VGcmM2MVNQMkV1WVE9"
 
-			if _, err := auth.ValidateWebToken(context, nil, webTok); err == nil {
+			if _, err := auth.ValidateWebToken(tests.Context, nil, webTok); err == nil {
 				t.Errorf("\t%s\tShould Not be able to validate a web token.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to validate a web token.", tests.Success)
 			}
 
-			if _, err := auth.GetUserByPublicID(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
+			if _, err := auth.GetUserByPublicID(tests.Context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to get a user by PublicID.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to get a user by PublicID.", tests.Success)
 			}
 
-			if _, err := auth.GetUserByEmail(context, nil, "bill@ardanlabs.com"); err == nil {
+			if _, err := auth.GetUserByEmail(tests.Context, nil, "bill@ardanlabs.com"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to get a user by Email.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to get a user by Email.", tests.Success)
@@ -1057,35 +1029,61 @@ func TestNoSession(t *testing.T) {
 				Email:    "upt@ardanlabs.com",
 			}
 
-			if err := auth.UpdateUser(context, nil, uu); err == nil {
+			if err := auth.UpdateUser(tests.Context, nil, uu); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user.", tests.Success)
 			}
 
-			if err := auth.UpdateUserPassword(context, nil, u1, "password890"); err == nil {
+			if err := auth.UpdateUserPassword(tests.Context, nil, u1, "password890"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to update a user pasword.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to update a user password.", tests.Success)
 			}
 
-			if err := auth.UpdateUserStatus(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f", auth.StatusDisabled); err == nil {
+			if err := auth.UpdateUserStatus(tests.Context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f", auth.StatusDisabled); err == nil {
 				t.Errorf("\t%s\tShould Not be able to disable a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to disable a user.", tests.Success)
 			}
 
-			if _, err := auth.LoginUser(context, nil, "bill@email.com", "_pass"); err == nil {
+			if _, err := auth.LoginUser(tests.Context, nil, "bill@email.com", "_pass"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to login a user.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to login a user.", tests.Success)
 			}
 
-			if _, err := auth.GetUserWebToken(context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
+			if _, err := auth.GetUserWebToken(tests.Context, nil, "6dcda2da-92c3-11e5-8994-feff819cdc9f"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to get user web token.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to get user web token.", tests.Success)
 			}
 		}
 	}
+}
+
+//==============================================================================
+
+// removeUser is used to clear out all the test user from the collection.
+func removeUser(db *db.DB, publicID string) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		return c.Remove(q)
+	}
+
+	if err := db.ExecuteMGO(tests.Context, "auth_users", f); err != nil {
+		return err
+	}
+
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(tests.Context, "sessions", f); err != nil {
+		return err
+	}
+
+	return nil
 }

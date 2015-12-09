@@ -1,7 +1,6 @@
 package comment_test
 
 import (
-	//	"fmt"
 	"testing"
 
 	"github.com/coralproject/shelf/pkg/db"
@@ -12,62 +11,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var context = "testing"
-
 func init() {
-	tests.Init()
-}
-
-//==============================================================================
-//=====  The Script
-//==============================================================================
-/*
-
-User
-====
-Test user validation rules
-Test create user
-Test duplicate user rules
-
-Comment
-=======
-Test validation rules
-Test require user to exist
-Test create
-
-Action
-======
-Test validation
-Test require user
-Test require comment
-
-Integration / stats
-===================
-Create user u1
-Create user u2
-
-Check for zero comment count
-Create comment
-Check for comment count = 1
-
-*/
-
-//==============================================================================
-//=====  User tests
-//==============================================================================
-
-// removeUser is used to clear out all the test user from the collection.
-func removeUser(db *db.DB, UserID string) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"user_id": UserID}
-		return c.Remove(q)
-	}
-
-	if err := db.ExecuteMGO(context, "users", f); err != nil {
-		return err
-	}
-
-	return nil
+	tests.InitMGO()
 }
 
 //==============================================================================
@@ -92,7 +37,7 @@ func TestCreateUser(t *testing.T) {
 		Avatar:   "https://picture.of/david.jpg",
 	}
 
-	if err := comment.CreateUser(context, db, &u1); err != nil {
+	if err := comment.CreateUser(tests.Context, db, &u1); err != nil {
 		t.Fatalf("\t%s\tShould be able to create a user : %v", tests.Failed, err)
 	}
 	t.Logf("\t%s\tShould be able to create a user", tests.Success)
@@ -100,32 +45,12 @@ func TestCreateUser(t *testing.T) {
 	// set ID for the deferred removeUser method
 	ID = u1.UserID
 
-	if err := comment.CreateUser(context, db, &u1); err == nil {
+	if err := comment.CreateUser(tests.Context, db, &u1); err == nil {
 		t.Fatalf("\t%s\tShould not be able to create a duplicate user", tests.Failed)
 	}
 	t.Logf("\t%s\tShould not be able to create a duplicate user", tests.Success)
 
 }
-
-//==============================================================================
-//=====  Comment tests
-//==============================================================================
-
-// removeComment is used to clear out all the test user from the collection.
-func removeComment(db *db.DB, CommentID string) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"comment_id": CommentID}
-		return c.Remove(q)
-	}
-
-	if err := db.ExecuteMGO(context, "comments", f); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-//==============================================================================
 
 func TestCreateComment(t *testing.T) {
 	tests.ResetLog()
@@ -147,7 +72,7 @@ func TestCreateComment(t *testing.T) {
 		Body:   "Wonderful story!  The world is going in the right direction!",
 	}
 
-	if err := comment.CreateComment(context, db, &c1); err != nil {
+	if err := comment.CreateComment(tests.Context, db, &c1); err != nil {
 		t.Fatalf("\t%s\tShould be able to create a comment : %v", tests.Failed, err)
 	}
 	t.Logf("\t%s\tShould be able to create a comment", tests.Success)
@@ -155,4 +80,34 @@ func TestCreateComment(t *testing.T) {
 	CommentID = c1.CommentID
 
 	t.Logf("\t%s\tYeah, ok, this works.", tests.Success)
+}
+
+//==============================================================================
+
+// removeUser is used to clear out all the test user from the collection.
+func removeUser(db *db.DB, UserID string) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"user_id": UserID}
+		return c.Remove(q)
+	}
+
+	if err := db.ExecuteMGO(tests.Context, "users", f); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// removeComment is used to clear out all the test user from the collection.
+func removeComment(db *db.DB, CommentID string) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"comment_id": CommentID}
+		return c.Remove(q)
+	}
+
+	if err := db.ExecuteMGO(tests.Context, "comments", f); err != nil {
+		return err
+	}
+
+	return nil
 }

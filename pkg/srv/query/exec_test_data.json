@@ -1,0 +1,48 @@
+[
+	{ 
+		"condition" : {
+			"date" : "ISODate(\"2012-10-30T16:00:00.000+0000\")", 
+			"update_date" : "ISODate(\"2015-12-09T04:27:02.288+0000\")", 
+			"observation_time" : "Last Updated on Oct 30 2012, 11:00 am CDT", 
+			"observation_time_rfc822" : "Tue, 30 Oct 2012 11:00:00 -0500", 
+			"weather" : "", 
+			"temperature_string" : "59.4 F (15.2 C)", 
+			"temp_f" : 59.4, 
+			"temp_c" : 15.2, 
+			"wind_string" : "Northwest at 24.6 MPH (21.38 KT)", 
+			"wind_dir" : "Northwest", 
+			"wind_mph" : 24.6, 
+			"wind_gust_mph" : 0.0, 
+			"wind_kt" : 21.38, 
+			"wind_gust_kt" : 0.0, 
+			"pressure_string" : "1014.0 mb", 
+			"pressure_mb" : 1014.0, 
+			"pressure_in" : 0.0, 
+			"dewpoint_string" : "", 
+			"dewpoint_f" : 0.0, 
+			"dewpoint_c" : 0.0, 
+			"windchill_string" : "55 F (13 C)", 
+			"windchill_f" : 55.0, 
+			"windchill_c" : 13.0, 
+			"visibility_mi" : 0.0, 
+			"heat_index_string" : "", 
+			"heat_index_f" : 0.0, 
+			"heat_index_c" : 0.0
+		}, 
+		"data_url" : "http://w1.weather.gov/xml/current_obs/42021.xml", 
+		"flag" : true, 
+		"icon_url_base" : "", 
+		"icon_url_name" : "", 
+		"location" : {
+			"type" : "Point", 
+			"coordinates" : [
+				-83.306, 
+				28.311
+			]
+		}, 
+		"name" : "C14 - Pasco County Buoy, FL", 
+		"ob_url" : "", 
+		"station_id" : "42021", 
+		"two_day_history_url" : ""
+	}
+]

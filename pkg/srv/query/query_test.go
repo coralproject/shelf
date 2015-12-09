@@ -16,56 +16,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var context = "testing"
-
 func init() {
-	tests.Init()
-}
-
-//==============================================================================
-
-// removeSets is used to clear out all the test sets from the collection.
-// All test query sets must start with QSTEST in their name.
-func removeSets(db *db.DB) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(context, query.Collection, f); err != nil {
-		return err
-	}
-
-	f = func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(context, query.CollectionHistory, f); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// getFixture retrieves a query record from the filesystem.
-func getFixture(filePath string) (*query.Set, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-
-	var qs query.Set
-	err = json.NewDecoder(file).Decode(&qs)
-	if err != nil {
-		return nil, err
-	}
-
-	return &qs, nil
+	tests.InitMGO()
 }
 
 //==============================================================================
@@ -96,125 +48,29 @@ func TestUpsertCreateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(context, db, qs1.Name)
+			_, err = query.GetLastSetHistoryByName(tests.Context, db, qs1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			qs2, err := query.GetSetByName(context, db, qs1.Name)
+			qs2, err := query.GetSetByName(tests.Context, db, qs1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set.", tests.Success)
 
-			if qs1.Name != qs2.Name {
-				t.Logf("\t%+v", qs1.Name)
-				t.Logf("\t%+v", qs2.Name)
-				t.Errorf("\t%s\tShould be able to get back the same Name value.", tests.Failed)
+			if !reflect.DeepEqual(qs1, qs2) {
+				t.Logf("\t%+v", qs1)
+				t.Logf("\t%+v", qs2)
+				t.Errorf("\t%s\tShould be able to get back the same query value.", tests.Failed)
 			} else {
-				t.Logf("\t%s\tShould be able to get back the same Name value.", tests.Success)
-			}
-
-			if qs1.Enabled != qs2.Enabled {
-				t.Logf("\t%+v", qs1.Enabled)
-				t.Logf("\t%+v", qs2.Enabled)
-				t.Errorf("\t%s\tShould be able to get back the same Enabled value.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same Enabled value.", tests.Success)
-			}
-
-			if qs1.Description != qs2.Description {
-				t.Logf("\t%+v", qs1.Description)
-				t.Logf("\t%+v", qs2.Description)
-				t.Errorf("\t%s\tShould be able to get back the same Description value.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same Description value.", tests.Success)
-			}
-
-			if len(qs1.Params) != len(qs2.Params) {
-				t.Logf("\t%+v", qs1.Params)
-				t.Logf("\t%+v", qs2.Params)
-				t.Errorf("\t%s\tShould be able to get back the same number of Param values.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same number of Param values.", tests.Success)
-			}
-
-			for ind, param1 := range qs1.Params {
-				param2 := qs2.Params[ind]
-				if !reflect.DeepEqual(param1, param2) {
-					t.Logf("\t%+v", param1)
-					t.Logf("\t%+v", param2)
-					t.Errorf("\t%s\tShould be able to get back the same Param value.", tests.Failed)
-				} else {
-					t.Logf("\t%s\tShould be able to get back the same Param value.", tests.Success)
-				}
-			}
-
-			if len(qs1.Queries) != len(qs2.Queries) {
-				t.Logf("\t%+v", qs1.Queries)
-				t.Logf("\t%+v", qs2.Queries)
-				t.Errorf("\t%s\tShould be able to get back the same number of Query values.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same number of Query values.", tests.Success)
-			}
-
-			for ind, qu := range qs1.Queries {
-				qu2 := qs2.Queries[ind]
-
-				if qu.Type != qu2.Type {
-					t.Errorf("\t%s\tShould have matching Type for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching Type for query at index %d", tests.Success, ind)
-				}
-
-				if qu.Description != qu2.Description {
-					t.Errorf("\t%s\tShould have matching description for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching description for query at index %d", tests.Success, ind)
-				}
-
-				if qu.Continue != qu2.Continue {
-					t.Errorf("\t%s\tShould have matching continue flag for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching continue flag for query at index %d", tests.Success, ind)
-				}
-
-				if !reflect.DeepEqual(*qu.SaveOptions, *qu2.SaveOptions) {
-					t.Errorf("\t%s\tShould have matching save_options for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching save_options for query at index %d", tests.Success, ind)
-				}
-
-				if !reflect.DeepEqual(*qu.ScriptOptions, *qu2.ScriptOptions) {
-					t.Errorf("\t%s\tShould have matching script_options for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching script_options for query at index %d", tests.Success, ind)
-				}
-
-				if !reflect.DeepEqual(*qu.VarOptions, *qu2.VarOptions) {
-					t.Errorf("\t%s\tShould have matching script_options for query at index %d", tests.Failed, ind)
-				} else {
-					t.Logf("\t%s\tShould have matching script_options for query at index %d", tests.Success, ind)
-				}
-
-				for sindex, src := range qu.Scripts {
-					csrc := qu2.Scripts[sindex]
-
-					if csrc != src {
-						t.Logf("Script Src(Index: %d): %s", sindex, src)
-						t.Logf("Script Src(Index: %d): %s", sindex, csrc)
-						t.Errorf("\t%s\tShould have matching src for query index: %d at scripts index %d", tests.Failed, ind, sindex)
-					} else {
-						t.Logf("\t%s\tShould have matching src for query index: %d at scripts index %d", tests.Success, ind, sindex)
-					}
-
-				}
+				t.Logf("\t%s\tShould be able to get back the same query value.", tests.Success)
 			}
 		}
 	}
@@ -248,18 +104,18 @@ func TestGetSetNames(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			qs1.Name += "2"
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
 
-			names, err := query.GetSetNames(context, db)
+			names, err := query.GetSetNames(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set names : %v", tests.Failed, err)
 			}
@@ -308,19 +164,19 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			qs1.Description = "Next Version"
 
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs2, err := query.GetLastSetHistoryByName(context, db, qsName)
+			qs2, err := query.GetLastSetHistoryByName(tests.Context, db, qsName)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the last query set from history : %s", tests.Failed, err)
 			}
@@ -395,7 +251,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -407,18 +263,18 @@ func TestUpsertUpdateQuery(t *testing.T) {
 				Desc:    "provides the group number for the query script",
 			})
 
-			if err := query.UpsertSet(context, db, &qs2); err != nil {
+			if err := query.UpsertSet(tests.Context, db, &qs2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(context, db, qs1.Name)
+			_, err = query.GetLastSetHistoryByName(tests.Context, db, qs1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			updSet, err := query.GetSetByName(context, db, qs2.Name)
+			updSet, err := query.GetSetByName(tests.Context, db, qs2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a query set record: %s", tests.Failed, err)
 			}
@@ -479,22 +335,22 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if err := query.DeleteSet(context, db, qsName); err != nil {
+			if err := query.DeleteSet(tests.Context, db, qsName); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete a query set using its name[%s]: %s", tests.Failed, qsName, err)
 			}
 			t.Logf("\t%s\tShould be able to delete a query set using its name[%s]:", tests.Success, qsName)
 
-			if err := query.DeleteSet(context, db, qsBadName); err == nil {
+			if err := query.DeleteSet(tests.Context, db, qsBadName); err == nil {
 				t.Fatalf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Failed, qsBadName)
 			}
 			t.Logf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Success, qsBadName)
 
-			if _, err := query.GetSetByName(context, db, qsName); err == nil {
+			if _, err := query.GetSetByName(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists:", tests.Success, qsName)
@@ -531,17 +387,17 @@ func TestUnknownName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if _, err := query.GetSetByName(context, db, qsName); err == nil {
+			if _, err := query.GetSetByName(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists.", tests.Success, qsName)
 
-			if err := query.DeleteSet(context, db, qsName); err == nil {
+			if err := query.DeleteSet(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted.", tests.Success, qsName)
@@ -567,30 +423,76 @@ func TestAPIFailure(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			if err := query.UpsertSet(context, nil, qs1); err == nil {
+			if err := query.UpsertSet(tests.Context, nil, qs1); err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetSetNames(context, nil); err == nil {
+			if _, err := query.GetSetNames(tests.Context, nil); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetSetByName(context, nil, qsName); err == nil {
+			if _, err := query.GetSetByName(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetLastSetHistoryByName(context, nil, qsName); err == nil {
+			if _, err := query.GetLastSetHistoryByName(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if err := query.DeleteSet(context, nil, qsName); err == nil {
+			if err := query.DeleteSet(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
 		}
 	}
+}
+
+//==============================================================================
+
+// removeSets is used to clear out all the test sets from the collection.
+// All test query sets must start with QSTEST in their name.
+func removeSets(db *db.DB) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(tests.Context, query.Collection, f); err != nil {
+		return err
+	}
+
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(tests.Context, query.CollectionHistory, f); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// getFixture retrieves a query record from the filesystem.
+func getFixture(filePath string) (*query.Set, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+
+	defer file.Close()
+
+	var qs query.Set
+	err = json.NewDecoder(file).Decode(&qs)
+	if err != nil {
+		return nil, err
+	}
+
+	return &qs, nil
 }

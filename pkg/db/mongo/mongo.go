@@ -22,7 +22,7 @@ var m struct {
 // cfg package has been initialized first.
 func InitMGO() error {
 	if m.ses != nil {
-		return errors.New("Mongo environment already initialized")
+		return nil
 	}
 
 	// We need this object to establish a session to our MongoDB.

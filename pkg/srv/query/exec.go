@@ -1,10 +1,12 @@
 package query
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"regexp"
 	"strings"
+	"time"
 
 	"github.com/coralproject/shelf/pkg/db"
 	"github.com/coralproject/shelf/pkg/db/mongo"
@@ -14,8 +16,15 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+// docs represents what a user will receive after
+// excuting a successful set.
+type docs struct {
+	name string
+	docs []bson.M
+}
+
 // emptyResult is for returning empty runs.
-var emptyResult = []bson.M{}
+var emptyResult []docs
 
 // ExecuteSet executes the specified query set by name.
 func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string) *Result {
@@ -26,12 +35,20 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 		Results: emptyResult,
 	}
 
+	if !set.Enabled {
+		err := errors.New("Set disabled")
+		r.Error = true
+		r.Results = bson.M{"error": err.Error()}
+		log.Error(context, "ExecuteSet", err, "Completed")
+		return &r
+	}
+
 	// Validate the variables against the meta-data.
 	if len(set.Params) > 0 {
 		if vars == nil {
-			err := errors.New("Invalid Variables List.")
+			err := errors.New("Invalid Variables List")
 			r.Error = true
-			r.Results = []bson.M{bson.M{"error": err.Error()}}
+			r.Results = bson.M{"error": err.Error()}
 			log.Error(context, "ExecuteSet", err, "Completed")
 			return &r
 		}
@@ -39,9 +56,9 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 		// Validate each know parameter is represented in the variable list.
 		for _, p := range set.Params {
 			if _, ok := vars[p.Name]; !ok {
-				err := fmt.Errorf("Variable %s not included with the call.", p.Name)
+				err := fmt.Errorf("Variable %s not included with the call", p.Name)
 				r.Error = true
-				r.Results = []bson.M{bson.M{"error": err.Error()}}
+				r.Results = bson.M{"error": err.Error()}
 				log.Error(context, "ExecuteSet", err, "Completed")
 				return &r
 			}
@@ -49,11 +66,11 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 	}
 
 	// Final results of running the set of queries.
-	var results []bson.M
+	var results []docs
 
 	// Iterate of the set of queries.
 	for _, q := range set.Queries {
-		var result []bson.M
+		var result docs
 		var err error
 
 		// We only have pipeline right now.
@@ -76,13 +93,15 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 			// We need to return an error result.
 			r.Error = true
-			r.Results = []bson.M{bson.M{"error": err.Error()}}
+			r.Results = bson.M{"error": err.Error()}
 			log.Error(context, "ExecuteSet", err, "Completed")
 			return &r
 		}
 
 		// Append these results to the final set.
-		results = append(results, result...)
+		if q.Return {
+			results = append(results, result)
+		}
 	}
 
 	// Save the final results to be returned.
@@ -93,10 +112,10 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 }
 
 // executePipeline executes the sepcified pipeline query.
-func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]string) ([]bson.M, error) {
+func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]string) (docs, error) {
 	// Validate we have scripts to run.
 	if len(q.Scripts) == 0 {
-		return nil, errors.New("Invalid pipeline script")
+		return docs{}, errors.New("Invalid pipeline script")
 	}
 
 	var pipeline []bson.M
@@ -114,16 +133,16 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 		}
 
 		// Unmarshal the script into a bson.M for use.
-		op, err := umarshalMongoScript(script, q.ScriptOptions)
+		op, err := UmarshalMongoScript(script, q)
 		if err != nil {
-			return nil, err
+			return docs{}, err
 		}
 
 		// Add the operation to the slice for the pipeline.
 		pipeline = append(pipeline, op)
 	}
 
-	collName := q.ScriptOptions.Collection
+	collName := q.Collection
 
 	// Build the pipeline function for the execution.
 	var results []bson.M
@@ -139,15 +158,15 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 
 	// Execute the pipeline.
 	if err := db.ExecuteMGO(context, collName, f); err != nil {
-		return nil, err
+		return docs{}, err
 	}
 
-	// If there were not results, treat it as an error.
+	// If there were no results, treat it as an error.
 	if len(results) == 0 {
-		return nil, errors.New("No result")
+		return docs{}, errors.New("No result")
 	}
 
-	return results, nil
+	return docs{q.Name, results}, nil
 }
 
 //==============================================================================
@@ -170,4 +189,92 @@ func renderScript(script string, vars map[string]string) string {
 	}
 
 	return script
+}
+
+//==============================================================================
+// MongoDB specific functions.
+
+// UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
+func UmarshalMongoScript(script string, q *Query) (bson.M, error) {
+	query := []byte(script)
+
+	var op bson.M
+	if err := json.Unmarshal(query, &op); err != nil {
+		return nil, err
+	}
+
+	// We have the HasDate and HasObjectID to prevent us from
+	// trying to process these things when it is not necessary.
+	if q != nil && (q.HasDate || q.HasObjectID) {
+		op = mongoExtensions(op, q)
+	}
+
+	return op, nil
+}
+
+// mongoExtensions searches for our extensions that need to be converted
+// from JSON into BSON, such as dates.
+func mongoExtensions(op bson.M, q *Query) bson.M {
+	for key, value := range op {
+		// Recurse through the map if provided.
+		if doc, ok := value.(map[string]interface{}); ok {
+			mongoExtensions(doc, q)
+		}
+
+		// Is the value a string.
+		if script, ok := value.(string); ok == true {
+			if q.HasDate && strings.HasPrefix(script, "ISODate") {
+				op[key] = isoDate(script)
+			}
+
+			if q.HasObjectID && strings.HasPrefix(script, "ObjectId") {
+				op[key] = bson.ObjectIdHex(script[10:34])
+			}
+		}
+
+		// Is the value an array.
+		if array, ok := value.([]interface{}); ok {
+			for _, item := range array {
+				// Recurse through the map if provided.
+				if doc, ok := item.(map[string]interface{}); ok {
+					mongoExtensions(doc, q)
+				}
+
+				// Is the value a string.
+				if script, ok := value.(string); ok == true {
+					if q.HasDate && strings.HasPrefix(script, "ISODate") {
+						op[key] = isoDate(script)
+					}
+
+					if q.HasObjectID && strings.HasPrefix(script, "ObjectId") {
+						op[key] = objID(script)
+					}
+				}
+			}
+		}
+	}
+
+	return op
+}
+
+// objID is a helper function to convert a string that represents a Mongo
+// Object Id into a bson ObjectId type.
+func objID(script string) bson.ObjectId {
+	if len(script) > 34 {
+		return bson.ObjectId("")
+	}
+
+	return bson.ObjectIdHex(script[10:34])
+}
+
+// isoDate is a helper function to convert the internal extension for dates
+// into a BSON date. We convert the following string
+// ISODate('2013-01-16T00:00:00.000Z') to a Go time value.
+func isoDate(script string) time.Time {
+	dateTime, err := time.Parse("2006-01-02T15:04:05.999Z", script[9:len(script)-2])
+	if err != nil {
+		return time.Now().UTC()
+	}
+
+	return dateTime
 }

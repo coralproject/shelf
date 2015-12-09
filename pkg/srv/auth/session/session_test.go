@@ -12,29 +12,10 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-var (
-	publicID = "6dcda2da-92c3-11e5-8994-feff819cdc9f"
-	context  = "testing"
-)
+var publicID = "6dcda2da-92c3-11e5-8994-feff819cdc9f"
 
 func init() {
-	tests.Init()
-}
-
-// removeSessions is used to clear out all the test sessions that are
-// created from tests.
-func removeSessions(db *db.DB) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"public_id": publicID}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(context, "sessions", f); err != nil {
-		return err
-	}
-
-	return nil
+	tests.InitMGO()
 }
 
 // TestIsExpired tests that we can properly identify when a
@@ -51,7 +32,7 @@ func TestIsExpired(t *testing.T) {
 
 		t.Log("\tWhen using an expired session.")
 		{
-			if !s.IsExpired(context) {
+			if !s.IsExpired(tests.Context) {
 				t.Fatalf("\t%s\tShould be expired.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be expired", tests.Success)
@@ -63,7 +44,7 @@ func TestIsExpired(t *testing.T) {
 
 		t.Log("\tWhen using an valid session")
 		{
-			if s.IsExpired(context) {
+			if s.IsExpired(tests.Context) {
 				t.Fatalf("\t%s\tShould Not be expired.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be expired", tests.Success)
@@ -95,13 +76,13 @@ func TestCreate(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
 
-			s1, err := session.Create(context, db, publicID, 10*time.Second)
+			s1, err := session.Create(tests.Context, db, publicID, 10*time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create a session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
-			s2, err := session.GetBySessionID(context, db, s1.SessionID)
+			s2, err := session.GetBySessionID(tests.Context, db, s1.SessionID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the session : %v", tests.Failed, err)
 			}
@@ -146,20 +127,20 @@ func TestGetLatest(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to remove all sessions.", tests.Success)
 
-			if _, err := session.Create(context, db, publicID, 10*time.Second); err != nil {
+			if _, err := session.Create(tests.Context, db, publicID, 10*time.Second); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a session.", tests.Success)
 
 			time.Sleep(time.Second)
 
-			s2, err := session.Create(context, db, publicID, 10*time.Second)
+			s2, err := session.Create(tests.Context, db, publicID, 10*time.Second)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to create another session : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create another session.", tests.Success)
 
-			s3, err := session.GetByLatest(context, db, publicID)
+			s3, err := session.GetByLatest(tests.Context, db, publicID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the latest session : %v", tests.Failed, err)
 			}
@@ -186,7 +167,7 @@ func TestGetNotFound(t *testing.T) {
 	{
 		t.Logf("\tWhen using SessionID %s", "NOT EXISTS")
 		{
-			if _, err := session.GetBySessionID(context, db, "NOT EXISTS"); err == nil {
+			if _, err := session.GetBySessionID(tests.Context, db, "NOT EXISTS"); err == nil {
 				t.Fatalf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
@@ -203,23 +184,41 @@ func TestNoSession(t *testing.T) {
 	{
 		t.Log("\tWhen using a nil session")
 		{
-			if _, err := session.Create(context, nil, publicID, 10*time.Second); err == nil {
+			if _, err := session.Create(tests.Context, nil, publicID, 10*time.Second); err == nil {
 				t.Errorf("\t%s\tShould Not be able to create a session.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to create a session.", tests.Success)
 			}
 
-			if _, err := session.GetBySessionID(context, nil, "NOT EXISTS"); err == nil {
+			if _, err := session.GetBySessionID(tests.Context, nil, "NOT EXISTS"); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 			}
 
-			if _, err := session.GetByLatest(context, nil, publicID); err == nil {
+			if _, err := session.GetByLatest(tests.Context, nil, publicID); err == nil {
 				t.Errorf("\t%s\tShould Not be able to retrieve the session.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould Not be able to retrieve the session.", tests.Success)
 			}
 		}
 	}
+}
+
+//==============================================================================
+
+// removeSessions is used to clear out all the test sessions that are
+// created from tests.
+func removeSessions(db *db.DB) error {
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"public_id": publicID}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(tests.Context, "sessions", f); err != nil {
+		return err
+	}
+
+	return nil
 }

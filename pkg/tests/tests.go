@@ -14,14 +14,22 @@ import (
 	"github.com/coralproject/shelf/pkg/log"
 )
 
-// Success is a unicode codepoint for a check mark.
-var Success = "\u2713"
+// Context provides a context for testing.
+var Context = "testing"
 
-// Failed is a unicode codepoint for a check X mark.
-var Failed = "\u2717"
+// Success and Failure markers.
+var (
+	Success = "\u2713"
+	Failed  = "\u2717"
+)
 
 // logdash is the central buffer where all logs are stored.
 var logdash bytes.Buffer
+
+func init() {
+	cfg.Init("shelf")
+	log.Init(&logdash, func() int { return log.DEV })
+}
 
 // ResetLog resets the contents of logdash.
 func ResetLog() {
@@ -38,12 +46,8 @@ func DisplayLog() {
 	logdash.WriteTo(os.Stdout)
 }
 
-// Init is to be runned once. It initializes the necessary logs and mongodb
-// connections for testing.
-func Init() {
-	cfg.Init("shelf")
-	log.Init(&logdash, func() int { return log.DEV })
-
+// InitMGO initializes the mongodb env for testing.
+func InitMGO() {
 	if err := mongo.InitMGO(); err != nil {
 		log.Error("Test", "Init", err, "Completed")
 		logdash.WriteTo(os.Stdout)
