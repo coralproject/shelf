@@ -3,9 +3,10 @@ package routes
 import (
 	"net/http"
 
-	"github.com/coralproject/shelf/app/xenia/app"
 	"github.com/coralproject/shelf/app/xenia/handlers"
-	"github.com/coralproject/shelf/app/xenia/midware"
+
+	"github.com/coralproject/shelf/pkg/web/app"
+	"github.com/coralproject/shelf/pkg/web/midware"
 )
 
 // API returns a handler for a set of routes.

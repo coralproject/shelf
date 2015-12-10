@@ -3,9 +3,13 @@ package app
 import (
 	"errors"
 	"net/http"
+	"os"
+	"os/signal"
 	"time"
 
+	"github.com/coralproject/shelf/pkg/cfg"
 	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/db/mongo"
 	"github.com/coralproject/shelf/pkg/log"
 
 	"github.com/dimfeld/httptreemux"
@@ -99,4 +103,52 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 
 	// Add this handler for the specified verb and route.
 	a.TreeMux.Handle(verb, path, h)
+}
+
+// Init is called to initialize the application.
+func Init(cfgKey string) {
+	logLevel := func() int {
+		ll, err := cfg.Int("LOGGING_LEVEL")
+		if err != nil {
+			return log.USER
+		}
+		return ll
+	}
+
+	log.Init(os.Stderr, logLevel)
+
+	if err := cfg.Init(cfgKey); err != nil {
+		log.Error("startup", "Init", err, "Initializing config")
+		os.Exit(1)
+	}
+
+	err := mongo.InitMGO()
+	if err != nil {
+		log.Error("startup", "Init", err, "Initializing MongoDB")
+		os.Exit(1)
+	}
+}
+
+// Run is called to start the web service.
+func Run(cfgHost string, defaultHost string, routes http.Handler) {
+	log.Dev("startup", "Run", "Start : cfgHost[%s] defaultHost[%s]", cfgHost, defaultHost)
+
+	// Check for a configured host value.
+	host, err := cfg.String(cfgHost)
+	if err != nil {
+		host = defaultHost
+	}
+
+	// Create this goroutine to run the web server.
+	go func() {
+		log.Dev("listener", "Run", "Listening on: %s", host)
+		http.ListenAndServe(host, routes)
+	}()
+
+	// Listen for an interrupt signal from the OS.
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, os.Interrupt)
+	<-sigChan
+
+	log.Dev("shutdown", "Run", "Complete")
 }

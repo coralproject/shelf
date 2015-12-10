@@ -216,7 +216,7 @@ func removeSessions(db *db.DB) error {
 		return err
 	}
 
-	if err := db.ExecuteMGO(tests.Context, "sessions", f); err != nil {
+	if err := db.ExecuteMGO(tests.Context, "auth_sessions", f); err != nil {
 		return err
 	}
 

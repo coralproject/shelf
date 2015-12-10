@@ -1,10 +1,9 @@
 package midware
 
 import (
-	"github.com/coralproject/shelf/app/xenia/app"
-
 	"github.com/coralproject/shelf/pkg/log"
 	"github.com/coralproject/shelf/pkg/srv/auth"
+	"github.com/coralproject/shelf/pkg/web/app"
 )
 
 // Auth handles token authentication.

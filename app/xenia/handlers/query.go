@@ -5,9 +5,8 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/coralproject/shelf/app/xenia/app"
-
 	"github.com/coralproject/shelf/pkg/srv/query"
+	"github.com/coralproject/shelf/pkg/web/app"
 )
 
 // queryHandle maintains the set of handlers for the query api.
