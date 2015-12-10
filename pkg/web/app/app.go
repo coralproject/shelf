@@ -42,6 +42,11 @@ type (
 	Middleware func(Handler) Handler
 )
 
+// app maintains some framework state.
+var app struct {
+	useMongo bool
+}
+
 // App is the entrypoint into our application and what configures our context
 // object for each of our http handlers. Feel free to add any configuration
 // data/logic on this App struct
@@ -67,14 +72,22 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		start := time.Now()
 
+		var dbConn *db.DB
+		if app.useMongo {
+			dbConn = db.NewMGO()
+		}
+
 		c := Context{
-			DB:             db.NewMGO(),
+			DB:             dbConn,
 			ResponseWriter: w,
 			Request:        r,
 			Params:         p,
 			SessionID:      uuid.New(),
 		}
-		defer c.DB.CloseMGO()
+
+		if app.useMongo {
+			defer c.DB.CloseMGO()
+		}
 
 		log.User(c.SessionID, "Request", "Started : Method[%s] URL[%s] RADDR[%s]", c.Request.Method, c.Request.URL.Path, c.Request.RemoteAddr)
 
@@ -105,8 +118,16 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	a.TreeMux.Handle(verb, path, h)
 }
 
+// Settings represents things required to initialize the app.
+type Settings struct {
+	ConfigKey string // The based environment variable key for all variables.
+	UseMongo  bool   // If MongoDB should be initialized and used.
+}
+
 // Init is called to initialize the application.
-func Init(cfgKey string) {
+func Init(set *Settings) {
+	app.useMongo = set.UseMongo
+
 	logLevel := func() int {
 		ll, err := cfg.Int("LOGGING_LEVEL")
 		if err != nil {
@@ -117,15 +138,17 @@ func Init(cfgKey string) {
 
 	log.Init(os.Stderr, logLevel)
 
-	if err := cfg.Init(cfgKey); err != nil {
+	if err := cfg.Init(set.ConfigKey); err != nil {
 		log.Error("startup", "Init", err, "Initializing config")
 		os.Exit(1)
 	}
 
-	err := mongo.InitMGO()
-	if err != nil {
-		log.Error("startup", "Init", err, "Initializing MongoDB")
-		os.Exit(1)
+	if set.UseMongo {
+		err := mongo.InitMGO()
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing MongoDB")
+			os.Exit(1)
+		}
 	}
 }
 

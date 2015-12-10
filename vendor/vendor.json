@@ -3,11 +3,6 @@
 	"ignore": "",
 	"package": [
 		{
-			"path": "github.com/astaxie/beego/validation",
-			"revision": "a89f14d80dab442927bdc11d641aa1250ab8ad71",
-			"revisionTime": "2015-06-19T11:43:15+08:00"
-		},
-		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
 			"revision": "71acacd42f85e5e82f70a55327789582a5200a90",
 			"revisionTime": "2015-08-03T11:35:22-04:00"
@@ -36,11 +31,6 @@
 			"path": "github.com/russross/blackfriday",
 			"revision": "300106c228d52c8941d4b3de6054a6062a86dda3",
 			"revisionTime": "2015-11-17T09:23:12+02:00"
-		},
-		{
-			"path": "github.com/satori/go.uuid",
-			"revision": "d41af8bb6a7704f00bc3b7cba9355ae6a5a80048",
-			"revisionTime": "2015-10-29T02:17:19+03:00"
 		},
 		{
 			"path": "github.com/shurcooL/sanitized_anchor_name",

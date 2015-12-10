@@ -13,7 +13,12 @@ import (
 )
 
 func init() {
-	app.Init("SHELF")
+	set := app.Settings{
+		ConfigKey: "SHELF",
+		UseMongo:  true,
+	}
+
+	app.Init(&set)
 }
 
 func main() {
