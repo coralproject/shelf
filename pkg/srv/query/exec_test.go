@@ -162,6 +162,7 @@ func getExecSet() []execSet {
 		querySetWithTime(),
 		querySetWithMultiResults(),
 		querySetNoResults(),
+		querySetMalformed(),
 	}
 }
 
@@ -272,6 +273,30 @@ func querySetNoResults() execSet {
 			},
 		},
 		result: `{"results":{"error":"No result"},"error":true}`,
+	}
+}
+
+// querySetMalformed creates a query set with a malformed query.
+func querySetMalformed() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "Malformed",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Malformed",
+					Type:       "pipeline",
+					Collection: "test_query",
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "XXXXXX"`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
+				},
+			},
+		},
+		result: `{"results":{"error":"unexpected end of JSON input"},"error":true}`,
 	}
 }
 
