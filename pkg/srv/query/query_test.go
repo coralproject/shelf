@@ -27,7 +27,7 @@ func TestUpsertCreateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -65,12 +65,12 @@ func TestUpsertCreateQuery(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set.", tests.Success)
 
-			if !reflect.DeepEqual(qs1, qs2) {
+			if !reflect.DeepEqual(*qs1, *qs2) {
 				t.Logf("\t%+v", qs1)
 				t.Logf("\t%+v", qs2)
-				t.Errorf("\t%s\tShould be able to get back the same query value.", tests.Failed)
+				t.Errorf("\t%s\tShould be able to get back the same query values.", tests.Failed)
 			} else {
-				t.Logf("\t%s\tShould be able to get back the same query value.", tests.Success)
+				t.Logf("\t%s\tShould be able to get back the same query values.", tests.Success)
 			}
 		}
 	}
@@ -81,9 +81,9 @@ func TestGetSetNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_spending_advice"
+	qsName := "QTEST_basic"
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -141,9 +141,9 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_spending_advice"
+	qsName := "QTEST_basic"
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -182,44 +182,12 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the last query set from history.", tests.Success)
 
-			if qs1.Name != qs2.Name {
-				t.Logf("\t%+v", qs1.Name)
-				t.Logf("\t%+v", qs2.Name)
-				t.Errorf("\t%s\tShould be able to get back the same Name value.", tests.Failed)
+			if !reflect.DeepEqual(*qs1, *qs2) {
+				t.Logf("\t%+v", qs1)
+				t.Logf("\t%+v", qs2)
+				t.Errorf("\t%s\tShould be able to get back the same query values.", tests.Failed)
 			} else {
-				t.Logf("\t%s\tShould be able to get back the same Name value.", tests.Success)
-			}
-
-			if qs1.Enabled != qs2.Enabled {
-				t.Logf("\t%+v", qs1.Enabled)
-				t.Logf("\t%+v", qs2.Enabled)
-				t.Errorf("\t%s\tShould be able to get back the same Enabled value.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same Enabled value.", tests.Success)
-			}
-
-			if qs2.Description != "Next Version" {
-				t.Logf("\t%+v", qs2.Description)
-				t.Logf("\tNext Version")
-				t.Errorf("\t%s\tShould be able to get back the same Description value.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same Description value.", tests.Success)
-			}
-
-			if len(qs1.Params) != len(qs2.Params) {
-				t.Logf("\t%+v", qs1.Params)
-				t.Logf("\t%+v", qs2.Params)
-				t.Errorf("\t%s\tShould be able to get back the same number of Param values.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same number of Param values.", tests.Success)
-			}
-
-			if len(qs1.Queries) != len(qs2.Queries) {
-				t.Logf("\t%+v", qs1.Queries)
-				t.Logf("\t%+v", qs2.Queries)
-				t.Errorf("\t%s\tShould be able to get back the same number of Query values.", tests.Failed)
-			} else {
-				t.Logf("\t%s\tShould be able to get back the same number of Query values.", tests.Success)
+				t.Logf("\t%s\tShould be able to get back the same query values.", tests.Success)
 			}
 		}
 	}
@@ -230,7 +198,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -292,17 +260,13 @@ func TestUpsertUpdateQuery(t *testing.T) {
 				t.Logf("\t%s\tShould have one more parameter in set record.", tests.Success)
 			}
 
-			oparam := qs1.Params[0]
-			uparam := updSet.Params[0]
-
-			if !reflect.DeepEqual(oparam, uparam) {
-				t.Logf("\t%+v", oparam)
-				t.Logf("\t%+v", uparam)
+			if !reflect.DeepEqual(qs2.Params[0], updSet.Params[0]) {
+				t.Logf("\t%+v", qs2.Params[0])
+				t.Logf("\t%+v", updSet.Params[0])
 				t.Errorf("\t%s\tShould be abe to validate the query param values in db.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be abe to validate the query param values in db.", tests.Success)
 			}
-
 		}
 	}
 }
@@ -312,10 +276,10 @@ func TestDeleteSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_spending_advice"
+	qsName := "QTEST_basic"
 	qsBadName := "QTEST_brod_advice"
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -331,6 +295,7 @@ func TestDeleteSet(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
 	}()
+
 	t.Log("Given the need to delete a query set in the database.")
 	{
 		t.Log("\tWhen using fixture", fixture)
@@ -364,9 +329,9 @@ func TestUnknownName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_spending_desire"
+	qsName := "QTEST_unknown"
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
@@ -410,9 +375,9 @@ func TestAPIFailure(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_spending_desire"
+	qsName := "QTEST_unknown"
 
-	const fixture = "./fixtures/spending_advice.json"
+	const fixture = "./fixtures/basic.json"
 	qs1, err := getFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
