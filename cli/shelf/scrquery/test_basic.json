@@ -1,0 +1,30 @@
+{
+   "name":"basic",
+   "desc":"Shows a basic multi result query.",
+   "enabled":true,
+   "params":null,
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "save":true,
+         "scripts":[
+            "{\"$match\": {\"station_id\" : \"42021\"}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+         ]
+      },
+      {
+         "name":"Time",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "save":true,
+         "has_date":true,
+         "scripts":[
+            "{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}",
+            "{\"$limit\": 2}"
+         ]
+      }
+   ]
+}

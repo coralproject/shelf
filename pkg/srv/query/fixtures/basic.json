@@ -7,7 +7,7 @@
       {
          "name":"Basic",
          "type":"pipeline",
-         "collection":"query_sets",
+         "collection":"test_bill",
          "save":true,
          "scripts":[
             "{\"$match\": {\"station_id\" : \"42021\"}}",

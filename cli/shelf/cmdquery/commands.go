@@ -20,7 +20,7 @@ func GetCommands() *cobra.Command {
 	addUpsert()
 	addGet()
 	addDel()
-	addExecute()
+	addExec()
 	addList()
 	return queryCmd
 }

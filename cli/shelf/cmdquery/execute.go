@@ -1,46 +1,71 @@
 package cmdquery
 
 import (
+	"encoding/json"
+
+	"github.com/coralproject/shelf/pkg/db"
+	"github.com/coralproject/shelf/pkg/srv/query"
 	"github.com/spf13/cobra"
 )
 
-var executeLong = `Executes a query from the system by the query name.
+var execLong = `Executes a query from the system by the query name.
 
 Example:
-	query execute -n "user_advice"
+	query exec -n "user_advice"
 
-	query execute -n "my_query" -v "key:value,key:value"
+	query exec -n "my_query" -v "key:value,key:value"
 `
 
-// execute contains the state for this command.
-var execute struct {
+// exec contains the state for this command.
+var exec struct {
 	name string
 	vars string
 }
 
-// addExecute handles the execution of queries.
-func addExecute() {
+// addExec handles the execution of queries.
+func addExec() {
 	cmd := &cobra.Command{
-		Use:   "execute",
+		Use:   "exec",
 		Short: "Executes a query by name.",
-		Long:  executeLong,
-		Run:   runExecute,
+		Long:  execLong,
+		Run:   runExec,
 	}
 
-	cmd.Flags().StringVarP(&execute.name, "name", "n", "", "Name of query.")
-	cmd.Flags().StringVarP(&execute.vars, "vars", "v", "", "Variables required by query.")
+	cmd.Flags().StringVarP(&exec.name, "name", "n", "", "Name of query.")
+	cmd.Flags().StringVarP(&exec.vars, "vars", "v", "", "Variables required by query.")
 
 	queryCmd.AddCommand(cmd)
 }
 
-// runExecute is the code that implements the execute command.
-func runExecute(cmd *cobra.Command, args []string) {
-	cmd.Printf("Executing Query : Name[%s] Vars[%v]\n", execute.name, execute.vars)
+// runExec is the code that implements the execute command.
+func runExec(cmd *cobra.Command, args []string) {
+	cmd.Printf("Exec Query : Name[%s] Vars[%v]\n", exec.name, exec.vars)
 
-	if execute.name == "" {
+	if exec.name == "" {
 		cmd.Help()
 		return
 	}
 
-	cmd.Println("Executing Query : Executed")
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	set, err := query.GetSetByName("", db, exec.name)
+	if err != nil {
+		cmd.Println("Exec Query : ", err)
+		return
+	}
+
+	if exec.vars != "" {
+		// TODO: Break K=V,K=V into a map.
+	}
+
+	result := query.ExecuteSet("", db, set, nil)
+
+	data, err := json.MarshalIndent(result, "", "    ")
+	if err != nil {
+		cmd.Println("Exec Query : ", err)
+		return
+	}
+
+	cmd.Printf("\n%s\n\n", string(data))
 }
