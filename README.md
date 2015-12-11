@@ -1,3 +1,5 @@
+**Note: This is an early stage project under active development. It is going to change quite a bit before it is ready. Consider it pre-alpha.**
+
 # Shelf
 
 Backend applications from The Coral Project

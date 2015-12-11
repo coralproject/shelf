@@ -1,0 +1,18 @@
+{
+   "name":"QTEST_basic",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "save":true,
+         "scripts":[
+            "{\"$match\": {\"station_id\" : \"42021\"}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+         ]
+      }
+   ]
+}
