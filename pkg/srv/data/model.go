@@ -1,4 +1,4 @@
-package comment
+package data
 
 import (
 	"fmt"
@@ -20,6 +20,8 @@ func init() {
 }
 
 //==============================================================================
+//==================================== Action ==================================
+//==============================================================================
 
 // Action denotes an action taken by an actor (User) on someone/something.
 //   TargetType and Target id may be zero value if data is a subdocument of the Target
@@ -33,6 +35,10 @@ type Action struct {
 	Date       time.Time `json:"date" bson:"date"`
 }
 
+//==============================================================================
+//==================================== Note ====================================
+//==============================================================================
+
 // Note denotes a note by a user in the system.
 type Note struct {
 	UserID string    `json:"user_id" bson:"user_id"`
@@ -40,10 +46,32 @@ type Note struct {
 	Date   time.Time `json:"date" bson:"date"`
 }
 
+//==============================================================================
+//==================================== Comment =================================
+//==============================================================================
+
+// struct defining required data to create a Comment
+type NComment struct {
+	UserID      string    `json:"user_id" bson:"user_id" validate:"required"`
+	ParentID    string    `json:"parent_id" bson:"parent_d"`
+	AssetID     string    `json:"asset_id" bson:"asset_id"`
+	Status      string    `json:"status" bson:"status"`
+	Body        string    `json:"body" bson:"body" validate:"required"`
+	DateCreated time.Time `json:"date_created" bson:"date_created"`
+}
+
+func (n *NComment) Validate() error {
+	errs := validate.Struct(n)
+	if errs != nil {
+		return fmt.Errorf("%v", errs)
+	}
+	return nil
+}
+
 // Comment denotes a comment by a user in the system.
 type Comment struct {
 	CommentID    string                 `json:"comment_id" bson:"comment_id"`
-	UserId       string                 `json:"user_id" bson:"user_id" validate:"required"`
+	UserID       string                 `json:"user_id" bson:"user_id" validate:"required"`
 	ParentID     string                 `json:"parent_id" bson:"parent_d"`
 	AssetID      string                 `json:"asset_id" bson:"asset_id"`
 	Children     []string               `json:"children" bson:"children"` // experimental
@@ -60,6 +88,29 @@ type Comment struct {
 	Source       map[string]interface{} `json:"source" bson:"source"` // source document if imported
 }
 
+func NewComment(n NComment) (*Comment, error) {
+	if err := n.Validate(); err != nil {
+		return nil, err
+	}
+
+	DateCreated := n.DateCreated
+	if DateCreated.IsZero() {
+		DateCreated = time.Now()
+	}
+
+	c := Comment{
+		UserID:      n.UserID,
+		ParentID:    n.ParentID,
+		AssetID:     n.AssetID,
+		Body:        n.Body,
+		Status:      n.Status,
+		DateCreated: DateCreated,
+	}
+
+	return &c, nil
+
+}
+
 // Validate performs validation on a Comment value before it is processed.
 func (com *Comment) Validate() error {
 	errs := validate.Struct(com)
@@ -71,19 +122,15 @@ func (com *Comment) Validate() error {
 }
 
 //==============================================================================
-
-// Taxonomy holds all name-value pairs.
-type Taxonomy struct {
-	Name  string `json:"name" bson:"name"`
-	Value string `json:"value" bson:"value"`
-}
+//==================================== Asset ===================================
+//==============================================================================
 
 // Asset denotes an asset in the system e.g. an article or a blog etc.
 type Asset struct {
-	AssetID    string     `json:"asset_id" bson:"asset_id"`
-	SourceID   string     `json:"src_id" bson:"src_id"`
-	URL        string     `json:"url" bson:"url" validate:"url"`
-	Taxonomies []Taxonomy `json:"taxonomies" bson:"taxonomies"`
+	AssetID    string   `json:"asset_id" bson:"asset_id"`
+	SourceID   string   `json:"src_id" bson:"src_id"`
+	URL        string   `json:"url" bson:"url" validate:"url"`
+	Taxonomies []string `json:"taxonomies" bson:"taxonomies"`
 }
 
 // Validate performs validation on an Asset value before it is processed.
@@ -96,6 +143,8 @@ func (a *Asset) Validate() error {
 	return nil
 }
 
+//==============================================================================
+//==================================== User ====================================
 //==============================================================================
 
 // User denotes a user in the system.

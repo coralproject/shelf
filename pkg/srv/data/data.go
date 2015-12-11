@@ -1,4 +1,4 @@
-package comment
+package data
 
 import (
 	"strings"
@@ -19,6 +19,8 @@ const (
 	userCollection    = "users"
 )
 
+//==============================================================================
+//==================================== Comment =================================
 //==============================================================================
 
 // CreateComment adds a new comment in the database.
@@ -45,14 +47,14 @@ func CreateComment(context interface{}, db *db.DB, com *Comment) error {
 }
 
 // GetCommentByID retrieves an individual comment by ID
-func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
+func GetCommentByID(context interface{}, db *db.DB, id string) (*Comment, error) {
 	log.Dev(context, "GetCommentById", "Started : Id[%s]", id)
 
-	var user User
+	var comment Comment
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"_id": id}
-		log.Dev(context, "GetCommentById", "MGO : db.%s.findOne(%s)", commentCollection, mongo.Query(q))
-		return c.Find(q).One(&user)
+		q := bson.M{"comment_id": id}
+		log.Dev(context, "GetCommentById", "MGO : db.%s.find(CommentId: '%s')", commentCollection, mongo.Query(q))
+		return c.Find(q).One(&comment)
 	}
 
 	if err := db.ExecuteMGO(context, commentCollection, f); err != nil {
@@ -61,9 +63,11 @@ func GetCommentByID(context interface{}, db *db.DB, id string) (*User, error) {
 	}
 
 	log.Dev(context, "GetCommentById", "Completed")
-	return &user, nil
+	return &comment, nil
 }
 
+//==============================================================================
+//==================================== User ====================================
 //==============================================================================
 
 // GetUserByID retrieves an individual user by ID
