@@ -9,7 +9,7 @@ package main
 import (
 	"github.com/coralproject/shelf/app/xenia/routes"
 
-	"github.com/coralproject/shelf/pkg/web/app"
+	"github.com/ardanlabs/kit/web/app"
 )
 
 func init() {

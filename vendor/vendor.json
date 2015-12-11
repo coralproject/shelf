@@ -3,6 +3,36 @@
 	"ignore": "",
 	"package": [
 		{
+			"path": "github.com/ardanlabs/kit/auth",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/cfg",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/db",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/log",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:53:34-05:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/tests",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/web",
+			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
+			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
 			"revision": "71acacd42f85e5e82f70a55327789582a5200a90",
 			"revisionTime": "2015-08-03T11:35:22-04:00"
@@ -69,6 +99,21 @@
 		},
 		{
 			"path": "gopkg.in/bluesuncorp/validator.v6",
+			"revision": "15e8444e515459e82ef3c33c8cd2dc68b2031e5b",
+			"revisionTime": "2015-09-24T07:48:25-04:00"
+		},
+		{
+			"path": "gopkg.in/check.v1",
+			"revision": "11d3bc7aa68e238947792f30573146a3231fc0f1",
+			"revisionTime": "2015-07-29T10:04:31+02:00"
+		},
+		{
+			"path": "gopkg.in/go-playground/assert.v1",
+			"revision": "81e18c3a1062114068407f67a360d6eb6b429715",
+			"revisionTime": "2015-09-24T06:57:13-04:00"
+		},
+		{
+			"path": "gopkg.in/go-playground/validator.v6",
 			"revision": "15e8444e515459e82ef3c33c8cd2dc68b2031e5b",
 			"revisionTime": "2015-09-24T07:48:25-04:00"
 		},

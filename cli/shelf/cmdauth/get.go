@@ -3,8 +3,8 @@ package cmdauth
 import (
 	"encoding/json"
 
-	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/srv/auth"
+	"github.com/ardanlabs/kit/auth"
+	"github.com/ardanlabs/kit/db"
 
 	"github.com/spf13/cobra"
 )

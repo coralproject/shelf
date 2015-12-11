@@ -6,11 +6,11 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/shelf/app/xenia/app"
 	"github.com/coralproject/shelf/app/xenia/routes"
 
-	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/tests"
+	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/tests"
+	"github.com/ardanlabs/kit/web/app"
 )
 
 func init() {

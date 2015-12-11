@@ -6,8 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/pkg/log"
-	"github.com/coralproject/shelf/pkg/srv/query"
+	"github.com/coralproject/shelf/pkg/query"
+
+	"github.com/ardanlabs/kit/log"
 )
 
 // setFromFile serializes the content of a getSet from a file using the

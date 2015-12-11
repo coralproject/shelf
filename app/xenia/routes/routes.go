@@ -5,8 +5,8 @@ import (
 
 	"github.com/coralproject/shelf/app/xenia/handlers"
 
-	"github.com/coralproject/shelf/pkg/web/app"
-	"github.com/coralproject/shelf/pkg/web/midware"
+	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web/midware"
 )
 
 // API returns a handler for a set of routes.

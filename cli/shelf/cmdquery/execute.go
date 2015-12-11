@@ -3,8 +3,10 @@ package cmdquery
 import (
 	"encoding/json"
 
-	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/srv/query"
+	"github.com/coralproject/shelf/pkg/query"
+
+	"github.com/ardanlabs/kit/db"
+
 	"github.com/spf13/cobra"
 )
 

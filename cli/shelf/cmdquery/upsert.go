@@ -4,9 +4,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/pkg/cfg"
-	"github.com/coralproject/shelf/pkg/db"
-	"github.com/coralproject/shelf/pkg/srv/query"
+	"github.com/coralproject/shelf/pkg/query"
+
+	"github.com/ardanlabs/kit/cfg"
+	"github.com/ardanlabs/kit/db"
 
 	"github.com/spf13/cobra"
 )

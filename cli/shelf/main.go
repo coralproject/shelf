@@ -7,9 +7,10 @@ import (
 	"github.com/coralproject/shelf/cli/shelf/cmdauth"
 	"github.com/coralproject/shelf/cli/shelf/cmddb"
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
-	"github.com/coralproject/shelf/pkg/cfg"
-	"github.com/coralproject/shelf/pkg/db/mongo"
-	"github.com/coralproject/shelf/pkg/log"
+
+	"github.com/ardanlabs/kit/cfg"
+	"github.com/ardanlabs/kit/db/mongo"
+	"github.com/ardanlabs/kit/log"
 
 	"github.com/spf13/cobra"
 )
@@ -35,7 +36,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	err := mongo.InitMGO()
+	err := mongo.Init()
 	if err != nil {
 		shelf.Println("Unable to initialize MongoDB")
 		os.Exit(1)

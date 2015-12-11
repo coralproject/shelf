@@ -5,8 +5,9 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/coralproject/shelf/pkg/srv/query"
-	"github.com/coralproject/shelf/pkg/web/app"
+	"github.com/coralproject/shelf/pkg/query"
+
+	"github.com/ardanlabs/kit/web/app"
 )
 
 // queryHandle maintains the set of handlers for the query api.
