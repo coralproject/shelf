@@ -14,7 +14,8 @@ import (
 )
 
 func init() {
-	tests.Init()
+	tests.Init("SHELF")
+	tests.InitMongo()
 }
 
 // TestQueryNames tests the retrieval of query names.
