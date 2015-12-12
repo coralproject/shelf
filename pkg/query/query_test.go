@@ -234,7 +234,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			qs2 := *qs1
-			qs2.Params = append(qs2.Params, query.SetParam{
+			qs2.Params = append(qs2.Params, query.Param{
 				Name:    "group",
 				Default: "1",
 				Desc:    "provides the group number for the query script",
