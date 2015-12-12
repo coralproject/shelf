@@ -1,6 +1,6 @@
 
 # query
-    import "github.com/coralproject/shelf/pkg/query"
+    import "github.com/coralproject/xenia/pkg/query"
 
 Package query provides the service layer for building apps using
 query functionality.

@@ -1,6 +1,6 @@
 
 # session
-    import "github.com/coralproject/shelf/pkg/srv/auth/session"
+    import "github.com/coralproject/xenia/pkg/srv/auth/session"
 
 Package session provides a level of security for web tokens by giving them an
 expiration date and a lookup point for the user accessing the API. The session

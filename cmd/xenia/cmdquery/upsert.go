@@ -4,7 +4,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -15,7 +15,7 @@ import (
 var upsertLong = `Use upsert to add or update a query in the system.
 Adding can be done per file or per directory.
 
-Note: Upsert will check for a $SHELF_PATH environment variable of which it
+Note: Upsert will check for a $XENIA_PATH environment variable of which it
 appends a './queries' to, when no dirPath or fileName is given.
 
 Example:

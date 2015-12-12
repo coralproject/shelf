@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/log"
 )

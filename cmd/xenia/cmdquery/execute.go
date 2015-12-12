@@ -3,7 +3,7 @@ package cmdquery
 import (
 	"encoding/json"
 
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
 

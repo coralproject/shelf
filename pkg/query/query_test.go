@@ -6,14 +6,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
 )
 
 func init() {
-	tests.Init("SHELF")
+	tests.Init("XENIA")
 	tests.InitMongo()
 }
 

@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/web/app"
 )

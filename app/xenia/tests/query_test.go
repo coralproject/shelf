@@ -5,8 +5,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/shelf/app/xenia/routes"
-	"github.com/coralproject/shelf/pkg/query"
+	"github.com/coralproject/xenia/app/xenia/routes"
+	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
@@ -16,7 +16,7 @@ import (
 var a *app.App
 
 func init() {
-	tests.Init("SHELF")
+	tests.Init("XENIA")
 	tests.InitMongo()
 
 	a = routes.API().(*app.App)

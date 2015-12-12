@@ -7,7 +7,7 @@
 package main
 
 import (
-	"github.com/coralproject/shelf/app/xenia/routes"
+	"github.com/coralproject/xenia/app/xenia/routes"
 
 	"github.com/ardanlabs/kit/web/app"
 )

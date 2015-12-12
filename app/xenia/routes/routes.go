@@ -3,7 +3,7 @@ package routes
 import (
 	"net/http"
 
-	"github.com/coralproject/shelf/app/xenia/handlers"
+	"github.com/coralproject/xenia/app/xenia/handlers"
 
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/ardanlabs/kit/web/midware"
@@ -11,7 +11,7 @@ import (
 
 func init() {
 	set := app.Settings{
-		ConfigKey: "SHELF",
+		ConfigKey: "XENIA",
 		UseMongo:  true,
 	}
 

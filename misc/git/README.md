@@ -6,7 +6,7 @@ A collection of useful pre-commit hooks can be found in the `pre-commit-hooks` d
 
 #### Installing pre-commit hooks
 
-In the `shelf/.git/hooks` directory, create a symbolic link to the `pre-commit` executable contained in this directory. 
+In the `xenia/.git/hooks` directory, create a symbolic link to the `pre-commit` executable contained in this directory. 
 
 ```bash
 cd $EVANSROOT/.git/hooks

@@ -6,6 +6,6 @@
 # Note the trailing "..." to make the paths recursive.
 # See "go help packages" for more info.
 #
-PKGS="github.com/shelf/log/... \
-github.com/shelf/cfg/... \
-github.com/shelf/xenia/tests/..."
+PKGS="github.com/xenia/log/... \
+github.com/xenia/cfg/... \
+github.com/xenia/xenia/tests/..."

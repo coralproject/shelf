@@ -1,6 +1,6 @@
 **Note: This is an early stage project under active development. It is going to change quite a bit before it is ready. Consider it pre-alpha.**
 
-# Shelf
+# Xenia
 
 Backend applications from The Coral Project
 
@@ -26,7 +26,7 @@ Configuration describing the endpoints and queries are stored in a mongo collect
 
 ### Quickstart
 
-*Todo: write installation guide, link to Trust deployment in Shelf*
+*Todo: write installation guide, link to Trust deployment in Xenia*
 
 *Todo: provide example query_set document*
 
