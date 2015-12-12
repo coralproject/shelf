@@ -2,64 +2,8 @@
 # query
     import "github.com/coralproject/shelf/pkg/query"
 
-Package query provides API's for managing querysets which will be used in
-executing different aggregation tests against their respective data collection.
-
-QuerySet
-In query, records are required to follow specific formatting and are at this
-point, only allowed to be in a json serializable format which meet the query.Set
-structure.
-
-The query set execution supports the following types:
-
-- Pipeline
-
-
-	  Pipeline query set types take advantage of MongoDB's aggregation API
-	(the currently supported data backend), which allows insightful use of its
-	internal query language, in providing context against data sets within the database.
-
-QuerySet Sample:
-
-```json
-{
-
-
-	"name":"spending_advice",
-	"description":"tests against user spending rate and provides adequate advice on saving more",
-	"enabled": true,
-	"params":[
-	  {
-	    "name":"user_id",
-	    "default":"396bc782-6ac6-4183-a671-6e75ca5989a5",
-	    "desc":"provides the user_id to check against the collection"
-	  }
-	],
-	"rules": [
-	{
-	  "desc":"match spending rate over 20 dollars",
-	  "type":"pipeline",
-	  "continue": true,
-	  "script_options": {
-	    "collection":"demo_user_transactions",
-	    "has_date":false,
-	    "has_objectid": false
-	  },
-	  "save_options": {
-	    "save_as":"high_dollar_users",
-	    "variables": true,
-	    "to_json": true
-	  },
-	  "var_options":{},
-	  "scripts":[
-	    "{ \"$match\" : { \"user_id\" : \"#userId#\", \"category\" : \"gas\" }}",
-	    "{ \"$group\" : { \"_id\" : { \"category\" : \"$category\" }, \"amount\" : { \"$sum\" : \"$amount\" }}}",
-	    "{ \"$match\" : { \"amount\" : { \"$gt\" : 20.00} }}"
-	  ]
-	 }]
-
-}
-```
+Package query provides the service layer for building apps using
+query functionality.
 
 
 
@@ -75,12 +19,20 @@ Set of query types we expect to receive
 
 ``` go
 const (
-    Collection        = "query_sets"
-    CollectionHistory = "query_sets_history"
+    Collection         = "query_sets"
+    CollectionHistory  = "query_sets_history"
+    CollectionExecTest = "test_query"
 )
 ```
 Contains the name of Mongo collections.
 
+
+
+## func AddTestSet
+``` go
+func AddTestSet(db *db.DB, qs *Set) error
+```
+AddTestSet inserts a set for testing.
 
 
 ## func DeleteSet
@@ -90,11 +42,34 @@ func DeleteSet(context interface{}, db *db.DB, name string) error
 DeleteSet is used to remove an existing Set document.
 
 
+## func DropTestData
+``` go
+func DropTestData()
+```
+DropTestData drops the temp collection.
+
+
+## func GenerateTestData
+``` go
+func GenerateTestData(db *db.DB) error
+```
+GenerateTestData creates a temp collection with data
+that can be used for testing things.
+
+
 ## func GetSetNames
 ``` go
 func GetSetNames(context interface{}, db *db.DB) ([]string, error)
 ```
 GetSetNames retrieves a list of rule names.
+
+
+## func RemoveTestSets
+``` go
+func RemoveTestSets(db *db.DB) error
+```
+RemoveTestSets is used to clear out all the test sets from the collection.
+All test query sets must start with QSTEST in their name.
 
 
 ## func UmarshalMongoScript
@@ -109,6 +84,26 @@ UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
 func UpsertSet(context interface{}, db *db.DB, qs *Set) error
 ```
 UpsertSet is used to create or update an existing Set document.
+
+
+
+## type Param
+``` go
+type Param struct {
+    Name    string `bson:"name" json:"name"`       // Name of the parameter.
+    Default string `bson:"default" json:"default"` // Default value for the parameter.
+    Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
+}
+```
+Param contains meta-data about a required parameter for the query.
+
+
+
+
+
+
+
+
 
 
 
@@ -184,11 +179,11 @@ ExecuteSet executes the specified query set by name.
 ## type Set
 ``` go
 type Set struct {
-    Name        string     `bson:"name" json:"name"`       // Name of the query set.
-    Description string     `bson:"desc" json:"desc"`       // Description of the query set.
-    Enabled     bool       `bson:"enabled" json:"enabled"` // If the query set is enabled to run.
-    Params      []SetParam `bson:"params" json:"params"`   // Collection of parameters.
-    Queries     []Query    `bson:"queries" json:"queries"` // Collection of queries.
+    Name        string  `bson:"name" json:"name"`       // Name of the query set.
+    Description string  `bson:"desc" json:"desc"`       // Description of the query set.
+    Enabled     bool    `bson:"enabled" json:"enabled"` // If the query set is enabled to run.
+    Params      []Param `bson:"params" json:"params"`   // Collection of parameters.
+    Queries     []Query `bson:"queries" json:"queries"` // Collection of queries.
 }
 ```
 Set contains the configuration details for a rule set.
@@ -199,6 +194,13 @@ Set contains the configuration details for a rule set.
 
 
 
+
+
+### func GetFixture
+``` go
+func GetFixture(fileName string) (*Set, error)
+```
+GetFixture retrieves a query record from the filesystem for testing.
 
 
 ### func GetLastSetHistoryByName
@@ -214,26 +216,6 @@ collection and returns the last one else returns a non-nil error if it fails.
 func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
 GetSetByName retrieves the configuration for the specified Set.
-
-
-
-
-## type SetParam
-``` go
-type SetParam struct {
-    Name    string `bson:"name" json:"name"`       // Name of the parameter.
-    Default string `bson:"default" json:"default"` // Default value for the parameter.
-    Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
-}
-```
-SetParam contains meta-data about a required parameter for the query.
-
-
-
-
-
-
-
 
 
 

@@ -1,3 +1,5 @@
+// Package query provides the service layer for building apps using
+// query functionality.
 package query
 
 import (
