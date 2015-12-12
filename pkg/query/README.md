@@ -1,6 +1,6 @@
 
 # query
-    import "github.com/coralproject/shelf/pkg/srv/query"
+    import "github.com/coralproject/shelf/pkg/query"
 
 Package query provides API's for managing querysets which will be used in
 executing different aggregation tests against their respective data collection.
@@ -64,13 +64,23 @@ QuerySet Sample:
 
 
 
-
-
-## func CreateSet
+## Constants
 ``` go
-func CreateSet(context interface{}, db *db.DB, qs *Set) error
+const (
+    TypePipeline = "pipeline"
+    TypeTemplate = "template"
+)
 ```
-CreateSet is used to create Set documents in the db.
+Set of query types we expect to receive
+
+``` go
+const (
+    Collection        = "query_sets"
+    CollectionHistory = "query_sets_history"
+)
+```
+Contains the name of Mongo collections.
+
 
 
 ## func DeleteSet
@@ -80,13 +90,6 @@ func DeleteSet(context interface{}, db *db.DB, name string) error
 DeleteSet is used to remove an existing Set document.
 
 
-## func ExecuteSet
-``` go
-func ExecuteSet(context interface{}, db *db.DB, name string) error
-```
-ExecuteSet is used to execute an existing Set document.
-
-
 ## func GetSetNames
 ``` go
 func GetSetNames(context interface{}, db *db.DB) ([]string, error)
@@ -94,28 +97,53 @@ func GetSetNames(context interface{}, db *db.DB) ([]string, error)
 GetSetNames retrieves a list of rule names.
 
 
-## func UpdateSet
+## func UmarshalMongoScript
 ``` go
-func UpdateSet(context interface{}, db *db.DB, qs *Set) error
+func UmarshalMongoScript(script string, q *Query) (bson.M, error)
 ```
-UpdateSet is used to update an existing Set document.
+UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
+
+
+## func UpsertSet
+``` go
+func UpsertSet(context interface{}, db *db.DB, qs *Set) error
+```
+UpsertSet is used to create or update an existing Set document.
 
 
 
 ## type Query
 ``` go
 type Query struct {
-    Description   string        `bson:"desc,omitempty" json:"desc,omitempty"`                     // Description of this specific query.
-    Type          string        `bson:"type" json:"type"`                                         // variable, inventory, pipeline, template
-    Continue      bool          `bson:"continue,omitempty" json:"continue,omitempty"`             // Indicates that on failure to process the next query.
-    ScriptOptions *ScriptOption `bson:"script_options,omitempty" json:"script_options,omitempty"` // Options associated with script processing.
-    SaveOptions   *SaveOption   `bson:"save_options,omitempty" json:"save_options,omitempty"`     // Options associated with saving the result.
-    VarOptions    *VarOption    `bson:"var_options,omitempty" json:"var_options,omitempty"`       // Options associated with variable processing.
-    Scripts       []string      `bson:"scripts" json:"scripts"`                                   // Scripts to process for the query.
+    // Unique name per Set where results are stored.
+    Name string `bson:"name" json:"name"`
+
+    // Description of this specific query.
+    Description string `bson:"desc,omitempty" json:"desc,omitempty"`
+
+    // TypePipeline, TypeTemplate
+    Type string `bson:"type" json:"type"`
+
+    // Name of the collection to use for processing the query.
+    Collection string `bson:"collection,omitempty" json:"collection,omitempty"`
+
+    // Indicates that on failure to process the next query.
+    Continue bool `bson:"continue,omitempty" json:"continue,omitempty"`
+
+    // Return the results back to the user with Name as the key.
+    Return bool `bson:"save" json:"save"`
+
+    // Indicates there is a date to be pre-processed in the scripts.
+    HasDate bool `bson:"has_date,omitempty" json:"has_date,omitempty"`
+
+    // Indicates there is an ObjectId to be pre-processed in the scripts.
+    HasObjectID bool `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`
+
+    // Scripts to process for the query.
+    Scripts []string `bson:"scripts" json:"scripts"`
 }
 ```
 Query contains the configuration details for a query.
-Options use a pointer so they can be excluded when not in use.
 
 
 
@@ -130,12 +158,8 @@ Options use a pointer so they can be excluded when not in use.
 ## type Result
 ``` go
 type Result struct {
-    FeedName   string      `json:"feed_name"`
-    Collection string      `json:"collection"`
-    QueryType  string      `json:"query_type"`
-    Results    interface{} `json:"results"`
-    Valid      bool        `json:"valid"`
-    Error      bool        `json:"-"`
+    Results interface{} `json:"results"`
+    Error   bool        `json:"error"`
 }
 ```
 Result contains the result of an query set execution.
@@ -148,44 +172,11 @@ Result contains the result of an query set execution.
 
 
 
-
-
-## type SaveOption
+### func ExecuteSet
 ``` go
-type SaveOption struct {
-    SaveAs    string `bson:"save_as,omitempty" json:"save_as,omitempty"`     // Name of the memory variable to store the result into.
-    Variables bool   `bson:"variables,omitempty" json:"variables,omitempty"` // Indicates if the result should be saved into the variables.
-    ToJSON    bool   `bson:"to_json,omitempty" json:"to_json,omitempty"`     // Convert the string result to JSON. Template oriented.
-}
+func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string) *Result
 ```
-SaveOption contains options for saving results.
-
-
-
-
-
-
-
-
-
-
-
-## type ScriptOption
-``` go
-type ScriptOption struct {
-    Collection  string `bson:"collection,omitempty" json:"collection,omitempty"`     // Name of the collection to use for processing the query.
-    HasDate     bool   `bson:"has_date,omitempty" json:"has_date,omitempty"`         // Indicates there is a date to be pre-processed in the scripts.
-    HasObjectID bool   `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"` // Indicates there is an ObjectId to be pre-processed in the scripts.
-}
-```
-ScriptOption contains options for processing the scripts.
-
-
-
-
-
-
-
+ExecuteSet executes the specified query set by name.
 
 
 
@@ -210,6 +201,14 @@ Set contains the configuration details for a rule set.
 
 
 
+### func GetLastSetHistoryByName
+``` go
+func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error)
+```
+GetLastSetHistoryByName gets the last written Set within the query_history
+collection and returns the last one else returns a non-nil error if it fails.
+
+
 ### func GetSetByName
 ``` go
 func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error)
@@ -228,24 +227,6 @@ type SetParam struct {
 }
 ```
 SetParam contains meta-data about a required parameter for the query.
-
-
-
-
-
-
-
-
-
-
-
-## type VarOption
-``` go
-type VarOption struct {
-    ObjectID bool `bson:"object_id,omitempty" json:"object_id,omitempty"` // Indicates to save ObjectId values with ObjectId tag.
-}
-```
-VarOption contains options for processing variables.
 
 
 

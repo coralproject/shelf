@@ -2,7 +2,7 @@
     "collections":
     [
         {
-            "name": "sessions",
+            "name": "auth_sessions",
             "indexes":
                 [
                     {   "name" : "session_id",
@@ -16,7 +16,7 @@
                 ]
         },
         {
-            "name": "auth",
+            "name": "auth_users",
             "indexes":
                 [
                     {   "name" : "public_id",

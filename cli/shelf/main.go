@@ -4,8 +4,6 @@ package main
 import (
 	"os"
 
-	"github.com/coralproject/shelf/cli/shelf/cmdauth"
-	"github.com/coralproject/shelf/cli/shelf/cmddb"
 	"github.com/coralproject/shelf/cli/shelf/cmdquery"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -42,6 +40,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	shelf.AddCommand(cmdauth.GetCommands(), cmdquery.GetCommands(), cmddb.GetCommands())
+	shelf.AddCommand(cmdquery.GetCommands())
 	shelf.Execute()
 }
