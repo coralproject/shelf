@@ -1,16 +1,16 @@
 {
-   "name":"QTEST_basic",
+   "name":"QTEST_basic_var",
    "desc":"",
    "enabled":true,
    "params":[],
    "queries":[
       {
-         "name":"Basic",
+         "name":"BasicVar",
          "type":"pipeline",
          "collection":"test_query",
          "save":true,
          "scripts":[
-            "{\"$match\": {\"station_id\" : \"42021\"}}",
+            "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
             "{\"$project\": {\"_id\": 0, \"name\": 1}}"
          ]
       }

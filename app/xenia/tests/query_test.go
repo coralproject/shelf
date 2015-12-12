@@ -22,6 +22,21 @@ func init() {
 	a = routes.API().(*app.App)
 }
 
+// TestMain helps to clean up the test data.
+func TestMain(m *testing.M) {
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	query.GenerateTestData(db)
+	defer query.DropTestData()
+
+	loadQuery(db, "basic.json")
+	loadQuery(db, "basic_var.json")
+	defer query.RemoveTestSets(db)
+
+	m.Run()
+}
+
 //==============================================================================
 
 // TestQueryNames tests the retrieval of query names.
@@ -29,15 +44,13 @@ func TestQueryNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	loadQuery()
-	defer removeQuery()
-
+	url := "/1.0/query"
 	r := tests.NewRequest("GET", "/1.0/query", nil)
 	w := httptest.NewRecorder()
 
 	a.ServeHTTP(w, r)
 
-	t.Log("Given the need get a list of query names.")
+	t.Logf("\tWhen calling url : %s", url)
 	{
 		t.Log("\tWhen we user version 1.0 of the query endpoint.")
 		if w.Code != 200 {
@@ -52,9 +65,7 @@ func TestQueryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	loadQuery()
-	defer removeQuery()
-
+	url := "/1.0/query/QTEST_basic"
 	r := tests.NewRequest("GET", "/1.0/query/QTEST_basic", nil)
 	w := httptest.NewRecorder()
 
@@ -62,38 +73,63 @@ func TestQueryByName(t *testing.T) {
 
 	t.Log("Given the need get a specific query.")
 	{
-		t.Log("\tWhen we user version 1.0 of the query/basic endpoint.")
+		t.Logf("\tWhen calling url : %s", url)
 		if w.Code != 200 {
 			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
 		}
 		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+
+		resp := `{"name":"QTEST_basic","desc":"","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query","save":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]}]}`
+		if resp[0:245] != w.Body.String()[0:245] {
+			t.Log(resp)
+			t.Log(w.Body.String())
+			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+		}
+		t.Logf("\t%s\tShould get the expected result.", tests.Success)
+	}
+}
+
+// TestQueryExec tests the execution of a specific query.
+func TestQueryExec(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	url := "/1.0/query/QTEST_basic/exec?station_id=42021"
+	r := tests.NewRequest("GET", url, nil)
+	w := httptest.NewRecorder()
+
+	a.ServeHTTP(w, r)
+
+	t.Log("Given the need get a specific query.")
+	{
+		t.Logf("\tWhen calling url : %s", url)
+		if w.Code != 200 {
+			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+		}
+		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+
+		resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+		if resp[0:92] != w.Body.String()[0:92] {
+			t.Log(resp)
+			t.Log(w.Body.String())
+			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+		}
+		t.Logf("\t%s\tShould get the expected result.", tests.Success)
 	}
 }
 
 //==============================================================================
 
 // loadQuery adds queries to run tests.
-func loadQuery() error {
-	const fixture = "basic.json"
+func loadQuery(db *db.DB, fixture string) error {
 	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		return err
 	}
-
-	db := db.NewMGO()
-	defer db.CloseMGO()
 
 	if err := query.AddTestSet(db, qs1); err != nil {
 		return err
 	}
 
 	return nil
-}
-
-// removeQuery removes the queries for the tests.
-func removeQuery() error {
-	db := db.NewMGO()
-	defer db.CloseMGO()
-
-	return query.RemoveTestSets(db)
 }
