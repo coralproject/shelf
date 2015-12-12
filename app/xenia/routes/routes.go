@@ -9,6 +9,17 @@ import (
 	"github.com/ardanlabs/kit/web/midware"
 )
 
+func init() {
+	set := app.Settings{
+		ConfigKey: "SHELF",
+		UseMongo:  true,
+	}
+
+	app.Init(&set)
+}
+
+//==============================================================================
+
 // API returns a handler for a set of routes.
 func API() http.Handler {
 	a := app.New(midware.Auth)
@@ -17,7 +28,6 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/query", handlers.Query.List)
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
 	a.Handle("GET", "/1.0/query/:name/exec", handlers.Query.Execute)
-	// a.Handle("POST", "/1.0/exec/custom", handlers.Query.ExecuteCustom)
 
 	return a
 }

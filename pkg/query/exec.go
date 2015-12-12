@@ -26,6 +26,8 @@ type docs struct {
 // emptyResult is for returning empty runs.
 var emptyResult []docs
 
+//==============================================================================
+
 // ExecuteSet executes the specified query set by name.
 func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string) *Result {
 	log.Dev(context, "ExecuteSet", "Started : Name[%s]", set.Name)

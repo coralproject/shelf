@@ -4,33 +4,45 @@
 	"package": [
 		{
 			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
-			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
-			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
-			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/log",
-			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
-			"revisionTime": "2015-12-11T17:53:34-05:00"
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
-			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
 			"revision": "00032e985e60cbb620a174f90af58ecc428754a5",
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
+		},
+		{
+			"origin": "github.com/coralproject/shelf/vendor/github.com/ardanlabs/kit/web/app",
+			"path": "github.com/ardanlabs/kit/web/app",
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
+		},
+		{
+			"origin": "github.com/coralproject/shelf/vendor/github.com/ardanlabs/kit/web/midware",
+			"path": "github.com/ardanlabs/kit/web/midware",
+			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
+			"revisionTime": "2015-12-12T01:12:27-05:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",

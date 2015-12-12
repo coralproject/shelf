@@ -12,15 +12,6 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 )
 
-func init() {
-	set := app.Settings{
-		ConfigKey: "SHELF",
-		UseMongo:  true,
-	}
-
-	app.Init(&set)
-}
-
 func main() {
 	app.Run("XENIA_HOST", ":4000", routes.API())
 }

@@ -1,0 +1,18 @@
+{
+   "name":"basic_var",
+   "desc":"Shows a basic query with variable.",
+   "enabled":true,
+   "params":null,
+   "queries":[
+      {
+         "name":"BasicVar",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "save":true,
+         "scripts":[
+            "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+         ]
+      }
+   ]
+}

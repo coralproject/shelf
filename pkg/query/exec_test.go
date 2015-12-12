@@ -2,18 +2,14 @@ package query_test
 
 import (
 	"encoding/json"
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/coralproject/shelf/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -88,13 +84,13 @@ func TestExecuteSet(t *testing.T) {
 
 	t.Logf("Given the need to execute mongo commands.")
 	{
-		err := generateTestData(db)
+		err := query.GenerateTestData(db)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
 
-		defer dropTestData()
+		defer query.DropTestData()
 
 		for _, es := range execSet {
 			t.Logf("\tWhen using Execute Set %s", es.set.Name)
@@ -181,7 +177,7 @@ func querySetBasic() execSet {
 				{
 					Name:       "Basic",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "42021"}}`,
@@ -205,7 +201,7 @@ func querySetWithTime() execSet {
 				{
 					Name:       "Time",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					HasDate:    true,
 					Scripts: []string{
@@ -231,7 +227,7 @@ func querySetWithMultiResults() execSet {
 				{
 					Name:       "Basic",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "42021"}}`,
@@ -241,7 +237,7 @@ func querySetWithMultiResults() execSet {
 				{
 					Name:       "Time",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					HasDate:    true,
 					Scripts: []string{
@@ -267,7 +263,7 @@ func querySetNoResults() execSet {
 				{
 					Name:       "NoResults",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "XXXXXX"}}`,
@@ -291,7 +287,7 @@ func querySetMalformed() execSet {
 				{
 					Name:       "Malformed",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "XXXXXX"`,
@@ -319,7 +315,7 @@ func querySetBasicVars() execSet {
 				{
 					Name:       "Vars",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "#stationid#"}}`,
@@ -347,7 +343,7 @@ func querySetBasicVarMissing() execSet {
 				{
 					Name:       "Vars",
 					Type:       "pipeline",
-					Collection: "test_query",
+					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "#stationid#"}}`,
@@ -361,60 +357,6 @@ func querySetBasicVarMissing() execSet {
 }
 
 //==============================================================================
-
-// generateTestData creates a temp collection with data
-// that can be used for testing things.
-func generateTestData(db *db.DB) error {
-	file, err := os.Open("exec_test_data.json")
-	if err != nil {
-		return err
-	}
-
-	defer file.Close()
-
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		return err
-	}
-
-	var rawDocs []bson.M
-	if err := json.Unmarshal(data, &rawDocs); err != nil {
-		return err
-	}
-
-	var docs []interface{}
-	for _, rd := range rawDocs {
-		mar, err := json.Marshal(rd)
-		if err != nil {
-			return err
-		}
-
-		doc, err := query.UmarshalMongoScript(string(mar), &query.Query{HasDate: true})
-		if err != nil {
-			return err
-		}
-
-		docs = append(docs, doc)
-	}
-
-	f := func(c *mgo.Collection) error {
-		return c.Insert(docs...)
-	}
-
-	if err := db.ExecuteMGO(tests.Context, "test_query", f); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// dropTestData drops the temp collection.
-func dropTestData() {
-	db := db.NewMGO()
-	defer db.CloseMGO()
-
-	mongo.GetCollection(db.MGOConn, "test_query").DropCollection()
-}
 
 // compareBson compares two bson maps for equivalence.
 func compareBson(m1 bson.M, m2 bson.M) bool {

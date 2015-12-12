@@ -1,9 +1,7 @@
 package query_test
 
 import (
-	"encoding/json"
 	"errors"
-	"os"
 	"reflect"
 	"strings"
 	"testing"
@@ -12,9 +10,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
-
-	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 func init() {
@@ -29,8 +24,8 @@ func TestUpsertCreateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -40,7 +35,7 @@ func TestUpsertCreateQuery(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -85,8 +80,8 @@ func TestGetSetNames(t *testing.T) {
 
 	qsName := "QTEST_basic"
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -96,7 +91,7 @@ func TestGetSetNames(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -152,8 +147,8 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 
 	qsName := "QTEST_basic"
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -163,7 +158,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -207,8 +202,8 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -218,7 +213,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -288,8 +283,8 @@ func TestDeleteSet(t *testing.T) {
 	qsName := "QTEST_basic"
 	qsBadName := "QTEST_brod_advice"
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -299,7 +294,7 @@ func TestDeleteSet(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -340,8 +335,8 @@ func TestUnknownName(t *testing.T) {
 
 	qsName := "QTEST_unknown"
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -351,7 +346,7 @@ func TestUnknownName(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := removeSets(db); err != nil {
+		if err := query.RemoveTestSets(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -386,8 +381,8 @@ func TestAPIFailure(t *testing.T) {
 
 	qsName := "QTEST_unknown"
 
-	const fixture = "./fixtures/basic.json"
-	qs1, err := getFixture(fixture)
+	const fixture = "basic.json"
+	qs1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -423,50 +418,4 @@ func TestAPIFailure(t *testing.T) {
 			t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)
 		}
 	}
-}
-
-//==============================================================================
-
-// removeSets is used to clear out all the test sets from the collection.
-// All test query sets must start with QSTEST in their name.
-func removeSets(db *db.DB) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(tests.Context, query.Collection, f); err != nil {
-		return err
-	}
-
-	f = func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
-		_, err := c.RemoveAll(q)
-		return err
-	}
-
-	if err := db.ExecuteMGO(tests.Context, query.CollectionHistory, f); err != nil {
-		return err
-	}
-
-	return nil
-}
-
-// getFixture retrieves a query record from the filesystem.
-func getFixture(filePath string) (*query.Set, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-
-	defer file.Close()
-
-	var qs query.Set
-	err = json.NewDecoder(file).Decode(&qs)
-	if err != nil {
-		return nil, err
-	}
-
-	return &qs, nil
 }
