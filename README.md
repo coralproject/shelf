@@ -1,37 +1,148 @@
-**Note: This is an early stage project under active development. It is going to change quite a bit before it is ready. Consider it pre-alpha.**
-
 # Xenia
 
-Backend applications from The Coral Project
+Alpha Release
 
-### Welcome!
-
-All software in this repo is Open Source, offered under the MIT license.
-
-For more information about The Coral Project, please visit [our website](https://coralproject.net).  For more information about how this technology is used in our projects, please visit [the reef](https://github.com/coralproject/reef).
-
-Note: For expediency we are focusing all of our server-side development efforts in this single repo during initial development.  Once packages and dependencies become clear, we will implement concise apis and separate the various applications into their final homes. 
-
-Note: The repo is under active development. Please browse our Issues and Pull Requests to get an idea of the state of our work.
-
-If anything is unclear, please ask early and often! [Slack channel]  
-
-## Xenia
-
-![Xenia Coral](http://www.101-saltwater-aquarium.com/graphics/xenia.jpg)
-
-Xenia is a flexible service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).  
+A flexible service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).  
 
 Configuration describing the endpoints and queries are stored in a mongo collection allowing for updates to the service layer without touching Go code or restarting the application.
 
+
+![Xenia Coral](http://www.101-saltwater-aquarium.com/graphics/xenia.jpg)
+
+
 ### Quickstart
 
-*Todo: write installation guide, link to Trust deployment in Xenia*
+#### Installation
 
-*Todo: provide example query_set document*
+1) Make sure you're have [go 1.5 or later](https://golang.org/dl/) installed and your [environment set up](https://golang.org/doc/install).
+
+2) Make sure your go vendor experiment flag is set (will be set by default in a couple of months...)
+
+```
+export GO15VENDOREXPERIMENT=1
+```
+
+_We recommend adding this to your ~/.bash_profile or other startup script_ as it will become default go behavior soon.
+
+3) Get the source code:
+
+```
+go get github.com/coralproject/xenia
+```
+
+4) Tell xenia which database you want to use:
+
+Edit one of the .cfg files in /config/, then:
+
+```
+source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
+```
+
+_Be careful not to commit any database passwords back to the repo!!_
+
+
+#### Run the web server
+
+1) To run the web server, build and run /app/xenia:
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
+go build
+./xenia
+```
+
+2) Xenia is secured via an Authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.  
+
+If you intend to hit endpoint through a browser, install an Addon/plugin/extension that will add headers to your requests. 
+
+```
+Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9"
+```
+
+#### Run the CLI tool (optional)
+
+Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
+
+_If you are running xenia on a db for the first time, you will need to use the CLI tool to add endpoints.  Without endpoints, xenia just sort of sits in the corner and rusts._
+
+1) Build and run /cli/xenia:
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
+go build
+./xenia
+```
+
+
+### Publishing Endpoints
+
+Xenia publishes http endpoints against mongodb aggregation pipeline commands.  These endpoints are read from a mongodb collection called _query\_sets_.
+
+To see the live query_sets:
+
+```
+mongo [flags to connect to your server]
+use coral (or your databasename)
+db.query_sets.find()
+```
+
+By convention, we store working queries in .json files.  You can find them [here](cmd/xenia/scrquery/):
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia/scrquery
+ls
+```
+
+#### Example query_set
+
+Here's a basic query_set configuration containing two pipeline calls and using a variable called #station_id#.
+
+
+```
+{
+   "name":"basic",
+   "desc":"Shows a basic multi result query.",
+   "enabled":true,
+   "params":null,
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "return":true,
+         "scripts":[
+            "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+         ]
+      },
+      {
+         "name":"Time",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "return":true,
+         "has_date":true,
+         "scripts":[
+            "{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}",
+            "{\"$project\": {\"_id\": 0, \"name\": 1}}",
+            "{\"$limit\": 2}"
+         ]
+      }
+   ]
+}
+```
+
+This query would be published to:
+
+```
+http://[server]:[port]/1.0/query/basic?station_id=123123
+```
+
+For living documentation of each of the parameters, please see [/pkg/query/main.go](pkg/query/main.go).
+
 
 *Todo: describe Xenia's Auth paradigm*
 
+## Concepts and Motivations
 
 ### Composition
 
@@ -46,77 +157,9 @@ Xenia moves 100% of the query logic out of the application code. Front end devs,
 Xenia's CLI tools allow anyone with a basic understanding of document database concepts and aggregation pipeline syntax to create or update endpoints.  (Once the web UI is complete updates to the pipelines will be even more convenient.) 
 
 
+### Also, Welcome!
 
-## Trust Service Layer
+All software in this repo is Open Source, offered under the MIT license.
 
-The application publishes all endpoints that cannot be accomplished via Xenia Aggregation Pipelines.  
+For more information about The Coral Project, please visit [our website](https://coralproject.net).  For more information about how this technology is used in our projects, please visit [the reef](https://github.com/coralproject/reef).
 
-The primary job of the service layer is to expose CRUD functionality for all Trust specific data types:
-
-
-### Users
-
-Collection: users
-
-A User is a member of the community.  They are the sole _actor_ type insomuch as they can create _content_ (aka, write comments) and perform _actions_ on _content_.
-
-*Todo: define count caching strategy for all _actors_.*
-
-*Todo: provide link to user model*
-
-### Comments
-
-Collection: comments
-
-A comment is a basic type of _content_. As _content_ it can be _acted on_.  
-
-*Todo: define count caching strategy for all _actionable_ content.*
-
-*Todo: provide link to user model*
-
-### Assets
-
-Collection: assets
-
-Addressable pieces of content that live outside of the Coral Ecosystem. The classic asset is an article.  _Content_ such as comments may be _on_ an asset.  In this sense, Assets are used to index conversation threads.
-
-### Actions
-
-Actions are carried out by _actors_ (aka, a User) on _content_ aka a comment.  
-
-Actions include:
-
-* A type (aka, 'like', 'recommend', 'flag')
-* An actor (aka, user_id: 23456)
-* A Target (aka, comment_id: 3242342)
-* (optional) A value (aka: 5 (as in 5 stars))
-
-### User Lists 
-
-Collection: coral_lists
-
-The primary use case of Trust is to allow community curators to build lists of users based on formulas.  
-
-Schema:
-
-* _id - bson id - required - provided by mongo
-* name - string - required - identifying name, also used in api url
-* curator - bson id - optional - placeholder for user
-* formula - CoralFormula - instructions for calculating metrics (to be defined)
-
-### Tags 
-
-Collections: coral_tags, coral_tags_ref(?)
-
-Curators may apply Tags to User and Comments. The list of available tags can be managed in the Settings interface.
-
-(To Be Designed) - The association between a tag and an object with either be stored in a reference collection or a subdocument.  
-
-### Notes (on users and comments)
-
-Collections: coral_notes(?)
-
-Curators may write Notes on Users and Comments. The list of available tags can be managed in the Settings interface.
-
-(To Be Designed) - The association between a tag and an object with either be stored in a reference collection or a subdocument.  
-	
