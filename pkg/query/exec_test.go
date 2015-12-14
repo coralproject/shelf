@@ -255,7 +255,7 @@ func querySetWithMultiResults() execSet {
 // querySetNoResults starts with a simple query set with no results.
 func querySetNoResults() execSet {
 	return execSet{
-		fail: true,
+		fail: false,
 		set: &query.Set{
 			Name:    "NoResults",
 			Enabled: true,
@@ -272,7 +272,7 @@ func querySetNoResults() execSet {
 				},
 			},
 		},
-		result: `{"results":{"error":"No result"},"error":true}`,
+		result: `{"results":[{"Name":"NoResults","Docs":[]}],"error":false}`,
 	}
 }
 

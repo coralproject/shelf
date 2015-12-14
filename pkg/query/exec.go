@@ -163,9 +163,9 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 		return docs{}, err
 	}
 
-	// If there were no results, treat it as an error.
-	if len(results) == 0 {
-		return docs{}, errors.New("No result")
+	// If there were no results, return an empty array.
+	if results == nil {
+		results = []bson.M{}
 	}
 
 	return docs{q.Name, results}, nil
