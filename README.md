@@ -63,8 +63,6 @@ Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFR
 
 Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
 
-_If you are running xenia on a db for the first time, you will need to use the CLI tool to add endpoints.  Without endpoints, xenia just sort of sits in the corner and rusts._
-
 1) Build and run /cli/xenia:
 
 ```
@@ -73,12 +71,35 @@ go build
 ./xenia
 ```
 
+2) ./xenia --help will take you from there
+
 
 ### Publishing Endpoints
 
 Xenia publishes http endpoints against mongodb aggregation pipeline commands.  These endpoints are read from a mongodb collection called _query\_sets_.
 
-To see the live query_sets:
+_If you are running xenia on a db for the first time, you will need to use the CLI tool to add endpoints.  Without endpoints, xenia just sort of sits in the corner and rusts._
+
+#### Adding query sets
+
+Querysets can be added through the cli tool like so:
+
+```
+./xenia query upsert -p ./scrquery/test_basic_var.json
+```
+
+By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](https://github.com/CoralProject/xenia/tree/master/cmd/xenia/scrquery) folder.  As we develop Coral features, store the .json files there so other members can use them.  Eventually, groups query_sets will be refactored to elsewhere's yet undefined.
+
+
+#### Viewing active query sets
+
+You can view a list of query_sets via the cli tool like so:
+
+```
+./xenia query list
+```
+
+Or you can just look in the db at them in raw form thiswise:
 
 ```
 mongo [flags to connect to your server]
