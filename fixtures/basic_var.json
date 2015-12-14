@@ -8,7 +8,7 @@
          "name":"BasicVar",
          "type":"pipeline",
          "collection":"test_query",
-         "save":true,
+         "return":true,
          "scripts":[
             "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
             "{\"$project\": {\"_id\": 0, \"name\": 1}}"

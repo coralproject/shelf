@@ -6,7 +6,6 @@ import (
 
 	"github.com/coralproject/xenia/pkg/query"
 
-	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 
 	"github.com/spf13/cobra"
@@ -14,9 +13,6 @@ import (
 
 var upsertLong = `Use upsert to add or update a query in the system.
 Adding can be done per file or per directory.
-
-Note: Upsert will check for a $XENIA_PATH environment variable of which it
-appends a './queries' to, when no dirPath or fileName is given.
 
 Example:
 	query upsert -p user_advice.json
@@ -50,15 +46,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 	if upsert.path == "" {
 		cmd.Help()
 		return
-	}
-
-	if upsert.path == "" {
-		dir, err := cfg.String(envKey)
-		if err != nil {
-			upsert.path = defDir
-		} else {
-			upsert.path = filepath.Join(dir, defDir)
-		}
 	}
 
 	pwd, err := os.Getwd()

@@ -24,7 +24,7 @@ type Query struct {
 	Continue bool `bson:"continue,omitempty" json:"continue,omitempty"`
 
 	// Return the results back to the user with Name as the key.
-	Return bool `bson:"save" json:"save"`
+	Return bool `bson:"return" json:"return"`
 
 	// Indicates there is a date to be pre-processed in the scripts.
 	HasDate bool `bson:"has_date,omitempty" json:"has_date,omitempty"`
