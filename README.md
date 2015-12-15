@@ -59,13 +59,15 @@ export XENIA_LOGGING_LEVEL=0
 
 ### Creating a Xenia database for the first time
 
-If you are running Xenia on a db for the first time you will need the Xenia command line tool:
-
-1) Run the db create command:
+If you are running Xenia on a Mongo database for the first time you will need the Xenia command line tool to perform these functions.
 
 ```
-cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
+cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
+```
 
+1) Run the `db create` command:
+
+```
 ./xenia db create -f ./srcdb/database.json
 ```
 
@@ -74,18 +76,14 @@ _You must run this on a new database to create the collections and the proper se
 2) Load all the exiting queries:
 
 ```
-cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
-
 ./xenia query upsert -p ./scrquery
 ```
 
-## Run the web server
+## Run the web service
 
-1) To run the web server, build and run /app/xenia:
+1) To run the web service, build and run `/app/xenia`:
 
 ```
-cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
-
 go build
 ./xenia
 ```
@@ -99,6 +97,34 @@ Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFR
 Xenia is secured via an authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.  
 
 If you intend to hit endpoints through a browser, install an Addon/plugin/extension that will allow you to add headers to your requests.
+
+### API calls
+
+If you set the authorization header properly in your browser you can run the following endpoints:
+
+1) Get a list of configured queries:
+
+```
+http://localhost:4000/1.0/query
+```
+
+2) Get the query set document for the `basic` query set:
+
+```
+http://localhost:4000/1.0/query/basic
+```
+
+3) Execute the query for the `basic` query set:
+
+```
+http://localhost:5000/1.0/query/basic/exec
+```
+
+4) Execute the query for the `basic_var` query set with variables:
+
+```
+http://localhost:5000/1.0/query/basic_var/exec?station_id=42021
+```
 
 ## Query management
 
