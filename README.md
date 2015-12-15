@@ -143,13 +143,13 @@ cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 3) Look at the details of a query:
 
 ```
-./xenia query get -n top_commenters_by_count
+./xenia query get -n basic
 ```
 
 4) Execute a query:
 
 ```
-./xenia query exec -n top_commenters_by_count
+./xenia query exec -n basic
 ```
 
 5) Add or update a query for use:
@@ -175,7 +175,7 @@ use coral (or your databasename)
 db.query_sets.find()
 ```
 
-#### Example query_set
+#### Example query set
 
 Here's a basic query set document containing two pipeline calls and using a variable called #station_id#:
 
@@ -218,7 +218,7 @@ This query once saved can be executed via the API:
 http://[server]:[port]/1.0/query/basic?station_id=123123
 ```
 
-For documentation of each field in a query set document please refer to the [models.go](pkg/query/models.go) source code file.
+For documentation of each field in a query set document please refer to the [model.go](/xenia/pkg/query/model.go) source code file.
 
 ## API Authentication
 
