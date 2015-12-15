@@ -7,7 +7,7 @@
       {
          "name":"Basic",
          "type":"pipeline",
-         "collection":"test_bill",
+         "collection":"test_query_data",
          "return":true,
          "scripts":[
             "{\"$match\": {\"station_id\" : \"42021\"}}",
@@ -17,7 +17,7 @@
       {
          "name":"Time",
          "type":"pipeline",
-         "collection":"test_bill",
+         "collection":"test_query_data",
          "return":true,
          "has_date":true,
          "scripts":[

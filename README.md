@@ -38,6 +38,20 @@ source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
 
 These environment variables must be set before running any of the code.
 
+```
+export XENIA_MONGO_HOST=52.23.154.37:27017
+export XENIA_MONGO_USER=coral-user
+export XENIA_MONGO_AUTHDB=coral
+export XENIA_MONGO_DB=coral
+
+export XENIA_LOGGING_LEVEL=1
+
+export XENIA_XENIA_HOST=:4000
+
+# DO NOT PUSH TO REPO
+export XENIA_MONGO_PASS=
+```
+
 _Be careful not to commit any database passwords back to the repo!!_
 
 ### Build the CLI tool
@@ -77,6 +91,10 @@ _You must run this on a new database to create the collections and the proper se
 
 ```
 ./xenia query upsert -p ./scrquery
+
+output:
+
+Upserting Query : Upserted
 ```
 
 ## Run the web service
@@ -106,24 +124,40 @@ If you set the authorization header properly in your browser you can run the fol
 
 ```
 http://localhost:4000/1.0/query
+
+output:
+
+["basic","basic_var","top_commenters_by_count"]
 ```
 
 2) Get the query set document for the `basic` query set:
 
 ```
 http://localhost:4000/1.0/query/basic
+
+output:
+
+{"name":"basic","desc":"Shows a basic multi result query.","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query_data","return":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]},{"name":"Time","type":"pipeline","collection":"test_bill","return":true,"has_date":true,"scripts":["{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}","{\"$project\": {\"_id\": 0, \"name\": 1}}","{\"$limit\": 2}"]}]}
 ```
 
 3) Execute the query for the `basic` query set:
 
 ```
-http://localhost:5000/1.0/query/basic/exec
+http://localhost:4000/1.0/query/basic/exec
+
+output:
+
+{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}
 ```
 
 4) Execute the query for the `basic_var` query set with variables:
 
 ```
-http://localhost:5000/1.0/query/basic_var/exec?station_id=42021
+http://localhost:4000/1.0/query/basic_var/exec?station_id=42021
+
+output:
+
+{"results":[{"Name":"BasicVar","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}
 ```
 
 ## Query management
@@ -196,11 +230,22 @@ output:
     "results": [
         {
             "Name": "Basic",
-            "Docs": []
+            "Docs": [
+                {
+                    "name": "C14 - Pasco County Buoy, FL"
+                }
+            ]
         },
         {
             "Name": "Time",
-            "Docs": []
+            "Docs": [
+                {
+                    "name": "C14 - Pasco County Buoy, FL"
+                },
+                {
+                    "name": "GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"
+                }
+            ]
         }
     ],
     "error": false
@@ -274,7 +319,7 @@ Here's a basic query set document containing two pipeline calls and using a vari
 This query once saved can be executed via the API:
 
 ```
-http://[server]:[port]/1.0/query/basic?station_id=123123
+http://[server]:[port]/1.0/query/[name]?[var_key]=[var_value]
 ```
 
 For documentation of each field in a query set document please refer to the [model.go](/pkg/query/model.go) source code file.

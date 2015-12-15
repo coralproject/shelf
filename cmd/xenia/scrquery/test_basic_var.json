@@ -7,7 +7,7 @@
       {
          "name":"BasicVar",
          "type":"pipeline",
-         "collection":"test_bill",
+         "collection":"test_query_data",
          "return":true,
          "scripts":[
             "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
