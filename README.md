@@ -218,7 +218,7 @@ This query once saved can be executed via the API:
 http://[server]:[port]/1.0/query/basic?station_id=123123
 ```
 
-For documentation of each field in a query set document please refer to the [model.go](/xenia/pkg/query/model.go) source code file.
+For documentation of each field in a query set document please refer to the [model.go](/pkg/query/model.go) source code file.
 
 ## API Authentication
 
@@ -287,16 +287,34 @@ To make things as secure as possible, database lookups are performed as part of 
 
 Here are the steps to web token authentication:
 
-	* Decode the web token and break it into its parts of SessionID and Token.
-	* Retrieve the Session document for the provided SessionID and validate it has not expired.
-	* Retrieve the User document from the PublicID in the Session document.
-	* Validate the Token is valid by generating a new Token from the retrieved User document.
+* Decode the web token and break it into its parts of SessionID and Token.
+* Retrieve the Session document for the provided SessionID and validate it has not expired.
+* Retrieve the User document from the PublicID in the Session document.
+* Validate the Token is valid by generating a new Token from the retrieved User document.
 
 If any of these steps fail, authorization fails.
 
-### Generating users and tokens
+### Managing Users
 
-The [Kit](https://github.com/ardanlabs/kit/tree/master/cmd) repo has a command line tool for creating new users. The tooling currently allows you to look up users and add new users to the system.
+The Xenia command line tool can be used to create new users. The tooling also allows you to look up users and get their web tokens.
+
+1) Get the public User information by User email including the web token:
+
+```
+./xenia auth get -e bill@ardanstudios.com
+```
+
+2) Change the status of a user from active to inactive:
+
+```
+./xenia auth status -e "bill@ardanlabs.com" -a false
+```
+
+3) Create a new user:
+
+```
+./xenia auth create -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "123Password"
+```
  
 ## Concepts and Motivations
 
