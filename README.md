@@ -138,24 +138,83 @@ cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 
 ```
 ./xenia query list
+
+output:
+
+basic
+basic_var
+top_commenters_by_count
 ```
 
 3) Look at the details of a query:
 
 ```
 ./xenia query get -n basic
+
+output:
+
+{
+    "name": "basic",
+    "desc": "Shows a basic multi result query.",
+    "enabled": true,
+    "params": [],
+    "queries": [
+        {
+            "name": "Basic",
+            "type": "pipeline",
+            "collection": "test_bill",
+            "return": true,
+            "scripts": [
+                "{\"$match\": {\"station_id\" : \"42021\"}}",
+                "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+            ]
+        },
+        {
+            "name": "Time",
+            "type": "pipeline",
+            "collection": "test_bill",
+            "return": true,
+            "has_date": true,
+            "scripts": [
+                "{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}",
+                "{\"$project\": {\"_id\": 0, \"name\": 1}}",
+                "{\"$limit\": 2}"
+            ]
+        }
+    ]
+}
 ```
 
 4) Execute a query:
 
 ```
 ./xenia query exec -n basic
+
+output:
+
+{
+    "results": [
+        {
+            "Name": "Basic",
+            "Docs": []
+        },
+        {
+            "Name": "Time",
+            "Docs": []
+        }
+    ],
+    "error": false
+}
 ```
 
 5) Add or update a query for use:
 
 ```
 ./xenia query upsert -p ./scrquery/test_basic_var.json
+
+output:
+
+Upserting Query : Path[./scrquery/test_basic_var.json]
 ```
 
 By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](https://github.com/CoralProject/xenia/tree/master/cmd/xenia/scrquery) folder.  As we develop Coral features, store the .json files there so other members can use them.  Eventually, groups of query sets will be refactored to elsewhere's yet undefined.
@@ -302,18 +361,41 @@ The Xenia command line tool can be used to create new users. The tooling also al
 
 ```
 ./xenia auth get -e bill@ardanstudios.com
+
+output:
+
+{
+    "public_id": "d648d9d1-f3a7-4586-b64e-f8d61ca986fe",
+    "status": 1,
+    "full_name": "TEST USER DON'T DELETE",
+    "email": "bill@ardanstudios.com"
+}
+
+Token: NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9
 ```
 
-2) Change the status of a user from active to inactive:
+2) Change the status of a user:
 
 ```
-./xenia auth status -e "bill@ardanlabs.com" -a false
+// Activate user:
+./xenia auth status -e "bill@ardanstudios.com"
+
+// Disable the user:
+./xenia auth status -e "bill@ardanstudios.com" -a
+
+output:
+
+Status User : Updated
 ```
 
 3) Create a new user:
 
 ```
 ./xenia auth create -n "Bill Kennedy" -e "bill@ardanlabs.com" -p "123Password"
+
+output:
+
+Token: ZTQ5MjA1MjQtMjM2OS00Zjg2LWE0MWUtNmMwZWYxODA2ZjU5Omd1cGxnUzFLVWNSUm16NDRhS1lpSU5pMnNrWVAwd2JPMEdRSWhZcnJocGc9
 ```
  
 ## Concepts and Motivations
