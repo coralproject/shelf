@@ -36,63 +36,98 @@ Make a copy of the dev.cfg and then edit your version to set the appropriate val
 source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
 ```
 
+These environment variables must be set before running any of the code.
+
 _Be careful not to commit any database passwords back to the repo!!_
+
+#### Build the CLI tool
+
+Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
+
+1) Build the tool:
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
+go build
+```
+
+_Note: It is best to run with logging level 0 when using the xenia command:_
+
+```
+export XENIA_LOGGING_LEVEL=0
+```
+
+#### Creating a Xenia database for the first time
+
+If you are running Xenia on a db for the first time you will need the Xenia command line tool:
+
+1) Run the db create command:
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
+
+./xenia db create -f ./srcdb/database.json
+```
+
+_You must run this on a new database to create the collections and the proper set of indexes._
+
+2) Load all the exiting queries:
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
+
+./xenia query upsert -p ./scrquery
+```
 
 #### Run the web server
 
 1) To run the web server, build and run /app/xenia:
 
 ```
-// This only need to be done once per terminal window:
-source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
-
 cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
+
 go build
 ./xenia
 ```
 
-2) Xenia is secured via an Authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.  
-
-If you intend to hit endpoint through a browser, install an Addon/plugin/extension that will add headers to your requests. 
+2) Use a proper web token: 
 
 ```
 Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9"
 ```
 
-#### Run the CLI tool
+Xenia is secured via an authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.  
 
-Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
+If you intend to hit endpoints through a browser, install an Addon/plugin/extension that will allow you to add headers to your requests.
 
-1) Build the tool:
+#### Query management
+
+Using the Xenia command line tool you can manage query sets.
+
 ```
-// This only need to be done once per terminal window:
-source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
-
-cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
-go build
-```
-
-_Note: It is best to run with logging level 0 when using the xenia command:_
-```
-export XENIA_LOGGING_LEVEL=0
+cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 ```
 
-2) Get a list of saved queries:
+1) Get a list of saved queries:
+
 ```
 ./xenia query list
 ```
 
 3) Look at the details of a query:
+
 ```
 ./xenia query get -n top_commenters_by_count
 ```
 
 4) Execute a query:
+
 ```
 ./xenia query exec -n top_commenters_by_count
 ```
 
 5) Add or update a query for use:
+
 ```
 ./xenia query upsert -p ./scrquery/test_basic_var.json
 ```
@@ -103,8 +138,6 @@ By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](ht
 cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia/scrquery
 ls
 ```
-
-_If you are running xenia on a db for the first time, you will need to use the CLI tool to add queries. Without queries, xenia just sort of sits in the corner and rusts._
 
 #### Direct Mongo access (optional)
 
@@ -165,7 +198,7 @@ For documentation of each field in a query set document please refer to the [mod
 
 The [auth](https://github.com/ardanlabs/kit/tree/master/auth) package provides API's for managing users who will be accessing the xenia API. This includes all the CRUD related support for users and authentication. There are two collections in MongoDB called `auth_users` and `auth_sessions` that contain API user information and authentication. The `auth_users` collection contains registered users and `auth_sessions` contain sessions that allows users to be active in the system.
 
-### Users
+#### Users
 
 A User is an entity that can be authenticated on the system and granted rights to the API. A user document has the following form:
 
@@ -192,7 +225,7 @@ From an authentication standpoint several fields from a User document are import
 
 **Password**  : This is a hash value based on a user provided password string and the user's private identifier. These values are combined and encrypted to create a hash value that is stored in the user document as the password.
 
-### Sessions
+#### Sessions
 
 A Session is a document in the database tied to a User via their PublicID. Sessions provide a level of security for web tokens by giving them an expiration date and a lookup point for the user accessing the API. The SessionID is what is used to look up the User performing the web call. The SessionID is a randomly generated UUID. If the Session is active, then a PublicID lookup can be performed and authentication can take place. If the Session is expired, authentication failed immediately. A user can have several Session documents, and when this is the case, the latest document is used to check authencation.
 
@@ -206,7 +239,7 @@ A Session is a document in the database tied to a User via their PublicID. Sessi
 }
 ```
 
-### Web tokens
+#### Web tokens
 
 Access to Xenia's web service API requires sending a web token on every request. HTTP `Basic Authorization` is being used:
 
@@ -222,7 +255,7 @@ base64Encode(SessionID:Token)
 
 The Token is generated by using the PublicID, PrivateID and Email fields from the User document to create a Salt value that is then combined with the User supplied Password to create a signed SHA256 hash value. This is the Token value that can be consistenly re-created when all the same values are present. If any of the fields used in this Token change, the Token will be invalidated.
 
-### Web token authentication
+#### Web token authentication
 
 To make things as secure as possible, database lookups are performed as part of web token authentication. The user must keep their token secure.
 
@@ -235,7 +268,7 @@ Here are the steps to web token authentication:
 
 If any of these steps fail, authorization fails.
 
-### Generating users and tokens
+#### Generating users and tokens
 
 The [Kit](https://github.com/ardanlabs/kit/tree/master/cmd) repo has a command line tool for creating new users. The tooling currently allows you to look up users and add new users to the system.
  
