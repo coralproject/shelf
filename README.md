@@ -6,9 +6,7 @@ A flexible service layer that publishes endpoints against [mongo aggregation pip
 
 Configuration describing the endpoints and queries are stored in a mongo collection allowing for updates to the service layer without touching Go code or restarting the application.
 
-
 ![Xenia Coral](http://www.101-saltwater-aquarium.com/graphics/xenia.jpg)
-
 
 ### Quickstart
 
@@ -22,7 +20,7 @@ Configuration describing the endpoints and queries are stored in a mongo collect
 export GO15VENDOREXPERIMENT=1
 ```
 
-_We recommend adding this to your ~/.bash_profile or other startup script_ as it will become default go behavior soon.
+_We recommend adding this to your ~/.bash_profile or other startup script as it will become default go behavior soon._
 
 3) Get the source code:
 
@@ -32,7 +30,7 @@ go get github.com/coralproject/xenia
 
 4) Tell xenia which database you want to use:
 
-Edit one of the .cfg files in /config/, then:
+Make a copy of the dev.cfg and then edit your version to set the appropriate values. Finally source your edited cfg file to create and set the environment variables: 
 
 ```
 source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
@@ -40,12 +38,14 @@ source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
 
 _Be careful not to commit any database passwords back to the repo!!_
 
-
 #### Run the web server
 
 1) To run the web server, build and run /app/xenia:
 
 ```
+// This only need to be done once per terminal window:
+source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
+
 cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 go build
 ./xenia
@@ -59,47 +59,56 @@ If you intend to hit endpoint through a browser, install an Addon/plugin/extensi
 Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9"
 ```
 
-#### Run the CLI tool (optional)
+#### Run the CLI tool
 
 Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
 
-1) Build and run /cli/xenia:
-
+1) Build the tool:
 ```
+// This only need to be done once per terminal window:
+source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
+
 cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia
 go build
-./xenia
 ```
 
-2) ./xenia --help will take you from there
-
-
-### Publishing Endpoints
-
-Xenia publishes http endpoints against mongodb aggregation pipeline commands.  These endpoints are read from a mongodb collection called _query\_sets_.
-
-_If you are running xenia on a db for the first time, you will need to use the CLI tool to add endpoints.  Without endpoints, xenia just sort of sits in the corner and rusts._
-
-#### Adding query sets
-
-Querysets can be added through the cli tool like so:
-
+_Note: It is best to run with logging level 0 when using the xenia command:_
 ```
-./xenia query upsert -p ./scrquery/test_basic_var.json
+export XENIA_LOGGING_LEVEL=0
 ```
 
-By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](https://github.com/CoralProject/xenia/tree/master/cmd/xenia/scrquery) folder.  As we develop Coral features, store the .json files there so other members can use them.  Eventually, groups query_sets will be refactored to elsewhere's yet undefined.
-
-
-#### Viewing active query sets
-
-You can view a list of query_sets via the cli tool like so:
-
+2) Get a list of saved queries:
 ```
 ./xenia query list
 ```
 
-Or you can just look in the db at them in raw form thiswise:
+3) Look at the details of a query:
+```
+./xenia query get -n top_commenters_by_count
+```
+
+4) Execute a query:
+```
+./xenia query exec -n top_commenters_by_count
+```
+
+5) Add or update a query for use:
+```
+./xenia query upsert -p ./scrquery/test_basic_var.json
+```
+
+By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](https://github.com/CoralProject/xenia/tree/master/cmd/xenia/scrquery) folder.  As we develop Coral features, store the .json files there so other members can use them.  Eventually, groups of query sets will be refactored to elsewhere's yet undefined.
+
+```
+cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia/scrquery
+ls
+```
+
+_If you are running xenia on a db for the first time, you will need to use the CLI tool to add queries. Without queries, xenia just sort of sits in the corner and rusts._
+
+#### Direct Mongo access (optional)
+
+You can look in the db at existing queries:
 
 ```
 mongo [flags to connect to your server]
@@ -107,17 +116,9 @@ use coral (or your databasename)
 db.query_sets.find()
 ```
 
-By convention, we store working queries in .json files.  You can find them [here](cmd/xenia/scrquery/):
-
-```
-cd $GOPATH/src/github.com/coralproject/xenia/cmd/xenia/scrquery
-ls
-```
-
 #### Example query_set
 
-Here's a basic query_set configuration containing two pipeline calls and using a variable called #station_id#.
-
+Here's a basic query set document containing two pipeline calls and using a variable called #station_id#:
 
 ```
 {
@@ -152,17 +153,92 @@ Here's a basic query_set configuration containing two pipeline calls and using a
 }
 ```
 
-This query would be published to:
+This query once saved can be executed via the API:
 
 ```
 http://[server]:[port]/1.0/query/basic?station_id=123123
 ```
 
-For living documentation of each of the parameters, please see [/pkg/query/main.go](pkg/query/main.go).
+For documentation of each field in a query set document please refer to the [models.go](pkg/query/models.go) source code file.
 
+### API Authentication
 
-*Todo: describe Xenia's Auth paradigm*
+The [auth](https://github.com/ardanlabs/kit/tree/master/auth) package provides API's for managing users who will be accessing the xenia API. This includes all the CRUD related support for users and authentication. There are two collections in MongoDB called `auth_users` and `auth_sessions` that contain API user information and authentication. The `auth_users` collection contains registered users and `auth_sessions` contain sessions that allows users to be active in the system.
 
+### Users
+
+A User is an entity that can be authenticated on the system and granted rights to the API. A user document has the following form:
+
+```
+{ 
+    "_id" : ObjectId("5660bc6e16908cae692e0593"), 
+    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe", 
+    "private_id" : "5d829805-d801-408e-b418-2e9055da244b", 
+    "status" : NumberInt(1), 
+    "full_name" : "TEST USER DON'T DELETE", 
+    "email" : "bill@ardanstudios.com", 
+    "password" : "$2a$10$CRoh/8Uex49hviQYDlDvruoQUO10QxVOU7O0UMliqGlXSySK4SZEq", 
+    "is_deleted" : false, 
+    "date_modified" : ISODate("2015-12-03T22:04:30.117+0000"), 
+    "date_created" : ISODate("2015-12-03T22:04:30.117+0000")
+}
+```
+
+From an authentication standpoint several fields from a User document are important:
+
+**PublicID**  : This is the users public identifier and can be shared with the world. It provides a unique id for each user. It is used to lookup users from the database. This is a randomlu generated UUID.
+
+**PrivateID** : This is the users private identifier and must not be shared with the world. It is used in conjunction with the user supplied password to create an encrypted password. To authenticate with a password you need the users password and this private id. This is a randomly generated UUID.
+
+**Password**  : This is a hash value based on a user provided password string and the user's private identifier. These values are combined and encrypted to create a hash value that is stored in the user document as the password.
+
+### Sessions
+
+A Session is a document in the database tied to a User via their PublicID. Sessions provide a level of security for web tokens by giving them an expiration date and a lookup point for the user accessing the API. The SessionID is what is used to look up the User performing the web call. The SessionID is a randomly generated UUID. If the Session is active, then a PublicID lookup can be performed and authentication can take place. If the Session is expired, authentication failed immediately. A user can have several Session documents, and when this is the case, the latest document is used to check authencation.
+
+```
+{ 
+    "_id" : ObjectId("5660bc6e16908cae692e0594"), 
+    "session_id" : "6d72e6dd-93d0-4413-9b4c-8546d4d3514e", 
+    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe", 
+    "date_expires" : ISODate("2016-12-02T22:04:30.282+0000"), 
+    "date_created" : ISODate("2015-12-03T22:04:30.282+0000")
+}
+```
+
+### Web tokens
+
+Access to Xenia's web service API requires sending a web token on every request. HTTP `Basic Authorization` is being used:
+
+```
+Authorization: Basic WebToken
+```
+
+A web token is a value that is not stored in the database for any User but is a value that can be consistently generated by having a User document and a SessionID. It is made up of two parts, a SessionID and a Token which are concatinated together and then base64 encoded for use over HTTP:
+
+```
+base64Encode(SessionID:Token)
+```
+
+The Token is generated by using the PublicID, PrivateID and Email fields from the User document to create a Salt value that is then combined with the User supplied Password to create a signed SHA256 hash value. This is the Token value that can be consistenly re-created when all the same values are present. If any of the fields used in this Token change, the Token will be invalidated.
+
+### Web token authentication
+
+To make things as secure as possible, database lookups are performed as part of web token authentication. The user must keep their token secure.
+
+Here are the steps to web token authentication:
+
+	* Decode the web token and break it into its parts of SessionID and Token.
+	* Retrieve the Session document for the provided SessionID and validate it has not expired.
+	* Retrieve the User document from the PublicID in the Session document.
+	* Validate the Token is valid by generating a new Token from the retrieved User document.
+
+If any of these steps fail, authorization fails.
+
+### Generating users and tokens
+
+The [Kit](https://github.com/ardanlabs/kit/tree/master/cmd) repo has a command line tool for creating new users. The tooling currently allows you to look up users and add new users to the system.
+ 
 ## Concepts and Motivations
 
 ### Composition
@@ -176,7 +252,6 @@ Similarly, output documents from multiple pipelines can be _bundled_ together. T
 Xenia moves 100% of the query logic out of the application code. Front end devs, data analysis, and anyone else familiar with the simple, declarative mongo aggregation syntax can alter the service behavior. This removes the requirement for back end engineering and devops expertise from the process of refining the data requests.
 
 Xenia's CLI tools allow anyone with a basic understanding of document database concepts and aggregation pipeline syntax to create or update endpoints.  (Once the web UI is complete updates to the pipelines will be even more convenient.) 
-
 
 ### Also, Welcome!
 
