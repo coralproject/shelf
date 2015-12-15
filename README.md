@@ -87,7 +87,7 @@ cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 
 _You must run this on a new database to create the collections and the proper set of indexes._
 
-2) Load all the exiting queries:
+2) Load all the existing queries:
 
 ```
 ./xenia query upsert -p ./scrquery
@@ -104,6 +104,11 @@ Upserting Query : Upserted
 ```
 go build
 ./xenia
+
+output:
+
+2015/12/14 21:04:42 app.go:161: DEV : startup : Run : Start : cfgHost[XENIA_HOST] defaultHost[:4000]
+2015/12/14 21:04:42 app.go:171: DEV : listener : Run : Listening on: :4000
 ```
 
 2) Use a proper web token: 
@@ -422,10 +427,10 @@ Token: NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVRe
 2) Change the status of a user:
 
 ```
-// Activate user:
+// Disable the user:
 ./xenia auth status -e "bill@ardanstudios.com"
 
-// Disable the user:
+// Activate the user:
 ./xenia auth status -e "bill@ardanstudios.com" -a
 
 output:
