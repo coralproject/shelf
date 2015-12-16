@@ -6,8 +6,6 @@ A configurable service layer that publishes endpoints against [mongo aggregation
 
 Xenia is part of [The Coral Project Ecosystem](https://github.com/CoralProject/reef/tree/master/ecosystem).
 
-![Xenia Coral](http://www.101-saltwater-aquarium.com/graphics/xenia.jpg)
-
 ## Installation
 
 ### Download source code
