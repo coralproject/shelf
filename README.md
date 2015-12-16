@@ -2,7 +2,7 @@
 
 Alpha Release
 
-A configurable service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).  
+A configurable service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).
 
 Xenia is part of [The Coral Project Ecosystem](https://github.com/CoralProject/reef/tree/master/ecosystem).
 
@@ -25,10 +25,16 @@ _We recommend adding this to your ~/.bash_profile or other startup script as it 
 ```
 go get github.com/coralproject/xenia
 ```
+or
+clone it in your gopath folder for coralproject
+
+```
+git clone git@github.com:CoralProject/xenia.git
+```
 
 4) Tell xenia which database you want to use:
 
-Make a copy of the dev.cfg and then edit your version to set the appropriate values. Finally source your edited cfg file to create and set the environment variables: 
+Make a copy of the dev.cfg and then edit your version to set the appropriate values. Finally source your edited cfg file to create and set the environment variables:
 
 ```
 source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
@@ -109,13 +115,13 @@ output:
 2015/12/14 21:04:42 app.go:171: DEV : listener : Run : Listening on: :4000
 ```
 
-2) Use a proper web token: 
+2) Use a proper web token:
 
 ```
 Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9"
 ```
 
-Xenia is secured via an authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.  
+Xenia is secured via an authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.
 
 If you intend to hit endpoints through a browser, install an Addon/plugin/extension that will allow you to add headers to your requests.
 
@@ -336,16 +342,16 @@ The [auth](https://github.com/ardanlabs/kit/tree/master/auth) package provides A
 A User is an entity that can be authenticated on the system and granted rights to the API. A user document has the following form:
 
 ```
-{ 
-    "_id" : ObjectId("5660bc6e16908cae692e0593"), 
-    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe", 
-    "private_id" : "5d829805-d801-408e-b418-2e9055da244b", 
-    "status" : NumberInt(1), 
-    "full_name" : "TEST USER DON'T DELETE", 
-    "email" : "bill@ardanstudios.com", 
-    "password" : "$2a$10$CRoh/8Uex49hviQYDlDvruoQUO10QxVOU7O0UMliqGlXSySK4SZEq", 
-    "is_deleted" : false, 
-    "date_modified" : ISODate("2015-12-03T22:04:30.117+0000"), 
+{
+    "_id" : ObjectId("5660bc6e16908cae692e0593"),
+    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe",
+    "private_id" : "5d829805-d801-408e-b418-2e9055da244b",
+    "status" : NumberInt(1),
+    "full_name" : "TEST USER DON'T DELETE",
+    "email" : "bill@ardanstudios.com",
+    "password" : "$2a$10$CRoh/8Uex49hviQYDlDvruoQUO10QxVOU7O0UMliqGlXSySK4SZEq",
+    "is_deleted" : false,
+    "date_modified" : ISODate("2015-12-03T22:04:30.117+0000"),
     "date_created" : ISODate("2015-12-03T22:04:30.117+0000")
 }
 ```
@@ -363,11 +369,11 @@ From an authentication standpoint several fields from a User document are import
 A Session is a document in the database tied to a User via their PublicID. Sessions provide a level of security for web tokens by giving them an expiration date and a lookup point for the user accessing the API. The SessionID is what is used to look up the User performing the web call. The SessionID is a randomly generated UUID. If the Session is active, then a PublicID lookup can be performed and authentication can take place. If the Session is expired, authentication failed immediately. A user can have several Session documents, and when this is the case, the latest document is used to check authencation.
 
 ```
-{ 
-    "_id" : ObjectId("5660bc6e16908cae692e0594"), 
-    "session_id" : "6d72e6dd-93d0-4413-9b4c-8546d4d3514e", 
-    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe", 
-    "date_expires" : ISODate("2016-12-02T22:04:30.282+0000"), 
+{
+    "_id" : ObjectId("5660bc6e16908cae692e0594"),
+    "session_id" : "6d72e6dd-93d0-4413-9b4c-8546d4d3514e",
+    "public_id" : "d648d9d1-f3a7-4586-b64e-f8d61ca986fe",
+    "date_expires" : ISODate("2016-12-02T22:04:30.282+0000"),
     "date_created" : ISODate("2015-12-03T22:04:30.282+0000")
 }
 ```
@@ -445,7 +451,7 @@ output:
 
 Token: ZTQ5MjA1MjQtMjM2OS00Zjg2LWE0MWUtNmMwZWYxODA2ZjU5Omd1cGxnUzFLVWNSUm16NDRhS1lpSU5pMnNrWVAwd2JPMEdRSWhZcnJocGc9
 ```
- 
+
 ## Concepts and Motivations
 
 ### Composition
@@ -458,7 +464,7 @@ Similarly, output documents from multiple pipelines can be _bundled_ together. T
 
 Xenia moves 100% of the query logic out of the application code. Front end devs, data analysis, and anyone else familiar with the simple, declarative mongo aggregation syntax can alter the service behavior. This removes the requirement for back end engineering and devops expertise from the process of refining the data requests.
 
-Xenia's CLI tools allow anyone with a basic understanding of document database concepts and aggregation pipeline syntax to create or update endpoints.  (Once the web UI is complete updates to the pipelines will be even more convenient.) 
+Xenia's CLI tools allow anyone with a basic understanding of document database concepts and aggregation pipeline syntax to create or update endpoints.  (Once the web UI is complete updates to the pipelines will be even more convenient.)
 
 ### Also, Welcome!
 
