@@ -5,7 +5,7 @@
    "params":null,
    "queries":[
       {
-         "name":"BasicVar",
+         "name":"basic_var",
          "type":"pipeline",
          "collection":"test_query_data",
          "return":true,

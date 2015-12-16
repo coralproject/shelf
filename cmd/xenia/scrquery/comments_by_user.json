@@ -1,0 +1,20 @@
+{
+   "name":"comments_by_user",
+   "desc":"Shows comments by user, sorted by date desc",
+   "enabled":true,
+   "params":null,
+   "queries":[
+      {
+         "name":"comments_by_user",
+         "type":"pipeline",
+         "collection":"nyt_coral_comments",
+         "return":true,
+         "scripts":[
+
+            "{ \"$match\": { \"user_id\": #user_id# } }",
+            "{ \"$sort\": { \"createDate\": -1 } }"
+
+         ]
+      }
+   ]
+}
