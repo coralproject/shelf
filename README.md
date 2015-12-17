@@ -10,9 +10,23 @@ Xenia is part of [The Coral Project Ecosystem](https://github.com/CoralProject/r
 
 ### Download source code
 
-1) Make sure you're have [go 1.5 or later](https://golang.org/dl/) installed and your [environment set up](https://golang.org/doc/install).
+1) Install Go:
 
-2) Make sure your go vendor experiment flag is set (will be set by default in a couple of months...)
+**Mac OS X**  
+http://www.goinggo.net/2013/06/installing-go-gocode-gdb-and-liteide.html
+
+**Windows**  
+http://www.wadewegner.com/2014/12/easy-go-programming-setup-for-windows/
+
+**Linux**  
+I do not recommend using `apt-get`. Go is easy to install. Just download the
+archive and extract it into /usr/local, creating a Go tree in /usr/local/go.
+
+https://golang.org/doc/install
+
+2) Vendor flag:
+
+Make sure your go vendor experiment flag is set (will be set by default in a couple of months).
 
 ```
 export GO15VENDOREXPERIMENT=1
@@ -25,25 +39,27 @@ _We recommend adding this to your ~/.bash_profile or other startup script as it 
 ```
 go get github.com/coralproject/xenia
 ```
-or
-clone it in your gopath folder for coralproject. The project must be cloned in the specific path based on the repo name.
+
+You can also clone the code manually. The project must be cloned inside the `github.com/coralproject/xenia` folder from inside your GOPATH.
 
 ```
-md $GOPATH/src/github.com/coralproject/xenia/app/xenia
-cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
+md $GOPATH/src/github.com/coralproject/xenia
+cd $GOPATH/src/github.com/coralproject/xenia
 
 git clone git@github.com:CoralProject/xenia.git
 ```
 
-4) Tell xenia which database you want to use:
+4) Set up your environment variables:
 
-Make a copy of the dev.cfg and then edit your version to set the appropriate values. Finally source your edited cfg file to create and set the environment variables:
+This tells xenia which database you want to use, sets your port, and sets your database key.
+
+Make your own copy of `config/dev.cfg` - `config/foo.cfg` - into the `config/` directory. Edit your version to set the appropriate values. Finally source your edited cfg file to create and set the environment variables:
 
 ```
-source $GOPATH/src/github.com/coralproject/xenia/config/[thefile].cfg
+source $GOPATH/src/github.com/coralproject/xenia/config/foo.cfg
 ```
 
-These environment variables must be set before running any of the code.
+The following environment variables must be set before running any of the code.
 
 ```
 export XENIA_MONGO_HOST=52.23.154.37:27017
