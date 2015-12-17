@@ -26,9 +26,12 @@ _We recommend adding this to your ~/.bash_profile or other startup script as it 
 go get github.com/coralproject/xenia
 ```
 or
-clone it in your gopath folder for coralproject
+clone it in your gopath folder for coralproject. The project must be cloned in the specific path based on the repo name.
 
 ```
+md $GOPATH/src/github.com/coralproject/xenia/app/xenia
+cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
+
 git clone git@github.com:CoralProject/xenia.git
 ```
 
