@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -42,9 +43,17 @@ type (
 	Middleware func(Handler) Handler
 )
 
+// Settings represents things required to initialize the app.
+type Settings struct {
+	ConfigKey string // The based environment variable key for all variables.
+	UseMongo  bool   // If MongoDB should be initialized and used.
+}
+
 // app maintains some framework state.
 var app struct {
-	useMongo bool
+	Settings
+
+	userHeaders map[string]string // Extra headers for each response.
 }
 
 //==============================================================================
@@ -70,12 +79,13 @@ func New(mw ...Middleware) *App {
 // Handle is our mechanism for mounting Handlers for a given HTTP verb and path
 // pair, this makes for really easy, convenient routing.
 func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
+
 	// The function to execute for each request.
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		start := time.Now()
 
 		var dbConn *db.DB
-		if app.useMongo {
+		if app.UseMongo {
 			dbConn = db.NewMGO()
 		}
 
@@ -87,7 +97,7 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 			SessionID:      uuid.New(),
 		}
 
-		if app.useMongo {
+		if app.UseMongo {
 			defer c.DB.CloseMGO()
 		}
 
@@ -122,15 +132,9 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 
 //==============================================================================
 
-// Settings represents things required to initialize the app.
-type Settings struct {
-	ConfigKey string // The based environment variable key for all variables.
-	UseMongo  bool   // If MongoDB should be initialized and used.
-}
-
 // Init is called to initialize the application.
-func Init(set *Settings) {
-	app.useMongo = set.UseMongo
+func Init(settings Settings) {
+	app.Settings = settings
 
 	logLevel := func() int {
 		ll, err := cfg.Int("LOGGING_LEVEL")
@@ -142,16 +146,28 @@ func Init(set *Settings) {
 
 	log.Init(os.Stderr, logLevel)
 
-	if err := cfg.Init(set.ConfigKey); err != nil {
+	if err := cfg.Init(settings.ConfigKey); err != nil {
 		log.Error("startup", "Init", err, "Initializing config")
 		os.Exit(1)
 	}
 
-	if set.UseMongo {
+	if settings.UseMongo {
 		err := mongo.Init()
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing MongoDB")
 			os.Exit(1)
+		}
+	}
+
+	// HEADERS should be key:value,key:value
+	if hs, err := cfg.String("HEADERS"); err == nil {
+		app.userHeaders = make(map[string]string)
+		hdrs := strings.Split(hs, ",")
+		for _, hdr := range hdrs {
+			if kv := strings.Split(hdr, ":"); len(kv) == 2 {
+				log.User("startup", "Init", "User Headers : %s:%s", kv[0], kv[1])
+				app.userHeaders[kv[0]] = kv[1]
+			}
 		}
 	}
 }

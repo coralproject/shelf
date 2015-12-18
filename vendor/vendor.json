@@ -45,8 +45,8 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "386b3b042804220f13761b9e5db7d44f838d34a0",
-			"revisionTime": "2015-12-18T11:14:31-05:00"
+			"revision": "40d3cb1c9c4a50727c4a1e8cb43aaae73a04fdaf",
+			"revisionTime": "2015-12-18T18:16:26-05:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
