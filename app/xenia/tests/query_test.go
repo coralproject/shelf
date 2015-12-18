@@ -118,6 +118,35 @@ func TestQueryExec(t *testing.T) {
 	}
 }
 
+// TestQueryExecJSONP tests the execution of a specific query using JSONP.
+func TestQueryExecJSONP(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	url := "/1.0/query/QTEST_basic/exec?station_id=42021&callback=handle_data"
+	r := tests.NewRequest("GET", url, nil)
+	w := httptest.NewRecorder()
+
+	a.ServeHTTP(w, r)
+
+	t.Log("Given the need get a specific query.")
+	{
+		t.Logf("\tWhen calling url : %s", url)
+		if w.Code != 200 {
+			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+		}
+		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+
+		resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false})`
+		if resp[0:92] != w.Body.String()[0:92] {
+			t.Log(resp)
+			t.Log(w.Body.String())
+			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+		}
+		t.Logf("\t%s\tShould get the expected result.", tests.Success)
+	}
+}
+
 //==============================================================================
 
 // loadQuery adds queries to run tests.
