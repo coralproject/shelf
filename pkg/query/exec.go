@@ -37,6 +37,7 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 		Results: emptyResult,
 	}
 
+	// Is the rule enabled.
 	if !set.Enabled {
 		err := errors.New("Set disabled")
 		r.Error = true
@@ -45,26 +46,17 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 		return &r
 	}
 
-	// Validate the variables against the meta-data.
-	if len(set.Params) > 0 {
-		if vars == nil {
-			err := errors.New("Invalid Variables List")
-			r.Error = true
-			r.Results = bson.M{"error": err.Error()}
-			log.Error(context, "ExecuteSet", err, "Completed")
-			return &r
-		}
+	// If we have been provided a nil map, make one.
+	if vars == nil {
+		vars = make(map[string]string)
+	}
 
-		// Validate each know parameter is represented in the variable list.
-		for _, p := range set.Params {
-			if _, ok := vars[p.Name]; !ok {
-				err := fmt.Errorf("Variable %s not included with the call", p.Name)
-				r.Error = true
-				r.Results = bson.M{"error": err.Error()}
-				log.Error(context, "ExecuteSet", err, "Completed")
-				return &r
-			}
-		}
+	// Did we get everything we need. Also load defaults.
+	if err := validateParameters(context, set, vars); err != nil {
+		r.Error = true
+		r.Results = bson.M{"error": err.Error()}
+		log.Error(context, "ExecuteSet", err, "Completed")
+		return &r
 	}
 
 	// Final results of running the set of queries.
@@ -83,8 +75,10 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 		// Was there an error processing the query.
 		if err != nil {
+
 			// Were we told to continue to the next one.
 			if q.Continue {
+
 				// Reset any existing result, it is invalid.
 				r.Results = emptyResult
 				r.Error = false
@@ -113,6 +107,52 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 	return &r
 }
 
+// validateParameters validates the variables against the query string
+// of parameters. Plus it loads default values.
+func validateParameters(context interface{}, set *Set, vars map[string]string) error {
+
+	// Do we not have parameters.
+	if len(set.Params) == 0 {
+		return nil
+	}
+
+	// Do we not have variables, load the default values.
+	if len(vars) == 0 {
+		for _, p := range set.Params {
+			if p.Default != "" {
+				log.Dev(context, "validateParameters", "Adding : Name[%s] Default[%s]", p.Name, p.Default)
+				vars[p.Name] = p.Default
+			}
+		}
+	}
+
+	var missing []string
+
+	// Validate each know parameter is represented in the variable list.
+	for _, p := range set.Params {
+		if _, ok := vars[p.Name]; !ok {
+
+			// The variable was not provided but we have a
+			// default value for this so use it.
+			if p.Default != "" {
+				log.Dev(context, "validateParameters", "Adding : Name[%s] Default[%s]", p.Name, p.Default)
+				vars[p.Name] = p.Default
+				continue
+			}
+
+			// We are missing the parameter.
+			missing = append(missing, p.Name)
+		}
+	}
+
+	// Were there missing parameters.
+	if missing == nil {
+		return nil
+	}
+
+	return fmt.Errorf("Variables [%s] were not included with the call", strings.Join(missing, ","))
+}
+
 // executePipeline executes the sepcified pipeline query.
 func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]string) (docs, error) {
 	// Validate we have scripts to run.
@@ -124,6 +164,7 @@ func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]s
 
 	// Iterate over the scripts building the pipeline.
 	for _, script := range q.Scripts {
+
 		// This marker means to skip over this script.
 		if strings.HasPrefix(script, "-") {
 			continue
@@ -218,6 +259,7 @@ func UmarshalMongoScript(script string, q *Query) (bson.M, error) {
 // from JSON into BSON, such as dates.
 func mongoExtensions(op bson.M, q *Query) bson.M {
 	for key, value := range op {
+
 		// Recurse through the map if provided.
 		if doc, ok := value.(map[string]interface{}); ok {
 			mongoExtensions(doc, q)
@@ -237,6 +279,7 @@ func mongoExtensions(op bson.M, q *Query) bson.M {
 		// Is the value an array.
 		if array, ok := value.([]interface{}); ok {
 			for _, item := range array {
+
 				// Recurse through the map if provided.
 				if doc, ok := item.(map[string]interface{}); ok {
 					mongoExtensions(doc, q)

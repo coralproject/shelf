@@ -162,7 +162,8 @@ func getExecSet() []execSet {
 		querySetNoResults(),
 		querySetMalformed(),
 		querySetBasicVars(),
-		querySetBasicVarMissing(),
+		querySetBasicMissingVars(),
+		querySetBasicParamDefault(),
 	}
 }
 
@@ -304,37 +305,9 @@ func querySetMalformed() execSet {
 func querySetBasicVars() execSet {
 	return execSet{
 		fail: false,
-		vars: map[string]string{"stationid": "42021"},
+		vars: map[string]string{"station_id": "42021"},
 		set: &query.Set{
-			Name:    "Vars",
-			Enabled: true,
-			Params: []query.Param{
-				{Name: "stationid"},
-			},
-			Queries: []query.Query{
-				{
-					Name:       "Vars",
-					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
-					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "#stationid#"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
-					},
-				},
-			},
-		},
-		result: `{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
-	}
-}
-
-// querySetBasicVarMissing performs simple query with missing parameters.
-func querySetBasicVarMissing() execSet {
-	return execSet{
-		fail: true,
-		vars: map[string]string{"stationid": "42021"},
-		set: &query.Set{
-			Name:    "Vars",
+			Name:    "BasicVars",
 			Enabled: true,
 			Params: []query.Param{
 				{Name: "station_id"},
@@ -346,13 +319,67 @@ func querySetBasicVarMissing() execSet {
 					Collection: query.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
-						`{"$match": {"station_id" : "#stationid#"}}`,
+						`{"$match": {"station_id" : "#station_id#"}}`,
 						`{"$project": {"_id": 0, "name": 1}}`,
 					},
 				},
 			},
 		},
-		result: `{"results":{"error":"Variable station_id not included with the call"},"error":true}`,
+		result: `{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+	}
+}
+
+// querySetBasicMissingVars performs simple query with missing parameters.
+func querySetBasicMissingVars() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "MissingVars",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Vars",
+					Type:       "pipeline",
+					Collection: query.CollectionExecTest,
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "#station_id#"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
+				},
+			},
+		},
+		result: `{"results":{"error":"Variables [station_id] were not included with the call"},"error":true}`,
+	}
+}
+
+// querySetBasicParamDefault performs simple query with a default parameters.
+func querySetBasicParamDefault() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "ParamDefault",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", Default: "42021"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Vars",
+					Type:       "pipeline",
+					Collection: query.CollectionExecTest,
+					Return:     true,
+					Scripts: []string{
+						`{"$match": {"station_id" : "#station_id#"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
+				},
+			},
+		},
+		result: `{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
 	}
 }
 
