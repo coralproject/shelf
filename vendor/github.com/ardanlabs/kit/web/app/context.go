@@ -9,7 +9,9 @@
 package app
 
 import (
+	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/ardanlabs/kit/auth"
@@ -70,7 +72,23 @@ func (c *Context) Respond(data interface{}, code int) {
 
 	c.Header().Set("Content-Type", "application/json")
 	c.WriteHeader(code)
-	json.NewEncoder(c).Encode(data)
+
+	// Look for a JSONP marker
+	if cb := c.Request.URL.Query().Get("callback"); cb != "" {
+
+		// We need to wrap the result in a function call.
+		// callback_value({"data_1": "hello world", "data_2": ["the","sun","is","shining"]});
+		b := bytes.NewBufferString(cb + "(")
+		json.NewEncoder(b).Encode(data)
+		b.WriteString(")")
+		fmt.Fprintf(c, b.String())
+
+	} else {
+
+		// We can send the result straight through.
+		json.NewEncoder(c).Encode(data)
+
+	}
 
 	log.User(c.SessionID, "api : Respond", "Completed")
 }
