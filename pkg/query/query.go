@@ -4,6 +4,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"

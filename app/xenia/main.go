@@ -13,5 +13,5 @@ import (
 )
 
 func main() {
-	app.Run("XENIA_HOST", ":4000", routes.API())
+	app.Run(":4000", routes.API())
 }
