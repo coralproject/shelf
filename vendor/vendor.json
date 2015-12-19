@@ -9,8 +9,8 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
-			"revisionTime": "2015-12-19T09:18:58-05:00"
+			"revision": "a888f54ce0b320b29fb75b4a5729565a39c58321",
+			"revisionTime": "2015-12-19T10:21:00-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
