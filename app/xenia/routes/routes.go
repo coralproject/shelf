@@ -24,5 +24,7 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
 	a.Handle("GET", "/1.0/query/:name/exec", handlers.Query.Execute)
 
+	a.CORS()
+
 	return a
 }
