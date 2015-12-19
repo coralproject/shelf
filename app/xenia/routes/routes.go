@@ -10,12 +10,7 @@ import (
 )
 
 func init() {
-	set := app.Settings{
-		ConfigKey: "XENIA",
-		UseMongo:  true,
-	}
-
-	app.Init(set)
+	app.Init("XENIA")
 }
 
 //==============================================================================
