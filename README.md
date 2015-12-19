@@ -59,20 +59,21 @@ Make your own copy of `config/dev.cfg` - `config/foo.cfg` - into the `config/` d
 source $GOPATH/src/github.com/coralproject/xenia/config/foo.cfg
 ```
 
-The following environment variables must be set before running any of the code.
+The following are environment variables for the web service and cli.
 
 ```
+// Mandatory
 export XENIA_MONGO_HOST=52.23.154.37:27017
 export XENIA_MONGO_USER=coral-user
 export XENIA_MONGO_AUTHDB=coral
 export XENIA_MONGO_DB=coral
+export XENIA_MONGO_PASS=         # Do not save to repo
 
-export XENIA_LOGGING_LEVEL=1
-
-export XENIA_XENIA_HOST=:4000
-
-# DO NOT PUSH TO REPO
-export XENIA_MONGO_PASS=
+// Optional
+export XENIA_HOST=:4000          # Default is `:4000` if missing
+export XENIA_LOGGING_LEVEL=1     # Default is `2` if missing (User)
+export XENIA_HEADERS=key:value   # Ignored is missing
+export XENIA_AUTH=false          # Default is `true` if missing
 ```
 
 _Be careful not to commit any database passwords back to the repo!!_
