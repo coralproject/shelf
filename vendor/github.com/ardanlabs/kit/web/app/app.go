@@ -1,3 +1,7 @@
+// Package app provides a thin layer of support for writing web services. It
+// integrates with the ardanlabs kit repo to provide support for logging,
+// configuration, database, routing and application context. The base things
+// you need to write a web service is provided.
 package app
 
 import (
@@ -159,8 +163,7 @@ func (a *App) CORS() {
 		fmt.Fprintf(w, resp)
 	}
 
-	a.TreeMux.Handle("GET", "/xmpp-httpbind", h)
-	a.TreeMux.Handle("OPTIONS", "/xmpp-httpbind", h)
+	a.TreeMux.OptionsHandler = h
 }
 
 //==============================================================================
