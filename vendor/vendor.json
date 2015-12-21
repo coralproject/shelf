@@ -4,13 +4,13 @@
 	"package": [
 		{
 			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "c8200dd8a76b23bc9970744f890f9aa90845dcae",
-			"revisionTime": "2015-12-14T20:33:18-08:00"
+			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
+			"revisionTime": "2015-12-19T09:18:58-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
-			"revisionTime": "2015-12-12T01:12:27-05:00"
+			"revision": "a888f54ce0b320b29fb75b4a5729565a39c58321",
+			"revisionTime": "2015-12-19T10:21:00-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
@@ -24,8 +24,14 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
-			"revisionTime": "2015-12-12T01:12:27-05:00"
+			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
+			"revisionTime": "2015-12-19T09:18:58-05:00"
+		},
+		{
+			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db/mongo",
+			"path": "github.com/ardanlabs/kit/db/mongo",
+			"revision": "02bf30681c9fdb6c69c3c6298f2cebec664da740",
+			"revisionTime": "2015-12-19T09:01:47-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/log",
@@ -34,8 +40,8 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
-			"revisionTime": "2015-12-12T01:12:27-05:00"
+			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
+			"revisionTime": "2015-12-19T09:18:58-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
@@ -45,8 +51,14 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "386b3b042804220f13761b9e5db7d44f838d34a0",
-			"revisionTime": "2015-12-18T11:14:31-05:00"
+			"revision": "2d1ab17e28c2adc33e6756e179ef8ef51c4aeb05",
+			"revisionTime": "2015-12-19T10:55:50-05:00"
+		},
+		{
+			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
+			"path": "github.com/ardanlabs/kit/web/midware",
+			"revision": "9b8e4d0771e0d68c5bfb9c2f4c040cdf581ec560",
+			"revisionTime": "2015-12-19T09:38:16-05:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",

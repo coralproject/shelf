@@ -15,28 +15,45 @@ import (
 	"github.com/spf13/cobra"
 )
 
+// Config environmental variables.
+const (
+	cfgLoggingLevel  = "LOGGING_LEVEL"
+	cfgMongoHost     = "MONGO_HOST"
+	cfgMongoAuthDB   = "MONGO_AUTHDB"
+	cfgMongoDB       = "MONGO_DB"
+	cfgMongoUser     = "MONGO_USER"
+	cfgMongoPassword = "MONGO_PASS"
+)
+
 var xenia = &cobra.Command{
 	Use:   "xenia",
 	Short: "Xenia provides the central cli housing of various cli tools that interface with the API",
 }
 
 func main() {
-	logLevel := func() int {
-		ll, err := cfg.Int("LOGGING_LEVEL")
-		if err != nil {
-			return log.NONE
-		}
-		return ll
-	}
-
-	log.Init(os.Stderr, logLevel)
-
 	if err := cfg.Init("XENIA"); err != nil {
 		xenia.Println("Unable to initialize configuration")
 		os.Exit(1)
 	}
 
-	err := mongo.Init()
+	logLevel := func() int {
+		ll, err := cfg.Int(cfgLoggingLevel)
+		if err != nil {
+			return log.NONE
+		}
+		return ll
+	}
+	log.Init(os.Stderr, logLevel)
+
+	cfg := mongo.Config{
+		Host:     cfg.MustString(cfgMongoHost),
+		AuthDB:   cfg.MustString(cfgMongoAuthDB),
+		DB:       cfg.MustString(cfgMongoDB),
+		User:     cfg.MustString(cfgMongoUser),
+		Password: cfg.MustString(cfgMongoPassword),
+	}
+
+	err := mongo.Init(cfg)
 	if err != nil {
 		xenia.Println("Unable to initialize MongoDB")
 		os.Exit(1)

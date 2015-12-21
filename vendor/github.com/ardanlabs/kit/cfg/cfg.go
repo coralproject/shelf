@@ -1,6 +1,7 @@
 package cfg
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"net/url"
@@ -55,6 +56,21 @@ func Init(namespace string) error {
 	}
 
 	return nil
+}
+
+// Log returns a string to help with logging configuration.
+func Log() string {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
+
+	var buf bytes.Buffer
+	for k, v := range c.m {
+		if !strings.Contains(k, "PASS") {
+			buf.WriteString(k + "=" + v + "\n")
+		}
+	}
+
+	return buf.String()
 }
 
 // String returns the value of the giving key as a string, else it will return
@@ -172,6 +188,12 @@ func Bool(key string) (bool, error) {
 		return false, fmt.Errorf("Unknown Key %s !", key)
 	}
 
+	if value == "on" || value == "yes" {
+		value = "true"
+	} else if value == "off" || value == "no" {
+		value = "false"
+	}
+
 	val, err := strconv.ParseBool(value)
 	if err != nil {
 		return false, err
@@ -189,6 +211,12 @@ func MustBool(key string) bool {
 	value, found := c.m[key]
 	if !found {
 		panic(fmt.Sprintf("Unknown Key %s !", key))
+	}
+
+	if value == "on" || value == "yes" {
+		value = "true"
+	} else if value == "off" || value == "no" {
+		value = "false"
 	}
 
 	val, err := strconv.ParseBool(value)

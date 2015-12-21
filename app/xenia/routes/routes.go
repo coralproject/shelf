@@ -10,12 +10,7 @@ import (
 )
 
 func init() {
-	set := app.Settings{
-		ConfigKey: "XENIA",
-		UseMongo:  true,
-	}
-
-	app.Init(&set)
+	app.Init("XENIA")
 }
 
 //==============================================================================
@@ -28,6 +23,8 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/query", handlers.Query.List)
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
 	a.Handle("GET", "/1.0/query/:name/exec", handlers.Query.Execute)
+
+	a.CORS()
 
 	return a
 }

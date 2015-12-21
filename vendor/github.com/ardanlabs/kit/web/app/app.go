@@ -2,9 +2,11 @@ package app
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"os"
 	"os/signal"
+	"strings"
 	"time"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -14,6 +16,21 @@ import (
 
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"
+)
+
+// Web config environmental variables.
+const (
+	cfgLoggingLevel = "LOGGING_LEVEL"
+	cfgHost         = "HOST"
+)
+
+// Mongo config environmental variables.
+const (
+	cfgMongoHost     = "MONGO_HOST"
+	cfgMongoAuthDB   = "MONGO_AUTHDB"
+	cfgMongoDB       = "MONGO_DB"
+	cfgMongoUser     = "MONGO_USER"
+	cfgMongoPassword = "MONGO_PASS"
 )
 
 var (
@@ -44,7 +61,8 @@ type (
 
 // app maintains some framework state.
 var app struct {
-	useMongo bool
+	useMongo    bool
+	userHeaders map[string]string // Extra headers for each response.
 }
 
 //==============================================================================
@@ -70,6 +88,7 @@ func New(mw ...Middleware) *App {
 // Handle is our mechanism for mounting Handlers for a given HTTP verb and path
 // pair, this makes for really easy, convenient routing.
 func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
+
 	// The function to execute for each request.
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		start := time.Now()
@@ -120,45 +139,88 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 	a.TreeMux.Handle(verb, path, h)
 }
 
-//==============================================================================
+// CORS providing support for Cross-Origin Resource Sharing.
+// https://metajack.im/2010/01/19/crossdomain-ajax-for-xmpp-http-binding-made-easy/
+func (a *App) CORS() {
+	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Max-Age", "86400")
+		w.Header().Set("Content-Type", "text/html")
+		w.WriteHeader(http.StatusOK)
 
-// Settings represents things required to initialize the app.
-type Settings struct {
-	ConfigKey string // The based environment variable key for all variables.
-	UseMongo  bool   // If MongoDB should be initialized and used.
+		const resp = `<html>
+	<body>
+		<a href='http://www.xmpp.org/extensions/xep-0124.html'>XEP-0124</a> - BOSH
+	</body>
+</html>`
+
+		fmt.Fprintf(w, resp)
+	}
+
+	a.TreeMux.Handle("GET", "/xmpp-httpbind", h)
+	a.TreeMux.Handle("OPTIONS", "/xmpp-httpbind", h)
 }
 
-// Init is called to initialize the application.
-func Init(set *Settings) {
-	app.useMongo = set.UseMongo
+//==============================================================================
 
+// Init is called to initialize the application.
+func Init(configKey string) {
+
+	// Init the configuration system.
+	if err := cfg.Init(configKey); err != nil {
+		fmt.Println("Error initalizing configuration system", err)
+		os.Exit(1)
+	}
+
+	// Init the log system.
 	logLevel := func() int {
-		ll, err := cfg.Int("LOGGING_LEVEL")
+		ll, err := cfg.Int(cfgLoggingLevel)
 		if err != nil {
 			return log.USER
 		}
 		return ll
 	}
-
 	log.Init(os.Stderr, logLevel)
 
-	if err := cfg.Init(set.ConfigKey); err != nil {
-		log.Error("startup", "Init", err, "Initializing config")
-		os.Exit(1)
-	}
+	// Log all the configuration options
+	log.User("startup", "Init", "\n\nConfig Settings: %s\n%s\n", configKey, cfg.Log())
 
-	if set.UseMongo {
-		err := mongo.Init()
-		if err != nil {
+	// Init MongoDB if configured.
+	if _, err := cfg.String(cfgMongoHost); err == nil {
+		app.useMongo = true
+
+		cfg := mongo.Config{
+			Host:     cfg.MustString(cfgMongoHost),
+			AuthDB:   cfg.MustString(cfgMongoAuthDB),
+			DB:       cfg.MustString(cfgMongoDB),
+			User:     cfg.MustString(cfgMongoUser),
+			Password: cfg.MustString(cfgMongoPassword),
+		}
+
+		if err := mongo.Init(cfg); err != nil {
 			log.Error("startup", "Init", err, "Initializing MongoDB")
 			os.Exit(1)
+		}
+	}
+
+	// Load user defined custom headers. HEADERS should be key:value,key:value
+	if hs, err := cfg.String("HEADERS"); err == nil {
+		app.userHeaders = make(map[string]string)
+		hdrs := strings.Split(hs, ",")
+		for _, hdr := range hdrs {
+			if kv := strings.Split(hdr, ":"); len(kv) == 2 {
+				log.User("startup", "Init", "User Headers : %s:%s", kv[0], kv[1])
+				app.userHeaders[kv[0]] = kv[1]
+			}
 		}
 	}
 }
 
 // Run is called to start the web service.
-func Run(cfgHost string, defaultHost string, routes http.Handler) {
-	log.Dev("startup", "Run", "Start : cfgHost[%s] defaultHost[%s]", cfgHost, defaultHost)
+func Run(defaultHost string, routes http.Handler) {
+	log.Dev("startup", "Run", "Start : defaultHost[%s]", defaultHost)
 
 	// Check for a configured host value.
 	host, err := cfg.String(cfgHost)
