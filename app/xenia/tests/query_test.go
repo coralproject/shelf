@@ -91,7 +91,7 @@ func TestQueryByName(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-		resp := `{"name":"QTEST_basic","desc":"","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query","save":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]}]}`
+		resp := `{"name":"QTEST_basic","desc":"","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query","return":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]}]}`
 		if resp[0:245] != w.Body.String()[0:245] {
 			t.Log(resp)
 			t.Log(w.Body.String())
