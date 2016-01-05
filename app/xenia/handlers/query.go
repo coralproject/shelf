@@ -3,6 +3,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"net/http"
 	"net/url"
 
@@ -43,7 +44,7 @@ func (queryHandle) Retrieve(c *app.Context) error {
 	return nil
 }
 
-// Retrieve returns the specified user from the system.
+// Execute runs the specified query set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Execute(c *app.Context) error {
 	set, err := query.GetSetByName(c.SessionID, c.DB, c.Params["name"])
@@ -51,6 +52,25 @@ func (queryHandle) Execute(c *app.Context) error {
 		return err
 	}
 
+	return execute(c, set)
+}
+
+// ExecuteCustom runs the provided query set and return results.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (queryHandle) ExecuteCustom(c *app.Context) error {
+	var set *query.Set
+	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
+		return err
+	}
+
+	return execute(c, set)
+}
+
+//==============================================================================
+
+// execute takes a context and query set and executes the set returning
+// any possible response.
+func execute(c *app.Context, set *query.Set) error {
 	var vars map[string]string
 	if c.Request.URL.RawQuery != "" {
 		if m, err := url.ParseQuery(c.Request.URL.RawQuery); err == nil {
