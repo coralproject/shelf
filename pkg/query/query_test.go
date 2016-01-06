@@ -35,7 +35,7 @@ func TestUpsertCreateQuery(t *testing.T) {
 	defer tests.DisplayLog()
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -55,26 +55,26 @@ func TestUpsertCreateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(tests.Context, db, qs1.Name)
+			_, err = query.GetLastSetHistoryByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			qs2, err := query.GetSetByName(tests.Context, db, qs1.Name)
+			set2, err := query.GetSetByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set.", tests.Success)
 
-			if !reflect.DeepEqual(*qs1, *qs2) {
-				t.Logf("\t%+v", qs1)
-				t.Logf("\t%+v", qs2)
+			if !reflect.DeepEqual(*set1, *set2) {
+				t.Logf("\t%+v", set1)
+				t.Logf("\t%+v", set2)
 				t.Errorf("\t%s\tShould be able to get back the same query values.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same query values.", tests.Success)
@@ -91,7 +91,7 @@ func TestGetSetNames(t *testing.T) {
 	qsName := "QTEST_basic"
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -111,13 +111,13 @@ func TestGetSetNames(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs1.Name += "2"
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			set1.Name += "2"
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
@@ -158,7 +158,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	qsName := "QTEST_basic"
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -178,27 +178,27 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs1.Description = "Next Version"
+			set1.Description = "Next Version"
 
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs2, err := query.GetLastSetHistoryByName(tests.Context, db, qsName)
+			set2, err := query.GetLastSetHistoryByName(tests.Context, db, qsName)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the last query set from history : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the last query set from history.", tests.Success)
 
-			if !reflect.DeepEqual(*qs1, *qs2) {
-				t.Logf("\t%+v", qs1)
-				t.Logf("\t%+v", qs2)
+			if !reflect.DeepEqual(*set1, *set2) {
+				t.Logf("\t%+v", set1)
+				t.Logf("\t%+v", set2)
 				t.Errorf("\t%s\tShould be able to get back the same query values.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same query values.", tests.Success)
@@ -213,7 +213,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	defer tests.DisplayLog()
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -233,49 +233,49 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			qs2 := *qs1
-			qs2.Params = append(qs2.Params, query.Param{
+			set2 := *set1
+			set2.Params = append(set2.Params, query.Param{
 				Name:    "group",
 				Default: "1",
 				Desc:    "provides the group number for the query script",
 			})
 
-			if err := query.UpsertSet(tests.Context, db, &qs2); err != nil {
+			if err := query.UpsertSet(tests.Context, db, &set2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(tests.Context, db, qs1.Name)
+			_, err = query.GetLastSetHistoryByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			updSet, err := query.GetSetByName(tests.Context, db, qs2.Name)
+			updSet, err := query.GetSetByName(tests.Context, db, set2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve a query set record.", tests.Success)
 
-			if updSet.Name != qs1.Name {
+			if updSet.Name != set1.Name {
 				t.Errorf("\t%s\tShould be able to get back the same query set name.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould be able to get back the same query set name.", tests.Success)
 			}
 
-			if lendiff := len(updSet.Params) - len(qs1.Params); lendiff != 1 {
+			if lendiff := len(updSet.Params) - len(set1.Params); lendiff != 1 {
 				t.Errorf("\t%s\tShould have one more parameter in set record: %d", tests.Failed, lendiff)
 			} else {
 				t.Logf("\t%s\tShould have one more parameter in set record.", tests.Success)
 			}
 
-			if !reflect.DeepEqual(qs2.Params[0], updSet.Params[0]) {
-				t.Logf("\t%+v", qs2.Params[0])
+			if !reflect.DeepEqual(set2.Params[0], updSet.Params[0]) {
+				t.Logf("\t%+v", set2.Params[0])
 				t.Logf("\t%+v", updSet.Params[0])
 				t.Errorf("\t%s\tShould be abe to validate the query param values in db.", tests.Failed)
 			} else {
@@ -294,7 +294,7 @@ func TestDeleteSet(t *testing.T) {
 	qsBadName := "QTEST_brod_advice"
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -314,7 +314,7 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -346,7 +346,7 @@ func TestUnknownName(t *testing.T) {
 	qsName := "QTEST_unknown"
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -366,7 +366,7 @@ func TestUnknownName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, qs1); err != nil {
+			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -392,7 +392,7 @@ func TestAPIFailure(t *testing.T) {
 	qsName := "QTEST_unknown"
 
 	const fixture = "basic.json"
-	qs1, err := query.GetFixture(fixture)
+	set1, err := query.GetFixture(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -402,7 +402,7 @@ func TestAPIFailure(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			if err := query.UpsertSet(tests.Context, nil, qs1); err == nil {
+			if err := query.UpsertSet(tests.Context, nil, set1); err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)

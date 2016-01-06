@@ -4,8 +4,8 @@
 	"package": [
 		{
 			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
-			"revisionTime": "2015-12-19T09:18:58-05:00"
+			"revision": "efa8e9b8a0edb5279d2dd00ef92f399611a5fcb7",
+			"revisionTime": "2016-01-05T20:17:43-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",

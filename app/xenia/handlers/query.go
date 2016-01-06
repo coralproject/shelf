@@ -63,6 +63,8 @@ func (queryHandle) ExecuteCustom(c *app.Context) error {
 		return err
 	}
 
+	// Validate the
+
 	return execute(c, set)
 }
 
