@@ -32,18 +32,14 @@ var emptyResult []docs
 func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string) *Result {
 	log.Dev(context, "ExecuteSet", "Started : Name[%s]", set.Name)
 
-	// Setup the result we will return.
-	r := Result{
-		Results: emptyResult,
+	// Validate the set that is provided.
+	if err := set.Validate(); err != nil {
+		return errResult(context, errors.New("Set not valid"))
 	}
 
 	// Is the rule enabled.
 	if !set.Enabled {
-		err := errors.New("Set disabled")
-		r.Error = true
-		r.Results = bson.M{"error": err.Error()}
-		log.Error(context, "ExecuteSet", err, "Completed")
-		return &r
+		return errResult(context, errors.New("Set disabled"))
 	}
 
 	// If we have been provided a nil map, make one.
@@ -53,10 +49,7 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 	// Did we get everything we need. Also load defaults.
 	if err := validateParameters(context, set, vars); err != nil {
-		r.Error = true
-		r.Results = bson.M{"error": err.Error()}
-		log.Error(context, "ExecuteSet", err, "Completed")
-		return &r
+		return errResult(context, err)
 	}
 
 	// Final results of running the set of queries.
@@ -79,19 +72,12 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 			// Were we told to continue to the next one.
 			if q.Continue {
 
-				// Reset any existing result, it is invalid.
-				r.Results = emptyResult
-				r.Error = false
-
 				// Go execute the next query starting over.
 				continue
 			}
 
 			// We need to return an error result.
-			r.Error = true
-			r.Results = bson.M{"error": err.Error()}
-			log.Error(context, "ExecuteSet", err, "Completed")
-			return &r
+			return errResult(context, err)
 		}
 
 		// Append these results to the final set.
@@ -100,10 +86,23 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 		}
 	}
 
-	// Save the final results to be returned.
-	r.Results = results
+	// Setup the result we will return.
+	r := Result{
+		Results: results,
+	}
 
 	log.Dev(context, "ExecuteSet", "Completed : \n%s\n", mongo.Query(results))
+	return &r
+}
+
+// errResult creates a result value with the error.
+func errResult(context interface{}, err error) *Result {
+	r := Result{
+		Results: bson.M{"error": err.Error()},
+		Error:   true,
+	}
+
+	log.Error(context, "ExecuteSet", err, "Completed")
 	return &r
 }
 

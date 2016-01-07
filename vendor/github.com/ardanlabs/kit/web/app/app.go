@@ -64,9 +64,11 @@ type (
 )
 
 // app maintains some framework state.
-var app struct {
+var app = struct {
 	useMongo    bool
-	userHeaders map[string]string // Extra headers for each response.
+	userHeaders map[string]string
+}{
+	userHeaders: make(map[string]string),
 }
 
 //==============================================================================
@@ -148,22 +150,17 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 func (a *App) CORS() {
 	h := func(w http.ResponseWriter, r *http.Request, p map[string]string) {
 		w.Header().Set("Access-Control-Allow-Origin", "*")
-		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		w.Header().Set("Access-Control-Max-Age", "86400")
-		w.Header().Set("Content-Type", "text/html")
+		w.Header().Set("Content-Type", "application/json")
+
 		w.WriteHeader(http.StatusOK)
-
-		const resp = `<html>
-	<body>
-		<a href='http://www.xmpp.org/extensions/xep-0124.html'>XEP-0124</a> - BOSH
-	</body>
-</html>`
-
-		fmt.Fprintf(w, resp)
 	}
 
 	a.TreeMux.OptionsHandler = h
+
+	app.userHeaders["Access-Control-Allow-Origin"] = "*"
 }
 
 //==============================================================================
@@ -172,7 +169,7 @@ func (a *App) CORS() {
 func Init(configKey string) {
 
 	// Init the configuration system.
-	if err := cfg.Init(configKey); err != nil {
+	if err := cfg.Init(cfg.EnvProvider{Namespace: configKey}); err != nil {
 		fmt.Println("Error initalizing configuration system", err)
 		os.Exit(1)
 	}
@@ -210,7 +207,6 @@ func Init(configKey string) {
 
 	// Load user defined custom headers. HEADERS should be key:value,key:value
 	if hs, err := cfg.String("HEADERS"); err == nil {
-		app.userHeaders = make(map[string]string)
 		hdrs := strings.Split(hs, ",")
 		for _, hdr := range hdrs {
 			if kv := strings.Split(hdr, ":"); len(kv) == 2 {

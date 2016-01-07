@@ -2,10 +2,8 @@ package cfg
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 	"sync"
@@ -21,39 +19,27 @@ var c struct {
 
 //==============================================================================
 
-// Init is to be called only once, to load up the giving namespace if found,
+// Provider is implemented by the user to provide the configuration as a map
+type Provider interface {
+	Provide() (map[string]string, error)
+}
+
+//==============================================================================
+
+// Init is to be called only once, to load up the given namespace if found,
 // in the environment variables. All keys will be made lowercase.
-func Init(namespace string) error {
+func Init(p Provider) error {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 
-	if c.m == nil {
-		c.m = make(map[string]string)
+	// Get the provided configuration.
+	m, err := p.Provide()
+	if err != nil {
+		return err
 	}
 
-	// Get the lists of available environment variables.
-	envs := os.Environ()
-	if len(envs) == 0 {
-		return errors.New("No environment variables found")
-	}
-
-	// Create the uppercase version to meet the standard {NAMESPACE_} format.
-	uspace := fmt.Sprintf("%s_", strings.ToUpper(namespace))
-
-	// Loop and match each variable using the uppercase namespace.
-	for _, val := range envs {
-		if !strings.HasPrefix(val, uspace) {
-			continue
-		}
-
-		idx := strings.Index(val, "=")
-		c.m[strings.ToUpper(strings.TrimPrefix(val[0:idx], uspace))] = val[idx+1:]
-	}
-
-	// Did we find any keys for this namespace?
-	if len(c.m) == 0 {
-		return fmt.Errorf("Namespace %q was not found", namespace)
-	}
+	// Set it to the global instance.
+	c.m = m
 
 	return nil
 }
@@ -73,7 +59,7 @@ func Log() string {
 	return buf.String()
 }
 
-// String returns the value of the giving key as a string, else it will return
+// String returns the value of the given key as a string, else it will return
 // an error if key was not found.
 func String(key string) (string, error) {
 	c.mu.RLock()
@@ -87,7 +73,7 @@ func String(key string) (string, error) {
 	return value, nil
 }
 
-// MustString returns the value of the giving key as a string, else it will panic
+// MustString returns the value of the given key as a string, else it will panic
 // if the key was not found.
 func MustString(key string) string {
 	c.mu.RLock()
@@ -101,7 +87,7 @@ func MustString(key string) string {
 	return value
 }
 
-// Int returns the value of the giving key as an int, else it will return
+// Int returns the value of the given key as an int, else it will return
 // an error, if the key was not found or the value can't be convered to an int.
 func Int(key string) (int, error) {
 	c.mu.RLock()
@@ -120,7 +106,7 @@ func Int(key string) (int, error) {
 	return iv, nil
 }
 
-// MustInt returns the value of the giving key as an int, else it will panic
+// MustInt returns the value of the given key as an int, else it will panic
 // if the key was not found or the value can't be convered to an int.
 func MustInt(key string) int {
 	c.mu.RLock()
@@ -139,7 +125,7 @@ func MustInt(key string) int {
 	return iv
 }
 
-// Time returns the value of the giving key as a Time, else it will return an
+// Time returns the value of the given key as a Time, else it will return an
 // error, if the key was not found or the value can't be convered to a Time.
 func Time(key string) (time.Time, error) {
 	c.mu.RLock()
@@ -158,7 +144,7 @@ func Time(key string) (time.Time, error) {
 	return tv, nil
 }
 
-// MustTime returns the value of the giving key as a Time, else it will panic
+// MustTime returns the value of the given key as a Time, else it will panic
 // if the key was not found or the value can't be convered to a Time.
 func MustTime(key string) time.Time {
 	c.mu.RLock()
@@ -227,7 +213,7 @@ func MustBool(key string) bool {
 	return val
 }
 
-// URL returns the value of the giving key as a URL, else it will return an
+// URL returns the value of the given key as a URL, else it will return an
 // error, if the key was not found or the value can't be convered to a URL.
 func URL(key string) (*url.URL, error) {
 	c.mu.RLock()
@@ -246,7 +232,7 @@ func URL(key string) (*url.URL, error) {
 	return u, nil
 }
 
-// MustURL returns the value of the giving key as a URL, else it will panic
+// MustURL returns the value of the given key as a URL, else it will panic
 // if the key was not found or the value can't be convered to a URL.
 func MustURL(key string) *url.URL {
 	c.mu.RLock()

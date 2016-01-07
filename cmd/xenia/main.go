@@ -31,7 +31,7 @@ var xenia = &cobra.Command{
 }
 
 func main() {
-	if err := cfg.Init("XENIA"); err != nil {
+	if err := cfg.Init(cfg.EnvProvider{Namespace: "XENIA"}); err != nil {
 		xenia.Println("Unable to initialize configuration")
 		os.Exit(1)
 	}

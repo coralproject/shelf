@@ -41,9 +41,9 @@ error, if the key was not found or the value can't be convered to a bool.
 
 ## func Init
 ``` go
-func Init(namespace string) error
+func Init(p Provider) error
 ```
-Init is to be called only once, to load up the giving namespace if found,
+Init is to be called only once, to load up the given namespace if found,
 in the environment variables. All keys will be made lowercase.
 
 
@@ -51,8 +51,15 @@ in the environment variables. All keys will be made lowercase.
 ``` go
 func Int(key string) (int, error)
 ```
-Int returns the value of the giving key as an int, else it will return
+Int returns the value of the given key as an int, else it will return
 an error, if the key was not found or the value can't be convered to an int.
+
+
+## func Log
+``` go
+func Log() string
+```
+Log returns a string to help with logging configuration.
 
 
 ## func MustBool
@@ -67,7 +74,7 @@ if the key was not found or the value can't be convered to a bool.
 ``` go
 func MustInt(key string) int
 ```
-MustInt returns the value of the giving key as an int, else it will panic
+MustInt returns the value of the given key as an int, else it will panic
 if the key was not found or the value can't be convered to an int.
 
 
@@ -75,7 +82,7 @@ if the key was not found or the value can't be convered to an int.
 ``` go
 func MustString(key string) string
 ```
-MustString returns the value of the giving key as a string, else it will panic
+MustString returns the value of the given key as a string, else it will panic
 if the key was not found.
 
 
@@ -83,7 +90,7 @@ if the key was not found.
 ``` go
 func MustTime(key string) time.Time
 ```
-MustTime returns the value of the giving key as a Time, else it will panic
+MustTime returns the value of the given key as a Time, else it will panic
 if the key was not found or the value can't be convered to a Time.
 
 
@@ -91,7 +98,7 @@ if the key was not found or the value can't be convered to a Time.
 ``` go
 func MustURL(key string) *url.URL
 ```
-MustURL returns the value of the giving key as a URL, else it will panic
+MustURL returns the value of the given key as a URL, else it will panic
 if the key was not found or the value can't be convered to a URL.
 
 
@@ -99,7 +106,7 @@ if the key was not found or the value can't be convered to a URL.
 ``` go
 func String(key string) (string, error)
 ```
-String returns the value of the giving key as a string, else it will return
+String returns the value of the given key as a string, else it will return
 an error if key was not found.
 
 
@@ -107,7 +114,7 @@ an error if key was not found.
 ``` go
 func Time(key string) (time.Time, error)
 ```
-Time returns the value of the giving key as a Time, else it will return an
+Time returns the value of the given key as a Time, else it will return an
 error, if the key was not found or the value can't be convered to a Time.
 
 
@@ -115,8 +122,79 @@ error, if the key was not found or the value can't be convered to a Time.
 ``` go
 func URL(key string) (*url.URL, error)
 ```
-URL returns the value of the giving key as a URL, else it will return an
+URL returns the value of the given key as a URL, else it will return an
 error, if the key was not found or the value can't be convered to a URL.
+
+
+
+## type EnvProvider
+``` go
+type EnvProvider struct {
+    Namespace string
+}
+```
+EnvProvider provides configuration from the environment.
+
+
+
+
+
+
+
+
+
+
+
+### func (EnvProvider) Provide
+``` go
+func (ep EnvProvider) Provide() (map[string]string, error)
+```
+Provide implements the Provider interface.
+
+
+
+## type MapProvider
+``` go
+type MapProvider struct {
+    Map map[string]string
+}
+```
+MapProvider provides a simple implementation of the Provider whereby it just
+returns a stored map.
+
+
+
+
+
+
+
+
+
+
+
+### func (MapProvider) Provide
+``` go
+func (mp MapProvider) Provide() (map[string]string, error)
+```
+Provide implements the Provider interface.
+
+
+
+## type Provider
+``` go
+type Provider interface {
+    Provide() (map[string]string, error)
+}
+```
+Provider is implemented by the user to provide the configuration as a map
+
+
+
+
+
+
+
+
 
 
 

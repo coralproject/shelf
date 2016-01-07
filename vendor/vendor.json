@@ -4,13 +4,13 @@
 	"package": [
 		{
 			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
-			"revisionTime": "2015-12-19T09:18:58-05:00"
+			"revision": "efa8e9b8a0edb5279d2dd00ef92f399611a5fcb7",
+			"revisionTime": "2016-01-05T20:17:43-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "a888f54ce0b320b29fb75b4a5729565a39c58321",
-			"revisionTime": "2015-12-19T10:21:00-05:00"
+			"revision": "5ff414cfe0f947deded630754487a0b871191556",
+			"revisionTime": "2015-12-29T21:21:53-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
@@ -40,8 +40,8 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "3c5869107a8dfa01100cf05a482d87216b8f2e50",
-			"revisionTime": "2015-12-19T09:18:58-05:00"
+			"revision": "26fe2b7c5eeeadad78e43b10d20c16820c5e09f0",
+			"revisionTime": "2015-12-29T21:03:15-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
@@ -51,8 +51,8 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "07ff02646b29709a5392f8b44a2a8556a7f67179",
-			"revisionTime": "2015-12-21T10:02:47-05:00"
+			"revision": "26fe2b7c5eeeadad78e43b10d20c16820c5e09f0",
+			"revisionTime": "2015-12-29T21:03:15-05:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
