@@ -2,11 +2,11 @@ package cmdquery
 
 import (
 	"encoding/json"
+	"strings"
 
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
-
 	"github.com/spf13/cobra"
 )
 
@@ -57,11 +57,19 @@ func runExec(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	vars := make(map[string]string)
 	if exec.vars != "" {
-		// TODO: Break K=V,K=V into a map.
+		vs := strings.Split(exec.vars, ",")
+		for _, kvs := range vs {
+			kv := strings.Split(kvs, ":")
+			if len(kv) != 2 {
+				continue
+			}
+			vars[kv[0]] = kv[1]
+		}
 	}
 
-	result := query.ExecuteSet("", db, set, nil)
+	result := query.ExecuteSet("", db, set, vars)
 
 	data, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
