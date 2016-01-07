@@ -1,0 +1,23 @@
+{
+   "name":"comments_per_day",
+   "desc":"comments per day",
+   "enabled":true,
+   "params":null,
+   "queries":[
+      {
+         "name":"comments_by_asset",
+         "type":"pipeline",
+         "collection":"comment",
+         "return":true,
+         "has_date":true,
+         "scripts":[
+
+
+            "{ \"$match\": { \"date_created\": {\"$gt\" : \"ISODate(\\\"#start_date#T00:00:00Z\\\")\"} } }",
+            "{ \"$match\": { \"date_created\": {\"$lt\" : \"ISODate(\\\"#end_date#T00:00:00Z\\\")\"} } }",
+            "{ \"$group\": { \"_id\": { \"day\": { \"$dayOfMonth\": \"$date_created\" }, \"month\": { \"$month\": \"$date_created\" }, \"year\": { \"$year\": \"$date_created\" } }, \"comments\": { \"$sum\": 1 } } }"
+
+         ]
+      }
+   ]
+}
