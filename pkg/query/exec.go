@@ -315,7 +315,14 @@ func objID(script string) bson.ObjectId {
 // into a BSON date. We convert the following string
 // ISODate('2013-01-16T00:00:00.000Z') to a Go time value.
 func isoDate(script string) time.Time {
-	dateTime, err := time.Parse("2006-01-02T15:04:05.999Z", script[9:len(script)-2])
+	var parse string
+	if len(script) == 21 {
+		parse = "2006-01-02"
+	} else {
+		parse = "2006-01-02T15:04:05.999Z"
+	}
+
+	dateTime, err := time.Parse(parse, script[9:len(script)-2])
 	if err != nil {
 		return time.Now().UTC()
 	}
