@@ -168,6 +168,7 @@ func getExecSet() []execSet {
 	return []execSet{
 		querySetBasic(),
 		querySetWithTime(),
+		querySetWithShortTime(),
 		querySetWithMultiResults(),
 		querySetNoResults(),
 		querySetMalformed(),
@@ -224,6 +225,32 @@ func querySetWithTime() execSet {
 			},
 		},
 		result: `{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+	}
+}
+
+// querySetWithShortTime creates a simple query set using short time.
+func querySetWithShortTime() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Short Time",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Short Time",
+					Type:       "pipeline",
+					Collection: query.CollectionExecTest,
+					Return:     true,
+					HasDate:    true,
+					Scripts: []string{
+						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01\")"}}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+						`{"$limit": 2}`,
+					},
+				},
+			},
+		},
+		result: `{"results":[{"Name":"Short Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
 	}
 }
 
