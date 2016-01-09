@@ -3,7 +3,7 @@ package query
 import (
 	"errors"
 
-	"gopkg.in/bluesuncorp/validator.v6"
+	"gopkg.in/bluesuncorp/validator.v8"
 )
 
 // Set of query types we expect to receive.
@@ -12,18 +12,19 @@ const (
 	TypeTemplate = "template"
 )
 
+// Set of document types for internal integrity of CRUDing documents.
+const (
+	docTypeQuerySet = "queryset"
+	docTypeScripts  = "scripts"
+)
+
 //==============================================================================
 
 // validate is used to perform model field validation.
 var validate *validator.Validate
 
 func init() {
-	config := validator.Config{
-		TagName:         "validate",
-		ValidationFuncs: validator.BakedInValidators,
-	}
-
-	validate = validator.New(config)
+	validate = validator.New(&validator.Config{TagName: "validate"})
 }
 
 //==============================================================================
@@ -36,9 +37,31 @@ type Result struct {
 
 //==============================================================================
 
+// Script contain pre and post commands to use per set or per query.
+type Script struct {
+	Name     string   `bson:"name" json:"name" validate:"required,min=3"`     // Unique name per Script document
+	DocType  string   `bson:"doc_type" json:"doc_type" validate:"eq=scripts"` // Hardcoded by API.
+	Commands []string `bson:"commands" json:"commands"`                       // Commands to add to a query.
+}
+
+// Validate checks the query value for consistency.
+func (scr *Script) Validate() error {
+	if err := validate.Struct(scr); err != nil {
+		return err
+	}
+
+	if len(scr.Commands) == 0 {
+		return errors.New("No commands exist")
+	}
+
+	return nil
+}
+
+//==============================================================================
+
 // Query contains the configuration details for a query.
 type Query struct {
-	Name        string   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per Set where results are stored.
+	Name        string   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
 	Description string   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
 	Type        string   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
 	Collection  string   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
@@ -56,7 +79,7 @@ func (q *Query) Validate() error {
 	}
 
 	if len(q.Scripts) == 0 {
-		return errors.New("No scripts to execute")
+		return errors.New("No scripts exist")
 	}
 
 	switch q.Type {
