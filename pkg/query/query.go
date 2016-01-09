@@ -115,9 +115,9 @@ func (sets) GetNames(context interface{}, db *db.DB) ([]string, error) {
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": 1}
-		log.Dev(context, "sets.GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(q))
-		return c.Find(nil).Select(q).Sort("name").All(&names)
+		s := bson.M{"name": 1}
+		log.Dev(context, "sets.GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
+		return c.Find(nil).Select(s).Sort("name").All(&names)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {

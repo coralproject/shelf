@@ -1,179 +1,212 @@
 package query
 
-// import (
-// 	"errors"
-// 	"strings"
+import (
+	"errors"
+	"strings"
 
-// 	"github.com/ardanlabs/kit/db"
-// 	"github.com/ardanlabs/kit/db/mongo"
-// 	"github.com/ardanlabs/kit/log"
+	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
+	"github.com/ardanlabs/kit/log"
 
-// 	"gopkg.in/mgo.v2"
-// 	"gopkg.in/mgo.v2/bson"
-// )
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
+)
 
-// // =============================================================================
+// scripts maintains the set of script related API calls.
+type scripts struct{}
 
-// // UpsertScript is used to create or update an existing Script document.
-// func UpsertScript(context interface{}, db *db.DB, scr *Script) error {
-// 	log.Dev(context, "UpsertSscript", "Started : Name[%s]", scr.Name)
+// Scripts fronts the access to the scripts functionality.
+var Scripts scripts
 
-// 	// Validate the set that is provided.
-// 	if err := scr.Validate(); err != nil {
-// 		log.Error(context, "UpsertScript", err, "Completed")
-// 		return err
-// 	}
+// =============================================================================
 
-// 	// We need to know if this is a new script.
-// 	var new bool
-// 	if _, err := GetScriptByName(context, db, scr.Name); err != nil {
-// 		if err != mgo.ErrNotFound {
-// 			log.Error(context, "UpsertScript", err, "Completed")
-// 			return err
-// 		}
+// Upsert is used to create or update an existing Script document.
+func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
+	log.Dev(context, "scripts.Upsert", "Started : Name[%s]", scr.Name)
 
-// 		new = true
-// 	}
+	// Validate the set that is provided.
+	if err := scr.Validate(); err != nil {
+		log.Error(context, "scripts.Upsert", err, "Completed")
+		return err
+	}
 
-// 	// Insert or update the script.
-// 	f := func(c *mgo.Collection) error {
-// 		q := bson.M{"name": set.Name}
-// 		log.Dev(context, "UpsertScript", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(src))
-// 		_, err := c.Upsert(q, set)
-// 		return err
-// 	}
+	// We need to know if this is a new script.
+	var new bool
+	if _, err := Scripts.GetByName(context, db, scr.Name); err != nil {
+		if err != mgo.ErrNotFound {
+			log.Error(context, "scripts.Upsert", err, "Completed")
+			return err
+		}
 
-// 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-// 		log.Error(context, "UpsertScript", err, "Completed")
-// 		return err
-// 	}
+		new = true
+	}
 
-// 	// Add a history record if this script set is new.
-// 	if new {
-// 		f = func(c *mgo.Collection) error {
-// 			sh := bson.M{
-// 				"name": scr.Name,
-// 				"scripts": []bson.M{},
-// 			}
+	// Insert or update the script.
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": scr.Name}
+		log.Dev(context, "scripts.Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(scr))
+		_, err := c.Upsert(q, scr)
+		return err
+	}
 
-// 			log.Dev(context, "UpsertScript", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(sh))
-// 			return c.Insert(sh)
-// 		}
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "scripts.Upsert", err, "Completed")
+		return err
+	}
 
-// 		if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
-// 			log.Error(context, "UpsertScript", err, "Completed")
-// 			return err
-// 		}
-// 	}
+	// Add a history record if this script set is new.
+	if new {
+		f = func(c *mgo.Collection) error {
+			sh := bson.M{
+				"name":    scr.Name,
+				"scripts": []bson.M{},
+			}
 
-// 	// Add this script to the beginning of the history.
-// 	f = func(c *mgo.Collection) error {
-// 		q := bson.M{"name": scr.Name}
-// 		su := bson.M{
-// 			"$push": bson.M{
-// 				"sets": bson.M{
-// 					"$each":     []*Script{scr},
-// 					"$position": 0,
-// 				},
-// 			},
-// 		}
+			log.Dev(context, "scripts.Upsert", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(sh))
+			return c.Insert(sh)
+		}
 
-// 		log.Dev(context, "UpsertScript", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(su))
-// 		_, err := c.Upsert(q, qu)
-// 		return err
-// 	}
+		if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
+			log.Error(context, "scripts.Upsert", err, "Completed")
+			return err
+		}
+	}
 
-// 	if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
-// 		log.Error(context, "UpsertScript", err, "Completed")
-// 		return err
-// 	}
+	// Add this script to the beginning of the history.
+	f = func(c *mgo.Collection) error {
+		q := bson.M{"name": scr.Name}
+		su := bson.M{
+			"$push": bson.M{
+				"sets": bson.M{
+					"$each":     []*Script{scr},
+					"$position": 0,
+				},
+			},
+		}
 
-// 	log.Dev(context, "UpsertScript", "Completed")
-// 	return nil
-// }
+		log.Dev(context, "scripts.Upsert", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(su))
+		_, err := c.Upsert(q, su)
+		return err
+	}
 
-// // =============================================================================
+	if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
+		log.Error(context, "scripts.Upsert", err, "Completed")
+		return err
+	}
 
-// // GetScriptNames retrieves a list of script names.
-// func GetScriptNames(context interface{}, db *db.DB) ([]string, error) {
-// 	log.Dev(context, "GetScriptNames", "Started")
+	log.Dev(context, "scripts.Upsert", "Completed")
+	return nil
+}
 
-// 	var names []bson.M
-// 	f := func(c *mgo.Collection) error {
-// 		q := bson.M{"name": 1}
-// 		log.Dev(context, "GetScriptNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(q))
-// 		return c.Find(nil).Select(q).Sort("name").All(&names)
-// 	}
+// =============================================================================
 
-// 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-// 		log.Error(context, "GetScriptNames", err, "Completed")
-// 		return nil, err
-// 	}
+// GetNames retrieves a list of script names.
+func (scripts) GetNames(context interface{}, db *db.DB) ([]string, error) {
+	log.Dev(context, "scripts.GetNames", "Started")
 
-// 	var sets []string
-// 	for _, doc := range names {
-// 		name := doc["name"].(string)
-// 		if strings.HasPrefix(name, "test") {
-// 			continue
-// 		}
+	var names []bson.M
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"doc_type": docTypeScript}
+		s := bson.M{"name": 1}
+		log.Dev(context, "scripts.GetNames", "MGO : db.%s.find(%s, %s).sort([\"name\"])", mongo.Query(q), mongo.Query(s))
+		return c.Find(q).Select(s).Sort("name").All(&names)
+	}
 
-// 		sets = append(sets, name)
-// 	}
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "scripts.GetNames", err, "Completed")
+		return nil, err
+	}
 
-// 	log.Dev(context, "GetScriptNames", "Completed : Sets[%+v]", sets)
-// 	return sets, nil
-// }
+	var sets []string
+	for _, doc := range names {
+		name := doc["name"].(string)
+		if strings.HasPrefix(name, "test") {
+			continue
+		}
 
-// // GetSetByName retrieves the configuration for the specified Set.
-// func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error) {
-// 	log.Dev(context, "GetSetByName", "Started : Name[%s]", name)
+		sets = append(sets, name)
+	}
 
-// 	var set Set
-// 	f := func(c *mgo.Collection) error {
-// 		q := bson.M{"name": name}
-// 		log.Dev(context, "GetSetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
-// 		return c.Find(q).One(&set)
-// 	}
+	log.Dev(context, "scripts.GetNames", "Completed : Sets[%+v]", sets)
+	return sets, nil
+}
 
-// 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-// 		log.Error(context, "GetSetByName", err, "Completed")
-// 		return nil, err
-// 	}
+// GetByName retrieves the configuration for the specified Script.
+func (scripts) GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
+	log.Dev(context, "scripts.GetByName", "Started : Name[%s]", name)
 
-// 	log.Dev(context, "GetSetByName", "Completed : Set[%+v]", &set)
-// 	return &set, nil
-// }
+	var scr Script
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": name, "doc_type": docTypeScript}
+		log.Dev(context, "scripts.GetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
+		return c.Find(q).One(&scr)
+	}
 
-// // GetLastSetHistoryByName gets the last written Set within the query_history
-// // collection and returns the last one else returns a non-nil error if it fails.
-// func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
-// 	log.Dev(context, "GetLastSetHistoryByName", "Started : Name[%s]", name)
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "scripts.GetByName", err, "Completed")
+		return nil, err
+	}
 
-// 	var result struct {
-// 		Name string `bson:"name"`
-// 		Sets []Set  `bson:"sets"`
-// 	}
+	log.Dev(context, "scripts.GetByName", "Completed : Set[%+v]", &scr)
+	return &scr, nil
+}
 
-// 	f := func(c *mgo.Collection) error {
-// 		q := bson.M{"name": name}
-// 		proj := bson.M{"sets": bson.M{"$slice": 1}}
+// GetLastHistoryByName gets the last written Set within the query_history
+// collection and returns the last one else returns a non-nil error if it fails.
+func (scripts) GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
+	log.Dev(context, "scripts.GetLastHistoryByName", "Started : Name[%s]", name)
 
-// 		log.Dev(context, "GetLastSetHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
-// 		return c.Find(q).Select(proj).One(&result)
-// 	}
+	var result struct {
+		Name    string   `bson:"name"`
+		Scripts []Script `bson:"scripts"`
+	}
 
-// 	err := db.ExecuteMGO(context, CollectionHistory, f)
-// 	if err != nil {
-// 		log.Error(context, "GetLastSetHistoryByName", err, "Complete")
-// 		return nil, err
-// 	}
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": name, "doc_type": docTypeScript}
+		proj := bson.M{"scripts": bson.M{"$slice": 1}}
 
-// 	if result.Sets == nil {
-// 		err := errors.New("History not found")
-// 		log.Error(context, "GetLastSetHistoryByName", err, "Complete")
-// 		return nil, err
-// 	}
+		log.Dev(context, "scripts.GetLastHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
+		return c.Find(q).Select(proj).One(&result)
+	}
 
-// 	log.Dev(context, "GetLastSetHistoryByName", "Completed : QS[%+v]", &result.Sets[0])
-// 	return &result.Sets[0], nil
-// }
+	err := db.ExecuteMGO(context, CollectionHistory, f)
+	if err != nil {
+		log.Error(context, "scripts.GetLastHistoryByName", err, "Complete")
+		return nil, err
+	}
+
+	if result.Scripts == nil {
+		err := errors.New("History not found")
+		log.Error(context, "scripts.GetLastHistoryByName", err, "Complete")
+		return nil, err
+	}
+
+	log.Dev(context, "scripts.GetLastHistoryByName", "Completed : QS[%+v]", &result.Scripts[0])
+	return &result.Scripts[0], nil
+}
+
+// =============================================================================
+
+// Delete is used to remove an existing Set document.
+func (scripts) Delete(context interface{}, db *db.DB, name string) error {
+	log.Dev(context, "scripts.Delete", "Started : Name[%s]", name)
+
+	set, err := Scripts.GetByName(context, db, name)
+	if err != nil {
+		return err
+	}
+
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"name": set.Name, "doc_type": docTypeScript}
+		log.Dev(context, "scripts.Delete", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
+		return c.Remove(q)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "scripts.Delete", err, "Completed")
+		return err
+	}
+
+	log.Dev(context, "scripts.Delete", "Completed")
+	return nil
+}

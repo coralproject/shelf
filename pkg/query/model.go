@@ -109,6 +109,8 @@ type Param struct {
 
 //==============================================================================
 
+// TODO: Add doctype to Set
+
 // Set contains the configuration details for a rule set.
 type Set struct {
 	Name        string  `bson:"name" json:"name" validate:"required,min=3"` // Name of the query set.
