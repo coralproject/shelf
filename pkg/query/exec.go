@@ -34,7 +34,7 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 	// Validate the set that is provided.
 	if err := set.Validate(); err != nil {
-		return errResult(context, errors.New("Set not valid"))
+		return errResult(context, err)
 	}
 
 	// Is the rule enabled.
