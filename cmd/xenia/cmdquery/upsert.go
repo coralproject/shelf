@@ -72,7 +72,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := query.UpsertSet("", db, q); err != nil {
+		if err := query.Sets.Upsert("", db, q); err != nil {
 			cmd.Println("Upserting Query : ", err)
 			return
 		}
@@ -86,7 +86,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		return query.UpsertSet("", db, q)
+		return query.Sets.Upsert("", db, q)
 	})
 
 	if err2 != nil {

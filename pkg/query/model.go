@@ -15,7 +15,7 @@ const (
 // Set of document types for internal integrity of CRUDing documents.
 const (
 	docTypeQuerySet = "queryset"
-	docTypeScripts  = "scripts"
+	docTypeScript   = "script"
 )
 
 //==============================================================================
@@ -39,9 +39,9 @@ type Result struct {
 
 // Script contain pre and post commands to use per set or per query.
 type Script struct {
-	Name     string   `bson:"name" json:"name" validate:"required,min=3"`     // Unique name per Script document
-	DocType  string   `bson:"doc_type" json:"doc_type" validate:"eq=scripts"` // Hardcoded by API.
-	Commands []string `bson:"commands" json:"commands"`                       // Commands to add to a query.
+	Name     string   `bson:"name" json:"name" validate:"required,min=3"`    // Unique name per Script document
+	DocType  string   `bson:"doc_type" json:"doc_type" validate:"eq=script"` // Set by the API.
+	Commands []string `bson:"commands" json:"commands"`                      // Commands to add to a query.
 }
 
 // Validate checks the query value for consistency.

@@ -55,18 +55,18 @@ func TestUpsertCreateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(tests.Context, db, set1.Name)
+			_, err = query.Sets.GetLastHistoryByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			set2, err := query.GetSetByName(tests.Context, db, set1.Name)
+			set2, err := query.Sets.GetByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set : %s", tests.Failed, err)
 			}
@@ -111,18 +111,18 @@ func TestGetSetNames(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			set1.Name += "2"
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
 
-			names, err := query.GetSetNames(tests.Context, db)
+			names, err := query.Sets.GetNames(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set names : %v", tests.Failed, err)
 			}
@@ -178,19 +178,19 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
 			set1.Description = "Next Version"
 
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			set2, err := query.GetLastSetHistoryByName(tests.Context, db, qsName)
+			set2, err := query.Sets.GetLastHistoryByName(tests.Context, db, qsName)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the last query set from history : %s", tests.Failed, err)
 			}
@@ -233,7 +233,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
@@ -245,18 +245,18 @@ func TestUpsertUpdateQuery(t *testing.T) {
 				Desc:    "provides the group number for the query script",
 			})
 
-			if err := query.UpsertSet(tests.Context, db, &set2); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, &set2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a query set record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			_, err = query.GetLastSetHistoryByName(tests.Context, db, set1.Name)
+			_, err = query.Sets.GetLastHistoryByName(tests.Context, db, set1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
 
-			updSet, err := query.GetSetByName(tests.Context, db, set2.Name)
+			updSet, err := query.Sets.GetByName(tests.Context, db, set2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a query set record: %s", tests.Failed, err)
 			}
@@ -314,22 +314,22 @@ func TestDeleteSet(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if err := query.DeleteSet(tests.Context, db, qsName); err != nil {
+			if err := query.Sets.Delete(tests.Context, db, qsName); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete a query set using its name[%s]: %s", tests.Failed, qsName, err)
 			}
 			t.Logf("\t%s\tShould be able to delete a query set using its name[%s]:", tests.Success, qsName)
 
-			if err := query.DeleteSet(tests.Context, db, qsBadName); err == nil {
+			if err := query.Sets.Delete(tests.Context, db, qsBadName); err == nil {
 				t.Fatalf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Failed, qsBadName)
 			}
 			t.Logf("\t%s\tShould not be able to delete a query set using wrong name name[%s]", tests.Success, qsBadName)
 
-			if _, err := query.GetSetByName(tests.Context, db, qsName); err == nil {
+			if _, err := query.Sets.GetByName(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists:", tests.Success, qsName)
@@ -366,17 +366,17 @@ func TestUnknownName(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.UpsertSet(tests.Context, db, set1); err != nil {
+			if err := query.Sets.Upsert(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if _, err := query.GetSetByName(tests.Context, db, qsName); err == nil {
+			if _, err := query.Sets.GetByName(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] does not exists: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] does not exists.", tests.Success, qsName)
 
-			if err := query.DeleteSet(tests.Context, db, qsName); err == nil {
+			if err := query.Sets.Delete(tests.Context, db, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted: %s", tests.Failed, qsName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate query set with Name[%s] can not be deleted.", tests.Success, qsName)
@@ -402,27 +402,27 @@ func TestAPIFailure(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			if err := query.UpsertSet(tests.Context, nil, set1); err == nil {
+			if err := query.Sets.Upsert(tests.Context, nil, set1); err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetSetNames(tests.Context, nil); err == nil {
+			if _, err := query.Sets.GetNames(tests.Context, nil); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetSetByName(tests.Context, nil, qsName); err == nil {
+			if _, err := query.Sets.GetByName(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if _, err := query.GetLastSetHistoryByName(tests.Context, nil, qsName); err == nil {
+			if _, err := query.Sets.GetLastHistoryByName(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			if err := query.DeleteSet(tests.Context, nil, qsName); err == nil {
+			if err := query.Sets.Delete(tests.Context, nil, qsName); err == nil {
 				t.Fatalf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused delete by api with bad session: %s", tests.Success, err)

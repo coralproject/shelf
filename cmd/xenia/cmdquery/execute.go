@@ -51,7 +51,7 @@ func runExec(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	set, err := query.GetSetByName("", db, exec.name)
+	set, err := query.Sets.GetByName("", db, exec.name)
 	if err != nil {
 		cmd.Println("Exec Query : ", err)
 		return
