@@ -12,12 +12,6 @@ const (
 	TypeTemplate = "template"
 )
 
-// Set of document types for internal integrity of CRUDing documents.
-const (
-	DocTypeQuerySet = "queryset"
-	DocTypeScript   = "script"
-)
-
 //==============================================================================
 
 // validate is used to perform model field validation.
@@ -33,28 +27,6 @@ func init() {
 type Result struct {
 	Results interface{} `json:"results"`
 	Error   bool        `json:"error"`
-}
-
-//==============================================================================
-
-// Script contain pre and post commands to use per set or per query.
-type Script struct {
-	Name     string   `bson:"name" json:"name" validate:"required,min=3"`    // Unique name per Script document
-	DocType  string   `bson:"doc_type" json:"doc_type" validate:"eq=script"` // Set by the API.
-	Commands []string `bson:"commands" json:"commands"`                      // Commands to add to a query.
-}
-
-// Validate checks the query value for consistency.
-func (scr *Script) Validate() error {
-	if err := validate.Struct(scr); err != nil {
-		return err
-	}
-
-	if len(scr.Commands) == 0 {
-		return errors.New("No commands exist")
-	}
-
-	return nil
 }
 
 //==============================================================================
@@ -108,8 +80,6 @@ type Param struct {
 }
 
 //==============================================================================
-
-// TODO: Add doctype to Set
 
 // Set contains the configuration details for a rule set.
 type Set struct {

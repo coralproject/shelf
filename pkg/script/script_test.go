@@ -1,4 +1,4 @@
-package query_test
+package script_test
 
 import (
 	"errors"
@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/script"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -27,9 +27,8 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
-var scr1 = &query.Script{
-	Name:    "QTEST_basic",
-	DocType: query.DocTypeScript,
+var scr1 = &script.Script{
+	Name: "STEST_basic",
 	Commands: []string{
 		"Command 1",
 		"Command 2",
@@ -48,7 +47,7 @@ func TestUpsertCreateScript(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := script.RemoveTestData(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -58,17 +57,17 @@ func TestUpsertCreateScript(t *testing.T) {
 	{
 		t.Log("\tWhen using script", scr1)
 		{
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			if _, err := query.Scripts.GetLastHistoryByName(tests.Context, db, scr1.Name); err != nil {
+			if _, err := script.GetLastHistoryByName(tests.Context, db, scr1.Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the script from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script from history.", tests.Success)
 
-			scr2, err := query.Scripts.GetByName(tests.Context, db, scr1.Name)
+			scr2, err := script.GetByName(tests.Context, db, scr1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the script : %s", tests.Failed, err)
 			}
@@ -94,7 +93,7 @@ func TestGetScriptNames(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := script.RemoveTestData(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -104,19 +103,19 @@ func TestGetScriptNames(t *testing.T) {
 	{
 		t.Log("\tWhen using two scripts")
 		{
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
 			scr2 := *scr1
 			scr2.Name += "2"
-			if err := query.Scripts.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
 
-			names, err := query.Scripts.GetNames(tests.Context, db)
+			names, err := script.GetNames(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the script names : %v", tests.Failed, err)
 			}
@@ -124,7 +123,7 @@ func TestGetScriptNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if name[0:5] == "QTEST" {
+				if name[0:5] == "STEST" {
 					count++
 				}
 			}
@@ -153,7 +152,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := script.RemoveTestData(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -163,19 +162,19 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	{
 		t.Log("\tWhen using script", scr1)
 		{
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
 			scr1.Commands = append(scr1.Commands, "Command 4")
 
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2, err := query.Scripts.GetLastHistoryByName(tests.Context, db, scr1.Name)
+			scr2, err := script.GetLastHistoryByName(tests.Context, db, scr1.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the last script from history : %s", tests.Failed, err)
 			}
@@ -201,7 +200,7 @@ func TestUpsertUpdateScript(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := script.RemoveTestData(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -211,7 +210,7 @@ func TestUpsertUpdateScript(t *testing.T) {
 	{
 		t.Log("\tWhen using two scripts")
 		{
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
@@ -219,17 +218,17 @@ func TestUpsertUpdateScript(t *testing.T) {
 			scr2 := *scr1
 			scr2.Commands = append(scr2.Commands, "Command 4")
 
-			if err := query.Scripts.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a script record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a script record.", tests.Success)
 
-			if _, err := query.Scripts.GetLastHistoryByName(tests.Context, db, scr1.Name); err != nil {
+			if _, err := script.GetLastHistoryByName(tests.Context, db, scr1.Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the script from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script from history.", tests.Success)
 
-			updScr, err := query.Scripts.GetByName(tests.Context, db, scr2.Name)
+			updScr, err := script.GetByName(tests.Context, db, scr2.Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a script record: %s", tests.Failed, err)
 			}
@@ -270,7 +269,7 @@ func TestDeleteScript(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := script.RemoveTestData(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -280,22 +279,22 @@ func TestDeleteScript(t *testing.T) {
 	{
 		t.Log("\tWhen using script", scr1)
 		{
-			if err := query.Scripts.Upsert(tests.Context, db, scr1); err != nil {
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			if err := query.Scripts.Delete(tests.Context, db, scrName); err != nil {
+			if err := script.Delete(tests.Context, db, scrName); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete a script using its name[%s]: %s", tests.Failed, scrName, err)
 			}
 			t.Logf("\t%s\tShould be able to delete a script using its name[%s]:", tests.Success, scrName)
 
-			if err := query.Scripts.Delete(tests.Context, db, scrBadName); err == nil {
+			if err := script.Delete(tests.Context, db, scrBadName); err == nil {
 				t.Fatalf("\t%s\tShould not be able to delete a script using wrong name name[%s]", tests.Failed, scrBadName)
 			}
 			t.Logf("\t%s\tShould not be able to delete a script using wrong name name[%s]", tests.Success, scrBadName)
 
-			if _, err := query.Scripts.GetByName(tests.Context, db, scrName); err == nil {
+			if _, err := script.GetByName(tests.Context, db, scrName); err == nil {
 				t.Fatalf("\t%s\tShould be able to validate script with Name[%s] does not exists: %s", tests.Failed, scrName, errors.New("Record Exists"))
 			}
 			t.Logf("\t%s\tShould be able to validate script  with Name[%s] does not exists:", tests.Success, scrName)
@@ -308,37 +307,37 @@ func TestAPIFailureScripts(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := "QTEST_unknown"
+	scrName := "STEST_unknown"
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{
 		t.Log("When giving a nil session")
 		{
-			err := query.Scripts.Upsert(tests.Context, nil, scr1)
+			err := script.Upsert(tests.Context, nil, scr1)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			_, err = query.Scripts.GetNames(tests.Context, nil)
+			_, err = script.GetNames(tests.Context, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			_, err = query.Scripts.GetByName(tests.Context, nil, scrName)
+			_, err = script.GetByName(tests.Context, nil, scrName)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			_, err = query.Scripts.GetLastHistoryByName(tests.Context, nil, scrName)
+			_, err = script.GetLastHistoryByName(tests.Context, nil, scrName)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			err = query.Scripts.Delete(tests.Context, nil, scrName)
+			err = script.Delete(tests.Context, nil, scrName)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused delete by api with bad session", tests.Failed)
 			}

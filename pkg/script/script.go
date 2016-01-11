@@ -1,4 +1,4 @@
-package query
+package script
 
 import (
 	"errors"
@@ -12,16 +12,17 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-// scripts maintains the set of script related API calls.
-type scripts struct{}
-
-// Scripts fronts the access to the scripts functionality.
-var Scripts scripts
+// Contains the name of Mongo collections.
+const (
+	Collection         = "scripts"
+	CollectionHistory  = "scripts_history"
+	CollectionExecTest = "test_scripts"
+)
 
 // =============================================================================
 
 // Upsert is used to create or update an existing Script document.
-func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
+func Upsert(context interface{}, db *db.DB, scr *Script) error {
 	log.Dev(context, "scripts.Upsert", "Started : Name[%s]", scr.Name)
 
 	// Validate the set that is provided.
@@ -32,7 +33,7 @@ func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
 
 	// We need to know if this is a new script.
 	var new bool
-	if _, err := Scripts.GetByName(context, db, scr.Name); err != nil {
+	if _, err := GetByName(context, db, scr.Name); err != nil {
 		if err != mgo.ErrNotFound {
 			log.Error(context, "scripts.Upsert", err, "Completed")
 			return err
@@ -58,9 +59,8 @@ func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
 	if new {
 		f = func(c *mgo.Collection) error {
 			sh := bson.M{
-				"name":     scr.Name,
-				"doc_type": DocTypeScript,
-				"scripts":  []bson.M{},
+				"name":    scr.Name,
+				"scripts": []bson.M{},
 			}
 
 			log.Dev(context, "scripts.Upsert", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(sh))
@@ -102,15 +102,14 @@ func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
 // =============================================================================
 
 // GetNames retrieves a list of script names.
-func (scripts) GetNames(context interface{}, db *db.DB) ([]string, error) {
+func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "scripts.GetNames", "Started")
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"doc_type": DocTypeScript}
 		s := bson.M{"name": 1}
-		log.Dev(context, "scripts.GetNames", "MGO : db.%s.find(%s, %s).sort([\"name\"])", mongo.Query(q), mongo.Query(s))
-		return c.Find(q).Select(s).Sort("name").All(&names)
+		log.Dev(context, "scripts.GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", mongo.Query(s))
+		return c.Find(nil).Select(s).Sort("name").All(&names)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -133,12 +132,12 @@ func (scripts) GetNames(context interface{}, db *db.DB) ([]string, error) {
 }
 
 // GetByName retrieves the configuration for the specified Script.
-func (scripts) GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
+func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	log.Dev(context, "scripts.GetByName", "Started : Name[%s]", name)
 
 	var scr Script
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": name, "doc_type": DocTypeScript}
+		q := bson.M{"name": name}
 		log.Dev(context, "scripts.GetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&scr)
 	}
@@ -154,7 +153,7 @@ func (scripts) GetByName(context interface{}, db *db.DB, name string) (*Script, 
 
 // GetLastHistoryByName gets the last written Set within the query_history
 // collection and returns the last one else returns a non-nil error if it fails.
-func (scripts) GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	log.Dev(context, "scripts.GetLastHistoryByName", "Started : Name[%s]", name)
 
 	var result struct {
@@ -163,7 +162,7 @@ func (scripts) GetLastHistoryByName(context interface{}, db *db.DB, name string)
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": name, "doc_type": DocTypeScript}
+		q := bson.M{"name": name}
 		proj := bson.M{"scripts": bson.M{"$slice": 1}}
 
 		log.Dev(context, "scripts.GetLastHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
@@ -189,16 +188,16 @@ func (scripts) GetLastHistoryByName(context interface{}, db *db.DB, name string)
 // =============================================================================
 
 // Delete is used to remove an existing Set document.
-func (scripts) Delete(context interface{}, db *db.DB, name string) error {
+func Delete(context interface{}, db *db.DB, name string) error {
 	log.Dev(context, "scripts.Delete", "Started : Name[%s]", name)
 
-	set, err := Scripts.GetByName(context, db, name)
+	set, err := GetByName(context, db, name)
 	if err != nil {
 		return err
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": set.Name, "doc_type": DocTypeScript}
+		q := bson.M{"name": set.Name}
 		log.Dev(context, "scripts.Delete", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
 		return c.Remove(q)
 	}
