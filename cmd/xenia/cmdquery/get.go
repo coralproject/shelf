@@ -47,7 +47,7 @@ func runGet(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	set, err := query.Sets.GetByName("", db, get.name)
+	set, err := query.GetByName("", db, get.name)
 	if err != nil {
 		cmd.Println("Getting Query : ", err)
 		return

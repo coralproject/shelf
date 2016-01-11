@@ -21,16 +21,10 @@ const (
 	CollectionExecTest = "test_query"
 )
 
-// sets maintains the set of set related API calls.
-type sets struct{}
-
-// Sets fronts the access to the set functionality.
-var Sets sets
-
 // =============================================================================
 
 // Upsert is used to create or update an existing Set document.
-func (sets) Upsert(context interface{}, db *db.DB, set *Set) error {
+func Upsert(context interface{}, db *db.DB, set *Set) error {
 	log.Dev(context, "sets.Upsert", "Started : Name[%s]", set.Name)
 
 	// Validate the set that is provided.
@@ -41,7 +35,7 @@ func (sets) Upsert(context interface{}, db *db.DB, set *Set) error {
 
 	// We need to know if this is a new set.
 	var new bool
-	if _, err := Sets.GetByName(context, db, set.Name); err != nil {
+	if _, err := GetByName(context, db, set.Name); err != nil {
 		if err != mgo.ErrNotFound {
 			log.Error(context, "sets.Upsert", err, "Completed")
 			return err
@@ -110,14 +104,14 @@ func (sets) Upsert(context interface{}, db *db.DB, set *Set) error {
 // =============================================================================
 
 // GetNames retrieves a list of query names.
-func (sets) GetNames(context interface{}, db *db.DB) ([]string, error) {
+func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "sets.GetNames", "Started")
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": 1}
-		log.Dev(context, "sets.GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(q))
-		return c.Find(nil).Select(q).Sort("name").All(&names)
+		s := bson.M{"name": 1}
+		log.Dev(context, "sets.GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
+		return c.Find(nil).Select(s).Sort("name").All(&names)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -140,7 +134,7 @@ func (sets) GetNames(context interface{}, db *db.DB) ([]string, error) {
 }
 
 // GetByName retrieves the configuration for the specified Set.
-func (sets) GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
+func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "sets.GetByName", "Started : Name[%s]", name)
 
 	var set Set
@@ -161,7 +155,7 @@ func (sets) GetByName(context interface{}, db *db.DB, name string) (*Set, error)
 
 // GetLastHistoryByName gets the last written Set within the query_history
 // collection and returns the last one else returns a non-nil error if it fails.
-func (sets) GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "sets.GetLastHistoryByName", "Started : Name[%s]", name)
 
 	var result struct {
@@ -196,10 +190,10 @@ func (sets) GetLastHistoryByName(context interface{}, db *db.DB, name string) (*
 // =============================================================================
 
 // Delete is used to remove an existing Set document.
-func (sets) Delete(context interface{}, db *db.DB, name string) error {
+func Delete(context interface{}, db *db.DB, name string) error {
 	log.Dev(context, "sets.Delete", "Started : Name[%s]", name)
 
-	set, err := Sets.GetByName(context, db, name)
+	set, err := GetByName(context, db, name)
 	if err != nil {
 		return err
 	}

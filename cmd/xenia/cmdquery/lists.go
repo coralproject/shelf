@@ -32,7 +32,7 @@ func runList(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	names, err := query.Sets.GetNames("", db)
+	names, err := query.GetNames("", db)
 	if err != nil {
 		cmd.Println("Getting Query : ", err)
 		return
