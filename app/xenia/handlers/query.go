@@ -23,7 +23,7 @@ var Query queryHandle
 // List returns all the existing query names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
-	names, err := query.Sets.GetNames(c.SessionID, c.DB)
+	names, err := query.GetNames(c.SessionID, c.DB)
 	if err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (queryHandle) List(c *app.Context) error {
 // Retrieve returns the specified user from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Retrieve(c *app.Context) error {
-	set, err := query.Sets.GetByName(c.SessionID, c.DB, c.Params["name"])
+	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
 	if err != nil {
 		return err
 	}
@@ -47,7 +47,7 @@ func (queryHandle) Retrieve(c *app.Context) error {
 // Execute runs the specified query set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Execute(c *app.Context) error {
-	set, err := query.Sets.GetByName(c.SessionID, c.DB, c.Params["name"])
+	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
 	if err != nil {
 		return err
 	}
