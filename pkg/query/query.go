@@ -63,6 +63,8 @@ func (sets) Upsert(context interface{}, db *db.DB, set *Set) error {
 		return err
 	}
 
+	// TODO: Add Doc Type !!
+
 	// Add a history record if this query set is new.
 	if new {
 		f = func(c *mgo.Collection) error {

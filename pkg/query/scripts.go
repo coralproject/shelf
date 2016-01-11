@@ -58,8 +58,9 @@ func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
 	if new {
 		f = func(c *mgo.Collection) error {
 			sh := bson.M{
-				"name":    scr.Name,
-				"scripts": []bson.M{},
+				"name":     scr.Name,
+				"doc_type": DocTypeScript,
+				"scripts":  []bson.M{},
 			}
 
 			log.Dev(context, "scripts.Upsert", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(sh))
@@ -77,7 +78,7 @@ func (scripts) Upsert(context interface{}, db *db.DB, scr *Script) error {
 		q := bson.M{"name": scr.Name}
 		su := bson.M{
 			"$push": bson.M{
-				"sets": bson.M{
+				"scripts": bson.M{
 					"$each":     []*Script{scr},
 					"$position": 0,
 				},
@@ -106,7 +107,7 @@ func (scripts) GetNames(context interface{}, db *db.DB) ([]string, error) {
 
 	var names []bson.M
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"doc_type": docTypeScript}
+		q := bson.M{"doc_type": DocTypeScript}
 		s := bson.M{"name": 1}
 		log.Dev(context, "scripts.GetNames", "MGO : db.%s.find(%s, %s).sort([\"name\"])", mongo.Query(q), mongo.Query(s))
 		return c.Find(q).Select(s).Sort("name").All(&names)
@@ -137,7 +138,7 @@ func (scripts) GetByName(context interface{}, db *db.DB, name string) (*Script, 
 
 	var scr Script
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": name, "doc_type": docTypeScript}
+		q := bson.M{"name": name, "doc_type": DocTypeScript}
 		log.Dev(context, "scripts.GetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&scr)
 	}
@@ -162,7 +163,7 @@ func (scripts) GetLastHistoryByName(context interface{}, db *db.DB, name string)
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": name, "doc_type": docTypeScript}
+		q := bson.M{"name": name, "doc_type": DocTypeScript}
 		proj := bson.M{"scripts": bson.M{"$slice": 1}}
 
 		log.Dev(context, "scripts.GetLastHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
@@ -197,7 +198,7 @@ func (scripts) Delete(context interface{}, db *db.DB, name string) error {
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": set.Name, "doc_type": docTypeScript}
+		q := bson.M{"name": set.Name, "doc_type": DocTypeScript}
 		log.Dev(context, "scripts.Delete", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
 		return c.Remove(q)
 	}

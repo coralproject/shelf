@@ -54,9 +54,9 @@ func AddTestSet(db *db.DB, qs *Set) error {
 	return nil
 }
 
-// RemoveTestSets is used to clear out all the test sets from the collection.
-// All test query sets must start with QSTEST in their name.
-func RemoveTestSets(db *db.DB) error {
+// RemoveTestData is used to clear out all the test data from the collection.
+// All test documents must start with QSTEST in their name.
+func RemoveTestData(db *db.DB) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": bson.RegEx{Pattern: "QTEST"}}
 		_, err := c.RemoveAll(q)

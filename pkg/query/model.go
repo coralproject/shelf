@@ -14,8 +14,8 @@ const (
 
 // Set of document types for internal integrity of CRUDing documents.
 const (
-	docTypeQuerySet = "queryset"
-	docTypeScript   = "script"
+	DocTypeQuerySet = "queryset"
+	DocTypeScript   = "script"
 )
 
 //==============================================================================
