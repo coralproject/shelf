@@ -86,7 +86,7 @@ type Set struct {
 	Name        string  `bson:"name" json:"name" validate:"required,min=3"` // Name of the query set.
 	Description string  `bson:"desc" json:"desc"`                           // Description of the query set.
 	PreScript   string  `bson:"pre_script" json:"pre_script"`               // Name of a script document to prepend.
-	PostScript  string  `bson:"post_script" json:"post_script"`             // Name of a script document to append.
+	PstScript   string  `bson:"post_script" json:"post_script"`             // Name of a script document to append.
 	Params      []Param `bson:"params" json:"params"`                       // Collection of parameters.
 	Queries     []Query `bson:"queries" json:"queries"`                     // Collection of queries.
 	Enabled     bool    `bson:"enabled" json:"enabled"`                     // If the query set is enabled to run.

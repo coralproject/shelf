@@ -160,7 +160,7 @@ func validateParameters(context interface{}, set *Set, vars map[string]string) e
 
 // loadPrePostScripts updates each query script slice with pre/post commands.
 func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
-	if set.PreScript == "" && set.PostScript == "" {
+	if set.PreScript == "" && set.PstScript == "" {
 		return nil
 	}
 
@@ -175,8 +175,8 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
 		fetchScripts[0] = set.PreScript
 	}
 
-	if set.PostScript != "" {
-		fetchScripts[1] = set.PostScript
+	if set.PstScript != "" {
+		fetchScripts[1] = set.PstScript
 	}
 
 	// Pull all the script documents we need.
@@ -194,7 +194,7 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
 			q.Scripts = scripts[0].Commands
 		}
 
-		if set.PostScript != "" {
+		if set.PstScript != "" {
 			q.Scripts = append(q.Scripts, scripts[1].Commands...)
 		}
 	}
