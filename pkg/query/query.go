@@ -16,9 +16,8 @@ import (
 
 // Contains the name of Mongo collections.
 const (
-	Collection         = "query_sets"
-	CollectionHistory  = "query_sets_history"
-	CollectionExecTest = "test_query"
+	Collection        = "query_sets"
+	CollectionHistory = "query_sets_history"
 )
 
 // =============================================================================

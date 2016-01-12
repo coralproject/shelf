@@ -157,6 +157,8 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 
 	var scrs []Script
 	f := func(c *mgo.Collection) error {
+
+		// Build a list of documents to find by name.
 		qn := make([]bson.M, len(names))
 		for i, name := range names {
 			if name != "" {
@@ -164,7 +166,9 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 			}
 		}
 
+		// Place that list in an $or operation.
 		q := bson.M{"$or": qn}
+
 		log.Dev(context, "GetByNames", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).All(&scrs)
 	}
@@ -174,9 +178,9 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 		return nil, err
 	}
 
-	// I can't assume MongoDB will bring it back in the order I
-	// setup the query. I want the order to match on the returned slice.
-	// I thought about using a map but I feel like it is overkill.
+	// I can't assume MongoDB will bring the results back in the order I
+	// setup the query. I need the order to match on the returned slice.
+	// I thought about using a map of name/value but I feel like it is overkill.
 
 	scripts := make([]Script, len(names))
 next:

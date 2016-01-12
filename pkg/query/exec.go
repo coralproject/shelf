@@ -165,11 +165,7 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
 	}
 
 	// Load the set of scripts we need to fetch.
-
-	// I am using an array to keep this data structure on the stack. The
-	// call to GetByNames will ignore an empty string. Everything here is
-	// so expensive but things are more expensive on MongoDB.
-	var fetchScripts [2]string
+	fetchScripts := make([]string, 2)
 
 	if set.PreScript != "" {
 		fetchScripts[0] = set.PreScript
@@ -180,14 +176,13 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
 	}
 
 	// Pull all the script documents we need.
-	scripts, err := script.GetByNames(context, db, fetchScripts[:])
+	scripts, err := script.GetByNames(context, db, fetchScripts)
 	if err != nil {
 		return err
 	}
 
-	// Finally add the commands to the scripts. Since I retained the
-	// order of the pre/post scripts, this is simplified.
-
+	// Add the commands to the query scripts. Since order of the
+	// pre/post scripts is maintained, this is simplified.
 	for _, q := range set.Queries {
 		if set.PreScript != "" {
 			scripts[0].Commands = append(scripts[0].Commands, q.Scripts...)

@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/query/qfix"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -35,7 +36,7 @@ func TestUpsertCreateQuery(t *testing.T) {
 	defer tests.DisplayLog()
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -45,7 +46,7 @@ func TestUpsertCreateQuery(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -90,7 +91,7 @@ func TestGetSetNames(t *testing.T) {
 	qsName := "QTEST_basic"
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -100,7 +101,7 @@ func TestGetSetNames(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -157,7 +158,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	qsName := "QTEST_basic"
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -167,7 +168,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -212,7 +213,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	defer tests.DisplayLog()
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -222,7 +223,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -289,10 +290,10 @@ func TestDeleteSet(t *testing.T) {
 	defer tests.DisplayLog()
 
 	qsName := "QTEST_basic"
-	qsBadName := "QTEST_brod_advice"
+	qsBadName := "QTEST_basic_advice"
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -302,7 +303,7 @@ func TestDeleteSet(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -344,7 +345,7 @@ func TestUnknownName(t *testing.T) {
 	qsName := "QTEST_unknown"
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}
@@ -354,7 +355,7 @@ func TestUnknownName(t *testing.T) {
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := query.RemoveTestData(db); err != nil {
+		if err := qfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -390,7 +391,7 @@ func TestAPIFailureSet(t *testing.T) {
 	qsName := "QTEST_unknown"
 
 	const fixture = "basic.json"
-	set1, err := query.GetFixture(fixture)
+	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
 	}

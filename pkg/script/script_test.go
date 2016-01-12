@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/pkg/script"
+	"github.com/coralproject/xenia/pkg/script/sfix"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -27,15 +28,6 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
-var scr1 = &script.Script{
-	Name: "STEST_basic",
-	Commands: []string{
-		"Command 1",
-		"Command 2",
-		"Command 3",
-	},
-}
-
 //==============================================================================
 
 // TestUpsertCreateScript tests if we can create a script record in the db.
@@ -43,11 +35,18 @@ func TestUpsertCreateScript(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -89,11 +88,20 @@ func TestGetScriptNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	scrName := "STEST_basic"
+
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -133,10 +141,10 @@ func TestGetScriptNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould have two scripts.", tests.Success)
 
-			if !strings.Contains(names[0], scr1.Name) || !strings.Contains(names[1], scr1.Name) {
-				t.Errorf("\t%s\tShould have \"%s\" in the name : %s", tests.Failed, scr1.Name, names[0])
+			if !strings.Contains(names[0], scrName) || !strings.Contains(names[1], scrName) {
+				t.Errorf("\t%s\tShould have \"%s\" in the name : %s", tests.Failed, scrName, names[0])
 			} else {
-				t.Logf("\t%s\tShould have \"%s\" in the name.", tests.Success, scr1.Name)
+				t.Logf("\t%s\tShould have \"%s\" in the name.", tests.Success, scrName)
 			}
 		}
 	}
@@ -147,11 +155,18 @@ func TestGetScriptByNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -206,11 +221,20 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	scrName := "STEST_basic"
+
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -232,7 +256,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2, err := script.GetLastHistoryByName(tests.Context, db, scr1.Name)
+			scr2, err := script.GetLastHistoryByName(tests.Context, db, scrName)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the last script from history : %s", tests.Failed, err)
 			}
@@ -254,11 +278,18 @@ func TestUpsertUpdateScript(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -320,14 +351,21 @@ func TestDeleteScript(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := scr1.Name
-	scrBadName := scr1.Name + "_advice"
+	scrName := "STEST_basic"
+	scrBadName := "STEST_basic_advice"
+
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
 	defer func() {
-		if err := script.RemoveTestData(db); err != nil {
+		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -366,6 +404,13 @@ func TestAPIFailureScripts(t *testing.T) {
 	defer tests.DisplayLog()
 
 	scrName := "STEST_unknown"
+
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{

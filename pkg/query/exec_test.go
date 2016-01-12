@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/tstdata"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -94,13 +95,13 @@ func TestExecuteSet(t *testing.T) {
 
 	t.Logf("Given the need to execute mongo commands.")
 	{
-		err := query.GenerateTestData(db)
+		err := tstdata.Generate(db)
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
 
-		defer query.DropTestData()
+		defer tstdata.Drop()
 
 		for _, es := range execSet {
 			t.Logf("\tWhen using Execute Set %s", es.set.Name)
@@ -189,7 +190,7 @@ func querySetBasic() execSet {
 				{
 					Name:       "Basic",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "42021"}}`,
@@ -213,7 +214,7 @@ func querySetWithTime() execSet {
 				{
 					Name:       "Time",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					HasDate:    true,
 					Scripts: []string{
@@ -239,7 +240,7 @@ func querySetWithShortTime() execSet {
 				{
 					Name:       "Short Time",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					HasDate:    true,
 					Scripts: []string{
@@ -265,7 +266,7 @@ func querySetWithMultiResults() execSet {
 				{
 					Name:       "Basic",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "42021"}}`,
@@ -275,7 +276,7 @@ func querySetWithMultiResults() execSet {
 				{
 					Name:       "Time",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					HasDate:    true,
 					Scripts: []string{
@@ -301,7 +302,7 @@ func querySetNoResults() execSet {
 				{
 					Name:       "NoResults",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "XXXXXX"}}`,
@@ -325,7 +326,7 @@ func querySetMalformed() execSet {
 				{
 					Name:       "Malformed",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "XXXXXX"`,
@@ -353,7 +354,7 @@ func querySetBasicVars() execSet {
 				{
 					Name:       "Vars",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "#station_id#"}}`,
@@ -380,7 +381,7 @@ func querySetBasicMissingVars() execSet {
 				{
 					Name:       "Vars",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "#station_id#"}}`,
@@ -407,7 +408,7 @@ func querySetBasicParamDefault() execSet {
 				{
 					Name:       "Vars",
 					Type:       "pipeline",
-					Collection: query.CollectionExecTest,
+					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "#station_id#"}}`,
