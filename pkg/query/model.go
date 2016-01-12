@@ -37,11 +37,11 @@ type Query struct {
 	Description string   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
 	Type        string   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
 	Collection  string   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
+	Scripts     []string `bson:"scripts" json:"scripts"`                                                     // Scripts to process for the query.
 	Continue    bool     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
 	Return      bool     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
 	HasDate     bool     `bson:"has_date,omitempty" json:"has_date,omitempty"`                               // Indicates there is a date to be pre-processed in the scripts.
 	HasObjectID bool     `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`                       // Indicates there is an ObjectId to be pre-processed in the scripts.
-	Scripts     []string `bson:"scripts" json:"scripts"`                                                     // Scripts to process for the query.
 }
 
 // Validate checks the query value for consistency.
@@ -85,9 +85,11 @@ type Param struct {
 type Set struct {
 	Name        string  `bson:"name" json:"name" validate:"required,min=3"` // Name of the query set.
 	Description string  `bson:"desc" json:"desc"`                           // Description of the query set.
-	Enabled     bool    `bson:"enabled" json:"enabled"`                     // If the query set is enabled to run.
+	PreScript   string  `bson:"pre_script" json:"pre_script"`               // Name of a script document to prepend.
+	PostScript  string  `bson:"post_script" json:"post_script"`             // Name of a script document to append.
 	Params      []Param `bson:"params" json:"params"`                       // Collection of parameters.
 	Queries     []Query `bson:"queries" json:"queries"`                     // Collection of queries.
+	Enabled     bool    `bson:"enabled" json:"enabled"`                     // If the query set is enabled to run.
 }
 
 // Validate checks the set value for consistency.

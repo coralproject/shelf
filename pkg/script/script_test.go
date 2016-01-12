@@ -142,6 +142,64 @@ func TestGetScriptNames(t *testing.T) {
 	}
 }
 
+// TestGetScriptByNames validates retrieval of Script records by a set of names.
+func TestGetScriptByNames(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	defer func() {
+		if err := script.RemoveTestData(db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
+	}()
+
+	t.Log("Given the need to retrieve a list of script values.")
+	{
+		t.Log("\tWhen using two scripts")
+		{
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
+
+			scr2 := *scr1
+			scr2.Name += "2"
+			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
+
+			scripts, err := script.GetByNames(tests.Context, db, []string{scr1.Name, scr2.Name})
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the scripts by names : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the scripts by names", tests.Success)
+
+			var count int
+			for _, scr := range scripts {
+				if scr.Name[0:5] == "STEST" {
+					count++
+				}
+			}
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould have two scripts : %d", tests.Failed, len(scripts))
+			}
+			t.Logf("\t%s\tShould have two scripts.", tests.Success)
+
+			if scripts[0].Name != scr1.Name || scripts[1].Name != scr2.Name {
+				t.Errorf("\t%s\tShould have retrieve the correct scripts.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould have retrieve the correct scripts.", tests.Success)
+			}
+		}
+	}
+}
+
 // TestGetLastScriptHistoryByName validates retrieval of Script from the history
 // collection.
 func TestGetLastScriptHistoryByName(t *testing.T) {

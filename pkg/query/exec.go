@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coralproject/xenia/pkg/script"
+
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -49,6 +50,11 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 	// Did we get everything we need. Also load defaults.
 	if err := validateParameters(context, set, vars); err != nil {
+		return errResult(context, err)
+	}
+
+	// Load the pre/post scripts.
+	if err := loadPrePostScripts(context, db, set); err != nil {
 		return errResult(context, err)
 	}
 
@@ -152,8 +158,53 @@ func validateParameters(context interface{}, set *Set, vars map[string]string) e
 	return fmt.Errorf("Variables [%s] were not included with the call", strings.Join(missing, ","))
 }
 
+// loadPrePostScripts updates each query script slice with pre/post commands.
+func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
+	if set.PreScript == "" && set.PostScript == "" {
+		return nil
+	}
+
+	// Load the set of scripts we need to fetch.
+
+	// I am using an array to keep this data structure on the stack. The
+	// call to GetByNames will ignore an empty string. Everything here is
+	// so expensive but things are more expensive on MongoDB.
+	var fetchScripts [2]string
+
+	if set.PreScript != "" {
+		fetchScripts[0] = set.PreScript
+	}
+
+	if set.PostScript != "" {
+		fetchScripts[1] = set.PostScript
+	}
+
+	// Pull all the script documents we need.
+	scripts, err := script.GetByNames(context, db, fetchScripts[:])
+	if err != nil {
+		return err
+	}
+
+	// Finally add the commands to the scripts. Since I retained the
+	// order of the pre/post scripts, this is simplified.
+
+	for _, q := range set.Queries {
+		if set.PreScript != "" {
+			scripts[0].Commands = append(scripts[0].Commands, q.Scripts...)
+			q.Scripts = scripts[0].Commands
+		}
+
+		if set.PostScript != "" {
+			q.Scripts = append(q.Scripts, scripts[1].Commands...)
+		}
+	}
+
+	return nil
+}
+
 // executePipeline executes the sepcified pipeline query.
 func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]string) (docs, error) {
+
 	// Validate we have scripts to run.
 	if len(q.Scripts) == 0 {
 		return docs{}, errors.New("Invalid pipeline script")

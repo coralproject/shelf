@@ -40,6 +40,36 @@
                 ]
         },
         {
+            "name": "query_sets_history",
+            "indexes":
+                [
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
+                    }
+                ]
+        },
+        {
+            "name": "scripts",
+            "indexes":
+                [
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
+                    }
+                ]
+        },
+        {
+            "name": "scripts_history",
+            "indexes":
+                [
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
+                    }
+                ]
+        },
+        {
             "name": "users",
             "indexes": 
                 [
