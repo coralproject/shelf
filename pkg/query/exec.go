@@ -8,10 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/coralproject/xenia/pkg/script"
+
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -49,6 +50,11 @@ func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string
 
 	// Did we get everything we need. Also load defaults.
 	if err := validateParameters(context, set, vars); err != nil {
+		return errResult(context, err)
+	}
+
+	// Load the pre/post scripts.
+	if err := loadPrePostScripts(context, db, set); err != nil {
 		return errResult(context, err)
 	}
 
@@ -152,8 +158,48 @@ func validateParameters(context interface{}, set *Set, vars map[string]string) e
 	return fmt.Errorf("Variables [%s] were not included with the call", strings.Join(missing, ","))
 }
 
+// loadPrePostScripts updates each query script slice with pre/post commands.
+func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
+	if set.PreScript == "" && set.PstScript == "" {
+		return nil
+	}
+
+	// Load the set of scripts we need to fetch.
+	fetchScripts := make([]string, 2)
+
+	if set.PreScript != "" {
+		fetchScripts[0] = set.PreScript
+	}
+
+	if set.PstScript != "" {
+		fetchScripts[1] = set.PstScript
+	}
+
+	// Pull all the script documents we need.
+	scripts, err := script.GetByNames(context, db, fetchScripts)
+	if err != nil {
+		return err
+	}
+
+	// Add the commands to the query scripts. Since order of the
+	// pre/post scripts is maintained, this is simplified.
+	for _, q := range set.Queries {
+		if set.PreScript != "" {
+			scripts[0].Commands = append(scripts[0].Commands, q.Scripts...)
+			q.Scripts = scripts[0].Commands
+		}
+
+		if set.PstScript != "" {
+			q.Scripts = append(q.Scripts, scripts[1].Commands...)
+		}
+	}
+
+	return nil
+}
+
 // executePipeline executes the sepcified pipeline query.
 func executePipeline(context interface{}, db *db.DB, q *Query, vars map[string]string) (docs, error) {
+
 	// Validate we have scripts to run.
 	if len(q.Scripts) == 0 {
 		return docs{}, errors.New("Invalid pipeline script")
