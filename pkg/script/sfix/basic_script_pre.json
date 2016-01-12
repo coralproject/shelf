@@ -1,6 +1,6 @@
 {
 	"name" : "STEST_basic_script_pre",
 	"commands":[
-		"{\"$match\": {\"name\" : \"C14 - Pasco County Buoy, FL\"}}"
+		"{\"$match\": {\"$or\": [{\"station_id\" : \"42021\"},{\"station_id\" : \"44008\"}] }}"
 	]
 }

@@ -183,14 +183,14 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *Set) error {
 
 	// Add the commands to the query scripts. Since order of the
 	// pre/post scripts is maintained, this is simplified.
-	for _, q := range set.Queries {
+	for i := range set.Queries {
 		if set.PreScript != "" {
-			scripts[0].Commands = append(scripts[0].Commands, q.Scripts...)
-			q.Scripts = scripts[0].Commands
+			scripts[0].Commands = append(scripts[0].Commands, set.Queries[i].Scripts...)
+			set.Queries[i].Scripts = scripts[0].Commands
 		}
 
 		if set.PstScript != "" {
-			q.Scripts = append(q.Scripts, scripts[1].Commands...)
+			set.Queries[i].Scripts = append(set.Queries[i].Scripts, scripts[1].Commands...)
 		}
 	}
 
