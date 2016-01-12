@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/script"
+	"github.com/coralproject/xenia/pkg/script/sfix"
 	"github.com/coralproject/xenia/tstdata"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -95,13 +97,8 @@ func TestExecuteSet(t *testing.T) {
 
 	t.Logf("Given the need to execute mongo commands.")
 	{
-		err := tstdata.Generate(db)
-		if err != nil {
-			t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
-
-		defer tstdata.Drop()
+		loadTestData(t, db)
+		defer unloadTestData(t, db)
 
 		for _, es := range execSet {
 			t.Logf("\tWhen using Execute Set %s", es.set.Name)
@@ -144,6 +141,51 @@ func TestExecuteSet(t *testing.T) {
 				t.Logf("\t%s\tShould have the correct result", tests.Success)
 			}
 		}
+	}
+}
+
+//==============================================================================
+
+// loadTestData adds all the test data into the database.
+func loadTestData(t *testing.T, db *db.DB) {
+	t.Log("\tWhen loading data for the tests")
+	{
+		err := tstdata.Generate(db)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to load system with test data : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to load system with test data.", tests.Success)
+
+		scripts := []string{
+			"basic_script_pre.json",
+			"basic_script_pst.json",
+		}
+
+		for _, file := range scripts {
+			scr, err := sfix.Get(file)
+			if err != nil {
+				t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
+			if err := script.Upsert(tests.Context, db, scr); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
+		}
+	}
+}
+
+// unloadTestData removes all the test data from the database.
+func unloadTestData(t *testing.T, db *db.DB) {
+	t.Log("\tWhen unloading data for the tests")
+	{
+		tstdata.Drop()
+
+		if err := sfix.Remove(db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
 	}
 }
 
