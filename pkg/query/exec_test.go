@@ -210,6 +210,7 @@ type docs struct {
 func getExecSet() []execSet {
 	return []execSet{
 		querySetBasic(),
+		querySetBasicPrePost(),
 		querySetWithTime(),
 		querySetWithShortTime(),
 		querySetWithMultiResults(),
@@ -236,6 +237,31 @@ func querySetBasic() execSet {
 					Return:     true,
 					Scripts: []string{
 						`{"$match": {"station_id" : "42021"}}`,
+						`{"$project": {"_id": 0, "name": 1}}`,
+					},
+				},
+			},
+		},
+		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+	}
+}
+
+// querySetBasicPrePost executes a simple query with pre/post scripts.
+func querySetBasicPrePost() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:      "Basic",
+			Enabled:   true,
+			PreScript: "STEST_basic_script_pre",
+			PstScript: "STEST_basic_script_pst",
+			Queries: []query.Query{
+				{
+					Name:       "Basic",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Scripts: []string{
 						`{"$project": {"_id": 0, "name": 1}}`,
 					},
 				},
