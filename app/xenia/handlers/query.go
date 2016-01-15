@@ -20,11 +20,14 @@ var Query queryHandle
 
 //==============================================================================
 
-// List returns all the existing query names in the system.
+// List returns all the existing set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
 	names, err := query.GetNames(c.SessionID, c.DB)
 	if err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
 		return err
 	}
 
@@ -32,11 +35,14 @@ func (queryHandle) List(c *app.Context) error {
 	return nil
 }
 
-// Retrieve returns the specified user from the system.
+// Retrieve returns the specified set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Retrieve(c *app.Context) error {
 	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
 	if err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
 		return err
 	}
 
@@ -69,6 +75,9 @@ func (queryHandle) Upsert(c *app.Context) error {
 func (queryHandle) Execute(c *app.Context) error {
 	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
 	if err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
 		return err
 	}
 
@@ -102,5 +111,21 @@ func execute(c *app.Context, set *query.Set) error {
 	result := query.ExecuteSet(c.SessionID, c.DB, set, vars)
 
 	c.Respond(result, http.StatusOK)
+	return nil
+}
+
+//==============================================================================
+
+// Delete removes the specified set from the system.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (queryHandle) Delete(c *app.Context) error {
+	if err := query.Delete(c.SessionID, c.DB, c.Params["name"]); err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
+		return err
+	}
+
+	c.Respond(nil, http.StatusNoContent)
 	return nil
 }

@@ -132,7 +132,7 @@ func TestQueryExec(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query.")
 	{
-		url := "/1.0/query/QTEST_basic/exec?station_id=42021"
+		url := "/1.0/exec/QTEST_basic?station_id=42021"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -177,7 +177,7 @@ func TestQueryExecCustom(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
 
-		url := "/1.0/query/exec"
+		url := "/1.0/exec"
 		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
@@ -210,7 +210,7 @@ func TestQueryExecJSONP(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query with JSONP output.")
 	{
-		url := "/1.0/query/QTEST_basic/exec?station_id=42021&callback=handle_data"
+		url := "/1.0/exec/QTEST_basic?station_id=42021&callback=handle_data"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -261,8 +261,8 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Set.
 
-		url := "/1.0/query/upsert"
-		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
+		url := "/1.0/query"
+		r := tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -313,8 +313,8 @@ func TestQueryUpsert(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
-		url = "/1.0/query/upsert"
-		r = tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
+		url = "/1.0/query"
+		r = tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -352,6 +352,108 @@ func TestQueryUpsert(t *testing.T) {
 				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould get the expected result.", tests.Success)
+		}
+	}
+}
+
+// TestQueryDelete tests the insert and deletion of a set.
+func TestQueryDelete(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to insert and then delete a set.")
+	{
+		//----------------------------------------------------------------------
+		// Get the fixture.
+
+		qs, err := qfix.Get("upsert.json")
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to retrieve the fixture : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve the fixture.", tests.Success)
+
+		qsStrData, err := json.Marshal(&qs)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to marshal the fixture : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
+
+		//----------------------------------------------------------------------
+		// Insert the Set.
+
+		url := "/1.0/query"
+		r := tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to insert : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to insert the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to insert the set.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Retrieve the Set.
+
+		url = "/1.0/query/QTEST_upsert"
+		r = tests.NewRequest("GET", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to get : %s", url)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
+
+			recv := w.Body.String()
+			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(w.Body.String())
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Delete the Set.
+
+		url = "/1.0/query/QTEST_upsert"
+		r = tests.NewRequest("DELETE", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to delete : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to delete the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to delete the set.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Retrieve the Set.
+
+		url = "/1.0/query/QTEST_upsert"
+		r = tests.NewRequest("GET", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to get : %s", url)
+		{
+			if w.Code != 404 {
+				t.Fatalf("\t%s\tShould Not be able to retrieve the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould Not be able to retrieve the set.", tests.Success)
 		}
 	}
 }

@@ -20,6 +20,11 @@ const (
 	CollectionHistory = "query_sets_history"
 )
 
+// Set of error variables.
+var (
+	ErrNotFound = errors.New("Set Not found")
+)
+
 // =============================================================================
 
 // Upsert is used to create or update an existing Set document.
@@ -35,7 +40,7 @@ func Upsert(context interface{}, db *db.DB, set *Set) error {
 	// We need to know if this is a new set.
 	var new bool
 	if _, err := GetByName(context, db, set.Name); err != nil {
-		if err != mgo.ErrNotFound {
+		if err != ErrNotFound {
 			log.Error(context, "Upsert", err, "Completed")
 			return err
 		}
@@ -114,6 +119,10 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetNames", err, "Completed")
 		return nil, err
 	}
@@ -144,6 +153,10 @@ func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetByName", err, "Completed")
 		return nil, err
 	}
@@ -170,8 +183,11 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, er
 		return c.Find(q).Select(proj).One(&result)
 	}
 
-	err := db.ExecuteMGO(context, CollectionHistory, f)
-	if err != nil {
+	if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}

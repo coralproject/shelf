@@ -19,6 +19,11 @@ const (
 	CollectionExecTest = "test_scripts"
 )
 
+// Set of error variables.
+var (
+	ErrNotFound = errors.New("Set Not found")
+)
+
 // =============================================================================
 
 // Upsert is used to create or update an existing Script document.
@@ -34,7 +39,7 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 	// We need to know if this is a new Set.
 	var new bool
 	if _, err := GetByName(context, db, scr.Name); err != nil {
-		if err != mgo.ErrNotFound {
+		if err != ErrNotFound {
 			log.Error(context, "Upsert", err, "Completed")
 			return err
 		}
@@ -113,6 +118,10 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetNames", err, "Completed")
 		return nil, err
 	}
@@ -143,6 +152,10 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetByName", err, "Completed")
 		return nil, err
 	}
@@ -174,6 +187,10 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetByNames", err, "Completed")
 		return nil, err
 	}
@@ -215,8 +232,11 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 		return c.Find(q).Select(proj).One(&result)
 	}
 
-	err := db.ExecuteMGO(context, CollectionHistory, f)
-	if err != nil {
+	if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}
