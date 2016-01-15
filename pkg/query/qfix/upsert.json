@@ -1,11 +1,11 @@
 {
-   "name":"QTEST_basic",
+   "name":"QTEST_upsert",
    "desc":"",
    "enabled":true,
    "params":[],
    "queries":[
       {
-         "name":"Basic",
+         "name":"Upsert",
          "type":"pipeline",
          "collection":"test_xenia_data",
          "return":true,
