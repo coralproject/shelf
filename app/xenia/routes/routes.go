@@ -20,11 +20,12 @@ func API() http.Handler {
 	a := app.New(midware.Auth)
 
 	a.Handle("GET", "/1.0/query", handlers.Query.List)
+	a.Handle("PUT", "/1.0/query", handlers.Query.Upsert)
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
-	a.Handle("GET", "/1.0/query/:name/exec", handlers.Query.Execute)
+	a.Handle("DELETE", "/1.0/query/:name", handlers.Query.Delete)
 
-	a.Handle("POST", "/1.0/query/exec", handlers.Query.ExecuteCustom)
-	a.Handle("POST", "/1.0/query/upsert", handlers.Query.Upsert)
+	a.Handle("POST", "/1.0/exec", handlers.Query.ExecuteCustom)
+	a.Handle("GET", "/1.0/exec/:name", handlers.Query.Execute)
 
 	a.CORS()
 
