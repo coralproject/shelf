@@ -8,7 +8,8 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/app/xenia/routes"
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/query/qfix"
+	"github.com/coralproject/xenia/tstdata"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
@@ -41,14 +42,28 @@ func TestMain(m *testing.M) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	query.GenerateTestData(db)
-	defer query.DropTestData()
+	tstdata.Generate(db)
+	defer tstdata.Drop()
 
 	loadQuery(db, "basic.json")
 	loadQuery(db, "basic_var.json")
-	defer query.RemoveTestSets(db)
+	defer qfix.Remove(db)
 
 	m.Run()
+}
+
+// loadQuery adds queries to run tests.
+func loadQuery(db *db.DB, file string) error {
+	qs1, err := qfix.Get(file)
+	if err != nil {
+		return err
+	}
+
+	if err := qfix.Add(db, qs1); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 //==============================================================================
@@ -61,7 +76,7 @@ func TestQueryNames(t *testing.T) {
 	t.Log("Given the need get a set of query names.")
 	{
 		url := "/1.0/query"
-		r := tests.NewRequest("GET", "/1.0/query", nil)
+		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -85,24 +100,28 @@ func TestQueryByName(t *testing.T) {
 	t.Log("Given the need to get a specific query.")
 	{
 		url := "/1.0/query/QTEST_basic"
-		r := tests.NewRequest("GET", "/1.0/query/QTEST_basic", nil)
+		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url : %s", url)
-		if w.Code != 200 {
-			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
-		}
-		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-		resp := `{"name":"QTEST_basic","desc":"","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query","return":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]}]}`
-		if resp[0:245] != w.Body.String()[0:245] {
-			t.Log(resp)
-			t.Log(w.Body.String())
-			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			recv := w.Body.String()
+			resp := `{"name":"QTEST_basic","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(recv)
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
 		}
-		t.Logf("\t%s\tShould get the expected result.", tests.Success)
 	}
 }
 
@@ -120,18 +139,22 @@ func TestQueryExec(t *testing.T) {
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url : %s", url)
-		if w.Code != 200 {
-			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
-		}
-		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-		resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
-		if resp[0:92] != w.Body.String()[0:92] {
-			t.Log(resp)
-			t.Log(w.Body.String())
-			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			recv := w.Body.String()
+			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(recv)
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
 		}
-		t.Logf("\t%s\tShould get the expected result.", tests.Success)
 	}
 }
 
@@ -142,7 +165,7 @@ func TestQueryExecCustom(t *testing.T) {
 
 	t.Log("Given the need to execute a custom query.")
 	{
-		qs, err := query.GetFixture("basic.json")
+		qs, err := qfix.Get("basic.json")
 		if err != nil {
 			t.Fatalf("\t%s\tShould be able to retrieve the fixture : %v", tests.Failed, err)
 		}
@@ -154,25 +177,29 @@ func TestQueryExecCustom(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
 
-		url := "/1.0/query/exec?station_id=42021"
+		url := "/1.0/query/exec"
 		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url : %s", url)
-		if w.Code != 200 {
-			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
-		}
-		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-		resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
-		if resp[0:92] != w.Body.String()[0:92] {
-			t.Log(resp)
-			t.Log(w.Body.String())
-			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			recv := w.Body.String()
+			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(recv)
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
 		}
-		t.Logf("\t%s\tShould get the expected result.", tests.Success)
 	}
 }
 
@@ -190,33 +217,141 @@ func TestQueryExecJSONP(t *testing.T) {
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url : %s", url)
-		if w.Code != 200 {
-			t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
-		}
-		t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-		resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false})`
-		if resp[0:92] != w.Body.String()[0:92] {
-			t.Log(resp)
-			t.Log(w.Body.String())
-			t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			recv := w.Body.String()
+			resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false})`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(recv)
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
 		}
-		t.Logf("\t%s\tShould get the expected result.", tests.Success)
 	}
 }
 
-//==============================================================================
+// TestQueryUpsert tests the insert and update of a set.
+func TestQueryUpsert(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
 
-// loadQuery adds queries to run tests.
-func loadQuery(db *db.DB, file string) error {
-	qs1, err := query.GetFixture(file)
-	if err != nil {
-		return err
+	t.Log("Given the need to insert and then update a set.")
+	{
+		//----------------------------------------------------------------------
+		// Get the fixture.
+
+		qs, err := qfix.Get("upsert.json")
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to retrieve the fixture : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to retrieve the fixture.", tests.Success)
+
+		qsStrData, err := json.Marshal(&qs)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to marshal the fixture : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
+
+		//----------------------------------------------------------------------
+		// Insert the Set.
+
+		url := "/1.0/query/upsert"
+		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to insert : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to insert the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to insert the set.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Retrieve the Set.
+
+		url = "/1.0/query/QTEST_upsert"
+		r = tests.NewRequest("GET", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to get : %s", url)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
+
+			recv := w.Body.String()
+			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(w.Body.String())
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Update the Set.
+
+		qs.Description = "C"
+
+		qsStrData, err = json.Marshal(&qs)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to marshal the changed fixture : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
+
+		url = "/1.0/query/upsert"
+		r = tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to update : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to update the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to update the set.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
+		// Retrieve the Set.
+
+		url = "/1.0/query/QTEST_upsert"
+		r = tests.NewRequest("GET", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to get : %s", url)
+		{
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to retrieve the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
+
+			recv := w.Body.String()
+			resp := `{"name":"QTEST_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+
+			if resp != recv {
+				t.Log(resp)
+				t.Log(w.Body.String())
+				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected result.", tests.Success)
+		}
 	}
-
-	if err := query.AddTestSet(db, qs1); err != nil {
-		return err
-	}
-
-	return nil
 }

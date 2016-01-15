@@ -44,6 +44,26 @@ func (queryHandle) Retrieve(c *app.Context) error {
 	return nil
 }
 
+//==============================================================================
+
+// Upsert inserts or updates the posted Set document into the database.
+// 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
+func (queryHandle) Upsert(c *app.Context) error {
+	var set *query.Set
+	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
+		return err
+	}
+
+	if err := query.Upsert(c.SessionID, c.DB, set); err != nil {
+		return err
+	}
+
+	c.Respond(nil, http.StatusNoContent)
+	return nil
+}
+
+//==============================================================================
+
 // Execute runs the specified query set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Execute(c *app.Context) error {
@@ -63,12 +83,8 @@ func (queryHandle) ExecuteCustom(c *app.Context) error {
 		return err
 	}
 
-	// Validate the
-
 	return execute(c, set)
 }
-
-//==============================================================================
 
 // execute takes a context and query set and executes the set returning
 // any possible response.

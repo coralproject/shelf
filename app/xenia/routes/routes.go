@@ -24,6 +24,7 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/query/:name/exec", handlers.Query.Execute)
 
 	a.Handle("POST", "/1.0/query/exec", handlers.Query.ExecuteCustom)
+	a.Handle("POST", "/1.0/query/upsert", handlers.Query.Upsert)
 
 	a.CORS()
 
