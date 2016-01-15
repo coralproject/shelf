@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/app/xenia/routes"
+	"github.com/coralproject/xenia/pkg/query"
 	"github.com/coralproject/xenia/pkg/query/qfix"
 	"github.com/coralproject/xenia/tstdata"
 
@@ -68,12 +69,12 @@ func loadQuery(db *db.DB, file string) error {
 
 //==============================================================================
 
-// TestQueryNames tests the retrieval of query names.
-func TestQueryNames(t *testing.T) {
+// TestQuerySets tests the retrieval of query sets.
+func TestQuerySets(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	t.Log("Given the need get a set of query names.")
+	t.Log("Given the need get a set of query sets.")
 	{
 		url := "/1.0/query"
 		r := tests.NewRequest("GET", url, nil)
@@ -85,9 +86,27 @@ func TestQueryNames(t *testing.T) {
 		{
 			t.Log("\tWhen we user version 1.0 of the query endpoint.")
 			if w.Code != 200 {
-				t.Fatalf("\t%s\tShould be able to retrieve the query list : %v", tests.Failed, w.Code)
+				t.Fatalf("\t%s\tShould be able to retrieve the query set list : %v", tests.Failed, w.Code)
 			}
-			t.Logf("\t%s\tShould be able to retrieve the query list.", tests.Success)
+			t.Logf("\t%s\tShould be able to retrieve the query set list.", tests.Success)
+
+			var sets []query.Set
+			if err := json.Unmarshal(w.Body.Bytes(), &sets); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+
+			var count int
+			for _, set := range sets {
+				if set.Name[0:5] == "QTEST" {
+					count++
+				}
+			}
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, count)
+			}
+			t.Logf("\t%s\tShould have two query sets.", tests.Success)
 		}
 	}
 }
@@ -112,15 +131,16 @@ func TestQueryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"QTEST_basic","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
-
-			if resp != recv {
-				t.Log(resp)
-				t.Log(recv)
-				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
+			var set query.Set
+			if err := json.Unmarshal(w.Body.Bytes(), &set); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould get the expected result.", tests.Success)
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+
+			if set.Name != "QTEST_basic" {
+				t.Fatalf("\t%s\tShould have the correct set : %s", tests.Failed, set.Name)
+			}
+			t.Logf("\t%s\tShould have the correct set.", tests.Success)
 		}
 	}
 }
