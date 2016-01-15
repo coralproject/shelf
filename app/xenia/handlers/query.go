@@ -20,7 +20,7 @@ var Query queryHandle
 
 //==============================================================================
 
-// List returns all the existing set names in the system.
+// List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
 	names, err := query.GetNames(c.SessionID, c.DB)
@@ -35,7 +35,7 @@ func (queryHandle) List(c *app.Context) error {
 	return nil
 }
 
-// Retrieve returns the specified set from the system.
+// Retrieve returns the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Retrieve(c *app.Context) error {
 	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
@@ -70,7 +70,7 @@ func (queryHandle) Upsert(c *app.Context) error {
 
 //==============================================================================
 
-// Execute runs the specified query set and return results.
+// Execute runs the specified Set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Execute(c *app.Context) error {
 	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
@@ -84,7 +84,7 @@ func (queryHandle) Execute(c *app.Context) error {
 	return execute(c, set)
 }
 
-// ExecuteCustom runs the provided query set and return results.
+// ExecuteCustom runs the provided Set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) ExecuteCustom(c *app.Context) error {
 	var set *query.Set
@@ -95,7 +95,7 @@ func (queryHandle) ExecuteCustom(c *app.Context) error {
 	return execute(c, set)
 }
 
-// execute takes a context and query set and executes the set returning
+// execute takes a context and Set and executes the set returning
 // any possible response.
 func execute(c *app.Context, set *query.Set) error {
 	var vars map[string]string
@@ -116,7 +116,7 @@ func execute(c *app.Context, set *query.Set) error {
 
 //==============================================================================
 
-// Delete removes the specified set from the system.
+// Delete removes the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Delete(c *app.Context) error {
 	if err := query.Delete(c.SessionID, c.DB, c.Params["name"]); err != nil {
