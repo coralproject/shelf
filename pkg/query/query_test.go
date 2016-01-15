@@ -3,7 +3,6 @@ package query_test
 import (
 	"errors"
 	"reflect"
-	"strings"
 	"testing"
 
 	"github.com/coralproject/xenia/pkg/query"
@@ -88,8 +87,6 @@ func TestGetSetNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_basic"
-
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)
 	if err != nil {
@@ -136,15 +133,67 @@ func TestGetSetNames(t *testing.T) {
 			}
 
 			if count != 2 {
-				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, len(names))
+				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, count)
 			}
 			t.Logf("\t%s\tShould have two query sets.", tests.Success)
+		}
+	}
+}
 
-			if !strings.Contains(names[0], qsName) || !strings.Contains(names[1], qsName) {
-				t.Errorf("\t%s\tShould have \"%s\" in the name.", tests.Failed, qsName)
-			} else {
-				t.Logf("\t%s\tShould have \"%s\" in the name.", tests.Success, qsName)
+// TestGetSets validates retrieval of all Set records.
+func TestGetSets(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	const fixture = "basic.json"
+	set1, err := qfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
+
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	defer func() {
+		if err := qfix.Remove(db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+	}()
+
+	t.Log("Given the need to retrieve a list of query sets.")
+	{
+		t.Log("\tWhen using fixture", fixture)
+		{
+			if err := query.Upsert(tests.Context, db, set1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a query set : %s", tests.Failed, err)
 			}
+			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
+
+			set1.Name += "2"
+			if err := query.Upsert(tests.Context, db, set1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
+
+			sets, err := query.GetSets(tests.Context, db, nil)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the query sets : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query sets", tests.Success)
+
+			var count int
+			for _, set := range sets {
+				if set.Name[0:5] == "QTEST" {
+					count++
+				}
+			}
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, count)
+			}
+			t.Logf("\t%s\tShould have two query sets.", tests.Success)
 		}
 	}
 }

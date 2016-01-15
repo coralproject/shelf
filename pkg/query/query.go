@@ -4,7 +4,6 @@ package query
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -111,11 +110,14 @@ func Upsert(context interface{}, db *db.DB, set *Set) error {
 func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "GetNames", "Started")
 
-	var names []bson.M
+	var rawNames []struct {
+		Name string
+	}
+
 	f := func(c *mgo.Collection) error {
 		s := bson.M{"name": 1}
 		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
-		return c.Find(nil).Select(s).Sort("name").All(&names)
+		return c.Find(nil).Select(s).Sort("name").All(&rawNames)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -127,17 +129,35 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		return nil, err
 	}
 
-	var sets []string
-	for _, doc := range names {
-		name := doc["name"].(string)
-		if strings.HasPrefix(name, "test") {
-			continue
-		}
-
-		sets = append(sets, name)
+	names := make([]string, len(rawNames))
+	for i := range rawNames {
+		names[i] = rawNames[i].Name
 	}
 
-	log.Dev(context, "GetNames", "Completed : Sets[%+v]", sets)
+	log.Dev(context, "GetNames", "Completed : Sets[%d]", len(names))
+	return names, nil
+}
+
+// GetSets retrieves a list of sets.
+func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
+	log.Dev(context, "GetSets", "Started : Tags[%v]", tags)
+
+	var sets []Set
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "GetSets", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		return c.Find(nil).All(&sets)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
+		log.Error(context, "GetSets", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(sets))
 	return sets, nil
 }
 
