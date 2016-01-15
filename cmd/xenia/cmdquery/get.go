@@ -6,11 +6,10 @@ import (
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
-
 	"github.com/spf13/cobra"
 )
 
-var getLong = `Retrieves a query record from the system with the supplied name.
+var getLong = `Retrieves a Set record from the system with the supplied name.
 
 Example:
 	query get -n user_advice
@@ -21,23 +20,23 @@ var get struct {
 	name string
 }
 
-// addGet handles the retrival query records, displayed in json formatted response.
+// addGet handles the retrival Set records, displayed in json formatted response.
 func addGet() {
 	cmd := &cobra.Command{
 		Use:   "get",
-		Short: "Retrieves a query record by name.",
+		Short: "Retrieves a Set record by name.",
 		Long:  getLong,
 		Run:   runGet,
 	}
 
-	cmd.Flags().StringVarP(&get.name, "name", "n", "", "Name of the query.")
+	cmd.Flags().StringVarP(&get.name, "name", "n", "", "Name of the Set.")
 
 	queryCmd.AddCommand(cmd)
 }
 
 // runGet is the code that implements the get command.
 func runGet(cmd *cobra.Command, args []string) {
-	cmd.Printf("Getting Query : Name[%s]\n", get.name)
+	cmd.Printf("Getting Set : Name[%s]\n", get.name)
 
 	if get.name == "" {
 		cmd.Help()
@@ -49,13 +48,13 @@ func runGet(cmd *cobra.Command, args []string) {
 
 	set, err := query.GetByName("", db, get.name)
 	if err != nil {
-		cmd.Println("Getting Query : ", err)
+		cmd.Println("Getting Set : ", err)
 		return
 	}
 
 	data, err := json.MarshalIndent(&set, "", "    ")
 	if err != nil {
-		cmd.Println("Getting Query : ", err)
+		cmd.Println("Getting Set : ", err)
 		return
 	}
 

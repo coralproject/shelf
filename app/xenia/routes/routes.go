@@ -19,6 +19,11 @@ func init() {
 func API() http.Handler {
 	a := app.New(midware.Auth)
 
+	a.Handle("GET", "/1.0/script", handlers.Script.List)
+	a.Handle("PUT", "/1.0/script", handlers.Script.Upsert)
+	a.Handle("GET", "/1.0/script/:name", handlers.Script.Retrieve)
+	a.Handle("DELETE", "/1.0/script/:name", handlers.Script.Delete)
+
 	a.Handle("GET", "/1.0/query", handlers.Query.List)
 	a.Handle("PUT", "/1.0/query", handlers.Query.Upsert)
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
