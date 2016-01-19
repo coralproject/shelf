@@ -6,6 +6,7 @@ import (
 
 	"github.com/coralproject/xenia/app/xenia/routes"
 	"github.com/coralproject/xenia/pkg/query/qfix"
+	"github.com/coralproject/xenia/pkg/script/sfix"
 	"github.com/coralproject/xenia/tstdata"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -46,17 +47,35 @@ func TestMain(m *testing.M) {
 	loadQuery(db, "basic_var.json")
 	defer qfix.Remove(db)
 
+	loadScript(db, "basic_script_pre.json")
+	loadScript(db, "basic_script_pst.json")
+	defer sfix.Remove(db)
+
 	m.Run()
 }
 
 // loadQuery adds queries to run tests.
 func loadQuery(db *db.DB, file string) error {
-	qs1, err := qfix.Get(file)
+	set, err := qfix.Get(file)
 	if err != nil {
 		return err
 	}
 
-	if err := qfix.Add(db, qs1); err != nil {
+	if err := qfix.Add(db, set); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadScript adds scripts to run tests.
+func loadScript(db *db.DB, file string) error {
+	scr, err := sfix.Get(file)
+	if err != nil {
+		return err
+	}
+
+	if err := sfix.Add(db, scr); err != nil {
 		return err
 	}
 
