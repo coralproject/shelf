@@ -15,61 +15,45 @@ const (
     TypeTemplate = "template"
 )
 ```
-Set of query types we expect to receive
+Set of query types we expect to receive.
 
 ``` go
 const (
-    Collection         = "query_sets"
-    CollectionHistory  = "query_sets_history"
-    CollectionExecTest = "test_query"
+    Collection        = "query_sets"
+    CollectionHistory = "query_sets_history"
 )
 ```
 Contains the name of Mongo collections.
 
 
-
-## func AddTestSet
+## Variables
 ``` go
-func AddTestSet(db *db.DB, qs *Set) error
+var (
+    ErrNotFound = errors.New("Set Not found")
+)
 ```
-AddTestSet inserts a set for testing.
+Set of error variables.
 
 
-## func DeleteSet
+## func Delete
 ``` go
-func DeleteSet(context interface{}, db *db.DB, name string) error
+func Delete(context interface{}, db *db.DB, name string) error
 ```
-DeleteSet is used to remove an existing Set document.
+Delete is used to remove an existing Set document.
 
 
-## func DropTestData
+## func GetNames
 ``` go
-func DropTestData()
+func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
-DropTestData drops the temp collection.
+GetNames retrieves a list of query names.
 
 
-## func GenerateTestData
+## func GetSets
 ``` go
-func GenerateTestData(db *db.DB) error
+func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error)
 ```
-GenerateTestData creates a temp collection with data
-that can be used for testing things.
-
-
-## func GetSetNames
-``` go
-func GetSetNames(context interface{}, db *db.DB) ([]string, error)
-```
-GetSetNames retrieves a list of rule names.
-
-
-## func RemoveTestSets
-``` go
-func RemoveTestSets(db *db.DB) error
-```
-RemoveTestSets is used to clear out all the test sets from the collection.
-All test query sets must start with QSTEST in their name.
+GetSets retrieves a list of sets.
 
 
 ## func UmarshalMongoScript
@@ -79,11 +63,11 @@ func UmarshalMongoScript(script string, q *Query) (bson.M, error)
 UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
 
 
-## func UpsertSet
+## func Upsert
 ``` go
-func UpsertSet(context interface{}, db *db.DB, qs *Set) error
+func Upsert(context interface{}, db *db.DB, set *Set) error
 ```
-UpsertSet is used to create or update an existing Set document.
+Upsert is used to create or update an existing Set document.
 
 
 
@@ -110,32 +94,15 @@ Param contains meta-data about a required parameter for the query.
 ## type Query
 ``` go
 type Query struct {
-    // Unique name per Set where results are stored.
-    Name string `bson:"name" json:"name"`
-
-    // Description of this specific query.
-    Description string `bson:"desc,omitempty" json:"desc,omitempty"`
-
-    // TypePipeline, TypeTemplate
-    Type string `bson:"type" json:"type"`
-
-    // Name of the collection to use for processing the query.
-    Collection string `bson:"collection,omitempty" json:"collection,omitempty"`
-
-    // Indicates that on failure to process the next query.
-    Continue bool `bson:"continue,omitempty" json:"continue,omitempty"`
-
-    // Return the results back to the user with Name as the key.
-    Return bool `bson:"save" json:"save"`
-
-    // Indicates there is a date to be pre-processed in the scripts.
-    HasDate bool `bson:"has_date,omitempty" json:"has_date,omitempty"`
-
-    // Indicates there is an ObjectId to be pre-processed in the scripts.
-    HasObjectID bool `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`
-
-    // Scripts to process for the query.
-    Scripts []string `bson:"scripts" json:"scripts"`
+    Name        string   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
+    Description string   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
+    Type        string   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
+    Collection  string   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
+    Scripts     []string `bson:"scripts" json:"scripts"`                                                     // Scripts to process for the query.
+    Continue    bool     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
+    Return      bool     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
+    HasDate     bool     `bson:"has_date,omitempty" json:"has_date,omitempty"`                               // Indicates there is a date to be pre-processed in the scripts.
+    HasObjectID bool     `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`                       // Indicates there is an ObjectId to be pre-processed in the scripts.
 }
 ```
 Query contains the configuration details for a query.
@@ -147,6 +114,14 @@ Query contains the configuration details for a query.
 
 
 
+
+
+
+### func (\*Query) Validate
+``` go
+func (q *Query) Validate() error
+```
+Validate checks the query value for consistency.
 
 
 
@@ -179,11 +154,13 @@ ExecuteSet executes the specified query set by name.
 ## type Set
 ``` go
 type Set struct {
-    Name        string  `bson:"name" json:"name"`       // Name of the query set.
-    Description string  `bson:"desc" json:"desc"`       // Description of the query set.
-    Enabled     bool    `bson:"enabled" json:"enabled"` // If the query set is enabled to run.
-    Params      []Param `bson:"params" json:"params"`   // Collection of parameters.
-    Queries     []Query `bson:"queries" json:"queries"` // Collection of queries.
+    Name        string  `bson:"name" json:"name" validate:"required,min=3"` // Name of the query set.
+    Description string  `bson:"desc" json:"desc"`                           // Description of the query set.
+    PreScript   string  `bson:"pre_script" json:"pre_script"`               // Name of a script document to prepend.
+    PstScript   string  `bson:"pst_script" json:"pst_script"`               // Name of a script document to append.
+    Params      []Param `bson:"params" json:"params"`                       // Collection of parameters.
+    Queries     []Query `bson:"queries" json:"queries"`                     // Collection of queries.
+    Enabled     bool    `bson:"enabled" json:"enabled"`                     // If the query set is enabled to run.
 }
 ```
 Set contains the configuration details for a rule set.
@@ -196,27 +173,28 @@ Set contains the configuration details for a rule set.
 
 
 
-### func GetFixture
+### func GetByName
 ``` go
-func GetFixture(fileName string) (*Set, error)
+func GetByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
-GetFixture retrieves a query record from the filesystem for testing.
+GetByName retrieves the document for the specified Set.
 
 
-### func GetLastSetHistoryByName
+### func GetLastHistoryByName
 ``` go
-func GetLastSetHistoryByName(context interface{}, db *db.DB, name string) (*Set, error)
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
-GetLastSetHistoryByName gets the last written Set within the query_history
+GetLastHistoryByName gets the last written Set within the query_history
 collection and returns the last one else returns a non-nil error if it fails.
 
 
-### func GetSetByName
-``` go
-func GetSetByName(context interface{}, db *db.DB, name string) (*Set, error)
-```
-GetSetByName retrieves the configuration for the specified Set.
 
+
+### func (\*Set) Validate
+``` go
+func (s *Set) Validate() error
+```
+Validate checks the set value for consistency.
 
 
 

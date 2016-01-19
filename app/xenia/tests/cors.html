@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<head>
+<script>
+var createCORSRequest = function(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // Most browsers.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // IE8 & IE9
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+};
+
+function test() {
+  var url = 'http://52.23.218.253:4000/1.0/query/comments_per_day';
+  var method = 'GET';
+  var xhr = createCORSRequest(method, url);
+
+  xhr.onload = function() {
+    // Success code goes here.
+    alert(url + ":" + xhr.status + ":" + xhr.responseText)
+  };
+
+  xhr.onerror = function() {
+    // Error code goes here.
+    alert("NOT WORKED")
+  };
+
+  xhr.setRequestHeader('Authorization', 'Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFRHWjhOdGZWOGVReXZObkpydm4xc2loQk9uQW5TNFpGZGNFdnc9');
+  xhr.send();
+}
+</script>
+</head>
+<html>
+<body>
+
+<h1>My First Heading</h1>
+
+<p>My first paragraph.</p>
+
+<input type="button" value="test" onclick="test()"/>
+
+</body>
+</html>

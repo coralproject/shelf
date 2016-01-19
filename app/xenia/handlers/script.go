@@ -15,14 +15,14 @@ import (
 type scriptHandle struct{}
 
 // Script fronts the access to the script service functionality.
-var Script queryHandle
+var Script scriptHandle
 
 //==============================================================================
 
-// List returns all the existing script names in the system.
+// List returns all the existing scripts in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (scriptHandle) List(c *app.Context) error {
-	names, err := script.GetNames(c.SessionID, c.DB)
+	scrs, err := script.GetScripts(c.SessionID, c.DB, nil)
 	if err != nil {
 		if err == script.ErrNotFound {
 			err = app.ErrNotFound
@@ -30,7 +30,7 @@ func (scriptHandle) List(c *app.Context) error {
 		return err
 	}
 
-	c.Respond(names, http.StatusOK)
+	c.Respond(scrs, http.StatusOK)
 	return nil
 }
 

@@ -150,6 +150,64 @@ func TestGetScriptNames(t *testing.T) {
 	}
 }
 
+// TestGetScripts validates retrieval of all Script records.
+func TestGetScripts(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	const fixture = "basic.json"
+	scr1, err := sfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+
+	db := db.NewMGO()
+	defer db.CloseMGO()
+
+	defer func() {
+		if err := sfix.Remove(db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
+	}()
+
+	t.Log("Given the need to retrieve a list of scripts.")
+	{
+		t.Log("\tWhen using two scripts")
+		{
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
+
+			scr1.Name += "2"
+			if err := script.Upsert(tests.Context, db, scr1); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
+
+			scrs, err := script.GetScripts(tests.Context, db, nil)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the scripts : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the scripts", tests.Success)
+
+			var count int
+			for _, scr := range scrs {
+				if scr.Name[0:5] == "STEST" {
+					count++
+				}
+			}
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould have two scripts : %d", tests.Failed, count)
+			}
+			t.Logf("\t%s\tShould have two scripts.", tests.Success)
+		}
+	}
+}
+
 // TestGetScriptByNames validates retrieval of Script records by a set of names.
 func TestGetScriptByNames(t *testing.T) {
 	tests.ResetLog()

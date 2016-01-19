@@ -2,7 +2,6 @@ package script
 
 import (
 	"errors"
-	"strings"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -110,11 +109,14 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "GetNames", "Started")
 
-	var names []bson.M
+	var rawNames []struct {
+		Name string
+	}
+
 	f := func(c *mgo.Collection) error {
 		s := bson.M{"name": 1}
-		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", mongo.Query(s))
-		return c.Find(nil).Select(s).Sort("name").All(&names)
+		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
+		return c.Find(nil).Select(s).Sort("name").All(&rawNames)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -126,18 +128,36 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		return nil, err
 	}
 
-	var sets []string
-	for _, doc := range names {
-		name := doc["name"].(string)
-		if strings.HasPrefix(name, "test") {
-			continue
-		}
-
-		sets = append(sets, name)
+	names := make([]string, len(rawNames))
+	for i := range rawNames {
+		names[i] = rawNames[i].Name
 	}
 
-	log.Dev(context, "GetNames", "Completed : Sets[%+v]", sets)
-	return sets, nil
+	log.Dev(context, "GetNames", "Completed : Scripts[%d]", len(names))
+	return names, nil
+}
+
+// GetScripts retrieves a list of scripts.
+func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error) {
+	log.Dev(context, "GetScripts", "Started : Tags[%v]", tags)
+
+	var scrs []Script
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "GetScripts", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		return c.Find(nil).All(&scrs)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
+		log.Error(context, "GetScripts", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
+	return scrs, nil
 }
 
 // GetByName retrieves the document for the specified name.
