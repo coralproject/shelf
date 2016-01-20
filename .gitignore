@@ -29,3 +29,4 @@ _testmain.go
 # Build files
 app/xenia/gib-bin
 app/xenia/xenia
+cmd/xenia/xenia
