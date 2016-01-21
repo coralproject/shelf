@@ -185,8 +185,7 @@ func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	return &set, nil
 }
 
-// GetLastHistoryByName gets the last written Set within the query_history
-// collection and returns the last one else returns a non-nil error if it fails.
+// GetLastHistoryByName gets the last written Set within the history.
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
@@ -218,7 +217,7 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, er
 		return nil, err
 	}
 
-	log.Dev(context, "GetLastHistoryByName", "Completed : QS[%+v]", &result.Sets[0])
+	log.Dev(context, "GetLastHistoryByName", "Completed : Set[%+v]", &result.Sets[0])
 	return &result.Sets[0], nil
 }
 
