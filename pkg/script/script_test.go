@@ -492,6 +492,12 @@ func TestAPIFailureScripts(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
+			_, err = script.GetByNames(tests.Context, nil, nil)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
+
 			_, err = script.GetLastHistoryByName(tests.Context, nil, scrName)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)

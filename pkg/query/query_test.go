@@ -12,17 +12,17 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
-// TestUpsertCreateQuery tests if we can create a query record in the db.
-func TestUpsertCreateQuery(t *testing.T) {
+// TestUpsertCreateSet tests if we can create a Set record in the db.
+func TestUpsertCreateSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)
 	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
+		t.Fatalf("\t%s\tShould load query set record from file : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
+	t.Logf("\t%s\tShould load query set record from file.", tests.Success)
 
 	db := db.NewMGO()
 	defer db.CloseMGO()

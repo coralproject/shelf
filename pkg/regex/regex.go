@@ -1,4 +1,6 @@
-package script
+// Package regex provides the service layer for building apps using
+// regex functionality.
+package regex
 
 import (
 	"errors"
@@ -13,8 +15,8 @@ import (
 
 // Contains the name of Mongo collections.
 const (
-	Collection        = "query_scripts"
-	CollectionHistory = "query_scripts_history"
+	Collection        = "query_regexs"
+	CollectionHistory = "query_regexs_history"
 )
 
 // Set of error variables.
@@ -24,19 +26,19 @@ var (
 
 // =============================================================================
 
-// Upsert is used to create or update an existing Script document.
-func Upsert(context interface{}, db *db.DB, scr *Script) error {
-	log.Dev(context, "Upsert", "Started : Name[%s]", scr.Name)
+// Upsert is used to create or update an existing Regex document.
+func Upsert(context interface{}, db *db.DB, rgx *Regex) error {
+	log.Dev(context, "Upsert", "Started : Name[%s]", rgx.Name)
 
-	// Validate the set that is provided.
-	if err := scr.Validate(); err != nil {
+	// Validate the regex that is provided.
+	if err := rgx.Validate(); err != nil {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
 
-	// We need to know if this is a new Set.
+	// We need to know if this is a new regex.
 	var new bool
-	if _, err := GetByName(context, db, scr.Name); err != nil {
+	if _, err := GetByName(context, db, rgx.Name); err != nil {
 		if err != ErrNotFound {
 			log.Error(context, "Upsert", err, "Completed")
 			return err
@@ -45,11 +47,11 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 		new = true
 	}
 
-	// Insert or update the Set.
+	// Insert or update the query regex.
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": scr.Name}
-		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(scr))
-		_, err := c.Upsert(q, scr)
+		q := bson.M{"name": rgx.Name}
+		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(rgx))
+		_, err := c.Upsert(q, rgx)
 		return err
 	}
 
@@ -58,16 +60,16 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 		return err
 	}
 
-	// Add a history record if this script set is new.
+	// Add a history record if this query regex is new.
 	if new {
 		f = func(c *mgo.Collection) error {
-			sh := bson.M{
-				"name":    scr.Name,
-				"scripts": []bson.M{},
+			qh := bson.M{
+				"name":   rgx.Name,
+				"regexs": []bson.M{},
 			}
 
-			log.Dev(context, "Upsert", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(sh))
-			return c.Insert(sh)
+			log.Dev(context, "Upsert", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(qh))
+			return c.Insert(qh)
 		}
 
 		if err := db.ExecuteMGO(context, CollectionHistory, f); err != nil {
@@ -76,20 +78,20 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 		}
 	}
 
-	// Add this script to the beginning of the history.
+	// Add this query set to the beginning of the history.
 	f = func(c *mgo.Collection) error {
-		q := bson.M{"name": scr.Name}
-		su := bson.M{
+		q := bson.M{"name": rgx.Name}
+		qu := bson.M{
 			"$push": bson.M{
-				"scripts": bson.M{
-					"$each":     []*Script{scr},
+				"regexs": bson.M{
+					"$each":     []*Regex{rgx},
 					"$position": 0,
 				},
 			},
 		}
 
-		log.Dev(context, "Upsert", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(su))
-		_, err := c.Upsert(q, su)
+		log.Dev(context, "Upsert", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(qu))
+		_, err := c.Upsert(q, qu)
 		return err
 	}
 
@@ -104,7 +106,7 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 
 // =============================================================================
 
-// GetNames retrieves a list of script names.
+// GetNames retrieves a list of query regex names.
 func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	log.Dev(context, "GetNames", "Started")
 
@@ -132,18 +134,18 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		names[i] = rawNames[i].Name
 	}
 
-	log.Dev(context, "GetNames", "Completed : Scripts[%d]", len(names))
+	log.Dev(context, "GetNames", "Completed : Sets[%d]", len(names))
 	return names, nil
 }
 
-// GetScripts retrieves a list of scripts.
-func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error) {
-	log.Dev(context, "GetScripts", "Started : Tags[%v]", tags)
+// GetRegexs retrieves a list of regexs.
+func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
+	log.Dev(context, "GetSets", "Started : Tags[%v]", tags)
 
-	var scrs []Script
+	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetScripts", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
-		return c.Find(nil).All(&scrs)
+		log.Dev(context, "GetSets", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		return c.Find(nil).All(&rgxs)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -151,23 +153,23 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetScripts", err, "Completed")
+		log.Error(context, "GetSets", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
-	return scrs, nil
+	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(rgxs))
+	return rgxs, nil
 }
 
-// GetByName retrieves the document for the specified name.
-func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
+// GetByName retrieves the document for the specified Regex.
+func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
 
-	var scr Script
+	var rgx Regex
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
 		log.Dev(context, "GetByName", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
-		return c.Find(q).One(&scr)
+		return c.Find(q).One(&rgx)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -179,15 +181,15 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 		return nil, err
 	}
 
-	log.Dev(context, "GetByName", "Completed : Script[%+v]", &scr)
-	return &scr, nil
+	log.Dev(context, "GetByName", "Completed : Set[%+v]", &rgx)
+	return &rgx, nil
 }
 
 // GetByNames retrieves the documents for the specified names.
-func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error) {
+func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error) {
 	log.Dev(context, "GetByNames", "Started : Names[%+v]", names)
 
-	var scrs []Script
+	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
 
 		// Build a list of documents to find by name.
@@ -202,7 +204,7 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 		q := bson.M{"$or": qn}
 
 		log.Dev(context, "GetByNames", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
-		return c.Find(q).All(&scrs)
+		return c.Find(q).All(&rgxs)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
@@ -218,33 +220,33 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 	// setup the query. I need the order to match on the returned slice.
 	// I thought about using a map of name/value but I feel like it is overkill.
 
-	scripts := make([]Script, len(names))
+	regexs := make([]Regex, len(names))
 next:
-	for _, scr := range scrs {
+	for _, rgx := range rgxs {
 		for i := range names {
-			if scr.Name == names[i] {
-				scripts[i] = scr
+			if rgx.Name == names[i] {
+				regexs[i] = rgx
 				continue next
 			}
 		}
 	}
 
-	log.Dev(context, "GetByNames", "Completed : Scripts[%+v]", scripts)
-	return scripts, nil
+	log.Dev(context, "GetByNames", "Completed : Regexs[%+v]", regexs)
+	return regexs, nil
 }
 
-// GetLastHistoryByName gets the last written Script within the history.
-func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
+// GetLastHistoryByName gets the last written Regex within the history.
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
 	var result struct {
-		Name    string   `bson:"name"`
-		Scripts []Script `bson:"scripts"`
+		Name   string  `bson:"name"`
+		Regexs []Regex `bson:"regexs"`
 	}
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
-		proj := bson.M{"scripts": bson.M{"$slice": 1}}
+		proj := bson.M{"regexs": bson.M{"$slice": 1}}
 
 		log.Dev(context, "GetLastHistoryByName", "MGO : db.%s.find(%s,%s)", c.Name, mongo.Query(q), mongo.Query(proj))
 		return c.Find(q).Select(proj).One(&result)
@@ -259,29 +261,29 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 		return nil, err
 	}
 
-	if result.Scripts == nil {
+	if result.Regexs == nil {
 		err := errors.New("History not found")
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}
 
-	log.Dev(context, "GetLastHistoryByName", "Completed : Script[%+v]", &result.Scripts[0])
-	return &result.Scripts[0], nil
+	log.Dev(context, "GetLastHistoryByName", "Completed : Regex[%+v]", &result.Regexs[0])
+	return &result.Regexs[0], nil
 }
 
 // =============================================================================
 
-// Delete is used to remove an existing Set document.
+// Delete is used to remove an existing Regex document.
 func Delete(context interface{}, db *db.DB, name string) error {
 	log.Dev(context, "Delete", "Started : Name[%s]", name)
 
-	set, err := GetByName(context, db, name)
+	rgx, err := GetByName(context, db, name)
 	if err != nil {
 		return err
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": set.Name}
+		q := bson.M{"name": rgx.Name}
 		log.Dev(context, "Delete", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
 		return c.Remove(q)
 	}

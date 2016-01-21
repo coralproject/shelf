@@ -74,9 +74,10 @@ func (q *Query) Validate() error {
 
 // Param contains meta-data about a required parameter for the query.
 type Param struct {
-	Name    string `bson:"name" json:"name"`       // Name of the parameter.
-	Default string `bson:"default" json:"default"` // Default value for the parameter.
-	Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
+	Name      string `bson:"name" json:"name"`             // Name of the parameter.
+	Desc      string `bson:"desc" json:"desc"`             // Description about the parameter.
+	Default   string `bson:"default" json:"default"`       // Default value for the parameter.
+	RegexName string `bson:"regex_name" json:"regex_name"` // Regular expression name.
 }
 
 //==============================================================================
