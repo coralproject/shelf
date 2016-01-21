@@ -34,7 +34,7 @@ func addDel() {
 
 // runDelete is the code that implements the delete command.
 func runDelete(cmd *cobra.Command, args []string) {
-	cmd.Printf("Deleting Script : Path[%s]\n", upsert.path)
+	cmd.Printf("Deleting Script : Name[%s]\n", delete.name)
 
 	if delete.name == "" {
 		cmd.Help()

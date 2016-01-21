@@ -3,10 +3,6 @@
     import "github.com/coralproject/xenia/app/xenia/handlers"
 
 Package handlers contains the handler logic for processing requests.
-USE THIS AS A MODEL FOR NOW.
-
-Package handlers contains the handler logic for processing requests.
-USE THIS AS A MODEL FOR NOW.
 
 
 
@@ -17,6 +13,11 @@ USE THIS AS A MODEL FOR NOW.
 var Query queryHandle
 ```
 Query fronts the access to the query service functionality.
+
+``` go
+var Regex regexHandle
+```
+Regex fronts the access to the regex service functionality.
 
 ``` go
 var Script scriptHandle

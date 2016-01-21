@@ -1,0 +1,4 @@
+{
+	"name": "alpha",
+	"expr": "^[a-zA-Z]+$"
+}

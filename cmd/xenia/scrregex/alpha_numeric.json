@@ -1,0 +1,4 @@
+{
+	"name": "alpha_numeric",
+	"expr": "^[a-zA-Z0-9]+$"
+}

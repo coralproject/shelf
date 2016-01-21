@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/regex"
 	"github.com/coralproject/xenia/pkg/script"
 
 	"github.com/ardanlabs/kit/log"
@@ -52,6 +53,27 @@ func LoadScript(context interface{}, path string) (*script.Script, error) {
 
 	log.Dev(context, "LoadScript", "Completed")
 	return &scr, nil
+}
+
+// LoadRegex serializes the content of a regex from a file using the
+// given file path. Returns the serialized regex value.
+func LoadRegex(context interface{}, path string) (*regex.Regex, error) {
+	log.Dev(context, "LoadRegex", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadRegex", err, "Completed")
+		return nil, err
+	}
+
+	var rgx regex.Regex
+	if err = json.NewDecoder(file).Decode(&rgx); err != nil {
+		log.Error(context, "LoadRegex", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "LoadRegex", "Completed")
+	return &rgx, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

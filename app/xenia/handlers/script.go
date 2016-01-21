@@ -1,5 +1,3 @@
-// Package handlers contains the handler logic for processing requests.
-// USE THIS AS A MODEL FOR NOW.
 package handlers
 
 import (
