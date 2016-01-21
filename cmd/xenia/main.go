@@ -5,6 +5,8 @@ import (
 	"os"
 
 	"github.com/coralproject/xenia/cmd/xenia/cmdquery"
+	"github.com/coralproject/xenia/cmd/xenia/cmdregex"
+	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/cmd/kit/cmdauth"
@@ -59,6 +61,12 @@ func main() {
 		os.Exit(1)
 	}
 
-	xenia.AddCommand(cmdauth.GetCommands(), cmddb.GetCommands(), cmdquery.GetCommands())
+	xenia.AddCommand(
+		cmdauth.GetCommands(),
+		cmddb.GetCommands(),
+		cmdquery.GetCommands(),
+		cmdscript.GetCommands(),
+		cmdregex.GetCommands(),
+	)
 	xenia.Execute()
 }

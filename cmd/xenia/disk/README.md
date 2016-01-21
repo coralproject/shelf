@@ -15,6 +15,14 @@ LoadDir loadsup a given directory, calling a load function for each valid
 json file found.
 
 
+## func LoadRegex
+``` go
+func LoadRegex(context interface{}, path string) (*regex.Regex, error)
+```
+LoadRegex serializes the content of a regex from a file using the
+given file path. Returns the serialized regex value.
+
+
 ## func LoadScript
 ``` go
 func LoadScript(context interface{}, path string) (*script.Script, error)

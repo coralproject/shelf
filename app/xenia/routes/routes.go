@@ -29,6 +29,11 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/query/:name", handlers.Query.Retrieve)
 	a.Handle("DELETE", "/1.0/query/:name", handlers.Query.Delete)
 
+	a.Handle("GET", "/1.0/regex", handlers.Regex.List)
+	a.Handle("PUT", "/1.0/regex", handlers.Regex.Upsert)
+	a.Handle("GET", "/1.0/regex/:name", handlers.Regex.Retrieve)
+	a.Handle("DELETE", "/1.0/regex/:name", handlers.Regex.Delete)
+
 	a.Handle("POST", "/1.0/exec", handlers.Query.ExecuteCustom)
 	a.Handle("GET", "/1.0/exec/:name", handlers.Query.Execute)
 
