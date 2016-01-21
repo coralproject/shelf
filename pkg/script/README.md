@@ -8,9 +8,8 @@
 ## Constants
 ``` go
 const (
-    Collection         = "scripts"
-    CollectionHistory  = "scripts_history"
-    CollectionExecTest = "test_scripts"
+    Collection        = "query_scripts"
+    CollectionHistory = "query_scripts_history"
 )
 ```
 Contains the name of Mongo collections.
@@ -89,8 +88,7 @@ GetByName retrieves the document for the specified name.
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error)
 ```
-GetLastHistoryByName gets the last written Set within the query_history
-collection and returns the last one else returns a non-nil error if it fails.
+GetLastHistoryByName gets the last written Script within the history.
 
 
 

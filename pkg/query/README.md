@@ -74,9 +74,10 @@ Upsert is used to create or update an existing Set document.
 ## type Param
 ``` go
 type Param struct {
-    Name    string `bson:"name" json:"name"`       // Name of the parameter.
-    Default string `bson:"default" json:"default"` // Default value for the parameter.
-    Desc    string `bson:"desc" json:"desc"`       // Description about the parameter.
+    Name      string `bson:"name" json:"name"`             // Name of the parameter.
+    Desc      string `bson:"desc" json:"desc"`             // Description about the parameter.
+    Default   string `bson:"default" json:"default"`       // Default value for the parameter.
+    RegexName string `bson:"regex_name" json:"regex_name"` // Regular expression name.
 }
 ```
 Param contains meta-data about a required parameter for the query.
@@ -184,8 +185,7 @@ GetByName retrieves the document for the specified Set.
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
-GetLastHistoryByName gets the last written Set within the query_history
-collection and returns the last one else returns a non-nil error if it fails.
+GetLastHistoryByName gets the last written Set within the history.
 
 
 
