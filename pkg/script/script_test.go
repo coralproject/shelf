@@ -131,15 +131,19 @@ func TestGetScriptNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if name[0:5] == "STEST" {
+				if len(name) > 5 && name[0:5] == "STEST" {
 					count++
 				}
 			}
 
-			if count != 2 {
-				t.Fatalf("\t%s\tShould have two scripts : %d", tests.Failed, len(names))
+			// When tests are running in parallel, the STEST_basic_script_pst and
+			// STEST_basic_script_pst scripts may be loaded including others from
+			// the exec tests.
+
+			if count < 2 {
+				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(names), names)
 			}
-			t.Logf("\t%s\tShould have two scripts.", tests.Success)
+			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
 
 			if !strings.Contains(names[0], scrName) || !strings.Contains(names[1], scrName) {
 				t.Errorf("\t%s\tShould have \"%s\" in the name : %s", tests.Failed, scrName, names[0])
@@ -195,15 +199,19 @@ func TestGetScripts(t *testing.T) {
 
 			var count int
 			for _, scr := range scrs {
-				if scr.Name[0:5] == "STEST" {
+				if len(scr.Name) > 5 && scr.Name[0:5] == "STEST" {
 					count++
 				}
 			}
 
-			if count != 2 {
-				t.Fatalf("\t%s\tShould have two scripts : %d", tests.Failed, count)
+			// When tests are running in parallel, the STEST_basic_script_pst and
+			// STEST_basic_script_pst scripts may be loaded including others from
+			// the exec tests.
+
+			if count < 2 {
+				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scrs), scrs)
 			}
-			t.Logf("\t%s\tShould have two scripts.", tests.Success)
+			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
 		}
 	}
 }
@@ -254,15 +262,19 @@ func TestGetScriptByNames(t *testing.T) {
 
 			var count int
 			for _, scr := range scripts {
-				if scr.Name[0:5] == "STEST" {
+				if len(scr.Name) > 5 && scr.Name[0:5] == "STEST" {
 					count++
 				}
 			}
 
-			if count != 2 {
-				t.Fatalf("\t%s\tShould have two scripts : %d", tests.Failed, len(scripts))
+			// When tests are running in parallel, the STEST_basic_script_pst and
+			// STEST_basic_script_pst scripts may be loaded including others from
+			// the exec tests.
+
+			if count < 2 {
+				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scripts), scripts)
 			}
-			t.Logf("\t%s\tShould have two scripts.", tests.Success)
+			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
 
 			if scripts[0].Name != scr1.Name || scripts[1].Name != scr2.Name {
 				t.Errorf("\t%s\tShould have retrieve the correct scripts.", tests.Failed)

@@ -131,7 +131,7 @@ func TestGetRegexNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if name[0:5] == "RTEST" {
+				if len(name) > 5 && name[0:5] == "RTEST" {
 					count++
 				}
 			}
@@ -195,7 +195,7 @@ func TestGetRegexs(t *testing.T) {
 
 			var count int
 			for _, rgx := range rgxs {
-				if rgx.Name[0:5] == "RTEST" {
+				if len(rgx.Name) > 5 && rgx.Name[0:5] == "RTEST" {
 					count++
 				}
 			}
@@ -254,7 +254,7 @@ func TestGetRegexByNames(t *testing.T) {
 
 			var count int
 			for _, rgx := range regexs {
-				if rgx.Name[0:5] == "RTEST" {
+				if len(rgx.Name) > 5 && rgx.Name[0:5] == "RTEST" {
 					count++
 				}
 			}

@@ -8,9 +8,26 @@ import (
 	"github.com/coralproject/xenia/pkg/query"
 	"github.com/coralproject/xenia/pkg/query/qfix"
 
+	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 )
+
+func init() {
+	tests.Init("XENIA")
+
+	cfg := mongo.Config{
+		Host:     cfg.MustString("MONGO_HOST"),
+		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
+		DB:       cfg.MustString("MONGO_DB"),
+		User:     cfg.MustString("MONGO_USER"),
+		Password: cfg.MustString("MONGO_PASS"),
+	}
+	tests.InitMongo(cfg)
+}
+
+//==============================================================================
 
 // TestUpsertCreateSet tests if we can create a Set record in the db.
 func TestUpsertCreateSet(t *testing.T) {
@@ -110,7 +127,7 @@ func TestGetSetNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if name[0:5] == "QTEST" {
+				if len(name) > 5 && name[0:5] == "QTEST" {
 					count++
 				}
 			}
@@ -168,7 +185,7 @@ func TestGetSets(t *testing.T) {
 
 			var count int
 			for _, set := range sets {
-				if set.Name[0:5] == "QTEST" {
+				if len(set.Name) > 5 && set.Name[0:5] == "QTEST" {
 					count++
 				}
 			}
