@@ -34,8 +34,8 @@ func API() http.Handler {
 	a.Handle("GET", "/1.0/regex/:name", handlers.Regex.Retrieve)
 	a.Handle("DELETE", "/1.0/regex/:name", handlers.Regex.Delete)
 
-	a.Handle("POST", "/1.0/exec", handlers.Query.ExecuteCustom)
-	a.Handle("GET", "/1.0/exec/:name", handlers.Query.Execute)
+	a.Handle("POST", "/1.0/exec", handlers.Exec.Custom)
+	a.Handle("GET", "/1.0/exec/:name", handlers.Exec.Name)
 
 	a.CORS()
 

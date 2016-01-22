@@ -4,11 +4,18 @@
 
 Package handlers contains the handler logic for processing requests.
 
+Package handlers contains the handler logic for processing requests.
+
 
 
 
 
 ## Variables
+``` go
+var Exec execHandle
+```
+Exec fronts the access to the exec service functionality.
+
 ``` go
 var Query queryHandle
 ```
