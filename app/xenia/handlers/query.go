@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/coralproject/xenia/pkg/exec"
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/web/app"
@@ -107,7 +108,7 @@ func execute(c *app.Context, set *query.Set) error {
 		}
 	}
 
-	result := query.ExecuteSet(c.SessionID, c.DB, set, vars)
+	result := exec.Set(c.SessionID, c.DB, set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

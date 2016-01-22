@@ -56,13 +56,6 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error)
 GetSets retrieves a list of sets.
 
 
-## func UmarshalMongoScript
-``` go
-func UmarshalMongoScript(script string, q *Query) (bson.M, error)
-```
-UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
-
-
 ## func Upsert
 ``` go
 func Upsert(context interface{}, db *db.DB, set *Set) error
@@ -118,6 +111,14 @@ Query contains the configuration details for a query.
 
 
 
+### func (\*Query) UmarshalMongoScript
+``` go
+func (q *Query) UmarshalMongoScript(script string) (bson.M, error)
+```
+UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
+
+
+
 ### func (\*Query) Validate
 ``` go
 func (q *Query) Validate() error
@@ -141,13 +142,6 @@ Result contains the result of an query set execution.
 
 
 
-
-
-### func ExecuteSet
-``` go
-func ExecuteSet(context interface{}, db *db.DB, set *Set, vars map[string]string) *Result
-```
-ExecuteSet executes the specified query set by name.
 
 
 

@@ -1,9 +1,11 @@
 package query
 
 import (
+	"encoding/json"
 	"errors"
 
 	"gopkg.in/bluesuncorp/validator.v8"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // Set of query types we expect to receive.
@@ -68,6 +70,24 @@ func (q *Query) Validate() error {
 	}
 
 	return nil
+}
+
+// UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
+func (q *Query) UmarshalMongoScript(script string) (bson.M, error) {
+	query := []byte(script)
+
+	var op bson.M
+	if err := json.Unmarshal(query, &op); err != nil {
+		return nil, err
+	}
+
+	// We have the HasDate and HasObjectID to prevent us from
+	// trying to process these things when it is not necessary.
+	if q != nil && (q.HasDate || q.HasObjectID) {
+		op = mongoExtensions(op, q)
+	}
+
+	return op, nil
 }
 
 //==============================================================================

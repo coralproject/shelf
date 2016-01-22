@@ -53,7 +53,8 @@ func Generate(db *db.DB) error {
 			return err
 		}
 
-		doc, err := query.UmarshalMongoScript(string(mar), &query.Query{HasDate: true})
+		q := query.Query{HasDate: true}
+		doc, err := q.UmarshalMongoScript(string(mar))
 		if err != nil {
 			return err
 		}

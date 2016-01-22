@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/coralproject/xenia/pkg/exec"
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/ardanlabs/kit/db"
@@ -18,8 +19,8 @@ Example:
 	query exec -n "my_set" -v "key:value,key:value"
 `
 
-// exec contains the state for this command.
-var exec struct {
+// exe contains the state for this command.
+var exe struct {
 	name string
 	vars string
 }
@@ -33,17 +34,17 @@ func addExec() {
 		Run:   runExec,
 	}
 
-	cmd.Flags().StringVarP(&exec.name, "name", "n", "", "Name of Set.")
-	cmd.Flags().StringVarP(&exec.vars, "vars", "v", "", "Variables required by Set.")
+	cmd.Flags().StringVarP(&exe.name, "name", "n", "", "Name of Set.")
+	cmd.Flags().StringVarP(&exe.vars, "vars", "v", "", "Variables required by Set.")
 
 	queryCmd.AddCommand(cmd)
 }
 
 // runExec is the code that implements the execute command.
 func runExec(cmd *cobra.Command, args []string) {
-	cmd.Printf("Exec Set : Name[%s] Vars[%v]\n", exec.name, exec.vars)
+	cmd.Printf("Exec Set : Name[%s] Vars[%v]\n", exe.name, exe.vars)
 
-	if exec.name == "" {
+	if exe.name == "" {
 		cmd.Help()
 		return
 	}
@@ -51,15 +52,15 @@ func runExec(cmd *cobra.Command, args []string) {
 	db := db.NewMGO()
 	defer db.CloseMGO()
 
-	set, err := query.GetByName("", db, exec.name)
+	set, err := query.GetByName("", db, exe.name)
 	if err != nil {
 		cmd.Println("Exec Set : ", err)
 		return
 	}
 
 	vars := make(map[string]string)
-	if exec.vars != "" {
-		vs := strings.Split(exec.vars, ",")
+	if exe.vars != "" {
+		vs := strings.Split(exe.vars, ",")
 		for _, kvs := range vs {
 			kv := strings.Split(kvs, ":")
 			if len(kv) != 2 {
@@ -69,7 +70,7 @@ func runExec(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	result := query.ExecuteSet("", db, set, vars)
+	result := exec.Set("", db, set, vars)
 
 	data, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {
