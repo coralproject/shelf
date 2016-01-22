@@ -4,11 +4,13 @@ package regex
 
 import (
 	"errors"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 
+	cache "github.com/patrickmn/go-cache"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -23,6 +25,19 @@ const (
 var (
 	ErrNotFound = errors.New("Set Not found")
 )
+
+// =============================================================================
+
+// c contans a cache of regex values. The cache will maintain items for one
+// minute and then marked as expired. This is a very small cache so the
+// gc time will be every hour.
+
+const (
+	expiration = time.Minute
+	cleanup    = time.Hour
+)
+
+var c = cache.New(expiration, cleanup)
 
 // =============================================================================
 
