@@ -1,8 +1,8 @@
 {
    "name":"STEST_upsert",
    "commands": [
-      "Command 1",
-      "Command 2",
-      "Command 3"
-   ]
+		{"command.one": 1},
+		{"command": 2},
+		{"command": 3}
+	]
 }

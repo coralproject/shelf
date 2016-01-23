@@ -1,6 +1,6 @@
 {
 	"name" : "STEST_basic_script_pst",
 	"commands":[
-		"{\"$limit\": 1}"
+		{"$limit": 1}
 	]
 }

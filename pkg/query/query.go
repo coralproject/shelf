@@ -47,6 +47,10 @@ func Upsert(context interface{}, db *db.DB, set *Set) error {
 		new = true
 	}
 
+	// Fix the set so it can be inserted.
+	set.PrepareForInsert()
+	defer set.PrepareForUse()
+
 	// Insert or update the query set.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": set.Name}
@@ -157,6 +161,11 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 		return nil, err
 	}
 
+	// Fix the sets so they can be used for processing.
+	for i := range sets {
+		sets[i].PrepareForUse()
+	}
+
 	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(sets))
 	return sets, nil
 }
@@ -180,6 +189,9 @@ func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 		log.Error(context, "GetByName", err, "Completed")
 		return nil, err
 	}
+
+	// Fix the set so it can be used for processing.
+	set.PrepareForUse()
 
 	log.Dev(context, "GetByName", "Completed : Set[%+v]", &set)
 	return &set, nil
@@ -216,6 +228,9 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, er
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}
+
+	// Fix the set so it can be used for processing.
+	result.Sets[0].PrepareForUse()
 
 	log.Dev(context, "GetLastHistoryByName", "Completed : Set[%+v]", &result.Sets[0])
 	return &result.Sets[0], nil

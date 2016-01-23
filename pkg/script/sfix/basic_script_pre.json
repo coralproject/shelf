@@ -1,6 +1,6 @@
 {
 	"name" : "STEST_basic_script_pre",
 	"commands":[
-		"{\"$match\": {\"$or\": [{\"station_id\" : \"42021\"},{\"station_id\" : \"44008\"}] }}"
+		{"$match": {"$or": [{"station_id" : "42021"},{"station_id" : "44008"}] }}
 	]
 }

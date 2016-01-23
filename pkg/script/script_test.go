@@ -319,7 +319,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr1.Commands = append(scr1.Commands, "Command 4")
+			scr1.Commands = append(scr1.Commands, map[string]interface{}{"command": 4})
 
 			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
@@ -375,7 +375,7 @@ func TestUpsertUpdateScript(t *testing.T) {
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
 			scr2 := *scr1
-			scr2.Commands = append(scr2.Commands, "Command 4")
+			scr2.Commands = append(scr2.Commands, map[string]interface{}{"command": 4})
 
 			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a script record: %s", tests.Failed, err)

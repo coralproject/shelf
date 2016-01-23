@@ -40,13 +40,7 @@ func Get(fileName string) (*query.Set, error) {
 
 // Add inserts a set for testing.
 func Add(db *db.DB, set *query.Set) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": set.Name}
-		_, err := c.Upsert(q, set)
-		return err
-	}
-
-	if err := db.ExecuteMGO(tests.Context, query.Collection, f); err != nil {
+	if err := query.Upsert("", db, set); err != nil {
 		return err
 	}
 

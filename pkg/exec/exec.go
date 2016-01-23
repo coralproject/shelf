@@ -3,15 +3,16 @@
 package exec
 
 import (
-	"fmt"
-	"regexp"
+	"errors"
 	"strings"
 
 	"github.com/coralproject/xenia/pkg/query"
 	"github.com/coralproject/xenia/pkg/script"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -36,76 +37,6 @@ func errResult(context interface{}, err error) *query.Result {
 
 	log.Error(context, "errResult", err, "Completed")
 	return &r
-}
-
-//==============================================================================
-
-// reVarSub represents a regular expression for processing variables.
-var reVarSub = regexp.MustCompile(`#(.*?)#`)
-
-// renderScript replaces variables inside of a query script.
-func renderScript(script string, vars map[string]string) string {
-	matches := reVarSub.FindAllString(script, -1)
-	if matches == nil {
-		return script
-	}
-
-	for _, match := range matches {
-		varName := strings.Trim(match, "#")
-		if v, exists := vars[varName]; exists {
-			script = strings.Replace(script, match, v, 1)
-		}
-	}
-
-	return script
-}
-
-//==============================================================================
-
-// validateParameters validates the variables against the query string
-// of parameters. Plus it loads default values.
-func validateParameters(context interface{}, set *query.Set, vars map[string]string) error {
-
-	// Do we not have parameters.
-	if len(set.Params) == 0 {
-		return nil
-	}
-
-	// Do we not have variables, load the default values.
-	if len(vars) == 0 {
-		for _, p := range set.Params {
-			if p.Default != "" {
-				log.Dev(context, "validateParameters", "Adding : Name[%s] Default[%s]", p.Name, p.Default)
-				vars[p.Name] = p.Default
-			}
-		}
-	}
-
-	var missing []string
-
-	// Validate each know parameter is represented in the variable list.
-	for _, p := range set.Params {
-		if _, ok := vars[p.Name]; !ok {
-
-			// The variable was not provided but we have a
-			// default value for this so use it.
-			if p.Default != "" {
-				log.Dev(context, "validateParameters", "Adding : Name[%s] Default[%s]", p.Name, p.Default)
-				vars[p.Name] = p.Default
-				continue
-			}
-
-			// We are missing the parameter.
-			missing = append(missing, p.Name)
-		}
-	}
-
-	// Were there missing parameters.
-	if missing == nil {
-		return nil
-	}
-
-	return fmt.Errorf("Variables [%s] were not included with the call", strings.Join(missing, ","))
 }
 
 //==============================================================================
@@ -137,14 +68,139 @@ func loadPrePostScripts(context interface{}, db *db.DB, set *query.Set) error {
 	// pre/post scripts is maintained, this is simplified.
 	for i := range set.Queries {
 		if set.PreScript != "" {
-			scripts[0].Commands = append(scripts[0].Commands, set.Queries[i].Scripts...)
-			set.Queries[i].Scripts = scripts[0].Commands
+			scripts[0].Commands = append(scripts[0].Commands, set.Queries[i].Commands...)
+			set.Queries[i].Commands = scripts[0].Commands
 		}
 
 		if set.PstScript != "" {
-			set.Queries[i].Scripts = append(set.Queries[i].Scripts, scripts[1].Commands...)
+			set.Queries[i].Commands = append(set.Queries[i].Commands, scripts[1].Commands...)
 		}
 	}
 
 	return nil
+}
+
+//==============================================================================
+
+// Exec executes the specified query set by name.
+func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result {
+	log.Dev(context, "Exec", "Started : Name[%s]", set.Name)
+
+	// Validate the set that is provided.
+	if err := set.Validate(); err != nil {
+		return errResult(context, err)
+	}
+
+	// Is the rule enabled.
+	if !set.Enabled {
+		return errResult(context, errors.New("Set disabled"))
+	}
+
+	// If we have been provided a nil map, make one.
+	if vars == nil {
+		vars = make(map[string]string)
+	}
+
+	// Did we get everything we need. Also load defaults.
+	if err := validateParameters(context, set, vars); err != nil {
+		return errResult(context, err)
+	}
+
+	// Load the pre/post scripts.
+	if err := loadPrePostScripts(context, db, set); err != nil {
+		return errResult(context, err)
+	}
+
+	// Final results of running the set of queries.
+	var results []docs
+
+	// Iterate of the set of queries.
+	for _, q := range set.Queries {
+		var result docs
+		var err error
+
+		// We only have pipeline right now.
+		switch strings.ToLower(q.Type) {
+		case "pipeline":
+			result, err = executePipeline(context, db, &q, vars)
+		}
+
+		// Was there an error processing the query.
+		if err != nil {
+
+			// Were we told to continue to the next one.
+			if q.Continue {
+
+				// Go execute the next query starting over.
+				continue
+			}
+
+			// We need to return an error result.
+			return errResult(context, err)
+		}
+
+		// Append these results to the final set.
+		if q.Return {
+			results = append(results, result)
+		}
+	}
+
+	// Setup the result we will return.
+	r := query.Result{
+		Results: results,
+	}
+
+	log.Dev(context, "Exec", "Completed : \n%s\n", mongo.Query(results))
+	return &r
+}
+
+//==============================================================================
+
+// executePipeline executes the sepcified pipeline query.
+func executePipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string) (docs, error) {
+
+	// Validate we have scripts to run.
+	if len(q.Commands) == 0 {
+		return docs{}, errors.New("Invalid pipeline script")
+	}
+
+	var pipeline []bson.M
+
+	// Iterate over the scripts building the pipeline.
+	for _, command := range q.Commands {
+
+		// Do we have variables to be substitued.
+		if vars != nil {
+			command = PreProcess(command, vars)
+		}
+
+		// Add the operation to the slice for the pipeline.
+		pipeline = append(pipeline, command)
+	}
+
+	collName := q.Collection
+
+	// Build the pipeline function for the execution.
+	var results []bson.M
+	f := func(c *mgo.Collection) error {
+		var ops string
+		for _, op := range pipeline {
+			ops += mongo.Query(op) + ",\n"
+		}
+
+		log.Dev(context, "executePipeline", "MGO :\ndb.%s.aggregate([\n%s])", c.Name, ops)
+		return c.Pipe(pipeline).All(&results)
+	}
+
+	// Execute the pipeline.
+	if err := db.ExecuteMGO(context, collName, f); err != nil {
+		return docs{}, err
+	}
+
+	// If there were no results, return an empty array.
+	if results == nil {
+		results = []bson.M{}
+	}
+
+	return docs{q.Name, results}, nil
 }

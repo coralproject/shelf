@@ -17,8 +17,8 @@ func init() {
 
 // Script contain pre and post commands to use per set or per query.
 type Script struct {
-	Name     string   `bson:"name" json:"name" validate:"required,min=3"` // Unique name per Script document
-	Commands []string `bson:"commands" json:"commands"`                   // Commands to add to a query.
+	Name     string                   `bson:"name" json:"name" validate:"required,min=3"` // Unique name per Script document
+	Commands []map[string]interface{} `bson:"commands" json:"commands"`                   // Commands to add to a query.
 }
 
 // Validate checks the query value for consistency.
@@ -32,4 +32,22 @@ func (scr *Script) Validate() error {
 	}
 
 	return nil
+}
+
+// PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+func (scr *Script) PrepareForInsert() {
+
+	// Fix the commands so it can be inserted.
+	for c := range scr.Commands {
+		prepareForInsert(scr.Commands[c])
+	}
+}
+
+// PrepareForUse replaces the `_$` to `$` when found in the front of field names.
+func (scr *Script) PrepareForUse() {
+
+	// Fix the commands so it can be inserted.
+	for c := range scr.Commands {
+		prepareForUse(scr.Commands[c])
+	}
 }

@@ -2,17 +2,16 @@
    "name":"top_commenters_by_likes",
    "desc":"Shows the top 20 commenters by number of likes on comments",
    "enabled":true,
-   "params":null,
    "queries":[
       {
          "name":"top_commenters_by_likes",
          "type":"pipeline",
          "collection":"nyt_coral_comments",
          "return":true,
-         "scripts":[
-            "{ \"$group\": { \"_id\": { \"user_id\": \"$user_id\" }, \"recommendationCount\": { \"$sum\": 1 } } }",
-            "{ \"$sort\": { \"recommendationCount\": -1 } }",
-            "{ \"$limit\": 20 }"
+         "commands":[
+            { "$group": { "_id": { "user_id": "$user_id" }, "recommendationCount": { "$sum": 1 } } },
+            { "$sort": { "recommendationCount": -1 } },
+            { "$limit": 20 }
          ]
       }
    ]
