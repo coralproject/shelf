@@ -9,6 +9,10 @@ import (
 )
 
 // PreProcess walks the document preprocessing it for use.
+//
+// We need to find and process variables. In some cases we are just replacing
+// the variable name for what is in the map. If we have dates and objectid,
+// that requires more work to convert to proper types.
 func PreProcess(commands map[string]interface{}, vars map[string]string) {
 	for key, value := range commands {
 
@@ -49,7 +53,7 @@ func PreProcess(commands map[string]interface{}, vars map[string]string) {
 	}
 }
 
-// renderCommand replaces variables inside of a query command.
+// parse replaces variables inside of a query command.
 func parse(varsub string, vars map[string]string) interface{} {
 
 	// We now have the following expressions.
