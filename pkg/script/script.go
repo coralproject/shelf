@@ -6,7 +6,6 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -44,6 +43,10 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 
 		new = true
 	}
+
+	// Fix the set so it can be inserted.
+	scr.PrepareForInsert()
+	defer scr.PrepareForUse()
 
 	// Insert or update the Set.
 	f := func(c *mgo.Collection) error {
@@ -155,6 +158,11 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 		return nil, err
 	}
 
+	// Fix the scripts so they can be used for processing.
+	for i := range scrs {
+		scrs[i].PrepareForUse()
+	}
+
 	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
 	return scrs, nil
 }
@@ -178,6 +186,9 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 		log.Error(context, "GetByName", err, "Completed")
 		return nil, err
 	}
+
+	// Fix the script so it can be used for processing.
+	scr.PrepareForUse()
 
 	log.Dev(context, "GetByName", "Completed : Script[%+v]", &scr)
 	return &scr, nil
@@ -229,6 +240,11 @@ next:
 		}
 	}
 
+	// Fix the scripts so they can be used for processing.
+	for i := range scripts {
+		scripts[i].PrepareForUse()
+	}
+
 	log.Dev(context, "GetByNames", "Completed : Scripts[%+v]", scripts)
 	return scripts, nil
 }
@@ -264,6 +280,9 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}
+
+	// Fix the script so it can be used for processing.
+	result.Scripts[0].PrepareForUse()
 
 	log.Dev(context, "GetLastHistoryByName", "Completed : Script[%+v]", &result.Scripts[0])
 	return &result.Scripts[0], nil
