@@ -2,18 +2,15 @@
    "name":"comments_by_asset",
    "desc":"Shows comments on and asset, sorted by date desc",
    "enabled":true,
-   "params":null,
    "queries":[
       {
          "name":"comments_by_asset",
          "type":"pipeline",
          "collection":"nyt_coral_comments",
          "return":true,
-         "scripts":[
-
-            "{ \"$match\": { \"asset_id\": #asset_id# } }",
-            "{ \"$sort\": { \"createDate\": -1 } }"
-
+         "commands":[
+            { "$match": { "asset_id": "#number:asset_id" } },
+            { "$sort": { "createDate": -1 } }
          ]
       }
    ]

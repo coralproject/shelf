@@ -136,9 +136,8 @@ func TestGetScriptNames(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(names), names)
@@ -204,9 +203,8 @@ func TestGetScripts(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scrs), scrs)
@@ -267,9 +265,8 @@ func TestGetScriptByNames(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scripts), scripts)
@@ -319,7 +316,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr1.Commands = append(scr1.Commands, "Command 4")
+			scr1.Commands = append(scr1.Commands, map[string]interface{}{"command": 4})
 
 			if err := script.Upsert(tests.Context, db, scr1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
@@ -375,7 +372,7 @@ func TestUpsertUpdateScript(t *testing.T) {
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
 			scr2 := *scr1
-			scr2.Commands = append(scr2.Commands, "Command 4")
+			scr2.Commands = append(scr2.Commands, map[string]interface{}{"command": 4})
 
 			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a script record: %s", tests.Failed, err)

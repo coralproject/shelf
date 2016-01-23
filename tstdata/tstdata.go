@@ -5,13 +5,12 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/pkg/exec"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 	"gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // CollectionExecTest contains the name of the collection that is
@@ -41,29 +40,23 @@ func Generate(db *db.DB) error {
 		return err
 	}
 
-	var rawDocs []bson.M
-	if err := json.Unmarshal(data, &rawDocs); err != nil {
+	var docs []map[string]interface{}
+	if err := json.Unmarshal(data, &docs); err != nil {
 		return err
 	}
 
-	var docs []interface{}
-	for _, rd := range rawDocs {
-		mar, err := json.Marshal(rd)
-		if err != nil {
-			return err
-		}
+	for i := range docs {
+		docs[i] = exec.PreProcess(docs[i], map[string]string{})
+	}
 
-		q := query.Query{HasDate: true}
-		doc, err := q.UmarshalMongoScript(string(mar))
-		if err != nil {
-			return err
-		}
-
-		docs = append(docs, doc)
+	// The Insert calls requires this converstion.
+	var insDocs []interface{}
+	for _, doc := range docs {
+		insDocs = append(insDocs, doc)
 	}
 
 	f := func(c *mgo.Collection) error {
-		return c.Insert(docs...)
+		return c.Insert(insDocs...)
 	}
 
 	if err := db.ExecuteMGO(tests.Context, CollectionExecTest, f); err != nil {

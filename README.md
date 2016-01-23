@@ -78,6 +78,24 @@ export XENIA_AUTH=false          # Default is `true` if missing
 
 _Be careful not to commit any database passwords back to the repo!!_
 
+### Running Tests
+
+You can run tests in the `app` and `pkg` folder.
+
+If you plan to run tests in parallel please use this command:
+
+```
+go test -cpu 1 ./...
+```
+
+You can alway run indivdual tests in each package using just:
+
+```
+go test
+```
+
+Do not run tests in the vendor folder.
+
 ### Build the CLI tool
 
 Xenia has a CLI tool that allows you to manage endpoints and perform other actions.
@@ -220,7 +238,6 @@ output:
     "name": "basic",
     "desc": "Shows a basic multi result query.",
     "enabled": true,
-    "params": [],
     "queries": [
         {
             "name": "Basic",
@@ -228,8 +245,8 @@ output:
             "collection": "test_bill",
             "return": true,
             "scripts": [
-                "{\"$match\": {\"station_id\" : \"42021\"}}",
-                "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+                {"$match": {"station_id" : "42021"}},
+                {"$project": {"_id": 0, "name": 1}}
             ]
         },
         {
@@ -237,11 +254,10 @@ output:
             "type": "pipeline",
             "collection": "test_bill",
             "return": true,
-            "has_date": true,
             "scripts": [
-                "{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}",
-                "{\"$project\": {\"_id\": 0, \"name\": 1}}",
-                "{\"$limit\": 2}"
+                {"$match": {"condition.date" : {"$gt": "#date:2013-01-01"}}},
+                {"$project": {"_id": 0, "name": 1}},
+                {"$limit": 2}
             ]
         }
     ]
@@ -317,7 +333,6 @@ Here's a basic query set document containing two pipeline calls and using a vari
    "name":"basic",
    "desc":"Shows a basic multi result query.",
    "enabled":true,
-   "params":null,
    "queries":[
       {
          "name":"Basic",
@@ -325,8 +340,8 @@ Here's a basic query set document containing two pipeline calls and using a vari
          "collection":"test_bill",
          "return":true,
          "scripts":[
-            "{\"$match\": {\"station_id\" : \"#station_id#\"}}",
-            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+            {"$match": {"station_id" : "#station_id#"}},
+            {"$project": {"_id": 0, "name": 1}}
          ]
       },
       {
@@ -334,11 +349,10 @@ Here's a basic query set document containing two pipeline calls and using a vari
          "type":"pipeline",
          "collection":"test_bill",
          "return":true,
-         "has_date":true,
          "scripts":[
-            "{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}",
-            "{\"$project\": {\"_id\": 0, \"name\": 1}}",
-            "{\"$limit\": 2}"
+            {"$match": {"condition.date" : {"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+            {"$project": {"_id": 0, "name": 1}},
+            {"$limit": 2}
          ]
       }
    ]

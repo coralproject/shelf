@@ -1,11 +1,9 @@
 package query
 
 import (
-	"encoding/json"
 	"errors"
 
 	"gopkg.in/bluesuncorp/validator.v8"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // Set of query types we expect to receive.
@@ -35,15 +33,13 @@ type Result struct {
 
 // Query contains the configuration details for a query.
 type Query struct {
-	Name        string   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
-	Description string   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
-	Type        string   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
-	Collection  string   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
-	Scripts     []string `bson:"scripts" json:"scripts"`                                                     // Scripts to process for the query.
-	Continue    bool     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
-	Return      bool     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
-	HasDate     bool     `bson:"has_date,omitempty" json:"has_date,omitempty"`                               // Indicates there is a date to be pre-processed in the scripts.
-	HasObjectID bool     `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`                       // Indicates there is an ObjectId to be pre-processed in the scripts.
+	Name        string                   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
+	Description string                   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
+	Type        string                   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
+	Collection  string                   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
+	Commands    []map[string]interface{} `bson:"commands" json:"commands"`                                                   // Commands to process for the query.
+	Continue    bool                     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
+	Return      bool                     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
 }
 
 // Validate checks the query value for consistency.
@@ -52,8 +48,8 @@ func (q *Query) Validate() error {
 		return err
 	}
 
-	if len(q.Scripts) == 0 {
-		return errors.New("No scripts exist")
+	if len(q.Commands) == 0 {
+		return errors.New("No commands exist")
 	}
 
 	switch q.Type {
@@ -61,8 +57,8 @@ func (q *Query) Validate() error {
 		// Place holder since things are good.
 
 	case TypeTemplate:
-		if len(q.Scripts) > 1 {
-			return errors.New("Invalid number of scripts")
+		if len(q.Commands) > 1 {
+			return errors.New("Invalid number of commands")
 		}
 
 	default:
@@ -70,24 +66,6 @@ func (q *Query) Validate() error {
 	}
 
 	return nil
-}
-
-// UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
-func (q *Query) UmarshalMongoScript(script string) (bson.M, error) {
-	query := []byte(script)
-
-	var op bson.M
-	if err := json.Unmarshal(query, &op); err != nil {
-		return nil, err
-	}
-
-	// We have the HasDate and HasObjectID to prevent us from
-	// trying to process these things when it is not necessary.
-	if q != nil && (q.HasDate || q.HasObjectID) {
-		op = mongoExtensions(op, q)
-	}
-
-	return op, nil
 }
 
 //==============================================================================
@@ -126,4 +104,26 @@ func (s *Set) Validate() error {
 	}
 
 	return nil
+}
+
+// PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+func (s *Set) PrepareForInsert() {
+
+	// Fix the commands so it can be inserted.
+	for q := range s.Queries {
+		for c := range s.Queries[q].Commands {
+			prepareForInsert(s.Queries[q].Commands[c])
+		}
+	}
+}
+
+// PrepareForUse replaces the `_$` to `$` when found in the front of field names.
+func (s *Set) PrepareForUse() {
+
+	// Fix the commands so it can be inserted.
+	for q := range s.Queries {
+		for c := range s.Queries[q].Commands {
+			prepareForUse(s.Queries[q].Commands[c])
+		}
+	}
 }

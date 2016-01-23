@@ -1,8 +1,8 @@
 [
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-10-30T16:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.288+0000\")", 
+			"date" : "#date:2012-10-30T16:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.288Z", 
 			"observation_time" : "Last Updated on Oct 30 2012, 11:00 am CDT", 
 			"observation_time_rfc822" : "Tue, 30 Oct 2012 11:00:00 -0500", 
 			"weather" : "", 
@@ -47,8 +47,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.113+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.113Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -93,8 +93,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.349+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.349Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -139,8 +139,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.289+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.289Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -185,8 +185,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.205+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.205Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -231,8 +231,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2013-01-09T16:04:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.117+0000\")", 
+			"date" : "#date:2013-01-09T16:04:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.117Z", 
 			"observation_time" : "Last Updated on Jan 9 2013, 11:04 am EST", 
 			"observation_time_rfc822" : "Wed, 09 Jan 2013 11:04:00 -0500", 
 			"weather" : "", 
@@ -277,8 +277,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.210+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.210Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -323,8 +323,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2013-02-07T19:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.286+0000\")", 
+			"date" : "#date:2013-02-07T19:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.286Z", 
 			"observation_time" : "Last Updated on Feb 7 2013, 10:50 am AKST", 
 			"observation_time_rfc822" : "Thu, 07 Feb 2013 10:50:00 -0900", 
 			"weather" : "", 
@@ -369,8 +369,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.274+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.274Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -415,8 +415,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.226+0000\")", 
+			"date" : "#date:2015-12-09T03:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.226Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 11:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 23:50:00 -0400", 
 			"weather" : "", 
@@ -461,8 +461,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:40:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.160+0000\")", 
+			"date" : "#date:2015-12-09T03:40:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.160Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 11:40 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 23:40:00 -0400", 
 			"weather" : "", 
@@ -507,8 +507,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-11-13T16:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.156+0000\")", 
+			"date" : "#date:2012-11-13T16:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.156Z", 
 			"observation_time" : "Last Updated on Nov 13 2012, 6:50 am HST", 
 			"observation_time_rfc822" : "Tue, 13 Nov 2012 06:50:00 -1000", 
 			"weather" : "", 
@@ -553,8 +553,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.107+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.107Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -599,8 +599,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T02:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.116+0000\")", 
+			"date" : "#date:2015-12-09T02:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.116Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:50 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:50:00 -0400", 
 			"weather" : "", 
@@ -645,8 +645,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2011-11-09T15:45:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.160+0000\")", 
+			"date" : "#date:2011-11-09T15:45:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.160Z", 
 			"observation_time" : "Last Updated on Nov 9 2011, 7:45 am PST", 
 			"observation_time_rfc822" : "Wed, 09 Nov 2011 07:45:00 -0800", 
 			"weather" : "", 
@@ -691,8 +691,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2011-09-29T15:16:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.159+0000\")", 
+			"date" : "#date:2011-09-29T15:16:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.159Z", 
 			"observation_time" : "Last Updated on Sep 29 2011, 8:16 am PDT", 
 			"observation_time_rfc822" : "Thu, 29 Sep 2011 08:16:00 -0700", 
 			"weather" : "", 
@@ -737,10 +737,10 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2011-12-10T14:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.109+0000\")", 
+			"date" : "#date:2011-12-10T14:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.109Z", 
 			"observation_time" : "Last Updated on Dec 10 2011, 2:00 pm ST ", 
-			"observation_time_rfc822" : "Sat, 10 Dec 2011 14:00:00 +0000", 
+			"observation_time_rfc822" : "Sat, 10 Dec 2011 14:00:00 Z", 
 			"weather" : "", 
 			"temperature_string" : "50.7 F (10.4 C)", 
 			"temp_f" : 50.7, 
@@ -783,10 +783,10 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-09-28T12:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.185+0000\")", 
+			"date" : "#date:2012-09-28T12:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.185Z", 
 			"observation_time" : "Last Updated on Sep 28 2012, 12:00 pm ST ", 
-			"observation_time_rfc822" : "Fri, 28 Sep 2012 12:00:00 +0000", 
+			"observation_time_rfc822" : "Fri, 28 Sep 2012 12:00:00 Z", 
 			"weather" : "", 
 			"temperature_string" : "55.4 F (13.0 C)", 
 			"temp_f" : 55.4, 
@@ -829,8 +829,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-05-14T20:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.263+0000\")", 
+			"date" : "#date:2015-05-14T20:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.263Z", 
 			"observation_time" : "Last Updated on May 14 2015, 2:00 pm MDT", 
 			"observation_time_rfc822" : "Thu, 14 May 2015 14:00:00 -0600", 
 			"weather" : "", 
@@ -875,8 +875,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2011-10-01T10:50:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.281+0000\")", 
+			"date" : "#date:2011-10-01T10:50:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.281Z", 
 			"observation_time" : "Last Updated on Oct 1 2011, 5:50 am EST", 
 			"observation_time_rfc822" : "Sat, 01 Oct 2011 05:50:00 -0500", 
 			"weather" : "", 
@@ -921,8 +921,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:30:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.277+0000\")", 
+			"date" : "#date:2015-12-09T03:30:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.277Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 11:30 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 23:30:00 -0400", 
 			"weather" : "", 
@@ -967,8 +967,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-12-27T15:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.134+0000\")", 
+			"date" : "#date:2012-12-27T15:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.134Z", 
 			"observation_time" : "Last Updated on Dec 27 2012, 7:00 am PST", 
 			"observation_time_rfc822" : "Thu, 27 Dec 2012 07:00:00 -0800", 
 			"weather" : "", 
@@ -1013,8 +1013,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:00:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.283+0000\")", 
+			"date" : "#date:2015-12-09T03:00:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.283Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 11:00 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 23:00:00 -0400", 
 			"weather" : "", 
@@ -1059,8 +1059,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:40:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.339+0000\")", 
+			"date" : "#date:2015-12-09T03:40:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.339Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 11:40 pm AST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 23:40:00 -0400", 
 			"weather" : "", 
@@ -1105,8 +1105,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-11-17T19:30:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.254+0000\")", 
+			"date" : "#date:2012-11-17T19:30:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.254Z", 
 			"observation_time" : "Last Updated on Nov 17 2012, 1:30 pm CST", 
 			"observation_time_rfc822" : "Sat, 17 Nov 2012 13:30:00 -0600", 
 			"weather" : "", 
@@ -1151,8 +1151,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.161+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.161Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 8:55 pm MST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 20:55:00 -0700", 
 			"weather" : "Fair", 
@@ -1197,8 +1197,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:52:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.211+0000\")", 
+			"date" : "#date:2015-12-09T03:52:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.211Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:52 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:52:00 -0600", 
 			"weather" : "Fog/Mist", 
@@ -1243,8 +1243,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.267+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.267Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1289,8 +1289,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.134+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.134Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1335,8 +1335,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.115+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.115Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "", 
@@ -1381,8 +1381,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:56:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.260+0000\")", 
+			"date" : "#date:2015-12-09T03:56:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.260Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:56 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:56:00 -0600", 
 			"weather" : "Fair", 
@@ -1427,8 +1427,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.287+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.287Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1473,8 +1473,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.336+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.336Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:55 pm EST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:55:00 -0500", 
 			"weather" : "Fair", 
@@ -1519,8 +1519,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:56:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.164+0000\")", 
+			"date" : "#date:2015-12-09T03:56:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.164Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 8:56 pm MST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 20:56:00 -0700", 
 			"weather" : "", 
@@ -1565,8 +1565,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.256+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.256Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 8:55 pm MST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 20:55:00 -0700", 
 			"weather" : "Fair", 
@@ -1611,8 +1611,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.276+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.276Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1657,8 +1657,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2014-07-21T15:17:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.290+0000\")", 
+			"date" : "#date:2014-07-21T15:17:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.290Z", 
 			"observation_time" : "Last Updated on Jul 21 2014, 9:17 am MDT", 
 			"observation_time_rfc822" : "Mon, 21 Jul 2014 09:17:00 -0600", 
 			"weather" : "Fair", 
@@ -1703,8 +1703,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.271+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.271Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1749,8 +1749,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.193+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.193Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 10:55 pm EST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 22:55:00 -0500", 
 			"weather" : "Partly Cloudy", 
@@ -1795,8 +1795,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.228+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.228Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 8:55 pm MST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 20:55:00 -0700", 
 			"weather" : "Fair", 
@@ -1841,8 +1841,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2012-09-30T12:58:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.272+0000\")", 
+			"date" : "#date:2012-09-30T12:58:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.272Z", 
 			"observation_time" : "Last Updated on Sep 30 2012, 6:58 am MDT", 
 			"observation_time_rfc822" : "Sun, 30 Sep 2012 06:58:00 -0600", 
 			"weather" : "Clear", 
@@ -1887,8 +1887,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.275+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.275Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -1933,8 +1933,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:53:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.289+0000\")", 
+			"date" : "#date:2015-12-09T03:53:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.289Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:53 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:53:00 -0600", 
 			"weather" : "", 
@@ -1979,8 +1979,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:54:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.195+0000\")", 
+			"date" : "#date:2015-12-09T03:54:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.195Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 8:54 pm MST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 20:54:00 -0700", 
 			"weather" : "Fair", 
@@ -2025,8 +2025,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2014-12-08T23:15:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.280+0000\")", 
+			"date" : "#date:2014-12-08T23:15:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.280Z", 
 			"observation_time" : "Last Updated on Dec 8 2014, 5:15 pm CST", 
 			"observation_time_rfc822" : "Mon, 08 Dec 2014 17:15:00 -0600", 
 			"weather" : "Clear", 
@@ -2071,8 +2071,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.338+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.338Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Partly Cloudy", 
@@ -2117,8 +2117,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:56:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.335+0000\")", 
+			"date" : "#date:2015-12-09T03:56:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.335Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:56 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:56:00 -0600", 
 			"weather" : "", 
@@ -2163,8 +2163,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.279+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.279Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -2209,8 +2209,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:55:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.368+0000\")", 
+			"date" : "#date:2015-12-09T03:55:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.368Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:55 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:55:00 -0600", 
 			"weather" : "Fair", 
@@ -2255,8 +2255,8 @@
 	},
 	{ 
 		"condition" : {
-			"date" : "ISODate(\"2015-12-09T03:54:00.000+0000\")", 
-			"update_date" : "ISODate(\"2015-12-09T04:27:02.285+0000\")", 
+			"date" : "#date:2015-12-09T03:54:00.000Z", 
+			"update_date" : "#date:2015-12-09T04:27:02.285Z", 
 			"observation_time" : "Last Updated on Dec 8 2015, 9:54 pm CST", 
 			"observation_time_rfc822" : "Tue, 08 Dec 2015 21:54:00 -0600", 
 			"weather" : "Fair", 

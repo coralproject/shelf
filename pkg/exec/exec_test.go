@@ -33,53 +33,65 @@ func init() {
 
 //==============================================================================
 
-// TestUmarshalMongoScript tests the ability to convert string based Mongo
-// commands into a bson map for processing.
-func TestUmarshalMongoScript(t *testing.T) {
+// TestPreProcessing tests the ability to preprocess json documents.
+func TestPreProcessing(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scripts := []struct {
-		text string
-		qry  *query.Query
-		cmp  bson.M
+	time1, _ := time.Parse("2006-01-02T15:04:05.999Z", "2013-01-16T00:00:00.000Z")
+	time2, _ := time.Parse("2006-01-02", "2013-01-16")
+
+	commands := []struct {
+		before map[string]interface{}
+		vars   map[string]string
+		after  map[string]interface{}
 	}{
 		{
-			`{"name":"bill"}`,
-			nil,
-			bson.M{"name": "bill"},
+			map[string]interface{}{"field_name": "#string:name"},
+			map[string]string{"name": "bill"},
+			map[string]interface{}{"field_name": "bill"},
 		},
 		{
-			`{"date":"ISODate('2013-01-16T00:00:00.000Z')"}`,
-			&query.Query{HasDate: true},
-			bson.M{"date": time.Date(2013, time.January, 16, 0, 0, 0, 0, time.UTC)},
+			map[string]interface{}{"field_name": "#number:value"},
+			map[string]string{"value": "10"},
+			map[string]interface{}{"field_name": 10},
 		},
 		{
-			`{"_id":"ObjectId(\"5660bc6e16908cae692e0593\")"}`,
-			&query.Query{HasObjectID: true},
-			bson.M{"_id": bson.ObjectIdHex("5660bc6e16908cae692e0593")},
+			map[string]interface{}{"field_name": "#date:value"},
+			map[string]string{"value": "2013-01-16T00:00:00.000Z"},
+			map[string]interface{}{"field_name": time1},
+		},
+		{
+			map[string]interface{}{"field_name": "#date:value"},
+			map[string]string{"value": "2013-01-16"},
+			map[string]interface{}{"field_name": time2},
+		},
+		{
+			map[string]interface{}{"field_name": "#date:2013-01-16T00:00:00.000Z"},
+			map[string]string{},
+			map[string]interface{}{"field_name": time1},
+		},
+		{
+			map[string]interface{}{"field_name": "#objid:value"},
+			map[string]string{"value": "5660bc6e16908cae692e0593"},
+			map[string]interface{}{"field_name": bson.ObjectIdHex("5660bc6e16908cae692e0593")},
 		},
 	}
 
-	t.Logf("Given the need to convert mongo commands.")
+	t.Logf("Given the need to preprocess commands.")
 	{
-		for _, script := range scripts {
-			t.Logf("\tWhen using %s with %+v", script.text, script.qry)
+		for _, cmd := range commands {
+			t.Logf("\tWhen using %+v with %+v", cmd.before, cmd.vars)
 			{
-				b, err := script.qry.UmarshalMongoScript(script.text)
-				if err != nil {
-					t.Errorf("\t%s\tShould be able to convert without an error : %v", tests.Failed, err)
-					continue
-				}
-				t.Logf("\t%s\tShould be able to convert without an error.", tests.Success)
+				after := exec.PreProcess(cmd.before, cmd.vars)
 
-				if eq := compareBson(b, script.cmp); !eq {
-					t.Log(b)
-					t.Log(script.cmp)
-					t.Errorf("\t%s\tShould get back the expected bson document.", tests.Failed)
+				if eq := compareBson(after, cmd.after); !eq {
+					t.Log(after)
+					t.Log(cmd.after)
+					t.Errorf("\t%s\tShould get back the expected document.", tests.Failed)
 					continue
 				}
-				t.Logf("\t%s\tShould get back the expected bson document.", tests.Success)
+				t.Logf("\t%s\tShould get back the expected document.", tests.Success)
 			}
 		}
 	}
@@ -103,7 +115,7 @@ func TestExecuteSet(t *testing.T) {
 		for _, es := range execSet {
 			t.Logf("\tWhen using Execute Set %s", es.set.Name)
 			{
-				result := exec.Set(tests.Context, db, es.set, es.vars)
+				result := exec.Exec(tests.Context, db, es.set, es.vars)
 				if !es.fail {
 					if result.Error {
 						t.Errorf("\t%s\tShould be able to execute the query set : %+v", tests.Failed, result.Results)
@@ -132,9 +144,19 @@ func TestExecuteSet(t *testing.T) {
 				}
 				t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
 
-				if string(data) != es.result {
+				var found bool
+				for _, rslt := range es.results {
+					if string(data) == rslt {
+						found = true
+						break
+					}
+				}
+
+				if !found {
 					t.Log(string(data))
-					t.Log(es.result)
+					for _, rslt := range es.results {
+						t.Log(rslt)
+					}
 					t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
 					continue
 				}
@@ -193,10 +215,10 @@ func unloadTestData(t *testing.T, db *db.DB) {
 
 // execSet represents the table for the table test of execution tests.
 type execSet struct {
-	fail   bool
-	set    *query.Set
-	vars   map[string]string
-	result string
+	fail    bool
+	set     *query.Set
+	vars    map[string]string
+	results []string
 }
 
 // docs represents what a user will receive after
@@ -215,7 +237,6 @@ func getExecSet() []execSet {
 		querySetWithShortTime(),
 		querySetWithMultiResults(),
 		querySetNoResults(),
-		querySetMalformed(),
 		querySetBasicVars(),
 		querySetBasicMissingVars(),
 		querySetBasicParamDefault(),
@@ -235,39 +256,43 @@ func querySetBasic() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "42021"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "42021"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
 	}
 }
 
-// querySetBasicPrePost executes a simple query with pre/post scripts.
+// querySetBasicPrePost executes a simple query with pre/post commands.
 func querySetBasicPrePost() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
-			Name:      "Basic",
+			Name:      "Basic PrePost",
 			Enabled:   true,
 			PreScript: "STEST_basic_script_pre",
 			PstScript: "STEST_basic_script_pst",
 			Queries: []query.Query{
 				{
-					Name:       "Basic",
+					Name:       "Basic PrePost",
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Basic PrePost","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
 	}
 }
 
@@ -284,16 +309,18 @@ func querySetWithTime() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					HasDate:    true,
-					Scripts: []string{
-						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
-						`{"$limit": 2}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+			`{"results":[{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+		},
 	}
 }
 
@@ -310,16 +337,18 @@ func querySetWithShortTime() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					HasDate:    true,
-					Scripts: []string{
-						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01\")"}}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
-						`{"$limit": 2}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#date:2013-01-01"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Short Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Short Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+			`{"results":[{"Name":"Short Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+		},
 	}
 }
 
@@ -328,7 +357,7 @@ func querySetWithMultiResults() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
-			Name:    "MultiResults",
+			Name:    "Multi Results",
 			Enabled: true,
 			Queries: []query.Query{
 				{
@@ -336,9 +365,9 @@ func querySetWithMultiResults() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "42021"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "42021"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 				{
@@ -346,16 +375,18 @@ func querySetWithMultiResults() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					HasDate:    true,
-					Scripts: []string{
-						`{"$match": {"condition.date" : {"$gt": "ISODate(\"2013-01-01T00:00:00.000Z\")"}}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
-						`{"$limit": 2}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+		},
 	}
 }
 
@@ -364,7 +395,7 @@ func querySetNoResults() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
-			Name:    "NoResults",
+			Name:    "No Results",
 			Enabled: true,
 			Queries: []query.Query{
 				{
@@ -372,38 +403,16 @@ func querySetNoResults() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "XXXXXX"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "XXXXXX"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"NoResults","Docs":[]}],"error":false}`,
-	}
-}
-
-// querySetMalformed creates a query set with a malformed query.
-func querySetMalformed() execSet {
-	return execSet{
-		fail: true,
-		set: &query.Set{
-			Name:    "Malformed",
-			Enabled: true,
-			Queries: []query.Query{
-				{
-					Name:       "Malformed",
-					Type:       "pipeline",
-					Collection: tstdata.CollectionExecTest,
-					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "XXXXXX"`,
-						`{"$project": {"_id": 0, "name": 1}}`,
-					},
-				},
-			},
+		results: []string{
+			`{"results":[{"Name":"NoResults","Docs":[]}],"error":false}`,
 		},
-		result: `{"results":{"error":"unexpected end of JSON input"},"error":true}`,
 	}
 }
 
@@ -413,7 +422,7 @@ func querySetBasicVars() execSet {
 		fail: false,
 		vars: map[string]string{"station_id": "42021"},
 		set: &query.Set{
-			Name:    "BasicVars",
+			Name:    "Basic Vars",
 			Enabled: true,
 			Params: []query.Param{
 				{Name: "station_id"},
@@ -424,14 +433,16 @@ func querySetBasicVars() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "#station_id#"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
 	}
 }
 
@@ -440,7 +451,7 @@ func querySetBasicMissingVars() execSet {
 	return execSet{
 		fail: true,
 		set: &query.Set{
-			Name:    "MissingVars",
+			Name:    "Missing Vars",
 			Enabled: true,
 			Params: []query.Param{
 				{Name: "station_id"},
@@ -451,14 +462,16 @@ func querySetBasicMissingVars() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "#station_id#"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":{"error":"Variables [station_id] were not included with the call"},"error":true}`,
+		results: []string{
+			`{"results":{"error":"Variables [station_id] were not included with the call"},"error":true}`,
+		},
 	}
 }
 
@@ -467,7 +480,7 @@ func querySetBasicParamDefault() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
-			Name:    "ParamDefault",
+			Name:    "Param Default",
 			Enabled: true,
 			Params: []query.Param{
 				{Name: "station_id", Default: "42021"},
@@ -478,14 +491,16 @@ func querySetBasicParamDefault() execSet {
 					Type:       "pipeline",
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
-					Scripts: []string{
-						`{"$match": {"station_id" : "#station_id#"}}`,
-						`{"$project": {"_id": 0, "name": 1}}`,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
 			},
 		},
-		result: `{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		results: []string{
+			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
 	}
 }
 

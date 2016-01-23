@@ -60,7 +60,7 @@ func execute(c *app.Context, set *query.Set) error {
 		}
 	}
 
-	result := exec.Set(c.SessionID, c.DB, set, vars)
+	result := exec.Exec(c.SessionID, c.DB, set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

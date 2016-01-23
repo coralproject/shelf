@@ -40,13 +40,7 @@ func Get(fileName string) (*script.Script, error) {
 
 // Add inserts a script for testing.
 func Add(db *db.DB, scr *script.Script) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": scr.Name}
-		_, err := c.Upsert(q, scr)
-		return err
-	}
-
-	if err := db.ExecuteMGO(tests.Context, script.Collection, f); err != nil {
+	if err := script.Upsert("", db, scr); err != nil {
 		return err
 	}
 
