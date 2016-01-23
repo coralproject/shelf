@@ -9,7 +9,7 @@ import (
 )
 
 // PreProcess walks the document preprocessing it for use.
-func PreProcess(commands map[string]interface{}, vars map[string]string) map[string]interface{} {
+func PreProcess(commands map[string]interface{}, vars map[string]string) {
 	for key, value := range commands {
 
 		// Test for the type of value we have.
@@ -47,8 +47,6 @@ func PreProcess(commands map[string]interface{}, vars map[string]string) map[str
 			}
 		}
 	}
-
-	return commands
 }
 
 // renderCommand replaces variables inside of a query command.

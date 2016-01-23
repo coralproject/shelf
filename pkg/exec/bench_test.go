@@ -66,17 +66,15 @@ func BenchmarkParseDate(b *testing.B) {
 /*
 	$ go test -run none -bench BenchmarkPP -benchtime 3s -benchmem
 	PASS
-	BenchmarkPPNumber-8	50000000	       113 ns/op	       0 B/op	       0 allocs/op
-	BenchmarkPPString-8	30000000	       126 ns/op	       0 B/op	       0 allocs/op
-	BenchmarkPPDate-8  	30000000	       175 ns/op	       0 B/op	       0 allocs/op
-	ok  	github.com/coralproject/xenia/pkg/exec	15.359s
+	BenchmarkPPNumber-8	50000000	       112 ns/op	       0 B/op	       0 allocs/op
+	BenchmarkPPString-8	30000000	       122 ns/op	       0 B/op	       0 allocs/op
+	BenchmarkPPDate-8  	30000000	       183 ns/op	       0 B/op	       0 allocs/op
+	ok  	github.com/coralproject/xenia/pkg/exec	15.443s
 */
 
-var ppCmds = []map[string]interface{}{
-	{"$match": map[string]interface{}{"duration": "#number:duration"}},
-	{"$match": map[string]interface{}{"target": "#string:target"}},
-	{"$match": map[string]interface{}{"start": map[string]interface{}{"$gte": "#date:start"}}},
-}
+// TODO: Review these benchmarks with community. Since these function alter
+// the existing map, I am not sure the benchmarks are providing an accurate
+// view.
 
 var ppVars = map[string]string{
 	"duration": "10",
@@ -84,34 +82,34 @@ var ppVars = map[string]string{
 	"start":    "2013-01-16T00:00:00.000Z",
 }
 
-var ppRes map[string]interface{}
-
 func BenchmarkPPNumber(b *testing.B) {
-	var res map[string]interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = PreProcess(ppCmds[0], ppVars)
+	cmd := map[string]interface{}{
+		"$match": map[string]interface{}{"duration": "#number:duration"},
 	}
 
-	ppRes = res
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		PreProcess(cmd, ppVars)
+	}
 }
 
 func BenchmarkPPString(b *testing.B) {
-	var res map[string]interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = PreProcess(ppCmds[1], ppVars)
+	cmd := map[string]interface{}{
+		"$match": map[string]interface{}{"target": "#string:target"},
 	}
 
-	ppRes = res
+	for i := 0; i < b.N; i++ {
+		PreProcess(cmd, ppVars)
+	}
 }
 
 func BenchmarkPPDate(b *testing.B) {
-	var res map[string]interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = PreProcess(ppCmds[2], ppVars)
+	cmd := map[string]interface{}{
+		"$match": map[string]interface{}{"start": map[string]interface{}{"$gte": "#date:start"}},
 	}
 
-	ppRes = res
+	for i := 0; i < b.N; i++ {
+		PreProcess(cmd, ppVars)
+	}
 }

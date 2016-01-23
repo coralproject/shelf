@@ -46,7 +46,7 @@ func Generate(db *db.DB) error {
 	}
 
 	for i := range docs {
-		docs[i] = exec.PreProcess(docs[i], map[string]string{})
+		exec.PreProcess(docs[i], map[string]string{})
 	}
 
 	// The Insert calls requires this converstion.
