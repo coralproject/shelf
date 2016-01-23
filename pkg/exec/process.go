@@ -61,7 +61,7 @@ func parse(varsub string, vars map[string]string) interface{} {
 	// {"field": "#objid:variable_name"}
 
 	// Remove the # characters from the left.
-	data := strings.TrimLeft(varsub, "#")
+	data := varsub[1:]
 
 	// Find the first instance of the separator.
 	idx := strings.Index(data, ":")
