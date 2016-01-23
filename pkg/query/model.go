@@ -120,7 +120,7 @@ func (s *Set) PrepareForInsert() {
 // PrepareForUse replaces the `_$` to `$` when found in the front of field names.
 func (s *Set) PrepareForUse() {
 
-	// Fix the commands so it can be inserted.
+	// Fix the commands so things are back to their orginal form.
 	for q := range s.Queries {
 		for c := range s.Queries[q].Commands {
 			prepareForUse(s.Queries[q].Commands[c])

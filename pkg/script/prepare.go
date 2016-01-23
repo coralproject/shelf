@@ -5,6 +5,9 @@ import (
 )
 
 // prepareForInsert walks the document preprocessing keys for insert.
+//
+// MongoDB will not let us save field names with '$' in the beginning or
+// using dot (name.name) notation. We need to change that out to save.
 func prepareForInsert(commands map[string]interface{}) {
 	for key, value := range commands {
 
@@ -47,6 +50,10 @@ func prepareForInsert(commands map[string]interface{}) {
 }
 
 // prepareForUse walks the document preprocessing keys for use.
+//
+// MongoDB will not let us save field names with '$' in the beginning or
+// using dot (name.name) notation. We need to change that out to save. But
+// when we get the document back, we need to replace things back.
 func prepareForUse(commands map[string]interface{}) {
 	for key, value := range commands {
 
