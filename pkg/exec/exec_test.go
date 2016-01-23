@@ -42,9 +42,9 @@ func TestPreProcessing(t *testing.T) {
 	time2, _ := time.Parse("2006-01-02", "2013-01-16")
 
 	commands := []struct {
-		before map[string]interface{}
-		vars   map[string]string
-		after  map[string]interface{}
+		doc   map[string]interface{}
+		vars  map[string]string
+		after map[string]interface{}
 	}{
 		{
 			map[string]interface{}{"field_name": "#string:name"},
@@ -81,12 +81,12 @@ func TestPreProcessing(t *testing.T) {
 	t.Logf("Given the need to preprocess commands.")
 	{
 		for _, cmd := range commands {
-			t.Logf("\tWhen using %+v with %+v", cmd.before, cmd.vars)
+			t.Logf("\tWhen using %+v with %+v", cmd.doc, cmd.vars)
 			{
-				after := exec.PreProcess(cmd.before, cmd.vars)
+				exec.PreProcess(cmd.doc, cmd.vars)
 
-				if eq := compareBson(after, cmd.after); !eq {
-					t.Log(after)
+				if eq := compareBson(cmd.doc, cmd.after); !eq {
+					t.Log(cmd.doc)
 					t.Log(cmd.after)
 					t.Errorf("\t%s\tShould get back the expected document.", tests.Failed)
 					continue

@@ -171,7 +171,7 @@ func executePipeline(context interface{}, db *db.DB, q *query.Query, vars map[st
 
 		// Do we have variables to be substitued.
 		if vars != nil {
-			command = PreProcess(command, vars)
+			PreProcess(command, vars)
 		}
 
 		// Add the operation to the slice for the pipeline.
