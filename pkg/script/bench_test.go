@@ -10,7 +10,7 @@ import (
 /*
 	$ go test -run none -bench . -benchtime 3s -benchmem
 	PASS
-	BenchmarkPrepareForInsert-8	 2000000	      2114 ns/op	      96 B/op	       6 allocs/op
+	BenchmarkPrepareForInsert-8	 2000000	      2074 ns/op	      96 B/op	       6 allocs/op
 	BenchmarkPrepareForUse-8   	 3000000	      1679 ns/op	      16 B/op	       1 allocs/op
 	ok  	github.com/coralproject/xenia/pkg/script	36.236s
 */
@@ -58,11 +58,11 @@ func newIns() map[string]interface{} {
 		"$group": map[string]interface{}{
 			"_id": map[string]interface{}{
 				"day": map[string]interface{}{
-					"$dayOfMonth": "$date_created",
+					"$dayOfMonth": "date_created",
 					"month": map[string]interface{}{
-						"$month": "$date_created",
+						"$month": "date_created",
 						"year": map[string]interface{}{
-							"$year": "$date_created",
+							"$year": "date_created",
 							"comm.ents": map[string]interface{}{
 								"$sum": 1,
 							},
@@ -79,11 +79,11 @@ func newUse() map[string]interface{} {
 		"_$group": map[string]interface{}{
 			"_id": map[string]interface{}{
 				"day": map[string]interface{}{
-					"_$dayOfMonth": "_$date_created",
+					"_$dayOfMonth": "date_created",
 					"month": map[string]interface{}{
-						"_$month": "_$date_created",
+						"_$month": "date_created",
 						"year": map[string]interface{}{
-							"_$year": "_$date_created",
+							"_$year": "date_created",
 							"comm*ents": map[string]interface{}{
 								"_$sum": 1,
 							},

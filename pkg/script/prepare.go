@@ -35,7 +35,7 @@ func prepareForInsert(commands map[string]interface{}) {
 
 			// Replace any key we find starts with $.
 			delete(commands, key)
-			commands["_$"+key[1:]] = value
+			commands["_"+key] = value
 
 		} else {
 
