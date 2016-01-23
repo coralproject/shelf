@@ -136,9 +136,8 @@ func TestGetScriptNames(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(names), names)
@@ -204,9 +203,8 @@ func TestGetScripts(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scrs), scrs)
@@ -267,9 +265,8 @@ func TestGetScriptByNames(t *testing.T) {
 				}
 			}
 
-			// When tests are running in parallel, the STEST_basic_script_pst and
-			// STEST_basic_script_pst scripts may be loaded including others from
-			// the exec tests.
+			// When tests are running in parallel with the query and exec package, we could
+			// have more scripts.
 
 			if count < 2 {
 				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scripts), scripts)
