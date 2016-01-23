@@ -10,17 +10,51 @@ import (
 /*
 	$ go test -run none -bench . -benchtime 3s -benchmem
 	PASS
-	BenchmarkPrepareForInsert-8	10000000	       722 ns/op	       0 B/op	       0 allocs/op
-	BenchmarkPrepareForUse-8   	10000000	       763 ns/op	       0 B/op	       0 allocs/op
-	ok  	github.com/coralproject/xenia/pkg/script	16.433s
+	BenchmarkPrepareForInsert-8	 2000000	      2114 ns/op	      96 B/op	       6 allocs/op
+	BenchmarkPrepareForUse-8   	 3000000	      1679 ns/op	      16 B/op	       1 allocs/op
+	ok  	github.com/coralproject/xenia/pkg/script	36.236s
 */
 
 // TODO: Review these benchmarks with community. Since these function alter
 // the existing map, I am not sure the benchmarks are providing an accurate
 // view.
 
+// BenchmarkPrepareForInsert tests the processing of commands for insert.
 func BenchmarkPrepareForInsert(b *testing.B) {
-	var cmd = map[string]interface{}{
+
+	// Generate a set of unique documents to process.
+	a := make([]map[string]interface{}, b.N)
+	for i := 0; i < b.N; i++ {
+		a[i] = newIns()
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		prepareForInsert(a[i])
+	}
+}
+
+// BenchmarkPrepareForUse tests the processing of commands for use.
+func BenchmarkPrepareForUse(b *testing.B) {
+
+	// Generate a set of unique documents to process.
+	a := make([]map[string]interface{}, b.N)
+	for i := 0; i < b.N; i++ {
+		a[i] = newUse()
+	}
+
+	b.ResetTimer()
+
+	for i := 0; i < b.N; i++ {
+		prepareForUse(a[i])
+	}
+}
+
+//==============================================================================
+
+func newIns() map[string]interface{} {
+	return map[string]interface{}{
 		"$group": map[string]interface{}{
 			"_id": map[string]interface{}{
 				"day": map[string]interface{}{
@@ -38,16 +72,10 @@ func BenchmarkPrepareForInsert(b *testing.B) {
 			},
 		},
 	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		prepareForInsert(cmd)
-	}
 }
 
-func BenchmarkPrepareForUse(b *testing.B) {
-	var cmd = map[string]interface{}{
+func newUse() map[string]interface{} {
+	return map[string]interface{}{
 		"_$group": map[string]interface{}{
 			"_id": map[string]interface{}{
 				"day": map[string]interface{}{
@@ -56,7 +84,7 @@ func BenchmarkPrepareForUse(b *testing.B) {
 						"_$month": "_$date_created",
 						"year": map[string]interface{}{
 							"_$year": "_$date_created",
-							"comm~ents": map[string]interface{}{
+							"comm*ents": map[string]interface{}{
 								"_$sum": 1,
 							},
 						},
@@ -64,11 +92,5 @@ func BenchmarkPrepareForUse(b *testing.B) {
 				},
 			},
 		},
-	}
-
-	b.ResetTimer()
-
-	for i := 0; i < b.N; i++ {
-		prepareForUse(cmd)
 	}
 }
