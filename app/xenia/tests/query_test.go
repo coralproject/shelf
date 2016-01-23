@@ -145,7 +145,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -197,7 +197,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+			resp := `{"name":"QTEST_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -265,7 +265,7 @@ func TestQueryDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"],"return":true}],"enabled":true}`
+			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)

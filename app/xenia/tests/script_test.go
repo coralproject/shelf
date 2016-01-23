@@ -145,7 +145,7 @@ func TestScriptUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":["Command 1","Command 2","Command 3"]}`
+			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -158,7 +158,7 @@ func TestScriptUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Update the Script.
 
-		scr.Commands = append(scr.Commands, "Command 4")
+		scr.Commands = append(scr.Commands, map[string]interface{}{"command": 4})
 
 		scrStrData, err = json.Marshal(&scr)
 		if err != nil {
@@ -197,7 +197,7 @@ func TestScriptUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":["Command 1","Command 2","Command 3","Command 4"]}`
+			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3},{"command":4}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -265,7 +265,7 @@ func TestScriptDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":["Command 1","Command 2","Command 3"]}`
+			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
 
 			if resp != recv {
 				t.Log(resp)

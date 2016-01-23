@@ -70,7 +70,7 @@ func runExec(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	result := exec.Set("", db, set, vars)
+	result := exec.Exec("", db, set, vars)
 
 	data, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {

@@ -9,9 +9,9 @@
          "type":"pipeline",
          "collection":"test_xenia_data",
          "return":true,
-         "scripts":[
-            "{\"$match\": {\"station_id\" : \"42021\"}}",
-            "{\"$project\": {\"_id\": 0, \"name\": 1}}"
+         "commands":[
+            {"$match": {"station_id" : "42021"}},
+            {"$project": {"_id": 0, "name": 1}}
          ]
       }
    ]

@@ -1,0 +1,20 @@
+{ 
+    "name" : "comment_timeseries", 
+    "desc" : "Returns a time series of comments by day.  Totals or broken down by target type user|asset]", 
+    "enabled" : true,
+    "queries" : [
+        {
+            "name" : "comment_timeseries", 
+            "type" : "pipeline", 
+            "collection" : "comment_timeseries", 
+            "return" : true,
+            "commands" : [
+                { "$match": { "start": {"$gte" : "#date:start" } } }, 
+                { "$match": { "start": {"$lt" : "#date:end" } } }, 
+                { "$match": { "duration": "#string:duration" } }, 
+                { "$match": { "target": "#string:target" } }, 
+                { "$sort": { "start": 1 } }
+            ]
+        }
+    ]
+}
