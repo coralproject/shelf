@@ -53,10 +53,17 @@ GetSession returns a copy of the master session for use.
 
 ## func Init
 ``` go
-func Init() error
+func Init(cfg Config) error
 ```
 Init sets up the MongoDB environment. This expects that the
 cfg package has been initialized first.
+
+
+## func New
+``` go
+func New(cfg Config) (*mgo.Session, error)
+```
+New creates a new master session.
 
 
 ## func Query
@@ -64,6 +71,28 @@ cfg package has been initialized first.
 func Query(value interface{}) string
 ```
 Query provides a string version of the value
+
+
+
+## type Config
+``` go
+type Config struct {
+    Host     string
+    AuthDB   string
+    DB       string
+    User     string
+    Password string
+}
+```
+Config provides configuration values.
+
+
+
+
+
+
+
+
 
 
 
