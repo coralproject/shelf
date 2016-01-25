@@ -149,8 +149,24 @@ go build
 
 output:
 
-2015/12/14 21:04:42 app.go:161: DEV : startup : Run : Start : cfgHost[XENIA_HOST] defaultHost[:4000]
-2015/12/14 21:04:42 app.go:171: DEV : listener : Run : Listening on: :4000
+Config Settings: XENIA
+MONGO_USER=coral-user
+MONGO_DB=coral
+LOGGING_LEVEL=1
+MONGO_HOST=10.0.1.90:27017
+MONGO_AUTHDB=coral
+HOST=:4000
+
+2016/01/25 17:03:31 main.go:25: USER : startup : Init : Revision     : "123123123123"
+2016/01/25 17:03:31 main.go:26: USER : startup : Init : Version      : "8e830ff"
+2016/01/25 17:03:31 main.go:27: USER : startup : Init : Build Date   : "2016-01-25"
+2016/01/25 17:03:31 main.go:28: USER : startup : Init : Go Version   : "go1.5.3"
+2016/01/25 17:03:31 main.go:29: USER : startup : Init : Go Compiler  : "gc"
+2016/01/25 17:03:31 main.go:30: USER : startup : Init : Go ARCH      : "amd64"
+2016/01/25 17:03:31 main.go:31: USER : startup : Init : Go OS        : "darwin"
+2016/01/25 17:03:31 main.go:32: USER : startup : Init : Race Detector: false
+2016/01/25 17:03:31 app.go:222: DEV : startup : Run : Start : defaultHost[:4000]
+2016/01/25 17:03:31 app.go:232: DEV : listener : Run : Listening on: :4000
 ```
 
 2) Use a proper web token:
@@ -162,6 +178,12 @@ Authorization "Basic NmQ3MmU2ZGQtOTNkMC00NDEzLTliNGMtODU0NmQ0ZDM1MTRlOlBDeVgvTFR
 Xenia is secured via an authorization token.  If you are using it through an application that provides this token (aka, Trust) then you're good to go.
 
 If you intend to hit endpoints through a browser, install an Addon/plugin/extension that will allow you to add headers to your requests.
+
+You can turn off authentication by setting
+
+```
+export XENIA_AUTH=off
+```
 
 ### API calls
 
