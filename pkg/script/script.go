@@ -2,10 +2,14 @@ package script
 
 import (
 	"errors"
+	"strings"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+
+	gc "github.com/patrickmn/go-cache"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -20,6 +24,19 @@ const (
 var (
 	ErrNotFound = errors.New("Set Not found")
 )
+
+// =============================================================================
+
+// c contans a cache of script values. The cache will maintain items for one
+// hour and then marked as expired. This is a very small cache so the
+// gc time will be every hour.
+
+const (
+	expiration = time.Hour
+	cleanup    = time.Hour
+)
+
+var cache = gc.New(expiration, cleanup)
 
 // =============================================================================
 
@@ -60,6 +77,9 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
+
+	// Flush the cache to invalidate everything.
+	cache.Flush()
 
 	// Add a history record if this script set is new.
 	if new {
@@ -115,6 +135,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		Name string
 	}
 
+	key := "gns"
+	if v, found := cache.Get(key); found {
+		names := v.([]string)
+		log.Dev(context, "GetNames", "Completed : CACHE : Scripts[%d]", len(names))
+		return names, nil
+	}
+
 	f := func(c *mgo.Collection) error {
 		s := bson.M{"name": 1}
 		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
@@ -135,6 +162,8 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		names[i] = rawNames[i].Name
 	}
 
+	cache.Set(key, names, gc.DefaultExpiration)
+
 	log.Dev(context, "GetNames", "Completed : Scripts[%d]", len(names))
 	return names, nil
 }
@@ -142,6 +171,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 // GetScripts retrieves a list of scripts.
 func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error) {
 	log.Dev(context, "GetScripts", "Started : Tags[%v]", tags)
+
+	key := "gss" + strings.Join(tags, "-")
+	if v, found := cache.Get(key); found {
+		scrs := v.([]Script)
+		log.Dev(context, "GetScripts", "Completed : CACHE : Scripts[%d]", len(scrs))
+		return scrs, nil
+	}
 
 	var scrs []Script
 	f := func(c *mgo.Collection) error {
@@ -163,6 +199,8 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 		scrs[i].PrepareForUse()
 	}
 
+	cache.Set(key, scrs, gc.DefaultExpiration)
+
 	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
 	return scrs, nil
 }
@@ -170,6 +208,13 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 // GetByName retrieves the document for the specified name.
 func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
+
+	key := "gbn" + name
+	if v, found := cache.Get(key); found {
+		scr := v.(Script)
+		log.Dev(context, "GetByName", "Completed : CACHE : Script[%+v]", &scr)
+		return &scr, nil
+	}
 
 	var scr Script
 	f := func(c *mgo.Collection) error {
@@ -190,6 +235,8 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	// Fix the script so it can be used for processing.
 	scr.PrepareForUse()
 
+	cache.Set(key, scr, gc.DefaultExpiration)
+
 	log.Dev(context, "GetByName", "Completed : Script[%+v]", &scr)
 	return &scr, nil
 }
@@ -197,6 +244,13 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 // GetByNames retrieves the documents for the specified names.
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error) {
 	log.Dev(context, "GetByNames", "Started : Names[%+v]", names)
+
+	key := "gbns" + strings.Join(names, "-")
+	if v, found := cache.Get(key); found {
+		scripts := v.([]Script)
+		log.Dev(context, "GetByNames", "Completed : CACHE : Scripts[%+v]", scripts)
+		return scripts, nil
+	}
 
 	var scrs []Script
 	f := func(c *mgo.Collection) error {
@@ -245,6 +299,8 @@ next:
 		scripts[i].PrepareForUse()
 	}
 
+	cache.Set(key, scripts, gc.DefaultExpiration)
+
 	log.Dev(context, "GetByNames", "Completed : Scripts[%+v]", scripts)
 	return scripts, nil
 }
@@ -253,10 +309,19 @@ next:
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
-	var result struct {
+	type rslt struct {
 		Name    string   `bson:"name"`
 		Scripts []Script `bson:"scripts"`
 	}
+
+	key := "glhbn" + name
+	if v, found := cache.Get(key); found {
+		result := v.(rslt)
+		log.Dev(context, "GetLastHistoryByName", "Completed : CACHE : Script[%+v]", &result.Scripts[0])
+		return &result.Scripts[0], nil
+	}
+
+	var result rslt
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
@@ -284,6 +349,8 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 	// Fix the script so it can be used for processing.
 	result.Scripts[0].PrepareForUse()
 
+	cache.Set(key, result, gc.DefaultExpiration)
+
 	log.Dev(context, "GetLastHistoryByName", "Completed : Script[%+v]", &result.Scripts[0])
 	return &result.Scripts[0], nil
 }
@@ -309,6 +376,8 @@ func Delete(context interface{}, db *db.DB, name string) error {
 		log.Error(context, "Delete", err, "Completed")
 		return err
 	}
+
+	cache.Flush()
 
 	log.Dev(context, "Delete", "Completed")
 	return nil

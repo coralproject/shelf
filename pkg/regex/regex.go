@@ -4,13 +4,14 @@ package regex
 
 import (
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 
-	cache "github.com/patrickmn/go-cache"
+	gc "github.com/patrickmn/go-cache"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -29,15 +30,15 @@ var (
 // =============================================================================
 
 // c contans a cache of regex values. The cache will maintain items for one
-// minute and then marked as expired. This is a very small cache so the
+// hour and then marked as expired. This is a very small cache so the
 // gc time will be every hour.
 
 const (
-	expiration = time.Minute
+	expiration = time.Hour
 	cleanup    = time.Hour
 )
 
-var c = cache.New(expiration, cleanup)
+var cache = gc.New(expiration, cleanup)
 
 // =============================================================================
 
@@ -74,6 +75,9 @@ func Upsert(context interface{}, db *db.DB, rgx *Regex) error {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
+
+	// Flush the cache to invalidate everything.
+	cache.Flush()
 
 	// Add a history record if this query regex is new.
 	if new {
@@ -129,6 +133,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		Name string
 	}
 
+	key := "gns"
+	if v, found := cache.Get(key); found {
+		names := v.([]string)
+		log.Dev(context, "GetNames", "Completed : CACHE : Sets[%d]", len(names))
+		return names, nil
+	}
+
 	f := func(c *mgo.Collection) error {
 		s := bson.M{"name": 1}
 		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
@@ -149,6 +160,8 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		names[i] = rawNames[i].Name
 	}
 
+	cache.Set(key, names, gc.DefaultExpiration)
+
 	log.Dev(context, "GetNames", "Completed : Sets[%d]", len(names))
 	return names, nil
 }
@@ -156,6 +169,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 // GetRegexs retrieves a list of regexs.
 func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 	log.Dev(context, "GetSets", "Started : Tags[%v]", tags)
+
+	key := "grs" + strings.Join(tags, "-")
+	if v, found := cache.Get(key); found {
+		rgxs := v.([]Regex)
+		log.Dev(context, "GetSets", "Completed : CACHE : Sets[%d]", len(rgxs))
+		return rgxs, nil
+	}
 
 	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
@@ -172,6 +192,8 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 		return nil, err
 	}
 
+	cache.Set(key, rgxs, gc.DefaultExpiration)
+
 	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(rgxs))
 	return rgxs, nil
 }
@@ -179,6 +201,13 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 // GetByName retrieves the document for the specified Regex.
 func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
+
+	key := "gbn" + name
+	if v, found := cache.Get(key); found {
+		rgx := v.(Regex)
+		log.Dev(context, "GetByName", "Completed : CACHE : Set[%+v]", &rgx)
+		return &rgx, nil
+	}
 
 	var rgx Regex
 	f := func(c *mgo.Collection) error {
@@ -196,6 +225,8 @@ func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 		return nil, err
 	}
 
+	cache.Set(key, rgx, gc.DefaultExpiration)
+
 	log.Dev(context, "GetByName", "Completed : Set[%+v]", &rgx)
 	return &rgx, nil
 }
@@ -203,6 +234,13 @@ func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 // GetByNames retrieves the documents for the specified names.
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error) {
 	log.Dev(context, "GetByNames", "Started : Names[%+v]", names)
+
+	key := "gbns" + strings.Join(names, "-")
+	if v, found := cache.Get(key); found {
+		regexs := v.([]Regex)
+		log.Dev(context, "GetByNames", "Completed : CACHE : Regexs[%+v]", regexs)
+		return regexs, nil
+	}
 
 	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
@@ -246,6 +284,8 @@ next:
 		}
 	}
 
+	cache.Set(key, regexs, gc.DefaultExpiration)
+
 	log.Dev(context, "GetByNames", "Completed : Regexs[%+v]", regexs)
 	return regexs, nil
 }
@@ -254,10 +294,19 @@ next:
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
-	var result struct {
+	type rslt struct {
 		Name   string  `bson:"name"`
 		Regexs []Regex `bson:"regexs"`
 	}
+
+	key := "glhbn" + name
+	if v, found := cache.Get(key); found {
+		result := v.(rslt)
+		log.Dev(context, "GetLastHistoryByName", "Completed : CACHE : Regex[%+v]", &result.Regexs[0])
+		return &result.Regexs[0], nil
+	}
+
+	var result rslt
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
@@ -281,6 +330,8 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, 
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
 		return nil, err
 	}
+
+	cache.Set(key, result, gc.DefaultExpiration)
 
 	log.Dev(context, "GetLastHistoryByName", "Completed : Regex[%+v]", &result.Regexs[0])
 	return &result.Regexs[0], nil
@@ -307,6 +358,8 @@ func Delete(context interface{}, db *db.DB, name string) error {
 		log.Error(context, "Delete", err, "Completed")
 		return err
 	}
+
+	cache.Flush()
 
 	log.Dev(context, "Delete", "Completed")
 	return nil
