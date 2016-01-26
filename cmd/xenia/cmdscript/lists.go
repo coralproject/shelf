@@ -28,8 +28,12 @@ func addList() {
 func runList(cmd *cobra.Command, args []string) {
 	cmd.Println("Getting Script List")
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO("", mgoSession)
+	if err != nil {
+		cmd.Println("Getting Script List : ", err)
+		return
+	}
+	defer db.CloseMGO("")
 
 	names, err := script.GetNames("", db)
 	if err != nil {

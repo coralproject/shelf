@@ -2,6 +2,7 @@
 package tests
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/coralproject/xenia/app/xenia/routes"
@@ -11,25 +12,14 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
-	"github.com/ardanlabs/kit/tests"
 	"github.com/ardanlabs/kit/web/app"
 )
 
 var a *app.App
 
 func init() {
-	tests.Init("XENIA")
-
-	cfg := mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
-	}
-	tests.InitMongo(cfg)
-
+	// The call to API will force the init() function to initialize
+	// cfg, log and mongodb.
 	a = routes.API().(*app.App)
 }
 
@@ -37,11 +27,25 @@ func init() {
 
 // TestMain helps to clean up the test data.
 func TestMain(m *testing.M) {
-	db := db.NewMGO()
-	defer db.CloseMGO()
+
+	// In order to get a Mongo session we need the name of the database we
+	// are using. The web framework middleware is using this by convention.
+	dbName, err := cfg.String("MONGO_DB")
+	if err != nil {
+		fmt.Println("MongoDB is not configured")
+		return
+	}
+
+	db, err := db.NewMGO("context", dbName)
+	if err != nil {
+		fmt.Println("Unable to get Mongo session")
+		return
+	}
+
+	defer db.CloseMGO("context")
 
 	tstdata.Generate(db)
-	defer tstdata.Drop()
+	defer tstdata.Drop(db)
 
 	loadQuery(db, "basic.json")
 	loadQuery(db, "basic_var.json")

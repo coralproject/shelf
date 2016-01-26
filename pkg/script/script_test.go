@@ -16,8 +16,12 @@ import (
 )
 
 func init() {
+	// Initialize the configuration and logging systems. Plus anything
+	// else the web app layer needs.
 	tests.Init("XENIA")
 
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
 	cfg := mongo.Config{
 		Host:     cfg.MustString("MONGO_HOST"),
 		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
@@ -42,8 +46,11 @@ func TestUpsertCreateScript(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -97,8 +104,11 @@ func TestGetScriptNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -165,8 +175,11 @@ func TestGetScripts(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -226,8 +239,11 @@ func TestGetScriptByNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -297,8 +313,11 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -352,8 +371,11 @@ func TestUpsertUpdateScript(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {
@@ -428,8 +450,11 @@ func TestDeleteScript(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := sfix.Remove(db); err != nil {

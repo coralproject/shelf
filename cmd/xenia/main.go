@@ -11,6 +11,7 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/cmd/kit/cmdauth"
 	"github.com/ardanlabs/kit/cmd/kit/cmddb"
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 
@@ -55,18 +56,17 @@ func main() {
 		Password: cfg.MustString(cfgMongoPassword),
 	}
 
-	err := mongo.Init(cfg)
-	if err != nil {
+	if err := db.RegMasterSession("startup", cfg.DB, cfg); err != nil {
 		xenia.Println("Unable to initialize MongoDB")
 		os.Exit(1)
 	}
 
 	xenia.AddCommand(
-		cmdauth.GetCommands(),
-		cmddb.GetCommands(),
-		cmdquery.GetCommands(),
-		cmdscript.GetCommands(),
-		cmdregex.GetCommands(),
+		cmdauth.GetCommands(cfg.DB),
+		cmddb.GetCommands(cfg.DB),
+		cmdquery.GetCommands(cfg.DB),
+		cmdscript.GetCommands(cfg.DB),
+		cmdregex.GetCommands(cfg.DB),
 	)
 	xenia.Execute()
 }

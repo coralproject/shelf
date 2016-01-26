@@ -2,13 +2,13 @@ package tstdata
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 
 	"github.com/coralproject/xenia/pkg/exec"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 	"gopkg.in/mgo.v2"
 )
@@ -67,9 +67,12 @@ func Generate(db *db.DB) error {
 }
 
 // Drop drops the temp collection.
-func Drop() {
-	db := db.NewMGO()
-	defer db.CloseMGO()
+func Drop(db *db.DB) {
+	col, err := db.CollectionMGO(tests.Context, CollectionExecTest)
+	if err != nil {
+		fmt.Printf("***********> Should be able to get a Mongo session : %v\n", err)
+		return
+	}
 
-	mongo.GetCollection(db.MGOConn, CollectionExecTest).DropCollection()
+	col.DropCollection()
 }

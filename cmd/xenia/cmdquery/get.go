@@ -43,8 +43,12 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO("", mgoSession)
+	if err != nil {
+		cmd.Println("Getting Set : ", err)
+		return
+	}
+	defer db.CloseMGO("")
 
 	set, err := query.GetByName("", db, get.name)
 	if err != nil {

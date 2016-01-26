@@ -8,8 +8,13 @@ var queryCmd = &cobra.Command{
 	Short: "query provides a xenia CLI for managing and executing queries.",
 }
 
+// mgoSession holds the master session for the DB access.
+var mgoSession string
+
 // GetCommands returns the query commands.
-func GetCommands() *cobra.Command {
+func GetCommands(mgoSes string) *cobra.Command {
+	mgoSession = mgoSes
+
 	addUpsert()
 	addGet()
 	addDel()

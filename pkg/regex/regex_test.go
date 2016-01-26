@@ -16,8 +16,12 @@ import (
 )
 
 func init() {
+	// Initialize the configuration and logging systems. Plus anything
+	// else the web app layer needs.
 	tests.Init("XENIA")
 
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
 	cfg := mongo.Config{
 		Host:     cfg.MustString("MONGO_HOST"),
 		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
@@ -42,8 +46,11 @@ func TestUpsertCreateRegex(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -97,8 +104,11 @@ func TestGetRegexNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -162,8 +172,11 @@ func TestGetRegexs(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -220,8 +233,11 @@ func TestGetRegexByNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -288,8 +304,11 @@ func TestGetLastRegexHistoryByName(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -343,8 +362,11 @@ func TestUpsertUpdateRegex(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
@@ -413,8 +435,11 @@ func TestDeleteRegex(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := rfix.Remove(db); err != nil {
