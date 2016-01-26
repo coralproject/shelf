@@ -41,11 +41,14 @@ func runDelete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
-
-	err := query.Delete("", db, delete.name)
+	db, err := db.NewMGO("", mgoSession)
 	if err != nil {
+		cmd.Println("Deleting Set : ", err)
+		return
+	}
+	defer db.CloseMGO("")
+
+	if err = query.Delete("", db, delete.name); err != nil {
 		cmd.Println("Deleting Set : ", err)
 		return
 	}

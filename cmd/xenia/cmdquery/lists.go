@@ -28,8 +28,12 @@ func addList() {
 func runList(cmd *cobra.Command, args []string) {
 	cmd.Println("Getting Set List")
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO("", mgoSession)
+	if err != nil {
+		cmd.Println("Getting Set List : ", err)
+		return
+	}
+	defer db.CloseMGO("")
 
 	names, err := query.GetNames("", db)
 	if err != nil {

@@ -62,8 +62,12 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO("", mgoSession)
+	if err != nil {
+		cmd.Println("Upserting Regex : ", err)
+		return
+	}
+	defer db.CloseMGO("")
 
 	if !stat.IsDir() {
 		rgx, err := disk.LoadRegex("", file)

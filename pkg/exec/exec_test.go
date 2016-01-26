@@ -19,8 +19,12 @@ import (
 )
 
 func init() {
+	// Initialize the configuration and logging systems. Plus anything
+	// else the web app layer needs.
 	tests.Init("XENIA")
 
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
 	cfg := mongo.Config{
 		Host:     cfg.MustString("MONGO_HOST"),
 		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
@@ -104,8 +108,11 @@ func TestExecuteSet(t *testing.T) {
 
 	execSet := getExecSet()
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	t.Logf("Given the need to execute mongo commands.")
 	{
@@ -202,7 +209,7 @@ func loadTestData(t *testing.T, db *db.DB) {
 func unloadTestData(t *testing.T, db *db.DB) {
 	t.Log("\tWhen unloading data for the tests")
 	{
-		tstdata.Drop()
+		tstdata.Drop(db)
 
 		if err := sfix.Remove(db); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)

@@ -15,8 +15,12 @@ import (
 )
 
 func init() {
+	// Initialize the configuration and logging systems. Plus anything
+	// else the web app layer needs.
 	tests.Init("XENIA")
 
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
 	cfg := mongo.Config{
 		Host:     cfg.MustString("MONGO_HOST"),
 		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
@@ -41,8 +45,11 @@ func TestUpsertCreateSet(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query set record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -94,8 +101,11 @@ func TestGetSetNames(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -152,8 +162,11 @@ func TestGetSets(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -213,8 +226,11 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -268,8 +284,11 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -348,8 +367,11 @@ func TestDeleteSet(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {
@@ -400,8 +422,11 @@ func TestUnknownName(t *testing.T) {
 	}
 	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
-	db := db.NewMGO()
-	defer db.CloseMGO()
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
 
 	defer func() {
 		if err := qfix.Remove(db); err != nil {

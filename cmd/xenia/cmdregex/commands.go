@@ -8,8 +8,13 @@ var regexCmd = &cobra.Command{
 	Short: "regex provides a xenia CLI for managing regexs.",
 }
 
+// mgoSession holds the master session for the DB access.
+var mgoSession string
+
 // GetCommands returns the query commands.
-func GetCommands() *cobra.Command {
+func GetCommands(mgoSes string) *cobra.Command {
+	mgoSession = mgoSes
+
 	addUpsert()
 	addGet()
 	addDel()
