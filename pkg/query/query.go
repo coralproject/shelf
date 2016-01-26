@@ -4,11 +4,14 @@ package query
 
 import (
 	"errors"
+	"strings"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 
+	gc "github.com/patrickmn/go-cache"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -23,6 +26,19 @@ const (
 var (
 	ErrNotFound = errors.New("Set Not found")
 )
+
+// =============================================================================
+
+// c contans a cache of set values. The cache will maintain items for one
+// hour and then marked as expired. This is a very small cache so the
+// gc time will be every hour.
+
+const (
+	expiration = time.Hour
+	cleanup    = time.Hour
+)
+
+var cache = gc.New(expiration, cleanup)
 
 // =============================================================================
 
@@ -63,6 +79,9 @@ func Upsert(context interface{}, db *db.DB, set *Set) error {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
+
+	// Flush the cache to invalidate everything.
+	cache.Flush()
 
 	// Add a history record if this query set is new.
 	if new {
@@ -118,6 +137,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		Name string
 	}
 
+	key := "gns"
+	if v, found := cache.Get(key); found {
+		names := v.([]string)
+		log.Dev(context, "GetNames", "Completed : CACHE : Sets[%d]", len(names))
+		return names, nil
+	}
+
 	f := func(c *mgo.Collection) error {
 		s := bson.M{"name": 1}
 		log.Dev(context, "GetNames", "MGO : db.%s.find({}, %s).sort([\"name\"])", c.Name, mongo.Query(s))
@@ -138,6 +164,8 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		names[i] = rawNames[i].Name
 	}
 
+	cache.Set(key, names, gc.DefaultExpiration)
+
 	log.Dev(context, "GetNames", "Completed : Sets[%d]", len(names))
 	return names, nil
 }
@@ -145,6 +173,13 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 // GetSets retrieves a list of sets.
 func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 	log.Dev(context, "GetSets", "Started : Tags[%v]", tags)
+
+	key := "gss" + strings.Join(tags, "-")
+	if v, found := cache.Get(key); found {
+		sets := v.([]Set)
+		log.Dev(context, "GetScripts", "Completed : CACHE : Sets[%d]", len(sets))
+		return sets, nil
+	}
 
 	var sets []Set
 	f := func(c *mgo.Collection) error {
@@ -166,6 +201,8 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 		sets[i].PrepareForUse()
 	}
 
+	cache.Set(key, sets, gc.DefaultExpiration)
+
 	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(sets))
 	return sets, nil
 }
@@ -173,6 +210,13 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 // GetByName retrieves the document for the specified Set.
 func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
+
+	key := "gbn" + name
+	if v, found := cache.Get(key); found {
+		set := v.(Set)
+		log.Dev(context, "GetByName", "Completed : CACHE : Set[%+v]", &set)
+		return &set, nil
+	}
 
 	var set Set
 	f := func(c *mgo.Collection) error {
@@ -193,6 +237,8 @@ func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	// Fix the set so it can be used for processing.
 	set.PrepareForUse()
 
+	cache.Set(key, set, gc.DefaultExpiration)
+
 	log.Dev(context, "GetByName", "Completed : Set[%+v]", &set)
 	return &set, nil
 }
@@ -201,10 +247,19 @@ func GetByName(context interface{}, db *db.DB, name string) (*Set, error) {
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
-	var result struct {
+	type rslt struct {
 		Name string `bson:"name"`
 		Sets []Set  `bson:"sets"`
 	}
+
+	key := "glhbn" + name
+	if v, found := cache.Get(key); found {
+		result := v.(rslt)
+		log.Dev(context, "GetLastHistoryByName", "Completed : CACHE :  Set[%+v]", &result.Sets[0])
+		return &result.Sets[0], nil
+	}
+
+	var result rslt
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": name}
@@ -232,6 +287,8 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, er
 	// Fix the set so it can be used for processing.
 	result.Sets[0].PrepareForUse()
 
+	cache.Set(key, result, gc.DefaultExpiration)
+
 	log.Dev(context, "GetLastHistoryByName", "Completed : Set[%+v]", &result.Sets[0])
 	return &result.Sets[0], nil
 }
@@ -257,6 +314,8 @@ func Delete(context interface{}, db *db.DB, name string) error {
 		log.Error(context, "Delete", err, "Completed")
 		return err
 	}
+
+	cache.Flush()
 
 	log.Dev(context, "Delete", "Completed")
 	return nil
