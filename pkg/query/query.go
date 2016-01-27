@@ -30,11 +30,11 @@ var (
 // =============================================================================
 
 // c contans a cache of set values. The cache will maintain items for one
-// hour and then marked as expired. This is a very small cache so the
+// second and then marked as expired. This is a very small cache so the
 // gc time will be every hour.
 
 const (
-	expiration = time.Hour
+	expiration = time.Second
 	cleanup    = time.Hour
 )
 
