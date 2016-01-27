@@ -52,7 +52,7 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	a := app.New(midware.Auth, midware.Mongo)
+	a := app.New(midware.Mongo, midware.Auth)
 
 	a.Handle("GET", "/1.0/script", handlers.Script.List)
 	a.Handle("PUT", "/1.0/script", handlers.Script.Upsert)
