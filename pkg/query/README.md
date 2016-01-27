@@ -88,15 +88,13 @@ Param contains meta-data about a required parameter for the query.
 ## type Query
 ``` go
 type Query struct {
-    Name        string   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
-    Description string   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
-    Type        string   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
-    Collection  string   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
-    Scripts     []string `bson:"scripts" json:"scripts"`                                                     // Scripts to process for the query.
-    Continue    bool     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
-    Return      bool     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
-    HasDate     bool     `bson:"has_date,omitempty" json:"has_date,omitempty"`                               // Indicates there is a date to be pre-processed in the scripts.
-    HasObjectID bool     `bson:"has_objectid,omitempty" json:"has_objectid,omitempty"`                       // Indicates there is an ObjectId to be pre-processed in the scripts.
+    Name        string                   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
+    Description string                   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
+    Type        string                   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
+    Collection  string                   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
+    Commands    []map[string]interface{} `bson:"commands" json:"commands"`                                                   // Commands to process for the query.
+    Continue    bool                     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
+    Return      bool                     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
 }
 ```
 Query contains the configuration details for a query.
@@ -108,14 +106,6 @@ Query contains the configuration details for a query.
 
 
 
-
-
-
-### func (\*Query) UmarshalMongoScript
-``` go
-func (q *Query) UmarshalMongoScript(script string) (bson.M, error)
-```
-UmarshalMongoScript converts a JSON Mongo commands into a BSON map.
 
 
 
@@ -181,6 +171,22 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, er
 ```
 GetLastHistoryByName gets the last written Set within the history.
 
+
+
+
+### func (\*Set) PrepareForInsert
+``` go
+func (s *Set) PrepareForInsert()
+```
+PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+
+
+
+### func (\*Set) PrepareForUse
+``` go
+func (s *Set) PrepareForUse()
+```
+PrepareForUse replaces the `_$` to `$` when found in the front of field names.
 
 
 

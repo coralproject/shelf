@@ -10,11 +10,22 @@ of commands.
 
 
 
-## func Set
+## func Exec
 ``` go
-func Set(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result
+func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result
 ```
-Set executes the specified query set by name.
+Exec executes the specified query set by name.
+
+
+## func PreProcess
+``` go
+func PreProcess(commands map[string]interface{}, vars map[string]string)
+```
+PreProcess walks the document preprocessing it for use.
+
+We need to find and process variables. In some cases we are just replacing
+the variable name for what is in the map. If we have dates and objectid,
+that requires more work to convert to proper types.
 
 
 

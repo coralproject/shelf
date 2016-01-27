@@ -21,7 +21,7 @@ Contains the name of Mongo collections.
 ## Variables
 ``` go
 var (
-    ErrNotFound = errors.New("Set Not found")
+    ErrNotFound = errors.New("Regex Not found")
 )
 ```
 Set of error variables.
@@ -68,6 +68,8 @@ Upsert is used to create or update an existing Regex document.
 type Regex struct {
     Name string `bson:"name" json:"name" validate:"required,min=3"`
     Expr string `bson:"expr" json:"expr" validate:"required,min=3"`
+
+    Compile *regexp.Regexp
 }
 ```
 Regex contains a single regular expresion bound to a name.
@@ -100,7 +102,7 @@ GetLastHistoryByName gets the last written Regex within the history.
 ``` go
 func (r *Regex) Validate() error
 ```
-Validate checks the set value for consistency.
+Validate checks the regex value for consistency and that it compiles.
 
 
 

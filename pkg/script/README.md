@@ -18,7 +18,7 @@ Contains the name of Mongo collections.
 ## Variables
 ``` go
 var (
-    ErrNotFound = errors.New("Set Not found")
+    ErrNotFound = errors.New("Script Not found")
 )
 ```
 Set of error variables.
@@ -63,8 +63,8 @@ Upsert is used to create or update an existing Script document.
 ## type Script
 ``` go
 type Script struct {
-    Name     string   `bson:"name" json:"name" validate:"required,min=3"` // Unique name per Script document
-    Commands []string `bson:"commands" json:"commands"`                   // Commands to add to a query.
+    Name     string                   `bson:"name" json:"name" validate:"required,min=3"` // Unique name per Script document
+    Commands []map[string]interface{} `bson:"commands" json:"commands"`                   // Commands to add to a query.
 }
 ```
 Script contain pre and post commands to use per set or per query.
@@ -90,6 +90,22 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 ```
 GetLastHistoryByName gets the last written Script within the history.
 
+
+
+
+### func (\*Script) PrepareForInsert
+``` go
+func (scr *Script) PrepareForInsert()
+```
+PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+
+
+
+### func (\*Script) PrepareForUse
+``` go
+func (scr *Script) PrepareForUse()
+```
+PrepareForUse replaces the `_$` to `$` when found in the front of field names.
 
 
 
