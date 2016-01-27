@@ -9,7 +9,7 @@
 
 ## func GetCommands
 ``` go
-func GetCommands() *cobra.Command
+func GetCommands(db *db.DB) *cobra.Command
 ```
 GetCommands returns the query commands.
 

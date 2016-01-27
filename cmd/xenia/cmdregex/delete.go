@@ -3,7 +3,6 @@ package cmdregex
 import (
 	"github.com/coralproject/xenia/pkg/regex"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -41,14 +40,7 @@ func runDelete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Deleting Regex : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	if err := regex.Delete("", db, delete.name); err != nil {
+	if err := regex.Delete("", conn, delete.name); err != nil {
 		cmd.Println("Deleting Regex : ", err)
 		return
 	}

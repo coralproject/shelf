@@ -22,7 +22,7 @@ const (
 
 // Set of error variables.
 var (
-	ErrNotFound = errors.New("Set Not found")
+	ErrNotFound = errors.New("Script Not found")
 )
 
 // =============================================================================

@@ -7,7 +7,6 @@ import (
 	"github.com/coralproject/xenia/cmd/xenia/disk"
 	"github.com/coralproject/xenia/pkg/query"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -62,13 +61,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Upserting Set : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
 	if !stat.IsDir() {
 		set, err := disk.LoadSet("", file)
 		if err != nil {
@@ -76,7 +68,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := query.Upsert("", db, set); err != nil {
+		if err := query.Upsert("", conn, set); err != nil {
 			cmd.Println("Upserting Set : ", err)
 			return
 		}
@@ -90,7 +82,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		return query.Upsert("", db, set)
+		return query.Upsert("", conn, set)
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {

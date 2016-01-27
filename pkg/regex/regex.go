@@ -4,6 +4,7 @@ package regex
 
 import (
 	"errors"
+	"regexp"
 	"strings"
 	"time"
 
@@ -24,7 +25,7 @@ const (
 
 // Set of error variables.
 var (
-	ErrNotFound = errors.New("Set Not found")
+	ErrNotFound = errors.New("Regex Not found")
 )
 
 // =============================================================================
@@ -136,7 +137,7 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	key := "gns"
 	if v, found := cache.Get(key); found {
 		names := v.([]string)
-		log.Dev(context, "GetNames", "Completed : CACHE : Sets[%d]", len(names))
+		log.Dev(context, "GetNames", "Completed : CACHE : Rgxs[%d]", len(names))
 		return names, nil
 	}
 
@@ -162,24 +163,24 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 
 	cache.Set(key, names, gc.DefaultExpiration)
 
-	log.Dev(context, "GetNames", "Completed : Sets[%d]", len(names))
+	log.Dev(context, "GetNames", "Completed : Rgxs[%d]", len(names))
 	return names, nil
 }
 
 // GetRegexs retrieves a list of regexs.
 func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
-	log.Dev(context, "GetSets", "Started : Tags[%v]", tags)
+	log.Dev(context, "GetRegexs", "Started : Tags[%v]", tags)
 
 	key := "grs" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		rgxs := v.([]Regex)
-		log.Dev(context, "GetSets", "Completed : CACHE : Sets[%d]", len(rgxs))
+		log.Dev(context, "GetRegexs", "Completed : CACHE : Rgxs[%d]", len(rgxs))
 		return rgxs, nil
 	}
 
 	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetSets", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		log.Dev(context, "GetRegexs", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
 		return c.Find(nil).All(&rgxs)
 	}
 
@@ -188,13 +189,13 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetSets", err, "Completed")
+		log.Error(context, "GetRegexs", err, "Completed")
 		return nil, err
 	}
 
 	cache.Set(key, rgxs, gc.DefaultExpiration)
 
-	log.Dev(context, "GetSets", "Completed : Sets[%d]", len(rgxs))
+	log.Dev(context, "GetRegexs", "Completed : Rgxs[%d]", len(rgxs))
 	return rgxs, nil
 }
 
@@ -205,7 +206,7 @@ func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 	key := "gbn" + name
 	if v, found := cache.Get(key); found {
 		rgx := v.(Regex)
-		log.Dev(context, "GetByName", "Completed : CACHE : Set[%+v]", &rgx)
+		log.Dev(context, "GetByName", "Completed : CACHE : Rgx[%s]", rgx.Name)
 		return &rgx, nil
 	}
 
@@ -225,9 +226,16 @@ func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 		return nil, err
 	}
 
+	// This call is made when the regex is required for actual use. So
+	// let's compile the regex now.
+	var err error
+	if rgx.Compile, err = regexp.Compile(rgx.Expr); err != nil {
+		return nil, err
+	}
+
 	cache.Set(key, rgx, gc.DefaultExpiration)
 
-	log.Dev(context, "GetByName", "Completed : Set[%+v]", &rgx)
+	log.Dev(context, "GetByName", "Completed : Rgx[%s]", rgx.Name)
 	return &rgx, nil
 }
 

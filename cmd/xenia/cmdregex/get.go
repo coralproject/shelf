@@ -5,7 +5,6 @@ import (
 
 	"github.com/coralproject/xenia/pkg/regex"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -43,14 +42,7 @@ func runGet(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Getting Regex : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	set, err := regex.GetByName("", db, get.name)
+	set, err := regex.GetByName("", conn, get.name)
 	if err != nil {
 		cmd.Println("Getting Regex : ", err)
 		return

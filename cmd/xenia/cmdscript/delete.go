@@ -3,7 +3,6 @@ package cmdscript
 import (
 	"github.com/coralproject/xenia/pkg/script"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -41,14 +40,7 @@ func runDelete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Deleting Script : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	if err := script.Delete("", db, delete.name); err != nil {
+	if err := script.Delete("", conn, delete.name); err != nil {
 		cmd.Println("Deleting Script : ", err)
 		return
 	}

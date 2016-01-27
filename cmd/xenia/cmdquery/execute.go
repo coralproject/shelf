@@ -7,7 +7,6 @@ import (
 	"github.com/coralproject/xenia/pkg/exec"
 	"github.com/coralproject/xenia/pkg/query"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -49,14 +48,7 @@ func runExec(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Exec Set : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	set, err := query.GetByName("", db, exe.name)
+	set, err := query.GetByName("", conn, exe.name)
 	if err != nil {
 		cmd.Println("Exec Set : ", err)
 		return
@@ -74,7 +66,7 @@ func runExec(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	result := exec.Exec("", db, set, vars)
+	result := exec.Exec("", conn, set, vars)
 
 	data, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {

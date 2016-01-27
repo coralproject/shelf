@@ -16,7 +16,7 @@ going to store the xenia test data.
 
 ## func Drop
 ``` go
-func Drop()
+func Drop(db *db.DB)
 ```
 Drop drops the temp collection.
 

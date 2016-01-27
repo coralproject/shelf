@@ -102,7 +102,7 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 	}
 
 	// Did we get everything we need. Also load defaults.
-	if err := validateParameters(context, set, vars); err != nil {
+	if err := validateParameters(context, db, set, vars); err != nil {
 		return errResult(context, err)
 	}
 

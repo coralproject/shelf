@@ -3,7 +3,6 @@ package cmdregex
 import (
 	"github.com/coralproject/xenia/pkg/regex"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -28,14 +27,7 @@ func addList() {
 func runList(cmd *cobra.Command, args []string) {
 	cmd.Println("Getting Regex List")
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Getting Regex List : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	names, err := regex.GetNames("", db)
+	names, err := regex.GetNames("", conn)
 	if err != nil {
 		cmd.Println("Getting Regex List : ", err)
 		return
