@@ -1,6 +1,9 @@
 package cmdquery
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/ardanlabs/kit/db"
+	"github.com/spf13/cobra"
+)
 
 // queryCmd represents the parent for all query cli commands.
 var queryCmd = &cobra.Command{
@@ -8,12 +11,12 @@ var queryCmd = &cobra.Command{
 	Short: "query provides a xenia CLI for managing and executing queries.",
 }
 
-// mgoSession holds the master session for the DB access.
-var mgoSession string
+// conn holds the session for the DB access.
+var conn *db.DB
 
 // GetCommands returns the query commands.
-func GetCommands(mgoSes string) *cobra.Command {
-	mgoSession = mgoSes
+func GetCommands(db *db.DB) *cobra.Command {
+	conn = db
 
 	addUpsert()
 	addGet()

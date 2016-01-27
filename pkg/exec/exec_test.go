@@ -247,6 +247,9 @@ func getExecSet() []execSet {
 		querySetBasicVars(),
 		querySetBasicMissingVars(),
 		querySetBasicParamDefault(),
+		querySetBasicVarRegex(),
+		querySetBasicVarRegexFail(),
+		querySetBasicVarRegexMissing(),
 	}
 }
 
@@ -477,7 +480,7 @@ func querySetBasicMissingVars() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"error":"Variables [station_id] were not included with the call"},"error":true}`,
+			`{"results":{"error":"Missing[station_id]"},"error":true}`,
 		},
 	}
 }
@@ -507,6 +510,98 @@ func querySetBasicParamDefault() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
+	}
+}
+
+// querySetBasicVarRegex performs simple query with variables and regex validation.
+func querySetBasicVarRegex() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{"station_id": "42021"},
+		set: &query.Set{
+			Name:    "Basic Var Regex",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", RegexName: "number"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Basic Var Regex",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Basic Var Regex","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
+	}
+}
+
+// querySetBasicVarRegexFail performs simple query with variables and an
+// invalid regex validation.
+func querySetBasicVarRegexFail() execSet {
+	return execSet{
+		fail: true,
+		vars: map[string]string{"station_id": "42021"},
+		set: &query.Set{
+			Name:    "Basic Var Regex Fail",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", RegexName: "email"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Basic Var Regex Fail",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"error":"Invalid[42021:email:Value \"42021\" does not match \"email\" expression]"},"error":true}`,
+		},
+	}
+}
+
+// querySetBasicVarRegexMissing performs simple query with variables and a
+// missing regex validation.
+func querySetBasicVarRegexMissing() execSet {
+	return execSet{
+		fail: true,
+		vars: map[string]string{"station_id": "42021"},
+		set: &query.Set{
+			Name:    "Basic Var Regex Missing",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", RegexName: "numbers"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Basic Var Regex Missing",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"error":"Invalid[42021:numbers:Regex Not found]"},"error":true}`,
 		},
 	}
 }

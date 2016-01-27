@@ -3,6 +3,7 @@ package regex_test
 import (
 	"errors"
 	"reflect"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -78,6 +79,11 @@ func TestUpsertCreateRegex(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to retrieve the regex : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the regex.", tests.Success)
+
+			if rgx1.Compile, err = regexp.Compile(rgx1.Expr); err != nil {
+				t.Fatalf("\t%s\tShould be able to compile the regex : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to compile the regex.", tests.Success)
 
 			if !reflect.DeepEqual(*rgx1, *rgx2) {
 				t.Logf("\t%+v", rgx1)

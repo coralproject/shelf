@@ -61,12 +61,19 @@ func main() {
 		os.Exit(1)
 	}
 
+	db, err := db.NewMGO("", cfg.DB)
+	if err != nil {
+		xenia.Println("Unable to get MongoDB session")
+		os.Exit(1)
+	}
+	defer db.CloseMGO("")
+
 	xenia.AddCommand(
-		cmdauth.GetCommands(cfg.DB),
-		cmddb.GetCommands(cfg.DB),
-		cmdquery.GetCommands(cfg.DB),
-		cmdscript.GetCommands(cfg.DB),
-		cmdregex.GetCommands(cfg.DB),
+		cmdauth.GetCommands(db),
+		cmddb.GetCommands(db),
+		cmdquery.GetCommands(db),
+		cmdscript.GetCommands(db),
+		cmdregex.GetCommands(db),
 	)
 	xenia.Execute()
 }

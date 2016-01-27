@@ -1,6 +1,9 @@
 package cmdregex
 
-import "github.com/spf13/cobra"
+import (
+	"github.com/ardanlabs/kit/db"
+	"github.com/spf13/cobra"
+)
 
 // regexCmd represents the parent for all regex cli commands.
 var regexCmd = &cobra.Command{
@@ -8,13 +11,12 @@ var regexCmd = &cobra.Command{
 	Short: "regex provides a xenia CLI for managing regexs.",
 }
 
-// mgoSession holds the master session for the DB access.
-var mgoSession string
+// conn holds the session for the DB access.
+var conn *db.DB
 
-// GetCommands returns the query commands.
-func GetCommands(mgoSes string) *cobra.Command {
-	mgoSession = mgoSes
-
+// GetCommands returns the regex commands.
+func GetCommands(db *db.DB) *cobra.Command {
+	conn = db
 	addUpsert()
 	addGet()
 	addDel()

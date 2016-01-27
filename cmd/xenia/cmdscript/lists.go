@@ -3,7 +3,6 @@ package cmdscript
 import (
 	"github.com/coralproject/xenia/pkg/script"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -28,14 +27,7 @@ func addList() {
 func runList(cmd *cobra.Command, args []string) {
 	cmd.Println("Getting Script List")
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Getting Script List : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	names, err := script.GetNames("", db)
+	names, err := script.GetNames("", conn)
 	if err != nil {
 		cmd.Println("Getting Script List : ", err)
 		return

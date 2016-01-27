@@ -3,7 +3,6 @@ package cmdquery
 import (
 	"github.com/coralproject/xenia/pkg/query"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/spf13/cobra"
 )
 
@@ -41,14 +40,7 @@ func runDelete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	db, err := db.NewMGO("", mgoSession)
-	if err != nil {
-		cmd.Println("Deleting Set : ", err)
-		return
-	}
-	defer db.CloseMGO("")
-
-	if err = query.Delete("", db, delete.name); err != nil {
+	if err := query.Delete("", conn, delete.name); err != nil {
 		cmd.Println("Deleting Set : ", err)
 		return
 	}
