@@ -1,0 +1,31 @@
+{
+   "name":"QTEST_basic_save",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"get_id_list",
+         "desc": "Get the list of id's",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":false,
+         "commands":[
+            {"$project": {"_id": 0, "station_id": 1}},
+            {"$limit": 5}
+            {"$save": "list"}
+         ]
+      },
+      {
+         "name":"retrieve_stations",
+         "desc": "Retrieve the list of stations",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : {"$in": "#in:list.station_id"}}},
+            {"$project": {"_id": 0, "name": 1}},
+         ]
+      }
+   ]
+}
