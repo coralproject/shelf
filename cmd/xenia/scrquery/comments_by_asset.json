@@ -6,7 +6,7 @@
       {
          "name":"comments_by_asset",
          "type":"pipeline",
-         "collection":"nyt_coral_comments",
+         "collection":"nyt_coral_assets",
          "return":true,
          "commands":[
             { "$match": { "asset_id": "#number:asset_id" } },

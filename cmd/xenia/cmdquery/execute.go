@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/coralproject/xenia/cmd/xenia/web"
 	"github.com/coralproject/xenia/pkg/exec"
 	"github.com/coralproject/xenia/pkg/query"
 
@@ -41,6 +42,55 @@ func addExec() {
 
 // runExec is the code that implements the execute command.
 func runExec(cmd *cobra.Command, args []string) {
+	vars := make(map[string]string)
+	if exe.vars != "" {
+		vs := strings.Split(exe.vars, ",")
+		for _, kvs := range vs {
+			kv := strings.Split(kvs, ":")
+			if len(kv) != 2 {
+				continue
+			}
+			vars[kv[0]] = kv[1]
+		}
+	}
+
+	if conn == nil {
+		runExecWeb(cmd, vars)
+		return
+	}
+
+	runExecDB(cmd, vars)
+}
+
+// runExecWeb issues the command talking to the web service.
+func runExecWeb(cmd *cobra.Command, vars map[string]string) {
+	verb := "GET"
+	url := "/1.0/exec/" + exe.name
+
+	if len(vars) > 0 {
+		var i int
+		for k, v := range vars {
+			if i == 0 {
+				url += "?"
+			} else {
+				url += "&"
+			}
+			i++
+
+			url += k + "=" + v
+		}
+	}
+
+	resp, err := web.Request(cmd, verb, url, nil)
+	if err != nil {
+		cmd.Println("Getting Set List : ", err)
+	}
+
+	cmd.Printf("\n%s\n\n", resp)
+}
+
+// runExecDB issues the command talking to the DB.
+func runExecDB(cmd *cobra.Command, vars map[string]string) {
 	cmd.Printf("Exec Set : Name[%s] Vars[%v]\n", exe.name, exe.vars)
 
 	if exe.name == "" {
@@ -52,18 +102,6 @@ func runExec(cmd *cobra.Command, args []string) {
 	if err != nil {
 		cmd.Println("Exec Set : ", err)
 		return
-	}
-
-	vars := make(map[string]string)
-	if exe.vars != "" {
-		vs := strings.Split(exe.vars, ",")
-		for _, kvs := range vs {
-			kv := strings.Split(kvs, ":")
-			if len(kv) != 2 {
-				continue
-			}
-			vars[kv[0]] = kv[1]
-		}
 	}
 
 	result := exec.Exec("", conn, set, vars)
