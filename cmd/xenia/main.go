@@ -48,32 +48,37 @@ func main() {
 	}
 	log.Init(os.Stderr, logLevel)
 
-	cfg := mongo.Config{
-		Host:     cfg.MustString(cfgMongoHost),
-		AuthDB:   cfg.MustString(cfgMongoAuthDB),
-		DB:       cfg.MustString(cfgMongoDB),
-		User:     cfg.MustString(cfgMongoUser),
-		Password: cfg.MustString(cfgMongoPassword),
-	}
+	// Pull options from the config.
+	var conn *db.DB
+	if host, errHost := cfg.String(cfgMongoHost); errHost != nil {
+		cfg := mongo.Config{
+			Host:     host,
+			AuthDB:   cfg.MustString(cfgMongoAuthDB),
+			DB:       cfg.MustString(cfgMongoDB),
+			User:     cfg.MustString(cfgMongoUser),
+			Password: cfg.MustString(cfgMongoPassword),
+		}
 
-	if err := db.RegMasterSession("startup", cfg.DB, cfg); err != nil {
-		xenia.Println("Unable to initialize MongoDB")
-		os.Exit(1)
-	}
+		err := db.RegMasterSession("startup", cfg.DB, cfg)
+		if err != nil {
+			xenia.Println("Unable to initialize MongoDB")
+			os.Exit(1)
+		}
 
-	db, err := db.NewMGO("", cfg.DB)
-	if err != nil {
-		xenia.Println("Unable to get MongoDB session")
-		os.Exit(1)
+		conn, err = db.NewMGO("", cfg.DB)
+		if err != nil {
+			xenia.Println("Unable to get MongoDB session")
+			os.Exit(1)
+		}
+		defer conn.CloseMGO("")
 	}
-	defer db.CloseMGO("")
 
 	xenia.AddCommand(
-		cmdauth.GetCommands(db),
-		cmddb.GetCommands(db),
-		cmdquery.GetCommands(db),
-		cmdscript.GetCommands(db),
-		cmdregex.GetCommands(db),
+		cmdauth.GetCommands(conn),
+		cmddb.GetCommands(conn),
+		cmdquery.GetCommands(conn),
+		cmdscript.GetCommands(conn),
+		cmdregex.GetCommands(conn),
 	)
 	xenia.Execute()
 }

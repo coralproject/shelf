@@ -17,6 +17,7 @@ var conn *db.DB
 // GetCommands returns the regex commands.
 func GetCommands(db *db.DB) *cobra.Command {
 	conn = db
+
 	addUpsert()
 	addGet()
 	addDel()

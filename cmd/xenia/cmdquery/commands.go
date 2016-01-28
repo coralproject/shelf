@@ -11,7 +11,7 @@ var queryCmd = &cobra.Command{
 	Short: "query provides a xenia CLI for managing and executing queries.",
 }
 
-// conn holds the session for the DB access.
+// Capture the database connection.
 var conn *db.DB
 
 // GetCommands returns the query commands.
