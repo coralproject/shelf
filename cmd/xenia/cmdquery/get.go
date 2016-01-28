@@ -3,6 +3,7 @@ package cmdquery
 import (
 	"encoding/json"
 
+	"github.com/coralproject/xenia/cmd/xenia/web"
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/spf13/cobra"
@@ -35,6 +36,29 @@ func addGet() {
 
 // runGet is the code that implements the get command.
 func runGet(cmd *cobra.Command, args []string) {
+	if conn == nil {
+		runGetWeb(cmd)
+		return
+	}
+
+	runGetDB(cmd)
+}
+
+// runListWeb issues the command talking to the web service.
+func runGetWeb(cmd *cobra.Command) {
+	verb := "GET"
+	url := "/1.0/query/" + get.name
+
+	resp, err := web.Request(cmd, verb, url, nil)
+	if err != nil {
+		cmd.Println("Getting Set : ", err)
+	}
+
+	cmd.Printf("\n%s\n\n", resp)
+}
+
+// runGetDB issues the command talking to the DB.
+func runGetDB(cmd *cobra.Command) {
 	cmd.Printf("Getting Set : Name[%s]\n", get.name)
 
 	if get.name == "" {

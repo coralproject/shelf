@@ -1,10 +1,13 @@
 package cmdregex
 
 import (
+	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 
 	"github.com/coralproject/xenia/cmd/xenia/disk"
+	"github.com/coralproject/xenia/cmd/xenia/web"
 	"github.com/coralproject/xenia/pkg/regex"
 
 	"github.com/spf13/cobra"
@@ -68,11 +71,20 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := regex.Upsert("", conn, rgx); err != nil {
-			cmd.Println("Upserting Regex : ", err)
-			return
+		if conn != nil {
+			cmd.Printf("\n%+v\n", rgx)
+			if err := regex.Upsert("", conn, rgx); err != nil {
+				cmd.Println("Upserting Regex : ", err)
+				return
+			}
+		} else {
+			if err := runUpsertWeb(cmd, rgx); err != nil {
+				cmd.Println("Upserting Regex : ", err)
+				return
+			}
 		}
 
+		cmd.Println("\n", "Upserting Regex : Upserted")
 		return
 	}
 
@@ -82,7 +94,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		return regex.Upsert("", conn, rgx)
+		if conn != nil {
+			return regex.Upsert("", conn, rgx)
+		}
+
+		return runUpsertWeb(cmd, rgx)
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {
@@ -90,5 +106,24 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cmd.Println("Upserting Regex : Upserted")
+	cmd.Println("\n", "Upserting Regex : Upserted")
+}
+
+// runUpsertWeb issues the command talking to the web service.
+func runUpsertWeb(cmd *cobra.Command, rgx *regex.Regex) error {
+	verb := "PUT"
+	url := "/1.0/regex"
+
+	data, err := json.Marshal(rgx)
+	if err != nil {
+		return err
+	}
+
+	cmd.Printf("\n%s\n\n", string(data))
+
+	if _, err := web.Request(cmd, verb, url, bytes.NewBuffer(data)); err != nil {
+		return err
+	}
+
+	return nil
 }

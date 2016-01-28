@@ -1,10 +1,13 @@
 package cmdquery
 
 import (
+	"bytes"
+	"encoding/json"
 	"os"
 	"path/filepath"
 
 	"github.com/coralproject/xenia/cmd/xenia/disk"
+	"github.com/coralproject/xenia/cmd/xenia/web"
 	"github.com/coralproject/xenia/pkg/query"
 
 	"github.com/spf13/cobra"
@@ -68,11 +71,20 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := query.Upsert("", conn, set); err != nil {
-			cmd.Println("Upserting Set : ", err)
-			return
+		if conn != nil {
+			cmd.Printf("\n%+v\n", set)
+			if err := query.Upsert("", conn, set); err != nil {
+				cmd.Println("Upserting Set : ", err)
+				return
+			}
+		} else {
+			if err := runUpsertWeb(cmd, set); err != nil {
+				cmd.Println("Upserting Set : ", err)
+				return
+			}
 		}
 
+		cmd.Println("\n", "Upserting Set : Upserted")
 		return
 	}
 
@@ -82,7 +94,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		return query.Upsert("", conn, set)
+		if conn != nil {
+			return query.Upsert("", conn, set)
+		}
+
+		return runUpsertWeb(cmd, set)
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {
@@ -90,5 +106,24 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	cmd.Println("Upserting Set : Upserted")
+	cmd.Println("\n", "Upserting Set : Upserted")
+}
+
+// runUpsertWeb issues the command talking to the web service.
+func runUpsertWeb(cmd *cobra.Command, set *query.Set) error {
+	verb := "PUT"
+	url := "/1.0/query"
+
+	data, err := json.Marshal(set)
+	if err != nil {
+		return err
+	}
+
+	cmd.Printf("\n%s\n\n", string(data))
+
+	if _, err := web.Request(cmd, verb, url, bytes.NewBuffer(data)); err != nil {
+		return err
+	}
+
+	return nil
 }
