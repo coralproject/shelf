@@ -87,7 +87,7 @@ func TestPreProcessing(t *testing.T) {
 		for _, cmd := range commands {
 			t.Logf("\tWhen using %+v with %+v", cmd.doc, cmd.vars)
 			{
-				exec.PreProcess(cmd.doc, cmd.vars)
+				exec.ProcessVariables(cmd.doc, cmd.vars, nil)
 
 				if eq := compareBson(cmd.doc, cmd.after); !eq {
 					t.Log(cmd.doc)
