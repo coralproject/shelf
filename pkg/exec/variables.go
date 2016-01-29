@@ -1,6 +1,7 @@
 package exec
 
 import (
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -100,9 +101,41 @@ func inSub(context interface{}, variable string, data map[string]interface{}) in
 		return variable
 	}
 
-	// Split the value into the data key and field key.
+	// Split the value into the data key and document field key.
+	idx := strings.Index(value, ".")
+	if idx == -1 {
+		log.Error(context, "inSub", fmt.Errorf("Invalid format : %s", value), "Parsing value")
+		return variable
+	}
 
-	return nil
+	// Extract the key and field.
+	key := value[0:idx]
+	field := value[idx+1:]
+
+	// Find the results.
+	results, exists := data[key]
+	if !exists {
+		log.Error(context, "inSub", fmt.Errorf("Key not found : %s", key), "Finding results")
+		return variable
+	}
+
+	// Find the values.
+	values, ok := results.([]interface{})
+	if !ok {
+		log.Error(context, "inSub", errors.New("Expected an array to exist"), "Type assert results")
+		return variable
+	}
+
+	// Iterate over the values and create an array of values.
+	var array []interface{}
+	for _, v := range values {
+
+		// We have to find the right document.
+
+		// array = append(array, )
+	}
+
+	return array
 }
 
 // fieldSub focuses on replacing variables where the key is a field name.
