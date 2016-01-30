@@ -12,9 +12,9 @@ import (
 	"github.com/ardanlabs/kit/log"
 )
 
-// validateParameters validates the variables against the query string
-// of parameters. Plus it loads default values.
-func validateParameters(context interface{}, db *db.DB, set *query.Set, vars map[string]string) error {
+// processParams validates the variables against the query string of parameters.
+// It also loads default values and processes parameter regexes.
+func processParams(context interface{}, db *db.DB, set *query.Set, vars map[string]string) error {
 
 	// Do we not have parameters.
 	if len(set.Params) == 0 {
