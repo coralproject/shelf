@@ -34,7 +34,7 @@ func BenchmarkParseNumber(b *testing.B) {
 	var res interface{}
 
 	for i := 0; i < b.N; i++ {
-		res = fieldSub(parseCmds[0], parseVars)
+		res = fieldSub("", parseCmds[0], parseVars)
 	}
 
 	parseRes = res
@@ -44,7 +44,7 @@ func BenchmarkParseString(b *testing.B) {
 	var res interface{}
 
 	for i := 0; i < b.N; i++ {
-		res = fieldSub(parseCmds[1], parseVars)
+		res = fieldSub("", parseCmds[1], parseVars)
 	}
 
 	parseRes = res
@@ -54,7 +54,7 @@ func BenchmarkParseDate(b *testing.B) {
 	var res interface{}
 
 	for i := 0; i < b.N; i++ {
-		res = fieldSub(parseCmds[2], parseVars)
+		res = fieldSub("", parseCmds[2], parseVars)
 	}
 
 	parseRes = res
@@ -96,7 +96,7 @@ func BenchmarkPPNumber(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		ProcessVariables(a[i], ppVars, nil)
+		ProcessVariables("", a[i], ppVars, nil)
 	}
 }
 
@@ -114,7 +114,7 @@ func BenchmarkPPString(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		ProcessVariables(a[i], ppVars, nil)
+		ProcessVariables("", a[i], ppVars, nil)
 	}
 }
 
@@ -132,6 +132,6 @@ func BenchmarkPPDate(b *testing.B) {
 	b.ResetTimer()
 
 	for i := 0; i < b.N; i++ {
-		ProcessVariables(a[i], ppVars, nil)
+		ProcessVariables("", a[i], ppVars, nil)
 	}
 }

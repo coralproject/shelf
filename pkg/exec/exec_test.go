@@ -87,7 +87,7 @@ func TestPreProcessing(t *testing.T) {
 		for _, cmd := range commands {
 			t.Logf("\tWhen using %+v with %+v", cmd.doc, cmd.vars)
 			{
-				exec.ProcessVariables(cmd.doc, cmd.vars, nil)
+				exec.ProcessVariables("", cmd.doc, cmd.vars, nil)
 
 				if eq := compareBson(cmd.doc, cmd.after); !eq {
 					t.Log(cmd.doc)
@@ -238,23 +238,24 @@ type docs struct {
 // getExecSet returns the table for the testing.
 func getExecSet() []execSet {
 	return []execSet{
-		querySetBasic(),
-		querySetBasicPrePost(),
-		querySetWithTime(),
-		querySetWithShortTime(),
-		querySetWithMultiResults(),
-		querySetNoResults(),
-		querySetBasicVars(),
-		querySetBasicMissingVars(),
-		querySetBasicParamDefault(),
-		querySetBasicVarRegex(),
-		querySetBasicVarRegexFail(),
-		querySetBasicVarRegexMissing(),
+		basic(),
+		basicPrePost(),
+		withTime(),
+		withShortTime(),
+		withMultiResults(),
+		noResults(),
+		basicVars(),
+		basicMissingVars(),
+		basicParamDefault(),
+		basicVarRegex(),
+		basicVarRegexFail(),
+		basicVarRegexMissing(),
+		basicSaveIn(),
 	}
 }
 
-// querySetBasic starts with a simple query set.
-func querySetBasic() execSet {
+// basic starts with a simple query set.
+func basic() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -279,8 +280,8 @@ func querySetBasic() execSet {
 	}
 }
 
-// querySetBasicPrePost executes a simple query with pre/post commands.
-func querySetBasicPrePost() execSet {
+// basicPrePost executes a simple query with pre/post commands.
+func basicPrePost() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -306,8 +307,8 @@ func querySetBasicPrePost() execSet {
 	}
 }
 
-// querySetWithTime creates a simple query set using time.
-func querySetWithTime() execSet {
+// withTime creates a simple query set using time.
+func withTime() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -334,8 +335,8 @@ func querySetWithTime() execSet {
 	}
 }
 
-// querySetWithShortTime creates a simple query set using short time.
-func querySetWithShortTime() execSet {
+// withShortTime creates a simple query set using short time.
+func withShortTime() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -362,8 +363,8 @@ func querySetWithShortTime() execSet {
 	}
 }
 
-// querySetWithMultiResults creates a simple query set using time.
-func querySetWithMultiResults() execSet {
+// withMultiResults creates a simple query set using time.
+func withMultiResults() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -400,8 +401,8 @@ func querySetWithMultiResults() execSet {
 	}
 }
 
-// querySetNoResults starts with a simple query set with no results.
-func querySetNoResults() execSet {
+// noResults starts with a simple query set with no results.
+func noResults() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -426,8 +427,8 @@ func querySetNoResults() execSet {
 	}
 }
 
-// querySetBasicVars performs simple query with variables.
-func querySetBasicVars() execSet {
+// basicVars performs simple query with variables.
+func basicVars() execSet {
 	return execSet{
 		fail: false,
 		vars: map[string]string{"station_id": "42021"},
@@ -456,8 +457,8 @@ func querySetBasicVars() execSet {
 	}
 }
 
-// querySetBasicMissingVars performs simple query with missing parameters.
-func querySetBasicMissingVars() execSet {
+// basicMissingVars performs simple query with missing parameters.
+func basicMissingVars() execSet {
 	return execSet{
 		fail: true,
 		set: &query.Set{
@@ -485,8 +486,8 @@ func querySetBasicMissingVars() execSet {
 	}
 }
 
-// querySetBasicParamDefault performs simple query with a default parameters.
-func querySetBasicParamDefault() execSet {
+// basicParamDefault performs simple query with a default parameters.
+func basicParamDefault() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -514,8 +515,8 @@ func querySetBasicParamDefault() execSet {
 	}
 }
 
-// querySetBasicVarRegex performs simple query with variables and regex validation.
-func querySetBasicVarRegex() execSet {
+// basicVarRegex performs simple query with variables and regex validation.
+func basicVarRegex() execSet {
 	return execSet{
 		fail: false,
 		vars: map[string]string{"station_id": "42021"},
@@ -544,9 +545,9 @@ func querySetBasicVarRegex() execSet {
 	}
 }
 
-// querySetBasicVarRegexFail performs simple query with variables and an
+// basicVarRegexFail performs simple query with variables and an
 // invalid regex validation.
-func querySetBasicVarRegexFail() execSet {
+func basicVarRegexFail() execSet {
 	return execSet{
 		fail: true,
 		vars: map[string]string{"station_id": "42021"},
@@ -575,9 +576,9 @@ func querySetBasicVarRegexFail() execSet {
 	}
 }
 
-// querySetBasicVarRegexMissing performs simple query with variables and a
+// basicVarRegexMissing performs simple query with variables and a
 // missing regex validation.
-func querySetBasicVarRegexMissing() execSet {
+func basicVarRegexMissing() execSet {
 	return execSet{
 		fail: true,
 		vars: map[string]string{"station_id": "42021"},
@@ -602,6 +603,44 @@ func querySetBasicVarRegexMissing() execSet {
 		},
 		results: []string{
 			`{"results":{"error":"Invalid[42021:numbers:Regex Not found]"},"error":true}`,
+		},
+	}
+}
+
+// basicSaveIn performs a simple query where the result of the first query
+// is used in an $In statement.
+func basicSaveIn() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Basic Save In",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Get Ids",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     false,
+					Commands: []map[string]interface{}{
+						{"$project": map[string]interface{}{"_id": 0, "station_id": 1}},
+						{"$limit": 5},
+						{"$save": map[string]interface{}{"$map": "list"}},
+					},
+				},
+				{
+					Name:       "Get Documents",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": map[string]interface{}{"$in": "#in:list.station_id"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}],"error":false}`,
 		},
 	}
 }

@@ -96,7 +96,7 @@ func inSub(context interface{}, variable string, data map[string]interface{}) in
 	// After  : { $in: []string{"42021", "45098"} }
 
 	// Split the variable into its parts.
-	typ, value, err := parseVar(context, variable)
+	_, value, err := parseVar(context, variable)
 	if err != nil {
 		return variable
 	}
@@ -119,20 +119,27 @@ func inSub(context interface{}, variable string, data map[string]interface{}) in
 		return variable
 	}
 
-	// Find the values.
-	values, ok := results.([]interface{})
+	// Extract the concrete type from the interface.
+	values, ok := results.([]bson.M)
 	if !ok {
 		log.Error(context, "inSub", errors.New("Expected an array to exist"), "Type assert results")
 		return variable
 	}
 
-	// Iterate over the values and create an array of values.
+	// Iterate over the interface values which represent a document
+	// and find the specified field in each document.
 	var array []interface{}
-	for _, v := range values {
+	for _, doc := range values {
 
-		// We have to find the right document.
+		// We have to find the value for the specified field.
+		fldValue, exists := doc[field]
+		if !exists {
+			log.Error(context, "inSub", fmt.Errorf("Field not found : %s", field), "Map field lookup")
+			return variable
+		}
 
-		// array = append(array, )
+		// Append the value to the array.
+		array = append(array, fldValue)
 	}
 
 	return array
