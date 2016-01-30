@@ -59,110 +59,46 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 
 // varSub provides branching to execute the correct substitution.
 func varSub(context interface{}, key string, variable string, commands map[string]interface{}, vars map[string]string, data map[string]interface{}) {
-	switch key {
-	case "$in":
-		commands[key] = inSub(context, variable, data)
 
-	default:
-		commands[key] = fieldSub(context, variable, vars)
-	}
-}
-
-// parseVar splits a variable in half and returns its parts.
-func parseVar(context interface{}, variable string) (key string, value string, err error) {
 	// Remove the # characters from the left.
-	data := variable[1:]
+	value := variable[1:]
 
 	// Find the first instance of the separator.
-	idx := strings.Index(data, ":")
+	idx := strings.Index(value, ":")
 	if idx == -1 {
 		err := fmt.Errorf("Invalid format : %s", variable)
 		log.Error(context, "parseVar", err, "Parsing variable")
-		return "", "", err
+		return
 	}
 
-	// Split the key and value apart.
-	return data[0:idx], data[idx+1:], nil
-}
+	// Split the key and variable apart.
+	typ := value[0:idx]
+	vari := value[idx+1:]
 
-// inSub focuses on producing an array of values from the data.
-func inSub(context interface{}, variable string, data map[string]interface{}) interface{} {
-
-	// Before : {"$in": "#in:list.station_id"}
-	//
-	// The data map contains a key to a document of the results that were saved.
-	// {"key": [{"station_id":"42021"}, {"station_id":"45098"]}]}
-	//
-	// After  : { $in: []string{"42021", "45098"} }
-
-	// Split the variable into its parts.
-	_, value, err := parseVar(context, variable)
-	if err != nil {
-		return variable
-	}
-
-	// Split the value into the data key and document field key.
-	idx := strings.Index(value, ".")
-	if idx == -1 {
-		log.Error(context, "inSub", fmt.Errorf("Invalid format : %s", value), "Parsing value")
-		return variable
-	}
-
-	// Extract the key and field.
-	key := value[0:idx]
-	field := value[idx+1:]
-
-	// Find the results.
-	results, exists := data[key]
-	if !exists {
-		log.Error(context, "inSub", fmt.Errorf("Key not found : %s", key), "Finding results")
-		return variable
-	}
-
-	// Extract the concrete type from the interface.
-	values, ok := results.([]bson.M)
-	if !ok {
-		log.Error(context, "inSub", errors.New("Expected an array to exist"), "Type assert results")
-		return variable
-	}
-
-	// Iterate over the interface values which represent a document
-	// and find the specified field in each document.
-	var array []interface{}
-	for _, doc := range values {
-
-		// We have to find the value for the specified field.
-		fldValue, exists := doc[field]
-		if !exists {
-			log.Error(context, "inSub", fmt.Errorf("Field not found : %s", field), "Map field lookup")
-			return variable
+	switch key {
+	case "$in":
+		if typ == "data" {
+			commands[key] = fieldData(context, vari, data)
 		}
 
-		// Append the value to the array.
-		array = append(array, fldValue)
+	default:
+		commands[key] = fieldSub(context, typ, vari, vars, data)
 	}
-
-	return array
 }
 
 // fieldSub focuses on replacing variables where the key is a field name.
-func fieldSub(context interface{}, variable string, vars map[string]string) interface{} {
+func fieldSub(context interface{}, typ, variable string, vars map[string]string, data map[string]interface{}) interface{} {
 
-	// Before : {"field": "#number:variable_name"}  After : {"field": 1234}
-	// Before : {"field": "#string:variable_name"}  After : {"field": "value"}
-	// Before : {"field": "#date:variable_name"}    After : {"field": time.Time}
-	// Before : {"field": "#objid:variable_name"}   After : {"field": mgo.ObjectId}
+	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
+	// Before: {"field": "#string:variable_name"}  After: {"field": "value"}
+	// Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
+	// Before: {"field": "#objid:variable_name"}   After: {"field": mgo.ObjectId}
+	// Before: {"field": "#data:doc.station_id"}   After: {"field": "23453"}
 
-	// Split the variable into its parts.
-	typ, value, err := parseVar(context, variable)
-	if err != nil {
-		return variable
-	}
-
-	// If the variable does not exist, use the value straight up.
-	param, exists := vars[value]
+	// If the variable does not exist, use the variable straight up.
+	param, exists := vars[variable]
 	if !exists {
-		param = value
+		param = variable
 	}
 
 	// Let's perform the right action per type.
@@ -180,18 +116,114 @@ func fieldSub(context interface{}, variable string, vars map[string]string) inte
 
 	case "objid":
 		return objID(param)
+
+	case "data":
+		return fieldData(context, param, data)
 	}
 
 	return variable
 }
 
+// fieldData locates the data from the data map for the specified field.
+func fieldData(context interface{}, variable string, data map[string]interface{}) interface{} {
+
+	// Before : {"field" : {"$in": "#data:list.station_id"}}}
+	// After  : {"field" : {"$in": ["12345", 45678"]}}
+	//  	variable : "list.station_id"
+	//  	data     : {"list": [{"station_id":"42021"}, {"station_id":"45098"]}]}
+
+	// Before : {"field" : "#data:station.station_id"}
+	// After  : {"field" : "12345"}
+	//  	variable : "station.station_id"
+	//  	data     : {"station": [{"station_id":"42021"}]}
+
+	// Find the data based on the variable and the field lookup.
+	values, field, err := findData(context, variable, data)
+	if err != nil {
+		return variable
+	}
+
+	// How many values do we have.
+	l := len(values)
+
+	// If there are no values just use the literal value
+	// for the variable.
+	if l == 0 {
+		return variable
+	}
+
+	// If there is onlu one value, use it.
+	if l == 1 {
+		fldValue, exists := values[0][field]
+		if !exists {
+			log.Error(context, "dataLookup", fmt.Errorf("Field not found : %s", field), "Map field lookup")
+			return variable
+		}
+
+		return fldValue
+	}
+
+	// We have more than one value so return an array of these values.
+	var array []interface{}
+	for _, doc := range values {
+
+		// We have to find the value for the specified field.
+		fldValue, exists := doc[field]
+		if !exists {
+			log.Error(context, "dataLookup", fmt.Errorf("Field not found : %s", field), "Map field lookup")
+			return variable
+		}
+
+		// Append the value to the array.
+		array = append(array, fldValue)
+	}
+
+	return array
+}
+
+// findData process the variable and lookups up the data.
+func findData(context interface{}, variable string, data map[string]interface{}) ([]bson.M, string, error) {
+
+	// Before: "station.station_id"  After: Data, station_id
+
+	// Split the variable into the data key and document field key.
+	idx := strings.Index(variable, ".")
+	if idx == -1 {
+		err := fmt.Errorf("Invalid format : %s", variable)
+		log.Error(context, "findData", err, "Parsing variable")
+		return nil, "", err
+	}
+
+	// Extract the key and field.
+	key := variable[0:idx]
+	field := variable[idx+1:]
+
+	// Find the results.
+	results, exists := data[key]
+	if !exists {
+		err := fmt.Errorf("Key not found : %s", key)
+		log.Error(context, "findData", err, "Finding results")
+		return nil, "", err
+	}
+
+	// Extract the concrete type from the interface.
+	values, ok := results.([]bson.M)
+	if !ok {
+		err := errors.New("Expected an array to exist")
+		log.Error(context, "findData", err, "Type assert results : %T", results)
+		return nil, "", err
+	}
+
+	return values, field, nil
+}
+
 // isoDate is a helper function to convert the internal extension for dates
 // into a BSON date. We convert the following string
 // ISODate('2013-01-16T00:00:00.000Z') to a Go time value.
-func isoDate(script string) time.Time {
+func isoDate(value string) time.Time {
 	var parse string
 
-	switch len(script) {
+	switch len(value) {
 	case 10:
 		parse = "2006-01-02"
 	case 24:
@@ -202,7 +234,7 @@ func isoDate(script string) time.Time {
 		return time.Now().UTC()
 	}
 
-	dateTime, err := time.Parse(parse, script)
+	dateTime, err := time.Parse(parse, value)
 	if err != nil {
 		return time.Now().UTC()
 	}
@@ -212,10 +244,10 @@ func isoDate(script string) time.Time {
 
 // objID is a helper function to convert a string that represents a Mongo
 // Object Id into a bson ObjectId type.
-func objID(script string) bson.ObjectId {
-	if len(script) > 24 {
+func objID(value string) bson.ObjectId {
+	if len(value) > 24 {
 		return bson.ObjectId("")
 	}
 
-	return bson.ObjectIdHex(script)
+	return bson.ObjectIdHex(value)
 }

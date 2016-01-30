@@ -5,62 +5,6 @@ import (
 )
 
 //==============================================================================
-// Parsing benchmarks to test the performance and memory allocations for
-// parsing varaibles inside each command.
-/*
-	$ go test -run none -bench BenchmarkParse -benchtime 3s -benchmem
-	PASS
-	BenchmarkParseNumber-8	50000000	        79.8 ns/op	      16 B/op	       1 allocs/op
-	BenchmarkParseString-8	50000000	        77.8 ns/op	      16 B/op	       1 allocs/op
-	BenchmarkParseDate-8  	50000000	        82.0 ns/op	      16 B/op	       1 allocs/op
-	ok  	github.com/coralproject/xenia/pkg/exec	12.409s
-*/
-
-var parseCmds = []string{
-	`{"duration": "#number:duration"}`,
-	`{"target": "#string:target"}`,
-	`{"$gte": "#date:start"}`,
-}
-
-var parseVars = map[string]string{
-	"duration": "10",
-	"target":   "bill2",
-	"start":    "2016-02-15",
-}
-
-var parseRes interface{}
-
-func BenchmarkParseNumber(b *testing.B) {
-	var res interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = fieldSub("", parseCmds[0], parseVars)
-	}
-
-	parseRes = res
-}
-
-func BenchmarkParseString(b *testing.B) {
-	var res interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = fieldSub("", parseCmds[1], parseVars)
-	}
-
-	parseRes = res
-}
-
-func BenchmarkParseDate(b *testing.B) {
-	var res interface{}
-
-	for i := 0; i < b.N; i++ {
-		res = fieldSub("", parseCmds[2], parseVars)
-	}
-
-	parseRes = res
-}
-
-//==============================================================================
 // PreProcess benchmarks to test the performance and memory alloctions for
 // parsing variables inside of commands.
 /*

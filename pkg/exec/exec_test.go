@@ -251,6 +251,7 @@ func getExecSet() []execSet {
 		basicVarRegexFail(),
 		basicVarRegexMissing(),
 		basicSaveIn(),
+		basicSaveVar(),
 	}
 }
 
@@ -633,7 +634,7 @@ func basicSaveIn() execSet {
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Commands: []map[string]interface{}{
-						{"$match": map[string]interface{}{"station_id": map[string]interface{}{"$in": "#in:list.station_id"}}},
+						{"$match": map[string]interface{}{"station_id": map[string]interface{}{"$in": "#data:list.station_id"}}},
 						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},
 				},
@@ -641,6 +642,44 @@ func basicSaveIn() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}],"error":false}`,
+		},
+	}
+}
+
+// basicSaveVar performs a simple query where the result of the first query
+// is used in a variable replacement.
+func basicSaveVar() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Basic Save Var",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Get Ids",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     false,
+					Commands: []map[string]interface{}{
+						{"$project": map[string]interface{}{"_id": 0, "station_id": 1}},
+						{"$limit": 1},
+						{"$save": map[string]interface{}{"$map": "station"}},
+					},
+				},
+				{
+					Name:       "Get Documents",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#data:station.station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
 		},
 	}
 }
