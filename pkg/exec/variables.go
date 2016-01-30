@@ -82,12 +82,12 @@ func varSub(context interface{}, key string, variable string, commands map[strin
 		}
 
 	default:
-		commands[key] = fieldSub(context, typ, vari, vars, data)
+		commands[key] = fieldVars(context, typ, vari, vars, data)
 	}
 }
 
-// fieldSub focuses on replacing variables where the key is a field name.
-func fieldSub(context interface{}, typ, variable string, vars map[string]string, data map[string]interface{}) interface{} {
+// fieldVars focuses on replacing variables where the key is a field name.
+func fieldVars(context interface{}, typ, variable string, vars map[string]string, data map[string]interface{}) interface{} {
 
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
 	// Before: {"field": "#string:variable_name"}  After: {"field": "value"}
