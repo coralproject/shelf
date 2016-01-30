@@ -5,6 +5,9 @@
 Package exec provides support for executing Sets and their different types
 of commands.
 
+Package exec provides support for executing Sets and their different types
+of commands.
+
 
 
 
@@ -17,15 +20,15 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 Exec executes the specified query set by name.
 
 
-## func PreProcess
+## func ProcessVariables
 ``` go
-func PreProcess(commands map[string]interface{}, vars map[string]string)
+func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, data map[string]interface{})
 ```
-PreProcess walks the document preprocessing it for use.
+ProcessVariables walks the document performing variable substitutions.
 
-We need to find and process variables. In some cases we are just replacing
-the variable name for what is in the map. If we have dates and objectid,
-that requires more work to convert to proper types.
+In some cases we are just replacing the variable name for what is in the map.
+If we have dates and objectid, that requires more work to convert to proper types.
+This function is also accessed by the tstdata package and exec_test.go
 
 
 

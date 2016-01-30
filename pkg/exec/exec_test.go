@@ -239,6 +239,7 @@ type docs struct {
 func getExecSet() []execSet {
 	return []execSet{
 		basic(),
+		basicArray(),
 		basicPrePost(),
 		withTime(),
 		withShortTime(),
@@ -277,6 +278,32 @@ func basic() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
+	}
+}
+
+// basicArray validates hard coded arrays work.
+func basicArray() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Basic Array",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Basic Array",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": map[string]interface{}{"$in": []string{"42021", "44008"}}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Basic Array","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
 		},
 	}
 }
