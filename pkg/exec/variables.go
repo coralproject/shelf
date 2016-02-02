@@ -99,7 +99,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 			return err
 		}
 
-		v, err := fieldData(context, cmd[5:6], vari, results)
+		v, err := dataLookup(context, cmd[5:6], vari, results)
 		if err != nil {
 			return err
 		}
@@ -108,7 +108,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 		return nil
 
 	default:
-		v, err := fieldVars(context, cmd, vari, vars, results)
+		v, err := varLookup(context, cmd, vari, vars, results)
 		if err != nil {
 			return err
 		}
@@ -118,8 +118,8 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 	}
 }
 
-// fieldVars looks up variables and returns their values as the specified type.
-func fieldVars(context interface{}, cmd, variable string, vars map[string]string, results map[string]interface{}) (interface{}, error) {
+// varLookup looks up variables and returns their values as the specified type.
+func varLookup(context interface{}, cmd, variable string, vars map[string]string, results map[string]interface{}) (interface{}, error) {
 
 	// {"field": "#cmd:variable"}
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
@@ -140,7 +140,7 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 		i, err := strconv.Atoi(param)
 		if err != nil {
 			err = fmt.Errorf("Parameter %q is not a number", param)
-			log.Error(context, "fieldVars", err, "Index conversion")
+			log.Error(context, "varLookup", err, "Index conversion")
 			return nil, err
 		}
 		return i, nil
@@ -156,24 +156,24 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 
 	default:
 		if len(cmd) == 6 && cmd[0:4] == "data" {
-			return fieldData(context, cmd[5:6], param, results)
+			return dataLookup(context, cmd[5:6], param, results)
 		}
 
 		if cmd == "data" {
 			err := errors.New("Data command is missing the operator")
-			log.Error(context, "fieldVars", err, "Checking cmd is data")
+			log.Error(context, "varLookup", err, "Checking cmd is data")
 			return nil, err
 		}
 
 		err := fmt.Errorf("Unknown command %q", cmd)
-		log.Error(context, "fieldVars", err, "Checking cmd is data")
+		log.Error(context, "varLookup", err, "Checking cmd is data")
 		return nil, err
 	}
 }
 
-// fieldData locates the data from the results based on the data operation
+// dataLookup looks up data from the saved results based on the data operation
 // and the lookup value.
-func fieldData(context interface{}, dataOp, lookup string, results map[string]interface{}) (interface{}, error) {
+func dataLookup(context interface{}, dataOp, lookup string, results map[string]interface{}) (interface{}, error) {
 
 	// We always want an array to be subsituted.					// We select the index and subtitue a single value.
 	// Before: {"field" : {"$in": "#data.*:list.station_id"}}}		// Before: {"field" : "#data.0:list.station_id"}
@@ -194,7 +194,7 @@ func fieldData(context interface{}, dataOp, lookup string, results map[string]in
 	// If there are no data just use the literal value for the lookup.
 	if l == 0 {
 		err := errors.New("The results contain no documents")
-		log.Error(context, "fieldData", err, "Checking length")
+		log.Error(context, "dataLookup", err, "Checking length")
 		return "", err
 	}
 
@@ -209,7 +209,7 @@ func fieldData(context interface{}, dataOp, lookup string, results map[string]in
 			fldValue, exists := doc[field]
 			if !exists {
 				err := fmt.Errorf("Field %q not found", field)
-				log.Error(context, "fieldData", err, "Map field lookup")
+				log.Error(context, "dataLookup", err, "Map field lookup")
 				return "", err
 			}
 
@@ -224,14 +224,14 @@ func fieldData(context interface{}, dataOp, lookup string, results map[string]in
 	index, err := strconv.Atoi(dataOp)
 	if err != nil {
 		err = fmt.Errorf("Invalid operator command operator %q", dataOp)
-		log.Error(context, "fieldData", err, "Index conversion")
+		log.Error(context, "dataLookup", err, "Index conversion")
 		return "", err
 	}
 
 	// We can't ask for a position we don't have.
 	if index > l-1 {
 		err := fmt.Errorf("Index \"%d\" out of range, total \"%d\"", index, l)
-		log.Error(context, "fieldData", err, "Index range check")
+		log.Error(context, "dataLookup", err, "Index range check")
 		return "", err
 	}
 
@@ -239,7 +239,7 @@ func fieldData(context interface{}, dataOp, lookup string, results map[string]in
 	fldValue, exists := data[index][field]
 	if !exists {
 		err := fmt.Errorf("Field %q not found at index \"%q\"", field, index)
-		log.Error(context, "fieldData", err, "Map field lookup")
+		log.Error(context, "dataLookup", err, "Map field lookup")
 		return "", err
 	}
 
