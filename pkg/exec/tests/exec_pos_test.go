@@ -23,6 +23,7 @@ func getPosExecSet() []execSet {
 		basicVarRegexMissing(),
 		basicSaveIn(),
 		basicSaveVar(),
+		multiFieldLookup(),
 	}
 }
 
@@ -469,6 +470,42 @@ func basicSaveVar() execSet {
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#data.0:station.station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
+	}
+}
+
+func multiFieldLookup() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Multi Field Lookup",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Get Document",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     false,
+					Commands: []map[string]interface{}{
+						{"$limit": 1},
+						{"$save": map[string]interface{}{"$map": "station"}},
+					},
+				},
+				{
+					Name:       "Get Documents",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"location.type": "#data.0:station.location.type"}},
 						{"$match": map[string]interface{}{"station_id": "#data.0:station.station_id"}},
 						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 					},

@@ -142,19 +142,6 @@ func TestExecuteSet(t *testing.T) {
 				t.Logf("\tWhen using Execute Set %s", es.set.Name)
 				{
 					result := exec.Exec(tests.Context, db, es.set, es.vars)
-					if !es.fail {
-						if result.Error {
-							t.Errorf("\t%s\tShould be able to execute the query set : %+v", tests.Failed, result.Results)
-							continue
-						}
-						t.Logf("\t%s\tShould be able to execute the query set.", tests.Success)
-					} else {
-						if !result.Error {
-							t.Errorf("\t%s\tShould Not be able to execute the query set : %+v", tests.Failed, result.Results)
-							continue
-						}
-						t.Logf("\t%s\tShould Not be able to execute the query set.", tests.Success)
-					}
 
 					data, err := json.Marshal(result)
 					if err != nil {
@@ -170,6 +157,8 @@ func TestExecuteSet(t *testing.T) {
 					}
 					t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
 
+					// This support allowing the test to provide multiple documents
+					// to check when data value order can be underterminstic.
 					var found bool
 					for _, rslt := range es.results {
 						if string(data) == rslt {

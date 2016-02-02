@@ -281,14 +281,47 @@ func findResultData(context interface{}, lookup string, results map[string]inter
 	return values, field, nil
 }
 
-// docFieldLookup recurses the document for the specified field and returns
-// its value.
+// docFieldLookup recurses the document for the specified field and returns its value.
 func docFieldLookup(context interface{}, doc map[string]interface{}, field string) (interface{}, error) {
+
+	// condition.location.type
+
+	// Extract the first field for lookup and the remaining fields
+	// if we need to recurse deeper into the result document.
+	var nextFld string
+	idx := strings.Index(field, ".")
+	if idx > 0 {
+		nextFld = field[idx+1:]
+		field = field[0:idx]
+	}
+
+	// Look up the first field.
 	fldValue, exists := doc[field]
 	if !exists {
 		err := fmt.Errorf("Field %q not found", field)
-		log.Error(context, "dataLookup", err, "Map field lookup")
-		return "", err
+		log.Error(context, "docFieldLookup", err, "Document field lookup")
+		return nil, err
+	}
+
+	// When we have found the last field, we have the data.
+	if idx == -1 {
+		return fldValue, nil
+	}
+
+	// We need to recuse the result for the next field.
+
+	// The field data we found needs to be a document.
+	fldDoc, ok := fldValue.(bson.M)
+	if !ok {
+		err := fmt.Errorf("Field value is a %T and not a bson document", fldValue)
+		log.Error(context, "docFieldLookup", err, "Type assert for document")
+		return nil, err
+	}
+
+	// Find the next field and its value.
+	fldValue, err := docFieldLookup(context, fldDoc, nextFld)
+	if err != nil {
+		return nil, err
 	}
 
 	return fldValue, nil
