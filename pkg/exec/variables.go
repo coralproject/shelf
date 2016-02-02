@@ -191,7 +191,7 @@ func dataLookup(context interface{}, dataOp, lookup string, results map[string]i
 	// How many documents do we have.
 	l := len(data)
 
-	// If there are no data just use the literal value for the lookup.
+	// If there is no data for the lookup.
 	if l == 0 {
 		err := errors.New("The results contain no documents")
 		log.Error(context, "dataLookup", err, "Checking length")
@@ -205,11 +205,9 @@ func dataLookup(context interface{}, dataOp, lookup string, results map[string]i
 		var array []interface{}
 		for _, doc := range data {
 
-			// We have to find the value for the specified field.
-			fldValue, exists := doc[field]
-			if !exists {
-				err := fmt.Errorf("Field %q not found", field)
-				log.Error(context, "dataLookup", err, "Map field lookup")
+			// Find the value for the specified field.
+			fldValue, err := docFieldLookup(context, doc, field)
+			if err != nil {
 				return "", err
 			}
 
@@ -235,11 +233,9 @@ func dataLookup(context interface{}, dataOp, lookup string, results map[string]i
 		return "", err
 	}
 
-	// Extract the value for the specified index.
-	fldValue, exists := data[index][field]
-	if !exists {
-		err := fmt.Errorf("Field %q not found at index \"%q\"", field, index)
-		log.Error(context, "dataLookup", err, "Map field lookup")
+	// Find the value for the specified field.
+	fldValue, err := docFieldLookup(context, data[index], field)
+	if err != nil {
 		return "", err
 	}
 
@@ -283,6 +279,19 @@ func findResultData(context interface{}, lookup string, results map[string]inter
 	}
 
 	return values, field, nil
+}
+
+// docFieldLookup recurses the document for the specified field and returns
+// its value.
+func docFieldLookup(context interface{}, doc map[string]interface{}, field string) (interface{}, error) {
+	fldValue, exists := doc[field]
+	if !exists {
+		err := fmt.Errorf("Field %q not found", field)
+		log.Error(context, "dataLookup", err, "Map field lookup")
+		return "", err
+	}
+
+	return fldValue, nil
 }
 
 // isoDate is a helper function to convert the internal extension for dates
