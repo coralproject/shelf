@@ -175,7 +175,7 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 // and the lookup value.
 func dataLookup(context interface{}, dataOp, lookup string, results map[string]interface{}) (interface{}, error) {
 
-	// We always want an array to be subsituted.					// We select the index and subtitue a single value.
+	// We you need an array to be substitued.						// We you need a single value to be substitued, select an index.
 	// Before: {"field" : {"$in": "#data.*:list.station_id"}}}		// Before: {"field" : "#data.0:list.station_id"}
 	// After : {"field" : {"$in": ["42021"]}}						// After : {"field" : "42021"}
 	//      dataOp : "*"                                         	//      dataOp : 0
