@@ -74,11 +74,15 @@ func validateRegex(context interface{}, db *db.DB, value string, name string) er
 	}
 
 	if rgx.Compile == nil {
-		return errors.New("FATAL ERROR: Regex is not pre-compiled")
+		err := errors.New("FATAL ERROR: Regex is not pre-compiled")
+		log.Error(context, "validateRegex", err, "Check compiled")
+		return err
 	}
 
 	if !rgx.Compile.MatchString(value) {
-		return fmt.Errorf("Value %q does not match %q expression", value, rgx.Name)
+		err := fmt.Errorf("Value %q does not match %q expression", value, rgx.Name)
+		log.Error(context, "validateRegex", err, "Preform match")
+		return err
 	}
 
 	return nil

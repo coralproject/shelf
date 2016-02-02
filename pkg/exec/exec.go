@@ -65,12 +65,13 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 	// Iterate of the set of queries.
 	for _, q := range set.Queries {
 		var result docs
+		var commands []map[string]interface{}
 		var err error
 
 		// We only have pipeline right now.
 		switch strings.ToLower(q.Type) {
 		case "pipeline":
-			result, err = execPipeline(context, db, &q, vars, data)
+			result, commands, err = execPipeline(context, db, &q, vars, data)
 		}
 
 		// Was there an error processing the query.
@@ -81,8 +82,14 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 				continue
 			}
 
-			// We need to return an error result.
-			return errResult(context, err, "Executing Result")
+			// We need to return an error result with the commands.
+			r := query.Result{
+				Results: bson.M{"error": err.Error(), "commands": commands},
+				Error:   true,
+			}
+
+			log.Error(context, "errResult", err, "Completed : Executing Result")
+			return &r
 		}
 
 		// Append these results to the final set.
