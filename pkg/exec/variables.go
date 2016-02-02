@@ -13,11 +13,14 @@ import (
 )
 
 // ProcessVariables walks the document performing variable substitutions.
-//
-// In some cases we are just replacing the variable name for what is in the map.
-// If we have dates and objectid, that requires more work to convert to proper types.
-// This function is also accessed by the tstdata package and exec_test.go
+// This function is exported because it is accessed by the tstdata package
+// and tests.
 func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
+
+	// commands: Contains the mongodb pipeline with any extenstions.
+	// vars    : Key/Value pairs passed into the set execution for variable substituion.
+	// results : Any result from previous sets that have been saved.
+
 	for key, value := range commands {
 
 		// Test for the type of value we have.
@@ -108,9 +111,10 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 	return nil
 }
 
-// fieldVars focuses on replacing variables where the key is a field name.
+// fieldVars looks up variables and returns their values as the specified type.
 func fieldVars(context interface{}, cmd, variable string, vars map[string]string, results map[string]interface{}) (interface{}, error) {
 
+	// {"field": "#cmd:variable"}
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
 	// Before: {"field": "#string:variable_name"}  After: {"field": "value"}
 	// Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
@@ -156,46 +160,46 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 	}
 }
 
-// fieldData locates the data from the results map based on the data operation and
-// the lookup valies.
+// fieldData locates the data from the results based on the data operation
+// and the lookup value.
 func fieldData(context interface{}, dataOp, lookup string, results map[string]interface{}) (interface{}, error) {
 
 	// We always want an array to be subsituted.					// We select the index and subtitue a single value.
 	// Before: {"field" : {"$in": "#data.*:list.station_id"}}}		// Before: {"field" : "#data.0:list.station_id"}
 	// After : {"field" : {"$in": ["42021"]}}						// After : {"field" : "42021"}
-	//      dataOp: "*"                                         	//      dataOp: 0
-	//  	lookup: "list.station_id"							    //  	lookup: "list.station_id"
-	//  	data  : {"list": [{"station_id":"42021"}]}				//  	data  : {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
+	//      dataOp : "*"                                         	//      dataOp : 0
+	//  	lookup : "list.station_id"							    //  	lookup : "list.station_id"
+	//  	results: {"list": [{"station_id":"42021"}]}				//  	results: {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
 
-	// Find the result data based on the lookup.
-	values, field, err := findResultData(context, lookup, results)
+	// Find the result data based on the lookup and the field lookup.
+	data, field, err := findResultData(context, lookup, results)
 	if err != nil {
-		return lookup, err
+		return "", err
 	}
 
-	// How many values do we have.
-	l := len(values)
+	// How many documents do we have.
+	l := len(data)
 
-	// If there are no values just use the literal value for the lookup.
+	// If there are no data just use the literal value for the lookup.
 	if l == 0 {
-		err := errors.New("No values returned")
+		err := errors.New("The results contain no documents")
 		log.Error(context, "fieldData", err, "Checking length")
-		return lookup, err
+		return "", err
 	}
 
 	// Do we need to return an array.
 	if dataOp == "*" {
 
-		// We have more than one value so return an array of these values.
+		// We need to create an array of the values.
 		var array []interface{}
-		for _, doc := range values {
+		for _, doc := range data {
 
 			// We have to find the value for the specified field.
 			fldValue, exists := doc[field]
 			if !exists {
 				err := fmt.Errorf("Field %q not found", field)
 				log.Error(context, "fieldData", err, "Map field lookup")
-				return lookup, err
+				return "", err
 			}
 
 			// Append the value to the array.
@@ -210,21 +214,22 @@ func fieldData(context interface{}, dataOp, lookup string, results map[string]in
 	if err != nil {
 		err = fmt.Errorf("Invalid operator command operator %q", dataOp)
 		log.Error(context, "fieldData", err, "Index conversion")
-		return lookup, err
+		return "", err
 	}
 
 	// We can't ask for a position we don't have.
 	if index > l-1 {
 		err := fmt.Errorf("Index \"%d\" out of range, total \"%d\"", index, l)
 		log.Error(context, "fieldData", err, "Index range check")
-		return lookup, err
+		return "", err
 	}
 
-	fldValue, exists := values[index][field]
+	// Extract the value for the specified index.
+	fldValue, exists := data[index][field]
 	if !exists {
 		err := fmt.Errorf("Field %q not found at index \"%q\"", field, index)
 		log.Error(context, "fieldData", err, "Map field lookup")
-		return lookup, err
+		return "", err
 	}
 
 	return fldValue, nil
