@@ -70,10 +70,11 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 	return nil
 }
 
-// varSub provides branching to execute the correct substitution.
+// varSub replaces variables inside the command set with values.
 func varSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 
-	// key:"field"  variable:"#cmd:variable_name"
+	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
+	// 		key:"field"  variable:"#cmd:variable_name"
 
 	// Remove the # characters from the left.
 	value := variable[1:]
@@ -81,8 +82,8 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 	// Find the first instance of the separator.
 	idx := strings.Index(value, ":")
 	if idx == -1 {
-		err := fmt.Errorf("Invalid variable format %q", variable)
-		log.Error(context, "parseVar", err, "Parsing variable")
+		err := fmt.Errorf("Invalid variable format %q, missing :", variable)
+		log.Error(context, "varSub", err, "Parsing variable")
 		return err
 	}
 
@@ -92,23 +93,29 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 
 	switch key {
 	case "$in":
-		if len(cmd) == 6 && cmd[0:4] == "data" {
-			v, err := fieldData(context, cmd[5:6], vari, results)
-			if err != nil {
-				return err
-			}
-			commands[key] = v
+		if len(cmd) != 6 || cmd[0:4] != "data" {
+			err := fmt.Errorf("Invalid $in command %q, missing \"data\" keyword or malformed", cmd)
+			log.Error(context, "varSub", err, "$in command processing")
+			return err
 		}
+
+		v, err := fieldData(context, cmd[5:6], vari, results)
+		if err != nil {
+			return err
+		}
+
+		commands[key] = v
+		return nil
 
 	default:
 		v, err := fieldVars(context, cmd, vari, vars, results)
 		if err != nil {
 			return err
 		}
-		commands[key] = v
-	}
 
-	return nil
+		commands[key] = v
+		return nil
+	}
 }
 
 // fieldVars looks up variables and returns their values as the specified type.
@@ -133,7 +140,7 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 		i, err := strconv.Atoi(param)
 		if err != nil {
 			err = fmt.Errorf("Parameter %q is not a number", param)
-			log.Error(context, "fieldData", err, "Index conversion")
+			log.Error(context, "fieldVars", err, "Index conversion")
 			return nil, err
 		}
 		return i, nil
@@ -153,10 +160,14 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 		}
 
 		if cmd == "data" {
-			return nil, errors.New("Data command is missing the operator")
+			err := errors.New("Data command is missing the operator")
+			log.Error(context, "fieldVars", err, "Checking cmd is data")
+			return nil, err
 		}
 
-		return nil, fmt.Errorf("Unknown command %q", cmd)
+		err := fmt.Errorf("Unknown command %q", cmd)
+		log.Error(context, "fieldVars", err, "Checking cmd is data")
+		return nil, err
 	}
 }
 

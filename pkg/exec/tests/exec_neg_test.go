@@ -14,6 +14,7 @@ func getNegExecSet() []execSet {
 		dataMissingInvldOperator(),
 		dataMissingResults(),
 		dataInvldIndex(),
+		dataInMalformed(),
 	}
 }
 
@@ -114,7 +115,7 @@ func dataMissingInvldOperator() execSet {
 	return execSet{
 		fail: true,
 		set: &query.Set{
-			Name:    "Data Invalid Operator",
+			Name:    "Data Missing Invalid Operator",
 			Enabled: true,
 			Queries: []query.Query{
 				{
@@ -152,7 +153,7 @@ func dataMissingResults() execSet {
 	return execSet{
 		fail: true,
 		set: &query.Set{
-			Name:    "Data Invalid Operator",
+			Name:    "Data Missing Results",
 			Enabled: true,
 			Queries: []query.Query{
 				{
@@ -190,7 +191,7 @@ func dataInvldIndex() execSet {
 	return execSet{
 		fail: true,
 		set: &query.Set{
-			Name:    "Data Invalid Operator",
+			Name:    "Data Invalid Index",
 			Enabled: true,
 			Queries: []query.Query{
 				{
@@ -218,6 +219,43 @@ func dataInvldIndex() execSet {
 		},
 		results: []string{
 			`{"results":{"commands":[{"$match":{"station_id":"#data.8:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Index \"8\" out of range, total \"1\""},"error":true}`,
+		},
+	}
+}
+
+// dataInMalformed performs a test for when the $in command is malformed.
+func dataInMalformed() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "Data In Malformed",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Get Ids",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     false,
+					Commands: []map[string]interface{}{
+						{"$project": map[string]interface{}{"_id": 0, "station_id": 1}},
+						{"$limit": 5},
+						{"$save": map[string]interface{}{"$map": "list"}},
+					},
+				},
+				{
+					Name:       "Get Documents",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": map[string]interface{}{"$in": "#tada:list.station_id"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"commands":[{"$match":{"station_id":{"$in":"#tada:list.station_id"}}},{"$project":{"_id":0,"name":1}}],"error":"Invalid $in command \"tada\", missing \"data\" keyword or malformed"},"error":true}`,
 		},
 	}
 }
