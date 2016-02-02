@@ -156,33 +156,35 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 	}
 }
 
-// fieldData locates the data from the data map for the specified field.
-func fieldData(context interface{}, cmdOp, variable string, data map[string]interface{}) (interface{}, error) {
+// fieldData locates the data from the data map based on the data operation and
+// the lookup valies.
+func fieldData(context interface{}, dataOp, lookup string, data map[string]interface{}) (interface{}, error) {
 
 	// We always want an array to be subsituted.					// We select the index and subtitue a single value.
-	// Before : {"field" : {"$in": "#data.*:list.station_id"}}}		// Before : {"field" : "#data.0:list.station_id"}
-	// After  : {"field" : {"$in": ["42021"]}}						// After  : {"field" : "42021"}
-	//  	variable : "list.station_id"							//  	variable : "list.station_id"
-	//  	data     : {"list": [{"station_id":"42021"}]}			//  	data     : {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
+	// Before: {"field" : {"$in": "#data.*:list.station_id"}}}		// Before: {"field" : "#data.0:list.station_id"}
+	// After : {"field" : {"$in": ["42021"]}}						// After : {"field" : "42021"}
+	//      dataOp: "*"                                         	//      dataOp: 0
+	//  	lookup: "list.station_id"							    //  	lookup: "list.station_id"
+	//  	data  : {"list": [{"station_id":"42021"}]}				//  	data  : {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
 
-	// Find the data based on the variable and the field lookup.
-	values, field, err := findData(context, variable, data)
+	// Find the result data based on the lookup.
+	values, field, err := findResultData(context, lookup, data)
 	if err != nil {
-		return variable, err
+		return lookup, err
 	}
 
 	// How many values do we have.
 	l := len(values)
 
-	// If there are no values just use the literal value for the variable.
+	// If there are no values just use the literal value for the lookup.
 	if l == 0 {
 		err := errors.New("No values returned")
 		log.Error(context, "fieldData", err, "Checking length")
-		return variable, err
+		return lookup, err
 	}
 
 	// Do we need to return an array.
-	if cmdOp == "*" {
+	if dataOp == "*" {
 
 		// We have more than one value so return an array of these values.
 		var array []interface{}
@@ -193,7 +195,7 @@ func fieldData(context interface{}, cmdOp, variable string, data map[string]inte
 			if !exists {
 				err := fmt.Errorf("Field %q not found", field)
 				log.Error(context, "fieldData", err, "Map field lookup")
-				return variable, err
+				return lookup, err
 			}
 
 			// Append the value to the array.
@@ -204,52 +206,55 @@ func fieldData(context interface{}, cmdOp, variable string, data map[string]inte
 	}
 
 	// Convert the index position to an int.
-	index, err := strconv.Atoi(cmdOp)
+	index, err := strconv.Atoi(dataOp)
 	if err != nil {
-		err = fmt.Errorf("Invalid operator command operator %q", cmdOp)
+		err = fmt.Errorf("Invalid operator command operator %q", dataOp)
 		log.Error(context, "fieldData", err, "Index conversion")
-		return variable, err
+		return lookup, err
 	}
 
 	// We can't ask for a position we don't have.
 	if index > l-1 {
 		err := fmt.Errorf("Index \"%d\" out of range, total \"%d\"", index, l)
 		log.Error(context, "fieldData", err, "Index range check")
-		return variable, err
+		return lookup, err
 	}
 
 	fldValue, exists := values[index][field]
 	if !exists {
 		err := fmt.Errorf("Field %q not found at index \"%q\"", field, index)
 		log.Error(context, "fieldData", err, "Map field lookup")
-		return variable, err
+		return lookup, err
 	}
 
 	return fldValue, nil
 }
 
-// findData process the variable and lookups up the data.
-func findData(context interface{}, variable string, data map[string]interface{}) ([]bson.M, string, error) {
+// findResultData process the lookup against the data. Returns the result if
+// found and the field name for the data required from the result.
+func findResultData(context interface{}, lookup string, data map[string]interface{}) ([]bson.M, string, error) {
 
-	// Before: "station.station_id"  After: {Field Data}, station_id
+	// lookup: "station.station_id"		lookup: "list.condition.wind_string"
+	// 		key  :   station				key  : list
+	//		field: station_id				field: condition.wind_string
 
-	// Split the variable into the data key and document field key.
-	idx := strings.Index(variable, ".")
+	// Split the lookup into the data key and document field key.
+	idx := strings.Index(lookup, ".")
 	if idx == -1 {
-		err := fmt.Errorf("Invalid formated variable %q", variable)
-		log.Error(context, "findData", err, "Parsing variable")
+		err := fmt.Errorf("Invalid formated lookup %q", lookup)
+		log.Error(context, "findResultData", err, "Parsing lookup")
 		return nil, "", err
 	}
 
 	// Extract the key and field.
-	key := variable[0:idx]
-	field := variable[idx+1:]
+	key := lookup[0:idx]
+	field := lookup[idx+1:]
 
 	// Find the results.
 	results, exists := data[key]
 	if !exists {
 		err := fmt.Errorf("Key %q not found in saved results", key)
-		log.Error(context, "findData", err, "Finding results")
+		log.Error(context, "findResultData", err, "Finding results")
 		return nil, "", err
 	}
 
@@ -257,7 +262,7 @@ func findData(context interface{}, variable string, data map[string]interface{})
 	values, ok := results.([]bson.M)
 	if !ok {
 		err := errors.New("** FATAL : Expected the result to be an array of documents")
-		log.Error(context, "findData", err, "Type assert results : %T", results)
+		log.Error(context, "findResultData", err, "Type assert results : %T", results)
 		return nil, "", err
 	}
 
@@ -266,7 +271,6 @@ func findData(context interface{}, variable string, data map[string]interface{})
 
 // isoDate is a helper function to convert the internal extension for dates
 // into a BSON date. We convert the following string
-// ISODate('2013-01-16T00:00:00.000Z') to a Go time value.
 func isoDate(context interface{}, value string) (time.Time, error) {
 	var parse string
 
