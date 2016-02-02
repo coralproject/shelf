@@ -17,7 +17,7 @@ import (
 // In some cases we are just replacing the variable name for what is in the map.
 // If we have dates and objectid, that requires more work to convert to proper types.
 // This function is also accessed by the tstdata package and exec_test.go
-func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, data map[string]interface{}) error {
+func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 	for key, value := range commands {
 
 		// Test for the type of value we have.
@@ -25,14 +25,14 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 
 		// We have another document.
 		case map[string]interface{}:
-			if err := ProcessVariables(context, doc, vars, data); err != nil {
+			if err := ProcessVariables(context, doc, vars, results); err != nil {
 				return err
 			}
 
 		// We have a string value so check it.
 		case string:
 			if doc != "" && doc[0] == '#' {
-				if err := varSub(context, key, doc, commands, vars, data); err != nil {
+				if err := varSub(context, key, doc, commands, vars, results); err != nil {
 					return err
 				}
 			}
@@ -48,14 +48,14 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 
 				// We have another document.
 				case map[string]interface{}:
-					if err := ProcessVariables(context, arrDoc, vars, data); err != nil {
+					if err := ProcessVariables(context, arrDoc, vars, results); err != nil {
 						return err
 					}
 
 				// We have a string value so check it.
 				case string:
 					if arrDoc != "" && arrDoc[0] == '#' {
-						if err := varSub(context, key, arrDoc, commands, vars, data); err != nil {
+						if err := varSub(context, key, arrDoc, commands, vars, results); err != nil {
 							return err
 						}
 					}
@@ -68,7 +68,7 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 }
 
 // varSub provides branching to execute the correct substitution.
-func varSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, data map[string]interface{}) error {
+func varSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 
 	// key:"field"  variable:"#cmd:variable_name"
 
@@ -90,7 +90,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 	switch key {
 	case "$in":
 		if len(cmd) == 6 && cmd[0:4] == "data" {
-			v, err := fieldData(context, cmd[5:6], vari, data)
+			v, err := fieldData(context, cmd[5:6], vari, results)
 			if err != nil {
 				return err
 			}
@@ -98,7 +98,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 		}
 
 	default:
-		v, err := fieldVars(context, cmd, vari, vars, data)
+		v, err := fieldVars(context, cmd, vari, vars, results)
 		if err != nil {
 			return err
 		}
@@ -109,7 +109,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 }
 
 // fieldVars focuses on replacing variables where the key is a field name.
-func fieldVars(context interface{}, cmd, variable string, vars map[string]string, data map[string]interface{}) (interface{}, error) {
+func fieldVars(context interface{}, cmd, variable string, vars map[string]string, results map[string]interface{}) (interface{}, error) {
 
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
 	// Before: {"field": "#string:variable_name"}  After: {"field": "value"}
@@ -145,7 +145,7 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 
 	default:
 		if len(cmd) == 6 && cmd[0:4] == "data" {
-			return fieldData(context, cmd[5:6], param, data)
+			return fieldData(context, cmd[5:6], param, results)
 		}
 
 		if cmd == "data" {
@@ -156,9 +156,9 @@ func fieldVars(context interface{}, cmd, variable string, vars map[string]string
 	}
 }
 
-// fieldData locates the data from the data map based on the data operation and
+// fieldData locates the data from the results map based on the data operation and
 // the lookup valies.
-func fieldData(context interface{}, dataOp, lookup string, data map[string]interface{}) (interface{}, error) {
+func fieldData(context interface{}, dataOp, lookup string, results map[string]interface{}) (interface{}, error) {
 
 	// We always want an array to be subsituted.					// We select the index and subtitue a single value.
 	// Before: {"field" : {"$in": "#data.*:list.station_id"}}}		// Before: {"field" : "#data.0:list.station_id"}
@@ -168,7 +168,7 @@ func fieldData(context interface{}, dataOp, lookup string, data map[string]inter
 	//  	data  : {"list": [{"station_id":"42021"}]}				//  	data  : {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
 
 	// Find the result data based on the lookup.
-	values, field, err := findResultData(context, lookup, data)
+	values, field, err := findResultData(context, lookup, results)
 	if err != nil {
 		return lookup, err
 	}
@@ -230,9 +230,9 @@ func fieldData(context interface{}, dataOp, lookup string, data map[string]inter
 	return fldValue, nil
 }
 
-// findResultData process the lookup against the data. Returns the result if
-// found and the field name for the data required from the result.
-func findResultData(context interface{}, lookup string, data map[string]interface{}) ([]bson.M, string, error) {
+// findResultData process the lookup against the results. Returns the result if
+// found and the field name for location the field from the results later.
+func findResultData(context interface{}, lookup string, results map[string]interface{}) ([]bson.M, string, error) {
 
 	// lookup: "station.station_id"		lookup: "list.condition.wind_string"
 	// 		key  :   station				key  : list
@@ -250,8 +250,8 @@ func findResultData(context interface{}, lookup string, data map[string]interfac
 	key := lookup[0:idx]
 	field := lookup[idx+1:]
 
-	// Find the results.
-	results, exists := data[key]
+	// Find the result the user is looking for.
+	data, exists := results[key]
 	if !exists {
 		err := fmt.Errorf("Key %q not found in saved results", key)
 		log.Error(context, "findResultData", err, "Finding results")
@@ -259,10 +259,10 @@ func findResultData(context interface{}, lookup string, data map[string]interfac
 	}
 
 	// Extract the concrete type from the interface.
-	values, ok := results.([]bson.M)
+	values, ok := data.([]bson.M)
 	if !ok {
 		err := errors.New("** FATAL : Expected the result to be an array of documents")
-		log.Error(context, "findResultData", err, "Type assert results : %T", results)
+		log.Error(context, "findResultData", err, "Type assert results : %T", data)
 		return nil, "", err
 	}
 
