@@ -22,7 +22,7 @@ Exec executes the specified query set by name.
 
 ## func ProcessVariables
 ``` go
-func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, data map[string]interface{})
+func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, data map[string]interface{}) error
 ```
 ProcessVariables walks the document performing variable substitutions.
 
