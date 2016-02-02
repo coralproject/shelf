@@ -74,5 +74,20 @@ func API() http.Handler {
 
 	a.CORS()
 
+	website(a)
+
 	return a
+}
+
+// website manages the serving of web files for the project.
+func website(a *app.App) {
+	fs := http.FileServer(http.Dir("static"))
+
+	h := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
+		fs.ServeHTTP(rw, r)
+	}
+
+	a.TreeMux.Handle("GET", "/dist/*path", h)
+	a.TreeMux.Handle("GET", "/img/*path", h)
+	a.TreeMux.Handle("GET", "/", h)
 }

@@ -25,7 +25,8 @@
          "collection":"test_xenia_data",
          "return":true,
          "commands":[
-            {"$match": {"station_id" : {"$in": "#data:list.station_id"}}},
+            {"$loop": "#data.list"}
+            {"$match": {"station_id" : {"$in": "#data.array:list.station_id"}}},
             {"$project": {"_id": 0, "name": 1}},
          ]
       }
@@ -59,7 +60,7 @@
          "collection":"test_xenia_data",
          "return":true,
          "commands":[
-            {"$match": {"station_id" : "#data:station.station_id"}},
+            {"$match": {"station_id" : "#data.doc:station.station_id"}},
             {"$project": {"_id": 0, "name": 1}},
          ]
       }
