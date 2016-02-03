@@ -26,6 +26,7 @@ const (
 	cfgMongoDB       = "MONGO_DB"
 	cfgMongoUser     = "MONGO_USER"
 	cfgMongoPassword = "MONGO_PASS"
+	cfgWebHost       = "WEB_HOST"
 )
 
 var xenia = &cobra.Command{
@@ -48,11 +49,15 @@ func main() {
 	}
 	log.Init(os.Stderr, logLevel)
 
+	xenia.Println("Using log level", logLevel())
+
 	// Pull options from the config.
 	var conn *db.DB
-	if host, errHost := cfg.String(cfgMongoHost); errHost != nil {
+	if _, errHost := cfg.String(cfgWebHost); errHost != nil {
+		xenia.Println("Configuring MongoDB")
+
 		cfg := mongo.Config{
-			Host:     host,
+			Host:     cfg.MustString(cfgMongoHost),
 			AuthDB:   cfg.MustString(cfgMongoAuthDB),
 			DB:       cfg.MustString(cfgMongoDB),
 			User:     cfg.MustString(cfgMongoUser),
