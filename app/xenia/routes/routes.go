@@ -1,6 +1,9 @@
 package routes
 
 import (
+	"encoding/json"
+	"io"
+	"io/ioutil"
 	"net/http"
 	"os"
 
@@ -54,6 +57,20 @@ func init() {
 func API() http.Handler {
 	a := app.New(midware.Mongo, midware.Auth)
 
+	log.Dev("startup", "Init", "Initalizing routes")
+	routes(a)
+
+	log.Dev("startup", "Init", "Initalizing CORS")
+	a.CORS()
+
+	log.Dev("startup", "Init", "Initalizing website")
+	website(a)
+
+	return a
+}
+
+// routes manages the handling of the API endpoints.
+func routes(a *app.App) {
 	a.Handle("GET", "/1.0/script", handlers.Script.List)
 	a.Handle("PUT", "/1.0/script", handlers.Script.Upsert)
 	a.Handle("GET", "/1.0/script/:name", handlers.Script.Retrieve)
@@ -71,23 +88,42 @@ func API() http.Handler {
 
 	a.Handle("POST", "/1.0/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/1.0/exec/:name", handlers.Exec.Name)
-
-	a.CORS()
-
-	website(a)
-
-	return a
 }
 
 // website manages the serving of web files for the project.
 func website(a *app.App) {
 	fs := http.FileServer(http.Dir("static"))
-
-	h := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
+	h1 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
 		fs.ServeHTTP(rw, r)
 	}
 
-	a.TreeMux.Handle("GET", "/dist/*path", h)
-	a.TreeMux.Handle("GET", "/img/*path", h)
-	a.TreeMux.Handle("GET", "/", h)
+	a.TreeMux.Handle("GET", "/dist/*path", h1)
+	a.TreeMux.Handle("GET", "/img/*path", h1)
+	a.TreeMux.Handle("GET", "/", h1)
+
+	h2 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
+		data, _ := ioutil.ReadFile("static/index.html")
+		io.WriteString(rw, string(data))
+	}
+
+	file, err := os.Open("static/routes.json")
+	if err != nil {
+		log.Error("startup", "Init", err, "Initializing website")
+		os.Exit(1)
+	}
+
+	defer file.Close()
+
+	var routes []struct {
+		URL string
+	}
+
+	if err := json.NewDecoder(file).Decode(&routes); err != nil {
+		log.Error("startup", "Init", err, "Initializing website")
+		os.Exit(1)
+	}
+
+	for _, route := range routes {
+		a.TreeMux.Handle("GET", route.URL, h2)
+	}
 }
