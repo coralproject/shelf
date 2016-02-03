@@ -16,16 +16,20 @@ import (
 )
 
 // execPipeline executes the sepcified pipeline query.
-func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}) (docs, error) {
+func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}) (docs, []map[string]interface{}, error) {
 
-	// Validate we have scripts to run.
-	if len(q.Commands) == 0 {
-		return docs{}, errors.New("Invalid pipeline script")
-	}
+	// I am returning commands as the second return value because if there
+	// is an error I need to send how far we got back to the client. If not,
+	// the user will not understand the error message.
 
 	// We need to check the last command for the extended $save command.
 	commands := q.Commands
 	l := len(q.Commands) - 1
+
+	// Validate we have scripts to run.
+	if l < 0 {
+		return docs{}, commands, errors.New("Invalid pipeline script")
+	}
 
 	// If the last command is a $save, capture its value and remove
 	// it from the pipeline.
@@ -46,7 +50,9 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 
 		// Do we have variables to be substitued.
 		if vars != nil {
-			ProcessVariables(context, command, vars, data)
+			if err := ProcessVariables(context, command, vars, data); err != nil {
+				return docs{}, commands, err
+			}
 		}
 
 		// Add the operation to the slice for the pipeline.
@@ -65,7 +71,7 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 
 	// Execute the pipeline.
 	if err := db.ExecuteMGO(context, q.Collection, f); err != nil {
-		return docs{}, err
+		return docs{}, commands, err
 	}
 
 	// If there were no results, return an empty array.
@@ -76,11 +82,11 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 	// Do we need to save the result.
 	if save != nil {
 		if err := saveResult(context, save, results, data); err != nil {
-			return docs{}, err
+			return docs{}, commands, err
 		}
 	}
 
-	return docs{q.Name, results}, nil
+	return docs{q.Name, results}, commands, nil
 }
 
 // saveResult processes the $save command for this result.
@@ -92,7 +98,9 @@ func saveResult(context interface{}, save map[string]interface{}, results []bson
 	for cmd, value := range save {
 		name, ok := value.(string)
 		if !ok {
-			return fmt.Errorf("Invalid map key provided : %v", value)
+			err := fmt.Errorf("Save key \"%v\" is a %T but must be a string", value, value)
+			log.Error(context, "saveResult", err, "Extracting save key")
+			return err
 		}
 
 		switch cmd {
@@ -101,11 +109,16 @@ func saveResult(context interface{}, save map[string]interface{}, results []bson
 		case "$map":
 			log.Dev(context, "saveResult", "Saving result to map[%s]", name)
 			data[name] = results
-		}
+			return nil
 
-		// Just process the first key because we should only have one.
-		return nil
+		default:
+			err := fmt.Errorf("Invalid save location %q", cmd)
+			log.Error(context, "saveResult", err, "Nothing saved")
+			return err
+		}
 	}
 
-	return nil
+	err := errors.New("Missing save document")
+	log.Error(context, "saveResult", err, "Nothing saved")
+	return err
 }

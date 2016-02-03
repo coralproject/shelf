@@ -22,13 +22,11 @@ Exec executes the specified query set by name.
 
 ## func ProcessVariables
 ``` go
-func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, data map[string]interface{})
+func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error
 ```
 ProcessVariables walks the document performing variable substitutions.
-
-In some cases we are just replacing the variable name for what is in the map.
-If we have dates and objectid, that requires more work to convert to proper types.
-This function is also accessed by the tstdata package and exec_test.go
+This function is exported because it is accessed by the tstdata package
+and tests.
 
 
 

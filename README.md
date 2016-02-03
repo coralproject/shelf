@@ -206,7 +206,25 @@ http://localhost:4000/1.0/query/basic
 
 output:
 
-{"name":"basic","desc":"Shows a basic multi result query.","enabled":true,"params":[],"queries":[{"name":"Basic","type":"pipeline","collection":"test_query_data","return":true,"scripts":["{\"$match\": {\"station_id\" : \"42021\"}}","{\"$project\": {\"_id\": 0, \"name\": 1}}"]},{"name":"Time","type":"pipeline","collection":"test_bill","return":true,"has_date":true,"scripts":["{\"$match\": {\"condition.date\" : {\"$gt\": \"ISODate(\\\"2013-01-01T00:00:00.000Z\\\")\"}}}","{\"$project\": {\"_id\": 0, \"name\": 1}}","{\"$limit\": 2}"]}]}
+{
+   "name":"QTEST_basic",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : "42021"}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
+}
+
 ```
 
 3) Execute the query for the `basic` query set:
@@ -214,9 +232,42 @@ output:
 ```
 http://localhost:4000/1.0/query/basic/exec
 
+set:
+
+{
+   "name":"basic",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : "42021"}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
+}
+
 output:
 
-{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}
+{
+  "results":[
+    {
+      "Name":"basic",
+      "Docs":[
+        {
+          "name":"C14 - Pasco County Buoy, FL"
+        }
+      ]
+    }
+  ],
+  "error":false
+}
 ```
 
 4) Execute the query for the `basic_var` query set with variables:
@@ -224,9 +275,42 @@ output:
 ```
 http://localhost:4000/1.0/query/basic_var/exec?station_id=42021
 
+set:
+
+{
+   "name":"basic_var",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"BasicVar",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : "#string:station_id"}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
+}
+
 output:
 
-{"results":[{"Name":"BasicVar","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}
+{
+  "results":[
+    {
+      "Name":"basic_var",
+      "Docs":[
+        {
+          "name":"C14 - Pasco County Buoy, FL"
+        }
+      ]
+    }
+  ],
+  "error":false
+}
 ```
 
 ## Query management
@@ -257,32 +341,22 @@ top_commenters_by_count
 output:
 
 {
-    "name": "basic",
-    "desc": "Shows a basic multi result query.",
-    "enabled": true,
-    "queries": [
-        {
-            "name": "Basic",
-            "type": "pipeline",
-            "collection": "test_bill",
-            "return": true,
-            "scripts": [
-                {"$match": {"station_id" : "42021"}},
-                {"$project": {"_id": 0, "name": 1}}
-            ]
-        },
-        {
-            "name": "Time",
-            "type": "pipeline",
-            "collection": "test_bill",
-            "return": true,
-            "scripts": [
-                {"$match": {"condition.date" : {"$gt": "#date:2013-01-01"}}},
-                {"$project": {"_id": 0, "name": 1}},
-                {"$limit": 2}
-            ]
-        }
-    ]
+   "name":"basic",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : "42021"}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
 }
 ```
 
@@ -294,39 +368,28 @@ output:
 output:
 
 {
-    "results": [
+  "results":[
+    {
+      "Name":"basic",
+      "Docs":[
         {
-            "Name": "Basic",
-            "Docs": [
-                {
-                    "name": "C14 - Pasco County Buoy, FL"
-                }
-            ]
-        },
-        {
-            "Name": "Time",
-            "Docs": [
-                {
-                    "name": "C14 - Pasco County Buoy, FL"
-                },
-                {
-                    "name": "GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"
-                }
-            ]
+          "name":"C14 - Pasco County Buoy, FL"
         }
-    ],
-    "error": false
+      ]
+    }
+  ],
+  "error":false
 }
 ```
 
 5) Add or update a query for use:
 
 ```
-./xenia query upsert -p ./scrquery/test_basic_var.json
+./xenia query upsert -p ./scrquery/basic_var.json
 
 output:
 
-Upserting Query : Path[./scrquery/test_basic_var.json]
+Upserting Query : Path[./scrquery/basic_var.json]
 ```
 
 By convention, we store core query scripts in the [/xenia/cmd/xenia/scrquery](https://github.com/CoralProject/xenia/tree/master/cmd/xenia/scrquery) folder.  As we develop Coral features, store the .json files there so other members can use them.  Eventually, groups of query sets will be refactored to elsewhere's yet undefined.
@@ -346,11 +409,15 @@ use coral (or your databasename)
 db.query_sets.find()
 ```
 
-#### Example query set
+#### Writing Sets
 
-Here's a basic query set document containing two pipeline calls and using a variable called #station_id#:
+Writing a set is mostly about creating a MongoDB aggregation pipeline. Xenia has built on top of this by providing extended functionality to make MongoDB more powerful.
+
+Multi query set with variable substitution and date processing.
 
 ```
+http://localhost:4000/1.0/query/basic/exec?station_id=42021
+
 {
    "name":"basic",
    "desc":"Shows a basic multi result query.",
@@ -381,13 +448,110 @@ Here's a basic query set document containing two pipeline calls and using a vari
 }
 ```
 
-This query once saved can be executed via the API:
+Here is the list of #commands that exist for variable substition.
 
 ```
-http://[server]:[port]/1.0/query/[name]?[var_key]=[var_value]
+{"field": "#cmd:variable"}
+Before: {"field": "#number:variable_name"}  After: {"field": 1234}
+Before: {"field": "#string:variable_name"}  After: {"field": "value"}
+Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
+Before: {"field": "#objid:variable_name"}   After: {"field": mgo.ObjectId}
 ```
 
-For documentation of each field in a query set document please refer to the [model.go](/pkg/query/model.go) source code file.
+You can save the result of one query for later use by the next.
+
+```
+http://localhost:4000/1.0/query/basic_save/exec
+
+{
+   "name":"basic_save",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"get_id_list",
+         "desc": "Get the list of id's",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":false,
+         "commands":[
+            {"$project": {"_id": 0, "station_id": 1}},
+            {"$limit": 5}
+            {"$save": {"$map": "list"}}
+         ]
+      },
+      {
+         "name":"retrieve_stations",
+         "desc": "Retrieve the list of stations",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : {"$in": "#data.*:list.station_id"}}},
+            {"$project": {"_id": 0, "name": 1}},
+         ]
+      }
+   ]
+}
+```
+
+The `$save` command is an Xenia extension and currently only `$map` is supported.
+
+```
+{"$save": {"$map": "list"}}
+```
+
+The result will be saved in a map under the name `list`.
+
+The second query is using the `#data` command. The data command has two options. Use can use `#data.*` or `#data.Idx`.
+
+Use the `*` operator when you need an array. In this example we need to support an `$in` command:
+
+```
+{
+   "name":"retrieve_stations",
+   "desc": "Retrieve the list of stations",
+   "type":"pipeline",
+   "collection":"test_xenia_data",
+   "return":true,
+   "commands":[
+      {"$match": {"station_id" : {"$in": "#data.*:list.station_id"}}},
+      {"$project": {"_id": 0, "name": 1}},
+   ]
+}
+
+We you need an array to be substitued.
+Before: {"field" : {"$in": "#data.*:list.station_id"}}}
+After : {"field" : {"$in": ["42021"]}}
+    dataOp : "*"
+    lookup : "list.station_id"
+    results: {"list": [{"station_id":"42021"}]}
+```
+
+Use the index operator when you need a single value. Specify which document in the array of documents you want to select:
+
+```
+
+{
+   "name":"retrieve_stations",
+   "desc": "Retrieve the list of stations",
+   "type":"pipeline",
+   "collection":"test_xenia_data",
+   "return":true,
+   "commands":[
+      {"$match": {"station_id" : "#data.0:list.station_id"}},
+      {"$project": {"_id": 0, "name": 1}},
+   ]
+}
+
+We you need a single value to be substitued, select an index.
+Before: {"field" : "#data.0:list.station_id"}
+After : {"field" : "42021"}
+    dataOp : 0
+    lookup : "list.station_id"
+    results: {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
+```
 
 ## API Authentication
 

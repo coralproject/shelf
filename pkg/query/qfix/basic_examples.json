@@ -1,3 +1,19 @@
+// We always want an array to be subsituted.
+//
+// Before : {"field" : {"$in": "#data.*:list.station_id"}}}
+// After  : {"field" : {"$in": ["42021"]}}
+//    variable : "list.station_id"
+//    data     : {"list": [{"station_id":"42021"}]}
+
+// We select the index and subtitue a single value.
+//
+// Before : {"field" : "#data.0:list.station_id"}
+// After  : {"field" : "42021"}
+//    variable : "list.station_id"
+//    data     : {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
+
+//==============================================================================
+
 // This is not being used by tests. It is for documentation.
 
 {
@@ -26,7 +42,7 @@
          "return":true,
          "commands":[
             {"$loop": "#data.list"}
-            {"$match": {"station_id" : {"$in": "#data.array:list.station_id"}}},
+            {"$match": {"station_id" : {"$in": "#data.*:list.station_id"}}},
             {"$project": {"_id": 0, "name": 1}},
          ]
       }
@@ -60,7 +76,7 @@
          "collection":"test_xenia_data",
          "return":true,
          "commands":[
-            {"$match": {"station_id" : "#data.doc:station.station_id"}},
+            {"$match": {"station_id" : "#data.0:station.station_id"}},
             {"$project": {"_id": 0, "name": 1}},
          ]
       }
