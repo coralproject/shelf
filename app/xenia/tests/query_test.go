@@ -45,7 +45,7 @@ func TestQuerySets(t *testing.T) {
 
 			var count int
 			for _, set := range sets {
-				if set.Name[0:len(qPrefix)] == qPrefix {
+				if len(set.Name) > len(qPrefix) && set.Name[0:len(qPrefix)] == qPrefix {
 					count++
 				}
 			}
