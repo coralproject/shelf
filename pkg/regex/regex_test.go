@@ -16,6 +16,9 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
+// prefix is what we are looking to delete after the test.
+const prefix = "RTEST_O"
+
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
@@ -54,7 +57,7 @@ func TestUpsertCreateRegex(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regex : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regex.", tests.Success)
@@ -101,7 +104,7 @@ func TestGetRegexNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	rgxName := "RTEST_basic"
+	rgxName := prefix + "_basic"
 
 	const fixture = "basic.json"
 	rgx1, err := rfix.Get(fixture)
@@ -117,7 +120,7 @@ func TestGetRegexNames(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -147,7 +150,7 @@ func TestGetRegexNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if len(name) > 5 && name[0:5] == "RTEST" {
+				if len(name) > len(prefix) && name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -185,7 +188,7 @@ func TestGetRegexs(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -214,7 +217,7 @@ func TestGetRegexs(t *testing.T) {
 
 			var count int
 			for _, rgx := range rgxs {
-				if len(rgx.Name) > 5 && rgx.Name[0:5] == "RTEST" {
+				if len(rgx.Name) > len(prefix) && rgx.Name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -246,7 +249,7 @@ func TestGetRegexByNames(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -276,7 +279,7 @@ func TestGetRegexByNames(t *testing.T) {
 
 			var count int
 			for _, rgx := range regexs {
-				if len(rgx.Name) > 5 && rgx.Name[0:5] == "RTEST" {
+				if len(rgx.Name) > len(prefix) && rgx.Name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -301,7 +304,7 @@ func TestGetLastRegexHistoryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	rgxName := "RTEST_basic"
+	rgxName := prefix + "_basic"
 
 	const fixture = "basic.json"
 	rgx1, err := rfix.Get(fixture)
@@ -317,7 +320,7 @@ func TestGetLastRegexHistoryByName(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -375,7 +378,7 @@ func TestUpsertUpdateRegex(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -431,8 +434,8 @@ func TestDeleteRegex(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	rgxName := "RTEST_basic"
-	rgxBadName := "RTEST_basic_advice"
+	rgxName := prefix + "_basic"
+	rgxBadName := prefix + "_basic_advice"
 
 	const fixture = "basic.json"
 	rgx1, err := rfix.Get(fixture)
@@ -448,7 +451,7 @@ func TestDeleteRegex(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := rfix.Remove(db); err != nil {
+		if err := rfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
@@ -486,7 +489,7 @@ func TestAPIFailureRegexs(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	rgxName := "RTEST_unknown"
+	rgxName := prefix + "_unknown"
 
 	const fixture = "basic.json"
 	rgx1, err := rfix.Get(fixture)

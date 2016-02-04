@@ -106,7 +106,7 @@ func (s *Set) Validate() error {
 	return nil
 }
 
-// PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+// PrepareForInsert replaces the documents for insertion.
 func (s *Set) PrepareForInsert() {
 
 	// Fix the commands so it can be inserted.
@@ -117,7 +117,7 @@ func (s *Set) PrepareForInsert() {
 	}
 }
 
-// PrepareForUse replaces the `_$` to `$` when found in the front of field names.
+// PrepareForUse replaces the documents back to their orginal form.
 func (s *Set) PrepareForUse() {
 
 	// Fix the commands so things are back to their orginal form.

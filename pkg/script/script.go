@@ -279,6 +279,11 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error
 		return nil, err
 	}
 
+	if scrs == nil {
+		log.Error(context, "GetByNames", ErrNotFound, "Completed")
+		return nil, ErrNotFound
+	}
+
 	// I can't assume MongoDB will bring the results back in the order I
 	// setup the query. I need the order to match on the returned slice.
 	// I thought about using a map of name/value but I feel like it is overkill.

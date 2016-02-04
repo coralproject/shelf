@@ -14,6 +14,9 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
+// prefix is what we are looking to delete after the test.
+const prefix = "QTEST_O"
+
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
@@ -38,7 +41,7 @@ func TestUpsertCreateSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "basic.json"
+	const fixture = "basic_sub.json"
 	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query set record from file : %v", tests.Failed, err)
@@ -52,7 +55,7 @@ func TestUpsertCreateSet(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -108,7 +111,7 @@ func TestGetSetNames(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -123,8 +126,9 @@ func TestGetSetNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			set1.Name += "2"
-			if err := query.Upsert(tests.Context, db, set1); err != nil {
+			set2 := *set1
+			set2.Name += "2"
+			if err := query.Upsert(tests.Context, db, &set2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second query set : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
@@ -137,7 +141,7 @@ func TestGetSetNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if len(name) > 5 && name[0:5] == "QTEST" {
+				if len(name) > len(prefix) && name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -169,7 +173,7 @@ func TestGetSets(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -198,7 +202,7 @@ func TestGetSets(t *testing.T) {
 
 			var count int
 			for _, set := range sets {
-				if len(set.Name) > 5 && set.Name[0:5] == "QTEST" {
+				if len(set.Name) > len(prefix) && set.Name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -217,7 +221,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_basic"
+	qsName := prefix + "_basic"
 
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)
@@ -233,7 +237,7 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -291,7 +295,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -357,8 +361,8 @@ func TestDeleteSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_basic"
-	qsBadName := "QTEST_basic_advice"
+	qsName := prefix + "_basic"
+	qsBadName := prefix + "_basic_advice"
 
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)
@@ -374,7 +378,7 @@ func TestDeleteSet(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -413,7 +417,7 @@ func TestUnknownName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_unknown"
+	qsName := prefix + "_unknown"
 
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)
@@ -429,7 +433,7 @@ func TestUnknownName(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := qfix.Remove(db); err != nil {
+		if err := qfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
@@ -462,7 +466,7 @@ func TestAPIFailureSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	qsName := "QTEST_unknown"
+	qsName := prefix + "_unknown"
 
 	const fixture = "basic.json"
 	set1, err := qfix.Get(fixture)

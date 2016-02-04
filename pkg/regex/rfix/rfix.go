@@ -55,9 +55,9 @@ func Add(db *db.DB, rgx *regex.Regex) error {
 
 // Remove is used to clear out all the test regexs from the collection.
 // All test documents must start with QSTEST in their name.
-func Remove(db *db.DB) error {
+func Remove(db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "RTEST"}}
+		q := bson.M{"name": bson.RegEx{Pattern: pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
@@ -67,7 +67,7 @@ func Remove(db *db.DB) error {
 	}
 
 	f = func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "RTEST"}}
+		q := bson.M{"name": bson.RegEx{Pattern: pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}

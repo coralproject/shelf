@@ -41,8 +41,9 @@ func prepareForInsert(commands map[string]interface{}) {
 
 			// Replace any key we find that has dot notation.
 			if idx := strings.Index(key, "."); idx != -1 {
+				nKey := strings.Replace(key, ".", "*", -1)
 				delete(commands, key)
-				commands[key[0:idx]+"*"+key[idx+1:]] = value
+				commands[nKey] = value
 			}
 
 		}
@@ -87,10 +88,10 @@ func prepareForUse(commands map[string]interface{}) {
 
 			// Replace any key we find that has *.
 			if idx := strings.Index(key, "*"); idx != -1 {
+				nKey := strings.Replace(key, "*", ".", -1)
 				delete(commands, key)
-				commands[key[0:idx]+"."+key[idx+1:]] = value
+				commands[nKey] = value
 			}
-
 		}
 	}
 }

@@ -1,5 +1,5 @@
 {
-	"name":"STEST_basic",
+	"name":"STEST_O_basic",
 	"commands": [
 		{"command": 1},
 		{"command": 2},

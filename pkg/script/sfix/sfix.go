@@ -49,9 +49,9 @@ func Add(db *db.DB, scr *script.Script) error {
 
 // Remove is used to clear out all the test sets from the collection.
 // All test documents must start with STEST in their name.
-func Remove(db *db.DB) error {
+func Remove(db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "STEST"}}
+		q := bson.M{"name": bson.RegEx{Pattern: pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
@@ -61,7 +61,7 @@ func Remove(db *db.DB) error {
 	}
 
 	f = func(c *mgo.Collection) error {
-		q := bson.M{"name": bson.RegEx{Pattern: "STEST"}}
+		q := bson.M{"name": bson.RegEx{Pattern: pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}

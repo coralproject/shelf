@@ -1,5 +1,5 @@
 {
-	"name" : "STEST_basic_script_pre",
+	"name" : "STEST_O_basic_script_pre",
 	"commands":[
 		{"$match": {"$or": [{"station_id" : "42021"},{"station_id" : "44008"}] }}
 	]

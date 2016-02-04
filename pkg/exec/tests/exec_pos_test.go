@@ -112,8 +112,8 @@ func basicPrePost() execSet {
 		set: &query.Set{
 			Name:      "Basic PrePost",
 			Enabled:   true,
-			PreScript: "STEST_basic_script_pre",
-			PstScript: "STEST_basic_script_pst",
+			PreScript: "STEST_T_basic_script_pre",
+			PstScript: "STEST_T_basic_script_pst",
 			Queries: []query.Query{
 				{
 					Name:       "Basic PrePost",
