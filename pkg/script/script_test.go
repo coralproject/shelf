@@ -15,6 +15,9 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
+// prefix is what we are looking to delete after the test.
+const prefix = "STEST_O"
+
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
@@ -53,7 +56,7 @@ func TestUpsertCreateScript(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -95,7 +98,7 @@ func TestGetScriptNames(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := "STEST_basic"
+	scrName := prefix + "_basic"
 
 	const fixture = "basic.json"
 	scr1, err := sfix.Get(fixture)
@@ -111,7 +114,7 @@ func TestGetScriptNames(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -141,7 +144,7 @@ func TestGetScriptNames(t *testing.T) {
 
 			var count int
 			for _, name := range names {
-				if len(name) > 5 && name[0:5] == "STEST" {
+				if len(name) > len(prefix) && name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -154,7 +157,15 @@ func TestGetScriptNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
 
-			if !strings.Contains(names[0], scrName) || !strings.Contains(names[1], scrName) {
+			var found bool
+			for _, n := range names {
+				if strings.Contains(n, scrName) {
+					found = true
+					break
+				}
+			}
+
+			if !found {
 				t.Errorf("\t%s\tShould have \"%s\" in the name : %s", tests.Failed, scrName, names[0])
 			} else {
 				t.Logf("\t%s\tShould have \"%s\" in the name.", tests.Success, scrName)
@@ -182,7 +193,7 @@ func TestGetScripts(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -197,21 +208,22 @@ func TestGetScripts(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr1.Name += "2"
-			if err := script.Upsert(tests.Context, db, scr1); err != nil {
+			scr2 := *scr1
+			scr2.Name += "2"
+			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
 
-			scrs, err := script.GetScripts(tests.Context, db, nil)
+			scripts, err := script.GetScripts(tests.Context, db, nil)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the scripts : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the scripts", tests.Success)
 
 			var count int
-			for _, scr := range scrs {
-				if len(scr.Name) > 5 && scr.Name[0:5] == "STEST" {
+			for _, scr := range scripts {
+				if len(scr.Name) > len(prefix) && scr.Name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -220,9 +232,22 @@ func TestGetScripts(t *testing.T) {
 			// have more scripts.
 
 			if count < 2 {
-				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scrs), scrs)
+				t.Fatalf("\t%s\tShould have at least two scripts : %d : %v", tests.Failed, len(scripts), scripts)
 			}
 			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
+
+			var found int
+			for _, s := range scripts {
+				if s.Name == scr1.Name || s.Name == scr2.Name {
+					found++
+				}
+			}
+
+			if found != 2 {
+				t.Errorf("\t%s\tShould have retrieve the correct scripts : found[%d]", tests.Failed, found)
+			} else {
+				t.Logf("\t%s\tShould have retrieve the correct scripts.", tests.Success)
+			}
 		}
 	}
 }
@@ -246,7 +271,7 @@ func TestGetScriptByNames(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -276,7 +301,7 @@ func TestGetScriptByNames(t *testing.T) {
 
 			var count int
 			for _, scr := range scripts {
-				if len(scr.Name) > 5 && scr.Name[0:5] == "STEST" {
+				if len(scr.Name) > len(prefix) && scr.Name[0:len(prefix)] == prefix {
 					count++
 				}
 			}
@@ -289,8 +314,15 @@ func TestGetScriptByNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould have at least two scripts.", tests.Success)
 
-			if scripts[0].Name != scr1.Name || scripts[1].Name != scr2.Name {
-				t.Errorf("\t%s\tShould have retrieve the correct scripts.", tests.Failed)
+			var found int
+			for _, s := range scripts {
+				if s.Name == scr1.Name || s.Name == scr2.Name {
+					found++
+				}
+			}
+
+			if found != 2 {
+				t.Errorf("\t%s\tShould have retrieve the correct scripts : found[%d]", tests.Failed, found)
 			} else {
 				t.Logf("\t%s\tShould have retrieve the correct scripts.", tests.Success)
 			}
@@ -304,7 +336,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := "STEST_basic"
+	scrName := prefix + "_basic"
 
 	const fixture = "basic.json"
 	scr1, err := sfix.Get(fixture)
@@ -320,7 +352,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -378,7 +410,7 @@ func TestUpsertUpdateScript(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -440,8 +472,8 @@ func TestDeleteScript(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := "STEST_basic"
-	scrBadName := "STEST_basic_advice"
+	scrName := prefix + "_basic"
+	scrBadName := prefix + "_basic_advice"
 
 	const fixture = "basic.json"
 	scr1, err := sfix.Get(fixture)
@@ -457,7 +489,7 @@ func TestDeleteScript(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
@@ -495,7 +527,7 @@ func TestAPIFailureScripts(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	scrName := "STEST_unknown"
+	scrName := prefix + "_unknown"
 
 	const fixture = "basic.json"
 	scr1, err := sfix.Get(fixture)

@@ -1,4 +1,4 @@
 {
-   "name": "RTEST_basic",
+   "name": "RTEST_O_basic",
    "expr": "^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$"
 }

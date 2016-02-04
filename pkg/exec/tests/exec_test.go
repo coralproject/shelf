@@ -2,6 +2,7 @@ package exec_test
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 	"time"
 
@@ -206,6 +207,10 @@ func loadTestData(t *testing.T, db *db.DB) {
 			}
 			t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
+			// We need these scripts loaded under another name to allow tests
+			// to run in parallel.
+			scr.Name = strings.Replace(scr.Name, "STEST_O", "STEST_T", 1)
+
 			if err := script.Upsert(tests.Context, db, scr); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
@@ -220,7 +225,7 @@ func unloadTestData(t *testing.T, db *db.DB) {
 	{
 		tstdata.Drop(db)
 
-		if err := sfix.Remove(db); err != nil {
+		if err := sfix.Remove(db, "STEST_T"); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)

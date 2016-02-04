@@ -17,7 +17,7 @@
 // This is not being used by tests. It is for documentation.
 
 {
-   "name":"QTEST_basic_save",
+   "name":"QTEST_O_basic_save",
    "desc":"",
    "enabled":true,
    "params":[],
@@ -52,7 +52,7 @@
 //==============================================================================
 
 {
-   "name":"QTEST_basic_save",
+   "name":"QTEST_O_basic_save",
    "desc":"",
    "enabled":true,
    "params":[],

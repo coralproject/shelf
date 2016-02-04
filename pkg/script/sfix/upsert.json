@@ -1,5 +1,5 @@
 {
-   "name":"STEST_upsert",
+   "name":"STEST_O_upsert",
    "commands": [
 		{"command.one": 1},
 		{"command": 2},
