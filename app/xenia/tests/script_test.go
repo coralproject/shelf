@@ -1,4 +1,4 @@
-// Package endpoint implements users tests for the API layer.
+// Package tests implements users tests for the API layer.
 package tests
 
 import (
@@ -12,6 +12,9 @@ import (
 
 	"github.com/ardanlabs/kit/tests"
 )
+
+// sPrefix is the base name for everything.
+const sPrefix = "STEST_O"
 
 // TestScripts tests the retrieval of scripts.
 func TestScripts(t *testing.T) {
@@ -42,7 +45,7 @@ func TestScripts(t *testing.T) {
 
 			var count int
 			for _, scr := range scrs {
-				if scr.Name[0:5] == "STEST" {
+				if scr.Name[0:len(sPrefix)] == sPrefix {
 					count++
 				}
 			}
@@ -62,7 +65,7 @@ func TestScriptByName(t *testing.T) {
 
 	t.Log("Given the need to get a specific script.")
 	{
-		url := "/1.0/script/STEST_basic_script_pre"
+		url := "/1.0/script/" + sPrefix + "_basic_script_pre"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -81,7 +84,7 @@ func TestScriptByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if scr.Name != "STEST_basic_script_pre" {
+			if scr.Name != sPrefix+"_basic_script_pre" {
 				t.Fatalf("\t%s\tShould have the correct script : %s", tests.Failed, scr.Name)
 			}
 			t.Logf("\t%s\tShould have the correct script.", tests.Success)
@@ -131,7 +134,7 @@ func TestScriptUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Script.
 
-		url = "/1.0/script/STEST_upsert"
+		url = "/1.0/script/" + sPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -145,7 +148,7 @@ func TestScriptUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
+			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -183,7 +186,7 @@ func TestScriptUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Script.
 
-		url = "/1.0/script/STEST_upsert"
+		url = "/1.0/script/" + sPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -197,7 +200,7 @@ func TestScriptUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3},{"command":4}]}`
+			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3},{"command":4}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -251,7 +254,7 @@ func TestScriptDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Script.
 
-		url = "/1.0/script/STEST_upsert"
+		url = "/1.0/script/" + sPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -265,7 +268,7 @@ func TestScriptDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"STEST_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
+			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -278,7 +281,7 @@ func TestScriptDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Script.
 
-		url = "/1.0/script/STEST_upsert"
+		url = "/1.0/script/" + sPrefix + "_upsert"
 		r = tests.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
@@ -295,7 +298,7 @@ func TestScriptDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Script.
 
-		url = "/1.0/script/STEST_upsert"
+		url = "/1.0/script/" + sPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 

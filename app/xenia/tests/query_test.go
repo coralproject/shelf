@@ -1,4 +1,4 @@
-// Package endpoint implements users tests for the API layer.
+// Package tests implements users tests for the API layer.
 package tests
 
 import (
@@ -12,6 +12,9 @@ import (
 
 	"github.com/ardanlabs/kit/tests"
 )
+
+// qPrefix is the base name for everything.
+const qPrefix = "QTEST_O"
 
 // TestQuerySets tests the retrieval of query sets.
 func TestQuerySets(t *testing.T) {
@@ -42,7 +45,7 @@ func TestQuerySets(t *testing.T) {
 
 			var count int
 			for _, set := range sets {
-				if set.Name[0:5] == "QTEST" {
+				if set.Name[0:len(qPrefix)] == qPrefix {
 					count++
 				}
 			}
@@ -62,7 +65,7 @@ func TestQueryByName(t *testing.T) {
 
 	t.Log("Given the need to get a specific query.")
 	{
-		url := "/1.0/query/QTEST_basic"
+		url := "/1.0/query/" + qPrefix + "_basic"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -81,7 +84,7 @@ func TestQueryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if set.Name != "QTEST_basic" {
+			if set.Name != qPrefix+"_basic" {
 				t.Fatalf("\t%s\tShould have the correct set : %s", tests.Failed, set.Name)
 			}
 			t.Logf("\t%s\tShould have the correct set.", tests.Success)
@@ -131,7 +134,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/QTEST_upsert"
+		url = "/1.0/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -145,7 +148,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -183,7 +186,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/QTEST_upsert"
+		url = "/1.0/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -197,7 +200,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -251,7 +254,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/QTEST_upsert"
+		url = "/1.0/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -265,7 +268,7 @@ func TestQueryDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"QTEST_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -278,7 +281,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Set.
 
-		url = "/1.0/query/QTEST_upsert"
+		url = "/1.0/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
@@ -295,7 +298,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/QTEST_upsert"
+		url = "/1.0/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 

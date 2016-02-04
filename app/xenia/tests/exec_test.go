@@ -1,4 +1,4 @@
-// Package endpoint implements users tests for the API layer.
+// Package tests implements users tests for the API layer.
 package tests
 
 import (
@@ -19,7 +19,7 @@ func TestExec(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query.")
 	{
-		url := "/1.0/exec/QTEST_basic?station_id=42021"
+		url := "/1.0/exec/" + qPrefix + "_basic?station_id=42021"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -97,7 +97,7 @@ func TestExecJSONP(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query with JSONP output.")
 	{
-		url := "/1.0/exec/QTEST_basic?station_id=42021&callback=handle_data"
+		url := "/1.0/exec/" + qPrefix + "_basic?station_id=42021&callback=handle_data"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 

@@ -1,4 +1,4 @@
-// Package endpoint implements users tests for the API layer.
+// Package tests implements users tests for the API layer.
 package tests
 
 import (
@@ -49,11 +49,11 @@ func TestMain(m *testing.M) {
 
 	loadQuery(db, "basic.json")
 	loadQuery(db, "basic_var.json")
-	defer qfix.Remove(db)
+	defer qfix.Remove(db, "QTEST_O")
 
 	loadScript(db, "basic_script_pre.json")
 	loadScript(db, "basic_script_pst.json")
-	defer sfix.Remove(db)
+	defer sfix.Remove(db, "STEST_O")
 
 	m.Run()
 }
