@@ -54,7 +54,7 @@ func init() {
 //==============================================================================
 
 // API returns a handler for a set of routes.
-func API() http.Handler {
+func API(testing ...bool) http.Handler {
 	a := app.New(midware.Mongo, midware.Auth)
 
 	log.Dev("startup", "Init", "Initalizing routes")
@@ -63,8 +63,10 @@ func API() http.Handler {
 	log.Dev("startup", "Init", "Initalizing CORS")
 	a.CORS()
 
-	log.Dev("startup", "Init", "Initalizing website")
-	website(a)
+	if testing == nil {
+		log.Dev("startup", "Init", "Initalizing website")
+		website(a)
+	}
 
 	return a
 }
