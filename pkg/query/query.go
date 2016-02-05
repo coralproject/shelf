@@ -159,6 +159,11 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		return nil, err
 	}
 
+	if rawNames == nil {
+		log.Error(context, "GetNames", ErrNotFound, "Completed")
+		return nil, ErrNotFound
+	}
+
 	names := make([]string, len(rawNames))
 	for i := range rawNames {
 		names[i] = rawNames[i].Name
@@ -194,6 +199,11 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 
 		log.Error(context, "GetSets", err, "Completed")
 		return nil, err
+	}
+
+	if sets == nil {
+		log.Error(context, "GetSets", ErrNotFound, "Completed")
+		return nil, ErrNotFound
 	}
 
 	// Fix the sets so they can be used for processing.

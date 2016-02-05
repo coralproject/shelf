@@ -157,6 +157,11 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		return nil, err
 	}
 
+	if rawNames == nil {
+		log.Error(context, "GetNames", ErrNotFound, "Completed")
+		return nil, ErrNotFound
+	}
+
 	names := make([]string, len(rawNames))
 	for i := range rawNames {
 		names[i] = rawNames[i].Name
@@ -192,6 +197,11 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 
 		log.Error(context, "GetScripts", err, "Completed")
 		return nil, err
+	}
+
+	if scrs == nil {
+		log.Error(context, "GetScripts", ErrNotFound, "Completed")
+		return nil, ErrNotFound
 	}
 
 	// Fix the scripts so they can be used for processing.
