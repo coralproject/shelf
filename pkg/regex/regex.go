@@ -156,6 +156,11 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 		return nil, err
 	}
 
+	if rawNames == nil {
+		log.Error(context, "GetNames", ErrNotFound, "Completed")
+		return nil, ErrNotFound
+	}
+
 	names := make([]string, len(rawNames))
 	for i := range rawNames {
 		names[i] = rawNames[i].Name
@@ -191,6 +196,11 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 
 		log.Error(context, "GetRegexs", err, "Completed")
 		return nil, err
+	}
+
+	if rgxs == nil {
+		log.Error(context, "GetRegexs", ErrNotFound, "Completed")
+		return nil, ErrNotFound
 	}
 
 	cache.Set(key, rgxs, gc.DefaultExpiration)
@@ -275,6 +285,11 @@ func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error)
 
 		log.Error(context, "GetByNames", err, "Completed")
 		return nil, err
+	}
+
+	if rgxs == nil {
+		log.Error(context, "GetByNames", ErrNotFound, "Completed")
+		return nil, ErrNotFound
 	}
 
 	// I can't assume MongoDB will bring the results back in the order I
