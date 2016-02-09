@@ -152,9 +152,9 @@
 			"revisionTime": "2015-09-24T06:57:13-04:00"
 		},
 		{
-			"path": "gopkg.in/go-playground/validator.v6",
-			"revision": "15e8444e515459e82ef3c33c8cd2dc68b2031e5b",
-			"revisionTime": "2015-09-24T07:48:25-04:00"
+			"path": "gopkg.in/go-playground/validator.v8",
+			"revision": "4c79e698231042063ef780f52bd0295392de42d7",
+			"revisionTime": "2016-02-02T20:01:43-05:00"
 		},
 		{
 			"path": "gopkg.in/mgo.v2",
