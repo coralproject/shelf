@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/coralproject/xenia/app/xenia/handlers"
+	"github.com/coralproject/xenia/cmd/xeniad/handlers"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"

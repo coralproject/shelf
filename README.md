@@ -141,11 +141,11 @@ Upserting Query : Upserted
 
 ## Run the web service
 
-1) To run the web service, build and run `/app/xenia`:
+1) To run the web service, build and run `/cmd/xeniad`:
 
 ```
 go build
-./xenia
+./xeniad
 
 output:
 
