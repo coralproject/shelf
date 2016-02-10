@@ -4,7 +4,7 @@ package main
 import (
 	"runtime"
 
-	"github.com/coralproject/xenia/app/xenia/routes"
+	"github.com/coralproject/xenia/cmd/xeniad/routes"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"

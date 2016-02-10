@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/coralproject/xenia/app/xenia/routes"
+	"github.com/coralproject/xenia/cmd/xeniad/routes"
 	"github.com/coralproject/xenia/pkg/query/qfix"
 	"github.com/coralproject/xenia/pkg/script/sfix"
 	"github.com/coralproject/xenia/tstdata"
