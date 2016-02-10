@@ -3,6 +3,7 @@ package tests
 
 import (
 	"fmt"
+	"os"
 	"testing"
 
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
@@ -27,19 +28,24 @@ func init() {
 
 // TestMain helps to clean up the test data.
 func TestMain(m *testing.M) {
+	os.Exit(runTest(m))
+}
 
+// runTest initializes the environment for the tests and allows for
+// the proper return code if the test fails or succeeds.
+func runTest(m *testing.M) int {
 	// In order to get a Mongo session we need the name of the database we
 	// are using. The web framework middleware is using this by convention.
 	dbName, err := cfg.String("MONGO_DB")
 	if err != nil {
 		fmt.Println("MongoDB is not configured")
-		return
+		return 1
 	}
 
 	db, err := db.NewMGO("context", dbName)
 	if err != nil {
 		fmt.Println("Unable to get Mongo session")
-		return
+		return 1
 	}
 
 	defer db.CloseMGO("context")
@@ -55,7 +61,7 @@ func TestMain(m *testing.M) {
 	loadScript(db, "basic_script_pst.json")
 	defer sfix.Remove(db, "STEST_O")
 
-	m.Run()
+	return m.Run()
 }
 
 // loadQuery adds queries to run tests.
