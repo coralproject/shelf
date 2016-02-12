@@ -57,8 +57,8 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "b37c7b08ea213df7050c1cfea4af8d7eac97459a",
-			"revisionTime": "2016-02-03T14:57:55-05:00"
+			"revision": "2dd62b2e21d8813700e9dcd48c8da33111bf3c9e",
+			"revisionTime": "2016-02-11T13:12:08-05:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
