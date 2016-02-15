@@ -6,6 +6,7 @@ import (
 
 	"github.com/coralproject/xenia/pkg/script"
 
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 )
 
@@ -20,7 +21,7 @@ var Script scriptHandle
 // List returns all the existing scripts in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (scriptHandle) List(c *app.Context) error {
-	scrs, err := script.GetScripts(c.SessionID, c.DB, nil)
+	scrs, err := script.GetScripts(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == script.ErrNotFound {
 			err = app.ErrNotFound
@@ -35,7 +36,7 @@ func (scriptHandle) List(c *app.Context) error {
 // Retrieve returns the specified script from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (scriptHandle) Retrieve(c *app.Context) error {
-	scr, err := script.GetByName(c.SessionID, c.DB, c.Params["name"])
+	scr, err := script.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == script.ErrNotFound {
 			err = app.ErrNotFound
@@ -57,7 +58,7 @@ func (scriptHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	if err := script.Upsert(c.SessionID, c.DB, scr); err != nil {
+	if err := script.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), scr); err != nil {
 		return err
 	}
 
@@ -70,7 +71,7 @@ func (scriptHandle) Upsert(c *app.Context) error {
 // Delete removes the specified Script from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (scriptHandle) Delete(c *app.Context) error {
-	if err := script.Delete(c.SessionID, c.DB, c.Params["name"]); err != nil {
+	if err := script.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"]); err != nil {
 		if err == script.ErrNotFound {
 			err = app.ErrNotFound
 		}

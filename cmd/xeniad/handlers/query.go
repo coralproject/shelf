@@ -7,6 +7,7 @@ import (
 
 	"github.com/coralproject/xenia/pkg/query"
 
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 )
 
@@ -21,7 +22,7 @@ var Query queryHandle
 // List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
-	sets, err := query.GetSets(c.SessionID, c.DB, nil)
+	sets, err := query.GetSets(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound
@@ -36,7 +37,7 @@ func (queryHandle) List(c *app.Context) error {
 // Retrieve returns the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Retrieve(c *app.Context) error {
-	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
+	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound
@@ -58,7 +59,7 @@ func (queryHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	if err := query.Upsert(c.SessionID, c.DB, set); err != nil {
+	if err := query.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), set); err != nil {
 		return err
 	}
 
@@ -71,7 +72,7 @@ func (queryHandle) Upsert(c *app.Context) error {
 // Delete removes the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Delete(c *app.Context) error {
-	if err := query.Delete(c.SessionID, c.DB, c.Params["name"]); err != nil {
+	if err := query.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"]); err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound
 		}

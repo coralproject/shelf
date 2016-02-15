@@ -9,6 +9,7 @@ import (
 	"github.com/coralproject/xenia/pkg/exec"
 	"github.com/coralproject/xenia/pkg/query"
 
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 )
 
@@ -23,7 +24,7 @@ var Exec execHandle
 // Name runs the specified Set and return results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (execHandle) Name(c *app.Context) error {
-	set, err := query.GetByName(c.SessionID, c.DB, c.Params["name"])
+	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound
@@ -60,7 +61,7 @@ func execute(c *app.Context, set *query.Set) error {
 		}
 	}
 
-	result := exec.Exec(c.SessionID, c.DB, set, vars)
+	result := exec.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

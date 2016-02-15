@@ -15,8 +15,8 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "5ff414cfe0f947deded630754487a0b871191556",
-			"revisionTime": "2015-12-29T21:21:53-05:00"
+			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
+			"revisionTime": "2016-02-15T10:47:25-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
@@ -41,8 +41,8 @@
 		},
 		{
 			"path": "github.com/ardanlabs/kit/log",
-			"revision": "99dadb4cabdbfd1943f48ba748b775cc11e2cfa4",
-			"revisionTime": "2015-12-12T01:12:27-05:00"
+			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
+			"revisionTime": "2016-02-15T10:47:25-05:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/tests",
@@ -57,14 +57,14 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "2dd62b2e21d8813700e9dcd48c8da33111bf3c9e",
-			"revisionTime": "2016-02-11T13:12:08-05:00"
+			"revision": "c6ccb42e117732d4b12caf6e29a9b6f8e51f646d",
+			"revisionTime": "2016-02-15T10:54:41-05:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
 			"path": "github.com/ardanlabs/kit/web/midware",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
+			"revisionTime": "2016-02-15T10:47:25-05:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
