@@ -29,7 +29,7 @@ const (
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init("XENIA")
+	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
 
 	// Initialize MongoDB.
 	if _, err := cfg.String(cfgMongoHost); err == nil {
@@ -63,10 +63,11 @@ func API(testing ...bool) http.Handler {
 	log.Dev("startup", "Init", "Initalizing CORS")
 	a.CORS()
 
-	if testing == nil {
-		log.Dev("startup", "Init", "Initalizing website")
-		website(a)
-	}
+	// It has been decided the website is no longer required.
+	// if testing == nil {
+	// 	log.Dev("startup", "Init", "Initalizing website")
+	// 	website(a)
+	// }
 
 	return a
 }
