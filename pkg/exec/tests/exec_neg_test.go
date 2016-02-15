@@ -15,6 +15,8 @@ func getNegExecSet() []execSet {
 		dataMissingResults(),
 		dataInvldIndex(),
 		dataInMalformed(),
+		mongoRegexMalformed1(),
+		mongoRegexMalformed2(),
 	}
 }
 
@@ -256,6 +258,58 @@ func dataInMalformed() execSet {
 		},
 		results: []string{
 			`{"results":{"commands":[{"$match":{"station_id":{"$in":"#tada:list.station_id"}}},{"$project":{"_id":0,"name":1}}],"error":"Invalid $in command \"tada\", missing \"data\" keyword or malformed"},"error":true}`,
+		},
+	}
+}
+
+// mongoRegexMalformed1 performs a Mongo malformed regex inside the pipeline.
+func mongoRegexMalformed1() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "Mongo Regex Malformed 1",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Mongo Regex",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"name": "#regex:east"}},
+						{"$group": map[string]interface{}{"_id": "station_id", "count": map[string]interface{}{"$sum": 1}}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"commands":[{"$match":{"name":"#regex:east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"east\" is not a regular expression"},"error":true}`,
+		},
+	}
+}
+
+// mongoRegexMalformed2 performs a Mongo malformed regex inside the pipeline.
+func mongoRegexMalformed2() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "Mongo Regex Malformed 2",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Mongo Regex",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"name": "#regex:/east"}},
+						{"$group": map[string]interface{}{"_id": "station_id", "count": map[string]interface{}{"$sum": 1}}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"commands":[{"$match":{"name":"#regex:/east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"/east\" is not a regular expression"},"error":true}`,
 		},
 	}
 }

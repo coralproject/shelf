@@ -24,6 +24,7 @@ func getPosExecSet() []execSet {
 		basicSaveIn(),
 		basicSaveVar(),
 		multiFieldLookup(),
+		mongoRegex(),
 	}
 }
 
@@ -514,6 +515,42 @@ func multiFieldLookup() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+		},
+	}
+}
+
+// mongoRegex performs a Mongo regex inside the pipeline.
+func mongoRegex() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Mongo Regex",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Mongo Regex 1",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"name": "#regex:/east/i"}},
+						{"$group": map[string]interface{}{"_id": "station_id", "count": map[string]interface{}{"$sum": 1}}},
+					},
+				},
+				{
+					Name:       "Mongo Regex 2",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"name": "#regex:/East/"}},
+						{"$group": map[string]interface{}{"_id": "station_id", "count": map[string]interface{}{"$sum": 1}}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Mongo Regex 1","Docs":[{"_id":"station_id","count":5}]},{"Name":"Mongo Regex 2","Docs":[{"_id":"station_id","count":3}]}],"error":false}`,
 		},
 	}
 }
