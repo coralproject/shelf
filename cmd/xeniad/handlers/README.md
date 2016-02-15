@@ -1,6 +1,6 @@
 
 # handlers
-    import "github.com/coralproject/xenia/app/xenia/handlers"
+    import "github.com/coralproject/xenia/cmd/xeniad/handlers"
 
 Package handlers contains the handler logic for processing requests.
 

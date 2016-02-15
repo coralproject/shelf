@@ -1,6 +1,6 @@
 
 # routes
-    import "github.com/coralproject/xenia/app/xenia/routes"
+    import "github.com/coralproject/xenia/cmd/xeniad/routes"
 
 
 
@@ -9,7 +9,7 @@
 
 ## func API
 ``` go
-func API() http.Handler
+func API(testing ...bool) http.Handler
 ```
 API returns a handler for a set of routes.
 

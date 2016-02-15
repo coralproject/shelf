@@ -178,7 +178,7 @@ GetLastHistoryByName gets the last written Set within the history.
 ``` go
 func (s *Set) PrepareForInsert()
 ```
-PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
+PrepareForInsert replaces the documents for insertion.
 
 
 
@@ -186,7 +186,7 @@ PrepareForInsert replaces the `$` to `_$` when found in the front of field names
 ``` go
 func (s *Set) PrepareForUse()
 ```
-PrepareForUse replaces the `_$` to `$` when found in the front of field names.
+PrepareForUse replaces the documents back to their orginal form.
 
 
 

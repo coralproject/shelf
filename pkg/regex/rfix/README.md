@@ -23,7 +23,7 @@ Get retrieves a regex document from the filesystem for testing.
 
 ## func Remove
 ``` go
-func Remove(db *db.DB) error
+func Remove(db *db.DB, pattern string) error
 ```
 Remove is used to clear out all the test regexs from the collection.
 All test documents must start with QSTEST in their name.
