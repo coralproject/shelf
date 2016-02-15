@@ -122,11 +122,12 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 func varLookup(context interface{}, cmd, variable string, vars map[string]string, results map[string]interface{}) (interface{}, error) {
 
 	// {"field": "#cmd:variable"}
-	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
-	// Before: {"field": "#string:variable_name"}  After: {"field": "value"}
-	// Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
-	// Before: {"field": "#objid:variable_name"}   After: {"field": mgo.ObjectId}
-	// Before: {"field": "#data:doc.station_id"}   After: {"field": "23453"}
+	// Before: {"field": "#number:variable_name"}  		After: {"field": 1234}
+	// Before: {"field": "#string:variable_name"}  		After: {"field": "value"}
+	// Before: {"field": "#date:variable_name"}    		After: {"field": time.Time}
+	// Before: {"field": "#objid:variable_name"}   		After: {"field": mgo.ObjectId}
+	// Before: {"field": "#regex:/pattern/<options>"}   After: {"field": bson.RegEx}
+	// Before: {"field": "#data:doc.station_id"}   		After: {"field": "23453"}
 
 	// If the variable does not exist, use the variable straight up.
 	param, exists := vars[variable]
@@ -153,6 +154,24 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 
 	case "objid":
 		return objID(context, param)
+
+	case "regex":
+		idx := strings.Index(param[1:], "/")
+		if param[0] != '/' || idx == -1 {
+			err := fmt.Errorf("Parameter %q is not a regular expression", param)
+			log.Error(context, "varLookup", err, "Regex parsing")
+			return nil, err
+		}
+
+		pattern := param[1 : idx+1]
+		l := len(pattern) + 2
+
+		var options string
+		if l < len(param) {
+			options = param[l:]
+		}
+
+		return bson.RegEx{Pattern: pattern, Options: options}, nil
 
 	default:
 		if len(cmd) == 6 && cmd[0:4] == "data" {
