@@ -132,6 +132,23 @@ func TestQueryUpsert(t *testing.T) {
 		}
 
 		//----------------------------------------------------------------------
+		// Ensure the indexes.
+
+		url = "/1.0/index/QTEST_O_upsert"
+		r = tests.NewRequest("PUT", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to ensure indexes : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to ensure indexes for the set : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to ensure indexes for the set.", tests.Success)
+		}
+
+		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
 		url = "/1.0/query/" + qPrefix + "_upsert"
@@ -148,7 +165,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -200,7 +217,7 @@ func TestQueryUpsert(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -268,7 +285,7 @@ func TestQueryDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"return":true}],"enabled":true}`
+			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true}`
 
 			if resp != recv {
 				t.Log(resp)

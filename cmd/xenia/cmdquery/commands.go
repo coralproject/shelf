@@ -23,5 +23,6 @@ func GetCommands(db *db.DB) *cobra.Command {
 	addDel()
 	addExec()
 	addList()
+	addIndex()
 	return queryCmd
 }
