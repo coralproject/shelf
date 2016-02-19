@@ -9,6 +9,9 @@
          "type":"pipeline",
          "collection":"test_xenia_data",
          "return":true,
+		 "indexes": [
+			{"key": ["station_id"], "unique": true} 
+		 ],
          "commands":[
             {"$match": {"station_id" : "#string:station_id"}},
             {"$project": {"_id": 0, "name": 1}}

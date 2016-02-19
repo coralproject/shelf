@@ -4,6 +4,7 @@ package query
 
 import (
 	"errors"
+	"fmt"
 	"strings"
 	"time"
 
@@ -39,6 +40,55 @@ const (
 )
 
 var cache = gc.New(expiration, cleanup)
+
+// =============================================================================
+
+// EnsureIndex perform index create commands against Mongo for the indexes
+// specied in each query for the set. It will attempt to ensure all indexes
+// regardless if one fails. Then reports all failures.
+func EnsureIndex(context interface{}, db *db.DB, set *Set) error {
+	log.Dev(context, "EnsureIndex", "Started : Name[%s]", set.Name)
+
+	var errStr string
+
+	for _, q := range set.Queries {
+		if len(q.Indexes) == 0 {
+			continue
+		}
+
+		f := func(c *mgo.Collection) error {
+			for _, idx := range q.Indexes {
+				mgoIdx := mgo.Index{
+					Key:        idx.Key,
+					Unique:     idx.Unique,
+					DropDups:   idx.DropDups,
+					Background: idx.Background,
+					Sparse:     idx.Sparse,
+				}
+
+				log.Dev(context, "EnsureIndex", "MGO : db.%s.ensureindex(%s)", c.Name, mongo.Query(mgoIdx))
+				if err := c.EnsureIndex(mgoIdx); err != nil {
+					log.Error(context, "EnsureIndex", err, "Ensuring Index")
+					errStr += fmt.Sprintf("[%s:%s] ", strings.Join(idx.Key, ","), err.Error())
+				}
+			}
+
+			return nil
+		}
+
+		if err := db.ExecuteMGO(context, q.Collection, f); err != nil {
+			log.Error(context, "EnsureIndex", err, "Completed")
+			return err
+		}
+	}
+
+	if errStr != "" {
+		return errors.New(errStr)
+	}
+
+	log.Dev(context, "EnsureIndex", "Completed")
+	return nil
+}
 
 // =============================================================================
 

@@ -461,6 +461,43 @@ func TestUnknownName(t *testing.T) {
 	}
 }
 
+// TestEnsureIndex validates indexes can be ensured.
+func TestEnsureIndex(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	const fixture = "basic.json"
+	set1, err := qfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load query record from file.", tests.Success)
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	defer func() {
+		if err := qfix.Remove(db, prefix); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
+	}()
+
+	t.Log("Given the need to validate ensureing indexes.")
+	{
+		t.Log("\tWhen using fixture", fixture)
+		{
+			if err := query.EnsureIndex(tests.Context, db, set1); err != nil {
+				t.Fatalf("\t%s\tShould be able to ensure a query set index : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to ensure a query set index.", tests.Success)
+		}
+	}
+}
+
 // TestAPIFailureSet validates the failure of the api using a nil session.
 func TestAPIFailureSet(t *testing.T) {
 	tests.ResetLog()
@@ -479,7 +516,13 @@ func TestAPIFailureSet(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			err := query.Upsert(tests.Context, nil, set1)
+			err := query.EnsureIndex(tests.Context, nil, set1)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
+
+			err = query.Upsert(tests.Context, nil, set1)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}

@@ -9,7 +9,6 @@ import (
 // Set of query types we expect to receive.
 const (
 	TypePipeline = "pipeline"
-	TypeTemplate = "template"
 )
 
 //==============================================================================
@@ -31,6 +30,17 @@ type Result struct {
 
 //==============================================================================
 
+// Index contains metadata for creating indexes in Mongo.
+type Index struct {
+	Key        []string `bson:"key" json:"key"`                                   // Index key fields; prefix name with dash (-) for descending order
+	Unique     bool     `bson:"unique,omitempty" json:"unique,omitempty"`         // Prevent two documents from having the same index key
+	DropDups   bool     `bson:"drop_dups,omitempty" json:"drop_dups,omitempty"`   // Drop documents with the same index key as a previously indexed one
+	Background bool     `bson:"background,omitempty" json:"background,omitempty"` // Build index in background and return immediately
+	Sparse     bool     `bson:"sparse,omitempty" json:"sparse,omitempty"`         // Only index documents containing the Key fields
+}
+
+//==============================================================================
+
 // Query contains the configuration details for a query.
 type Query struct {
 	Name        string                   `bson:"name" json:"name" validate:"required,min=3"`                                 // Unique name per query document.
@@ -38,6 +48,7 @@ type Query struct {
 	Type        string                   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
 	Collection  string                   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
 	Commands    []map[string]interface{} `bson:"commands" json:"commands"`                                                   // Commands to process for the query.
+	Indexes     []Index                  `bson:"indexes" json:"indexes"`                                                     // Set of indexes required to optimize the execution of the query.
 	Continue    bool                     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
 	Return      bool                     `bson:"return" json:"return"`                                                       // Return the results back to the user with Name as the key.
 }
@@ -54,12 +65,7 @@ func (q *Query) Validate() error {
 
 	switch q.Type {
 	case TypePipeline:
-		// Place holder since things are good.
-
-	case TypeTemplate:
-		if len(q.Commands) > 1 {
-			return errors.New("Invalid number of commands")
-		}
+		// Currently this is the only type we have at the moment.
 
 	default:
 		return errors.New("Invalid query type")
