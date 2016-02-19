@@ -490,7 +490,7 @@ func TestEnsureIndex(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := query.EnsureIndex(tests.Context, db, set1); err != nil {
+			if err := query.EnsureIndexes(tests.Context, db, set1); err != nil {
 				t.Fatalf("\t%s\tShould be able to ensure a query set index : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to ensure a query set index.", tests.Success)
@@ -516,7 +516,7 @@ func TestAPIFailureSet(t *testing.T) {
 	{
 		t.Log("When giving a nil session")
 		{
-			err := query.EnsureIndex(tests.Context, nil, set1)
+			err := query.EnsureIndexes(tests.Context, nil, set1)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused create by api with bad session", tests.Failed)
 			}

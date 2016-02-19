@@ -43,11 +43,11 @@ var cache = gc.New(expiration, cleanup)
 
 // =============================================================================
 
-// EnsureIndex perform index create commands against Mongo for the indexes
+// EnsureIndexes perform index create commands against Mongo for the indexes
 // specied in each query for the set. It will attempt to ensure all indexes
 // regardless if one fails. Then reports all failures.
-func EnsureIndex(context interface{}, db *db.DB, set *Set) error {
-	log.Dev(context, "EnsureIndex", "Started : Name[%s]", set.Name)
+func EnsureIndexes(context interface{}, db *db.DB, set *Set) error {
+	log.Dev(context, "EnsureIndexes", "Started : Name[%s]", set.Name)
 
 	var errStr string
 
@@ -66,9 +66,9 @@ func EnsureIndex(context interface{}, db *db.DB, set *Set) error {
 					Sparse:     idx.Sparse,
 				}
 
-				log.Dev(context, "EnsureIndex", "MGO : db.%s.ensureindex(%s)", c.Name, mongo.Query(mgoIdx))
+				log.Dev(context, "EnsureIndexes", "MGO : db.%s.ensureindex(%s)", c.Name, mongo.Query(mgoIdx))
 				if err := c.EnsureIndex(mgoIdx); err != nil {
-					log.Error(context, "EnsureIndex", err, "Ensuring Index")
+					log.Error(context, "EnsureIndexes", err, "Ensuring Index")
 					errStr += fmt.Sprintf("[%s:%s] ", strings.Join(idx.Key, ","), err.Error())
 				}
 			}
@@ -77,7 +77,7 @@ func EnsureIndex(context interface{}, db *db.DB, set *Set) error {
 		}
 
 		if err := db.ExecuteMGO(context, q.Collection, f); err != nil {
-			log.Error(context, "EnsureIndex", err, "Completed")
+			log.Error(context, "EnsureIndexes", err, "Completed")
 			return err
 		}
 	}
@@ -86,7 +86,7 @@ func EnsureIndex(context interface{}, db *db.DB, set *Set) error {
 		return errors.New(errStr)
 	}
 
-	log.Dev(context, "EnsureIndex", "Completed")
+	log.Dev(context, "EnsureIndexes", "Completed")
 	return nil
 }
 

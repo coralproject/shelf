@@ -67,6 +67,27 @@ func (queryHandle) Upsert(c *app.Context) error {
 	return nil
 }
 
+// EnsureIndexes makes sure indexes for the specified set exist.
+// 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
+func (queryHandle) EnsureIndexes(c *app.Context) error {
+	db := c.Ctx["DB"].(*db.DB)
+
+	set, err := query.GetByName(c.SessionID, db, c.Params["name"])
+	if err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
+		return err
+	}
+
+	if err := query.EnsureIndexes(c.SessionID, db, set); err != nil {
+		return err
+	}
+
+	c.Respond(nil, http.StatusNoContent)
+	return nil
+}
+
 //==============================================================================
 
 // Delete removes the specified Set from the system.
