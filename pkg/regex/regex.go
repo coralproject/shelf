@@ -44,7 +44,7 @@ var cache = gc.New(expiration, cleanup)
 // =============================================================================
 
 // Upsert is used to create or update an existing Regex document.
-func Upsert(context interface{}, db *db.DB, rgx *Regex) error {
+func Upsert(context interface{}, db *db.DB, rgx Regex) error {
 	log.Dev(context, "Upsert", "Started : Name[%s]", rgx.Name)
 
 	// Validate the regex that is provided.
@@ -104,7 +104,7 @@ func Upsert(context interface{}, db *db.DB, rgx *Regex) error {
 		qu := bson.M{
 			"$push": bson.M{
 				"regexs": bson.M{
-					"$each":     []*Regex{rgx},
+					"$each":     []Regex{rgx},
 					"$position": 0,
 				},
 			},
@@ -210,14 +210,14 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 }
 
 // GetByName retrieves the document for the specified Regex.
-func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
+func GetByName(context interface{}, db *db.DB, name string) (Regex, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
 
 	key := "gbn" + name
 	if v, found := cache.Get(key); found {
 		rgx := v.(Regex)
 		log.Dev(context, "GetByName", "Completed : CACHE : Rgx[%s]", rgx.Name)
-		return &rgx, nil
+		return rgx, nil
 	}
 
 	var rgx Regex
@@ -233,20 +233,20 @@ func GetByName(context interface{}, db *db.DB, name string) (*Regex, error) {
 		}
 
 		log.Error(context, "GetByName", err, "Completed")
-		return nil, err
+		return Regex{}, err
 	}
 
 	// This call is made when the regex is required for actual use. So
 	// let's compile the regex now.
 	var err error
 	if rgx.Compile, err = regexp.Compile(rgx.Expr); err != nil {
-		return nil, err
+		return Regex{}, err
 	}
 
 	cache.Set(key, rgx, gc.DefaultExpiration)
 
 	log.Dev(context, "GetByName", "Completed : Rgx[%s]", rgx.Name)
-	return &rgx, nil
+	return rgx, nil
 }
 
 // GetByNames retrieves the documents for the specified names.
@@ -314,7 +314,7 @@ next:
 }
 
 // GetLastHistoryByName gets the last written Regex within the history.
-func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, error) {
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Regex, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
 	type rslt struct {
@@ -326,7 +326,7 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, 
 	if v, found := cache.Get(key); found {
 		result := v.(rslt)
 		log.Dev(context, "GetLastHistoryByName", "Completed : CACHE : Regex[%+v]", &result.Regexs[0])
-		return &result.Regexs[0], nil
+		return result.Regexs[0], nil
 	}
 
 	var result rslt
@@ -345,19 +345,19 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, 
 		}
 
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
-		return nil, err
+		return Regex{}, err
 	}
 
 	if result.Regexs == nil {
 		err := errors.New("History not found")
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
-		return nil, err
+		return Regex{}, err
 	}
 
 	cache.Set(key, result, gc.DefaultExpiration)
 
 	log.Dev(context, "GetLastHistoryByName", "Completed : Regex[%+v]", &result.Regexs[0])
-	return &result.Regexs[0], nil
+	return result.Regexs[0], nil
 }
 
 // =============================================================================

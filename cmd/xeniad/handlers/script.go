@@ -53,7 +53,7 @@ func (scriptHandle) Retrieve(c *app.Context) error {
 // Upsert inserts or updates the posted Script document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (scriptHandle) Upsert(c *app.Context) error {
-	var scr *script.Script
+	var scr script.Script
 	if err := json.NewDecoder(c.Request.Body).Decode(&scr); err != nil {
 		return err
 	}

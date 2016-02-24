@@ -232,7 +232,7 @@ func GetSets(context interface{}, db *db.DB, tags []string) ([]Set, error) {
 	key := "gss" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		sets := v.([]Set)
-		log.Dev(context, "GetScripts", "Completed : CACHE : Sets[%d]", len(sets))
+		log.Dev(context, "GetSets", "Completed : CACHE : Sets[%d]", len(sets))
 		return sets, nil
 	}
 

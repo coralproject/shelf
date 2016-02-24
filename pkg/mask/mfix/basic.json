@@ -1,0 +1,12 @@
+[
+	{
+		"collection": "test_xenia_data",
+		"field": "name",
+		"type": "remove"
+	},
+	{
+		"collection": "test_xenia_data",
+		"field": "station_id",
+		"type": "remove"
+	}
+]

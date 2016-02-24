@@ -26,7 +26,7 @@ type Regex struct {
 }
 
 // Validate checks the regex value for consistency and that it compiles.
-func (r *Regex) Validate() error {
+func (r Regex) Validate() error {
 	if err := validate.Struct(r); err != nil {
 		return err
 	}

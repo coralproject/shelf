@@ -82,7 +82,7 @@ func TestUpsertCreateScript(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
-			if !reflect.DeepEqual(*scr1, *scr2) {
+			if !reflect.DeepEqual(scr1, scr2) {
 				t.Logf("\t%+v", scr1)
 				t.Logf("\t%+v", scr2)
 				t.Errorf("\t%s\tShould be able to get back the same script values.", tests.Failed)
@@ -129,9 +129,9 @@ func TestGetScriptNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2 := *scr1
+			scr2 := scr1
 			scr2.Name += "2"
-			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
@@ -208,9 +208,9 @@ func TestGetScripts(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2 := *scr1
+			scr2 := scr1
 			scr2.Name += "2"
-			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
@@ -286,9 +286,9 @@ func TestGetScriptByNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2 := *scr1
+			scr2 := scr1
 			scr2.Name += "2"
-			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
@@ -380,7 +380,7 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the last script from history.", tests.Success)
 
-			if !reflect.DeepEqual(*scr1, *scr2) {
+			if !reflect.DeepEqual(scr1, scr2) {
 				t.Logf("\t%+v", scr1)
 				t.Logf("\t%+v", scr2)
 				t.Errorf("\t%s\tShould be able to get back the same script values.", tests.Failed)
@@ -425,10 +425,10 @@ func TestUpsertUpdateScript(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
 
-			scr2 := *scr1
+			scr2 := scr1
 			scr2.Commands = append(scr2.Commands, map[string]interface{}{"command": 4})
 
-			if err := script.Upsert(tests.Context, db, &scr2); err != nil {
+			if err := script.Upsert(tests.Context, db, scr2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a script record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a script record.", tests.Success)
@@ -547,6 +547,12 @@ func TestAPIFailureScripts(t *testing.T) {
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
 			_, err = script.GetNames(tests.Context, nil)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
+
+			_, err = script.GetScripts(tests.Context, nil, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

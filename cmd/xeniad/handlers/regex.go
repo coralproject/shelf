@@ -53,7 +53,7 @@ func (regexHandle) Retrieve(c *app.Context) error {
 // Upsert inserts or updates the posted Regex document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (regexHandle) Upsert(c *app.Context) error {
-	var rgx *regex.Regex
+	var rgx regex.Regex
 	if err := json.NewDecoder(c.Request.Body).Decode(&rgx); err != nil {
 		return err
 	}
