@@ -21,7 +21,7 @@ var Script scriptHandle
 // List returns all the existing scripts in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (scriptHandle) List(c *app.Context) error {
-	scrs, err := script.GetScripts(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
+	scrs, err := script.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == script.ErrNotFound {
 			err = app.ErrNotFound

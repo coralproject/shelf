@@ -173,20 +173,20 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	return names, nil
 }
 
-// GetScripts retrieves a list of scripts.
-func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error) {
-	log.Dev(context, "GetScripts", "Started : Tags[%v]", tags)
+// GetAll retrieves a list of scripts.
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error) {
+	log.Dev(context, "GetAll", "Started : Tags[%v]", tags)
 
 	key := "gss" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		scrs := v.([]Script)
-		log.Dev(context, "GetScripts", "Completed : CACHE : Scripts[%d]", len(scrs))
+		log.Dev(context, "GetAll", "Completed : CACHE : Scripts[%d]", len(scrs))
 		return scrs, nil
 	}
 
 	var scrs []Script
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetScripts", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		log.Dev(context, "GetAll", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
 		return c.Find(nil).All(&scrs)
 	}
 
@@ -195,12 +195,12 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetScripts", err, "Completed")
+		log.Error(context, "GetAll", err, "Completed")
 		return nil, err
 	}
 
 	if scrs == nil {
-		log.Error(context, "GetScripts", ErrNotFound, "Completed")
+		log.Error(context, "GetAll", ErrNotFound, "Completed")
 		return nil, ErrNotFound
 	}
 
@@ -211,7 +211,7 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 
 	cache.Set(key, scrs, gc.DefaultExpiration)
 
-	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
+	log.Dev(context, "GetAll", "Completed : Scripts[%d]", len(scrs))
 	return scrs, nil
 }
 

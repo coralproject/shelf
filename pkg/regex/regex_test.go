@@ -209,7 +209,7 @@ func TestGetRegexs(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a second regex.", tests.Success)
 
-			rgxs, err := regex.GetRegexs(tests.Context, db, nil)
+			rgxs, err := regex.GetAll(tests.Context, db, nil)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the regexs : %v", tests.Failed, err)
 			}
@@ -514,7 +514,7 @@ func TestAPIFailureRegexs(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			_, err = regex.GetRegexs(tests.Context, nil, nil)
+			_, err = regex.GetAll(tests.Context, nil, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

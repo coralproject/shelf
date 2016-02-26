@@ -172,20 +172,20 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	return names, nil
 }
 
-// GetRegexs retrieves a list of regexs.
-func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
-	log.Dev(context, "GetRegexs", "Started : Tags[%v]", tags)
+// GetAll retrieves a list of regexs.
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
+	log.Dev(context, "GetAll", "Started : Tags[%v]", tags)
 
 	key := "grs" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		rgxs := v.([]Regex)
-		log.Dev(context, "GetRegexs", "Completed : CACHE : Rgxs[%d]", len(rgxs))
+		log.Dev(context, "GetAll", "Completed : CACHE : Rgxs[%d]", len(rgxs))
 		return rgxs, nil
 	}
 
 	var rgxs []Regex
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetRegexs", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		log.Dev(context, "GetAll", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
 		return c.Find(nil).All(&rgxs)
 	}
 
@@ -194,18 +194,18 @@ func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error) {
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetRegexs", err, "Completed")
+		log.Error(context, "GetAll", err, "Completed")
 		return nil, err
 	}
 
 	if rgxs == nil {
-		log.Error(context, "GetRegexs", ErrNotFound, "Completed")
+		log.Error(context, "GetAll", ErrNotFound, "Completed")
 		return nil, ErrNotFound
 	}
 
 	cache.Set(key, rgxs, gc.DefaultExpiration)
 
-	log.Dev(context, "GetRegexs", "Completed : Rgxs[%d]", len(rgxs))
+	log.Dev(context, "GetAll", "Completed : Rgxs[%d]", len(rgxs))
 	return rgxs, nil
 }
 

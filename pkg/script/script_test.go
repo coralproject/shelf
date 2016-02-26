@@ -215,7 +215,7 @@ func TestGetScripts(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a second script.", tests.Success)
 
-			scripts, err := script.GetScripts(tests.Context, db, nil)
+			scripts, err := script.GetAll(tests.Context, db, nil)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the scripts : %v", tests.Failed, err)
 			}
@@ -552,7 +552,7 @@ func TestAPIFailureScripts(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
 
-			_, err = script.GetScripts(tests.Context, nil, nil)
+			_, err = script.GetAll(tests.Context, nil, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

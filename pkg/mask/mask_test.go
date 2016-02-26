@@ -131,7 +131,67 @@ func TestGetMasks(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a second query mask.", tests.Success)
 
-			msks, err := mask.GetMasks(tests.Context, db, nil)
+			msks, err := mask.GetAll(tests.Context, db, nil)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the query masks : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the query masks", tests.Success)
+
+			var count int
+			for _, msk := range msks {
+				if msk.Collection == collection {
+					count++
+				}
+			}
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould have two query masks : %d", tests.Failed, count)
+			}
+			t.Logf("\t%s\tShould have two query masks.", tests.Success)
+		}
+	}
+}
+
+// TestGetMaskByCollection validates retrieval of all query mask records by collection.
+func TestGetMaskByCollection(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	const fixture = "basic.json"
+	masks, err := mfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	defer func() {
+		if err := mfix.Remove(db, collection); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
+	}()
+
+	t.Log("Given the need to retrieve a list of query masks by collection.")
+	{
+		t.Log("\tWhen using fixture", fixture)
+		{
+			if err := mask.Upsert(tests.Context, db, masks[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a query mask : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
+
+			if err := mask.Upsert(tests.Context, db, masks[1]); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a second query mask : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a second query mask.", tests.Success)
+
+			msks, err := mask.GetByCollection(tests.Context, db, masks[0].Collection)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query masks : %v", tests.Failed, err)
 			}
@@ -346,7 +406,13 @@ func TestAPIFailureMasks(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
-			_, err = mask.GetMasks(tests.Context, nil, nil)
+			_, err = mask.GetAll(tests.Context, nil, nil)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
+
+			_, err = mask.GetByCollection(tests.Context, nil, masks[0].Collection)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

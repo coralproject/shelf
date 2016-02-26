@@ -21,7 +21,7 @@ var Regex regexHandle
 // List returns all the existing regex in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (regexHandle) List(c *app.Context) error {
-	rgxs, err := regex.GetRegexs(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
+	rgxs, err := regex.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == regex.ErrNotFound {
 			err = app.ErrNotFound

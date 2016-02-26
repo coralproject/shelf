@@ -22,7 +22,7 @@ var Query queryHandle
 // List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
-	sets, err := query.GetSets(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
+	sets, err := query.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound

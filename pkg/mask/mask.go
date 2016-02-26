@@ -126,20 +126,20 @@ func Upsert(context interface{}, db *db.DB, mask Mask) error {
 
 // =============================================================================
 
-// GetMasks retrieves a list of query masks.
-func GetMasks(context interface{}, db *db.DB, tags []string) ([]Mask, error) {
-	log.Dev(context, "GetMasks", "Started : Tags[%v]", tags)
+// GetAll retrieves a list of query masks.
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Mask, error) {
+	log.Dev(context, "GetAll", "Started : Tags[%v]", tags)
 
 	key := "gms" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		masks := v.([]Mask)
-		log.Dev(context, "GetMasks", "Completed : CACHE : Masks[%d]", len(masks))
+		log.Dev(context, "GetAll", "Completed : CACHE : Masks[%d]", len(masks))
 		return masks, nil
 	}
 
 	var masks []Mask
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetMasks", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		log.Dev(context, "GetAll", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
 		return c.Find(nil).All(&masks)
 	}
 
@@ -148,12 +148,50 @@ func GetMasks(context interface{}, db *db.DB, tags []string) ([]Mask, error) {
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetMasks", err, "Completed")
+		log.Error(context, "GetAll", err, "Completed")
 		return nil, err
 	}
 
 	if masks == nil {
-		log.Error(context, "GetMasks", ErrNotFound, "Completed")
+		log.Error(context, "GetAll", ErrNotFound, "Completed")
+		return nil, ErrNotFound
+	}
+
+	cache.Set(key, masks, gc.DefaultExpiration)
+
+	log.Dev(context, "GetAll", "Completed : Masks[%d]", len(masks))
+	return masks, nil
+}
+
+// GetByCollection retrieves the masks for the specified collection.
+func GetByCollection(context interface{}, db *db.DB, collection string) ([]Mask, error) {
+	log.Dev(context, "GetByCollection", "Started : Collection[%s]", collection)
+
+	key := "gbc" + collection
+	if v, found := cache.Get(key); found {
+		masks := v.([]Mask)
+		log.Dev(context, "GetByCollection", "Completed : CACHE : Masks[%d]", len(masks))
+		return masks, nil
+	}
+
+	var masks []Mask
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"collection": collection}
+		log.Dev(context, "GetByCollection", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
+		return c.Find(q).All(&masks)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+
+		log.Error(context, "GetByCollection", err, "Completed")
+		return nil, err
+	}
+
+	if masks == nil {
+		log.Error(context, "GetByCollection", ErrNotFound, "Completed")
 		return nil, ErrNotFound
 	}
 

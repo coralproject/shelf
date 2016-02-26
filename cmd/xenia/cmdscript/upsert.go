@@ -110,7 +110,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 }
 
 // runUpsertWeb issues the command talking to the web service.
-func runUpsertWeb(cmd *cobra.Command, scr *script.Script) error {
+func runUpsertWeb(cmd *cobra.Command, scr script.Script) error {
 	verb := "PUT"
 	url := "/1.0/script"
 
