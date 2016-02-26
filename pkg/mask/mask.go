@@ -127,14 +127,14 @@ func Upsert(context interface{}, db *db.DB, mask Mask) error {
 // =============================================================================
 
 // GetAll retrieves a list of query masks.
-func GetAll(context interface{}, db *db.DB, tags []string) ([]Mask, error) {
+func GetAll(context interface{}, db *db.DB, tags []string) (map[string]Mask, error) {
 	log.Dev(context, "GetAll", "Started : Tags[%v]", tags)
 
 	key := "gms" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
-		masks := v.([]Mask)
-		log.Dev(context, "GetAll", "Completed : CACHE : Masks[%d]", len(masks))
-		return masks, nil
+		mskMap := v.(map[string]Mask)
+		log.Dev(context, "GetAll", "Completed : CACHE : Masks[%d]", len(mskMap))
+		return mskMap, nil
 	}
 
 	var masks []Mask
@@ -157,21 +157,26 @@ func GetAll(context interface{}, db *db.DB, tags []string) ([]Mask, error) {
 		return nil, ErrNotFound
 	}
 
-	cache.Set(key, masks, gc.DefaultExpiration)
+	mskMap := make(map[string]Mask, len(masks))
+	for _, msk := range masks {
+		mskMap[msk.Field] = msk
+	}
 
-	log.Dev(context, "GetAll", "Completed : Masks[%d]", len(masks))
-	return masks, nil
+	cache.Set(key, mskMap, gc.DefaultExpiration)
+
+	log.Dev(context, "GetAll", "Completed : Masks[%d]", len(mskMap))
+	return mskMap, nil
 }
 
 // GetByCollection retrieves the masks for the specified collection.
-func GetByCollection(context interface{}, db *db.DB, collection string) ([]Mask, error) {
+func GetByCollection(context interface{}, db *db.DB, collection string) (map[string]Mask, error) {
 	log.Dev(context, "GetByCollection", "Started : Collection[%s]", collection)
 
 	key := "gbc" + collection
 	if v, found := cache.Get(key); found {
-		masks := v.([]Mask)
-		log.Dev(context, "GetByCollection", "Completed : CACHE : Masks[%d]", len(masks))
-		return masks, nil
+		mskMap := v.(map[string]Mask)
+		log.Dev(context, "GetByCollection", "Completed : CACHE : Masks[%d]", len(mskMap))
+		return mskMap, nil
 	}
 
 	var masks []Mask
@@ -195,10 +200,15 @@ func GetByCollection(context interface{}, db *db.DB, collection string) ([]Mask,
 		return nil, ErrNotFound
 	}
 
-	cache.Set(key, masks, gc.DefaultExpiration)
+	mskMap := make(map[string]Mask, len(masks))
+	for _, msk := range masks {
+		mskMap[msk.Field] = msk
+	}
 
-	log.Dev(context, "GetMasks", "Completed : Masks[%d]", len(masks))
-	return masks, nil
+	cache.Set(key, mskMap, gc.DefaultExpiration)
+
+	log.Dev(context, "GetMasks", "Completed : Masks[%d]", len(mskMap))
+	return mskMap, nil
 }
 
 // GetByName retrieves the document for the specified query mask.
