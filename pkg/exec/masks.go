@@ -1,15 +1,18 @@
 package exec
 
 import (
+	"strconv"
+
 	"github.com/coralproject/xenia/pkg/mask"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/log"
 	"gopkg.in/mgo.v2/bson"
 )
 
-// ProcessMasks reviews the document for fields that are defined to have
-// their values masked. This function is exported so it can be tested.
-func ProcessMasks(context interface{}, db *db.DB, collection string, results []bson.M) error {
+// processMasks reviews the document for fields that are defined to have
+// their values masked.
+func processMasks(context interface{}, db *db.DB, collection string, results []bson.M) error {
 	masks, err := mask.GetByCollection(context, db, collection)
 	if err != nil {
 		return err
@@ -26,7 +29,7 @@ func ProcessMasks(context interface{}, db *db.DB, collection string, results []b
 
 // matchMaskField checks the specificed document against the masks and updated any
 // field values that match based on the configured masking operation.
-func matchMaskField(context interface{}, masks map[string]mask.Mask, doc bson.M) error {
+func matchMaskField(context interface{}, masks map[string]mask.Mask, doc map[string]interface{}) error {
 
 	// masks: Contains the map of fields that need masking.
 	// doc  : The document to check fields against to apply masking.
@@ -37,11 +40,11 @@ func matchMaskField(context interface{}, masks map[string]mask.Mask, doc bson.M)
 		switch fldVal := value.(type) {
 
 		// We have another document.
-		case bson.M:
+		case map[string]interface{}:
 			matchMaskField(context, masks, fldVal)
 
 		// We have an array of documents.
-		case []bson.M:
+		case []map[string]interface{}:
 			for _, subDoc := range fldVal {
 				matchMaskField(context, masks, subDoc)
 			}
@@ -67,16 +70,38 @@ func matchMaskField(context interface{}, masks map[string]mask.Mask, doc bson.M)
 
 // applyMask performs the specified masking operation.
 func applyMask(context interface{}, msk mask.Mask, doc bson.M, key string) error {
-	switch msk.Type {
-	case mask.MaskRemove:
+	switch msk.Type[0:3] {
+	case mask.MaskRemove[0:3]:
 		delete(doc, key)
 
 	case mask.MaskAll:
-		doc[key] = "******"
+		switch doc[key].(type) {
+		case string:
+			doc[key] = "******"
+		case int, int8, int16, int32, int64:
+			doc[key] = 0
+		case float32, float64:
+			doc[key] = 0.00
+		}
 
-	case mask.MaskEmail:
-	case mask.MaskLeft:
-	case mask.MaskRight:
+	case mask.MaskEmail[0:3]:
+
+	case mask.MaskLeft[0:3]:
+
+		// A left mask defaults to 4 characters to be masked. The user can
+		// provide more or less by specifing size, left8. This would use 8
+		// instead of 4. If there are less than specified all will be masked.
+		chrs := 4
+		if msk.Type != "left" {
+			var err error
+			chrs, err = strconv.Atoi(msk.Type[5:])
+			if err != nil {
+				log.Error(context, "applyMask", err, "Converting left size")
+				return err
+			}
+		}
+
+	case mask.MaskRight[0:3]:
 	}
 
 	return nil

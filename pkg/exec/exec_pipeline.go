@@ -80,7 +80,7 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 	}
 
 	// Perform any masking that is required.
-	if err := ProcessMasks(context, db, q.Collection, results); err != nil {
+	if err := processMasks(context, db, q.Collection, results); err != nil {
 		return docs{}, commands, err
 	}
 
