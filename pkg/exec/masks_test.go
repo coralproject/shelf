@@ -12,6 +12,23 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+type (
+	location struct {
+		Type string `json:"type"`
+	}
+
+	condition struct {
+		TempF float64 `json:"temp_f"`
+		Temp  string  `json:"temperature_string"`
+	}
+
+	doc struct {
+		StationID string    `json:"station_id"`
+		Location  location  `json:"location"`
+		Condition condition `json:"condition"`
+	}
+)
+
 //==============================================================================
 
 // TestMaskingDelete tests the masking functionality for deletes.
@@ -74,20 +91,6 @@ func TestMaskingDelete(t *testing.T) {
 
 // TestMaskingAll tests the masking functionality for all.
 func TestMaskingAll(t *testing.T) {
-	type location struct {
-		Type string `json:"type"`
-	}
-
-	type condition struct {
-		TempF float64 `json:"temp_f"`
-	}
-
-	type doc struct {
-		StationID string    `json:"station_id"`
-		Location  location  `json:"location"`
-		Condition condition `json:"condition"`
-	}
-
 	masks := map[string]mask.Mask{
 		"station_id": {"test_xenia_data", "station_id", mask.MaskAll},
 		"type":       {"test_xenia_data", "type", mask.MaskAll},
@@ -128,6 +131,218 @@ func TestMaskingAll(t *testing.T) {
 				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "******", "location.type", fin.Location.Type)
 			} else {
 				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "******", "location.type")
+			}
+
+			if fin.Condition.TempF != 0.00 {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "0.00", "condition.temp_f", fin.Condition.TempF)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "0.00", "condition.temp_f")
+			}
+		}
+	}
+}
+
+// TestMaskingLeft tests the masking functionality for left.
+func TestMaskingLeft(t *testing.T) {
+	masks := map[string]mask.Mask{
+		"station_id":         {"test_xenia_data", "station_id", mask.MaskLeft},
+		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskLeft},
+		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskLeft},
+	}
+
+	t.Logf("Given the need to mask fields as left.")
+	{
+		t.Logf("\tWhen using test fixture data.")
+		{
+			docs, err := fixtures()
+			if err != nil {
+				t.Fatalf("\t%s\tShould retrieve fixture documents.", tests.Failed)
+			}
+
+			if err := matchMaskField(tests.Context, masks, docs[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to mask fields : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to mask fields.", tests.Success)
+
+			data, err := json.Marshal(docs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to marshal document.", tests.Failed)
+			}
+
+			var fin doc
+			if err := json.Unmarshal(data, &fin); err != nil {
+				t.Fatalf("\t%s\tShould unmarshal document.", tests.Failed)
+			}
+
+			if fin.StationID != "****1" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "****1", "station_id", fin.StationID)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "****1", "station_id")
+			}
+
+			if fin.Condition.Temp != "**** F (15.2 C)" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "**** F (15.2 C)", "condition.temperature_string", fin.Condition.Temp)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "**** F (15.2 C)", "condition.temperature_string")
+			}
+
+			if fin.Condition.TempF != 0.00 {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "0.00", "condition.temp_f", fin.Condition.TempF)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "0.00", "condition.temp_f")
+			}
+		}
+	}
+}
+
+// TestMaskingLeft8 tests the masking functionality for left8.
+func TestMaskingLeft8(t *testing.T) {
+	masks := map[string]mask.Mask{
+		"station_id":         {"test_xenia_data", "station_id", mask.MaskLeft + "8"},
+		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskLeft + "8"},
+		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskLeft + "8"},
+	}
+
+	t.Logf("Given the need to mask fields as left.")
+	{
+		t.Logf("\tWhen using test fixture data.")
+		{
+			docs, err := fixtures()
+			if err != nil {
+				t.Fatalf("\t%s\tShould retrieve fixture documents.", tests.Failed)
+			}
+
+			if err := matchMaskField(tests.Context, masks, docs[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to mask fields : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to mask fields.", tests.Success)
+
+			data, err := json.Marshal(docs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to marshal document.", tests.Failed)
+			}
+
+			var fin doc
+			if err := json.Unmarshal(data, &fin); err != nil {
+				t.Fatalf("\t%s\tShould unmarshal document.", tests.Failed)
+			}
+
+			if fin.StationID != "*****" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "*****", "station_id", fin.StationID)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "*****", "station_id")
+			}
+
+			if fin.Condition.Temp != "********15.2 C)" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "********15.2 C)", "condition.temperature_string", fin.Condition.Temp)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "********15.2 C)", "condition.temperature_string")
+			}
+
+			if fin.Condition.TempF != 0.00 {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "0.00", "condition.temp_f", fin.Condition.TempF)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "0.00", "condition.temp_f")
+			}
+		}
+	}
+}
+
+// TestMaskingRight tests the masking functionality for right.
+func TestMaskingRight(t *testing.T) {
+	masks := map[string]mask.Mask{
+		"station_id":         {"test_xenia_data", "station_id", mask.MaskRight},
+		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskRight},
+		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskRight},
+	}
+
+	t.Logf("Given the need to mask fields as left.")
+	{
+		t.Logf("\tWhen using test fixture data.")
+		{
+			docs, err := fixtures()
+			if err != nil {
+				t.Fatalf("\t%s\tShould retrieve fixture documents.", tests.Failed)
+			}
+
+			if err := matchMaskField(tests.Context, masks, docs[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to mask fields : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to mask fields.", tests.Success)
+
+			data, err := json.Marshal(docs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to marshal document.", tests.Failed)
+			}
+
+			var fin doc
+			if err := json.Unmarshal(data, &fin); err != nil {
+				t.Fatalf("\t%s\tShould unmarshal document.", tests.Failed)
+			}
+
+			if fin.StationID != "4****" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "4****", "station_id", fin.StationID)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "4****", "station_id")
+			}
+
+			if fin.Condition.Temp != "59.4 F (15.****" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "59.4 F (15.****", "condition.temperature_string", fin.Condition.Temp)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "59.4 F (15.****", "condition.temperature_string")
+			}
+
+			if fin.Condition.TempF != 0.00 {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "0.00", "condition.temp_f", fin.Condition.TempF)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "0.00", "condition.temp_f")
+			}
+		}
+	}
+}
+
+// TestMaskingRight8 tests the masking functionality for right8.
+func TestMaskingRight8(t *testing.T) {
+	masks := map[string]mask.Mask{
+		"station_id":         {"test_xenia_data", "station_id", mask.MaskRight + "8"},
+		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskRight + "8"},
+		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskRight + "8"},
+	}
+
+	t.Logf("Given the need to mask fields as left.")
+	{
+		t.Logf("\tWhen using test fixture data.")
+		{
+			docs, err := fixtures()
+			if err != nil {
+				t.Fatalf("\t%s\tShould retrieve fixture documents.", tests.Failed)
+			}
+
+			if err := matchMaskField(tests.Context, masks, docs[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to mask fields : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to mask fields.", tests.Success)
+
+			data, err := json.Marshal(docs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to marshal document.", tests.Failed)
+			}
+
+			var fin doc
+			if err := json.Unmarshal(data, &fin); err != nil {
+				t.Fatalf("\t%s\tShould unmarshal document.", tests.Failed)
+			}
+
+			if fin.StationID != "*****" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "*****", "station_id", fin.StationID)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "*****", "station_id")
+			}
+
+			if fin.Condition.Temp != "59.4 F ********" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "59.4 F ********", "condition.temperature_string", fin.Condition.Temp)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "59.4 F ********", "condition.temperature_string")
 			}
 
 			if fin.Condition.TempF != 0.00 {

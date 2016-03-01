@@ -1,7 +1,9 @@
 package exec
 
 import (
+	"errors"
 	"strconv"
+	"strings"
 
 	"github.com/coralproject/xenia/pkg/mask"
 
@@ -52,7 +54,7 @@ func matchMaskField(context interface{}, masks map[string]mask.Mask, doc map[str
 		// We have something we can mask.
 		default:
 
-			// If this a field we need to mask?
+			// If this is a field we need to mask?
 			msk, exists := masks[key]
 			if !exists {
 				continue
@@ -70,21 +72,38 @@ func matchMaskField(context interface{}, masks map[string]mask.Mask, doc map[str
 
 // applyMask performs the specified masking operation.
 func applyMask(context interface{}, msk mask.Mask, doc bson.M, key string) error {
-	switch msk.Type[0:3] {
-	case mask.MaskRemove[0:3]:
-		delete(doc, key)
 
+	// Handle the remove mask for all fields.
+	if msk.Type == mask.MaskRemove {
+		delete(doc, key)
+		return nil
+	}
+
+	// Handle fields that are not strings.
+	switch doc[key].(type) {
+	case int, int8, int16, int32, int64:
+		doc[key] = 0
+		return nil
+
+	case float32, float64:
+		doc[key] = 0.00
+		return nil
+
+	case string:
+		// We need to process strings special.
+
+	default:
+		return errors.New("Invalid masking field type")
+	}
+
+	// Handle string based fields.
+	switch msk.Type[0:3] {
 	case mask.MaskAll:
-		switch doc[key].(type) {
-		case string:
-			doc[key] = "******"
-		case int, int8, int16, int32, int64:
-			doc[key] = 0
-		case float32, float64:
-			doc[key] = 0.00
-		}
+		doc[key] = "******"
+		return nil
 
 	case mask.MaskEmail[0:3]:
+		return nil
 
 	case mask.MaskLeft[0:3]:
 
@@ -92,17 +111,49 @@ func applyMask(context interface{}, msk mask.Mask, doc bson.M, key string) error
 		// provide more or less by specifing size, left8. This would use 8
 		// instead of 4. If there are less than specified all will be masked.
 		chrs := 4
-		if msk.Type != "left" {
+		if msk.Type != mask.MaskLeft {
 			var err error
-			chrs, err = strconv.Atoi(msk.Type[5:])
+			chrs, err = strconv.Atoi(msk.Type[4:])
 			if err != nil {
 				log.Error(context, "applyMask", err, "Converting left size")
 				return err
 			}
 		}
 
-	case mask.MaskRight[0:3]:
-	}
+		v := doc[key].(string)
+		l := len(v)
+		if l < chrs {
+			chrs = l
+		}
 
-	return nil
+		doc[key] = strings.Replace(v, v[:chrs], strings.Repeat("*", chrs), 1)
+		return nil
+
+	case mask.MaskRight[0:3]:
+
+		// A right mask defaults to 4 characters to be masked. The user can
+		// provide more or less by specifing size, right8. This would use 8
+		// instead of 4. If there are less than specified all will be masked.
+		chrs := 4
+		if msk.Type != mask.MaskRight {
+			var err error
+			chrs, err = strconv.Atoi(msk.Type[5:])
+			if err != nil {
+				log.Error(context, "applyMask", err, "Converting right size")
+				return err
+			}
+		}
+
+		v := doc[key].(string)
+		l := len(v)
+		if l < chrs {
+			chrs = l
+		}
+
+		doc[key] = strings.Replace(v, v[l-chrs:], strings.Repeat("*", chrs), 1)
+		return nil
+
+	default:
+		return errors.New("Invalid masking type")
+	}
 }
