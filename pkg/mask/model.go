@@ -28,8 +28,8 @@ func init() {
 
 // Mask contains information about what needs to be masked.
 type Mask struct {
-	Collection string `bson:"collection" json:"collection" validate:"required,min=3"`
-	Field      string `bson:"field" json:"field" validate:"required,min=3"`
+	Collection string `bson:"collection" json:"collection" validate:"required"`
+	Field      string `bson:"field" json:"field" validate:"required"`
 	Type       string `bson:"type" json:"type" validate:"required,min=3"`
 }
 

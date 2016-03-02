@@ -181,7 +181,7 @@ func GetByCollection(context interface{}, db *db.DB, collection string) (map[str
 
 	var masks []Mask
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"collection": collection}
+		q := bson.M{"$or": []bson.M{bson.M{"collection": collection}, bson.M{"collection": "*"}}}
 		log.Dev(context, "GetByCollection", "MGO : db.%s.findOne(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).All(&masks)
 	}

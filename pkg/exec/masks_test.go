@@ -37,9 +37,9 @@ func TestMaskingDelete(t *testing.T) {
 	t.Logf("Given the need to mask fields as deletes.")
 	{
 		masks := map[string]mask.Mask{
-			"station_id": {"test_xenia_data", "station_id", mask.MaskRemove},
-			"type":       {"test_xenia_data", "type", mask.MaskRemove},
-			"wind_dir":   {"test_xenia_data", "wind_dir", mask.MaskRemove},
+			"station_id": {"*", "station_id", mask.MaskRemove},
+			"type":       {"*", "type", mask.MaskRemove},
+			"wind_dir":   {"*", "wind_dir", mask.MaskRemove},
 		}
 
 		docs, err := fixtures()
@@ -93,9 +93,9 @@ func TestMaskingDelete(t *testing.T) {
 // TestMaskingAll tests the masking functionality for all.
 func TestMaskingAll(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id": {"test_xenia_data", "station_id", mask.MaskAll},
-		"type":       {"test_xenia_data", "type", mask.MaskAll},
-		"temp_f":     {"test_xenia_data", "temp_f", mask.MaskAll},
+		"station_id": {"*", "station_id", mask.MaskAll},
+		"type":       {"*", "type", mask.MaskAll},
+		"temp_f":     {"*", "temp_f", mask.MaskAll},
 	}
 
 	t.Logf("Given the need to mask fields as all.")
@@ -146,9 +146,9 @@ func TestMaskingAll(t *testing.T) {
 // TestMaskingLeft tests the masking functionality for left.
 func TestMaskingLeft(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id":         {"test_xenia_data", "station_id", mask.MaskLeft},
-		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskLeft},
-		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskLeft},
+		"station_id":         {"*", "station_id", mask.MaskLeft},
+		"temperature_string": {"*", "temperature_string", mask.MaskLeft},
+		"temp_f":             {"*", "temp_f", mask.MaskLeft},
 	}
 
 	t.Logf("Given the need to mask fields as left.")
@@ -199,9 +199,9 @@ func TestMaskingLeft(t *testing.T) {
 // TestMaskingLeft8 tests the masking functionality for left8.
 func TestMaskingLeft8(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id":         {"test_xenia_data", "station_id", mask.MaskLeft + "8"},
-		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskLeft + "8"},
-		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskLeft + "8"},
+		"station_id":         {"*", "station_id", mask.MaskLeft + "8"},
+		"temperature_string": {"*", "temperature_string", mask.MaskLeft + "8"},
+		"temp_f":             {"*", "temp_f", mask.MaskLeft + "8"},
 	}
 
 	t.Logf("Given the need to mask fields as left.")
@@ -252,9 +252,9 @@ func TestMaskingLeft8(t *testing.T) {
 // TestMaskingRight tests the masking functionality for right.
 func TestMaskingRight(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id":         {"test_xenia_data", "station_id", mask.MaskRight},
-		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskRight},
-		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskRight},
+		"station_id":         {"*", "station_id", mask.MaskRight},
+		"temperature_string": {"*", "temperature_string", mask.MaskRight},
+		"temp_f":             {"*", "temp_f", mask.MaskRight},
 	}
 
 	t.Logf("Given the need to mask fields as left.")
@@ -305,9 +305,9 @@ func TestMaskingRight(t *testing.T) {
 // TestMaskingRight8 tests the masking functionality for right8.
 func TestMaskingRight8(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id":         {"test_xenia_data", "station_id", mask.MaskRight + "8"},
-		"temperature_string": {"test_xenia_data", "temperature_string", mask.MaskRight + "8"},
-		"temp_f":             {"test_xenia_data", "temp_f", mask.MaskRight + "8"},
+		"station_id":         {"*", "station_id", mask.MaskRight + "8"},
+		"temperature_string": {"*", "temperature_string", mask.MaskRight + "8"},
+		"temp_f":             {"*", "temp_f", mask.MaskRight + "8"},
 	}
 
 	t.Logf("Given the need to mask fields as left.")
@@ -358,9 +358,9 @@ func TestMaskingRight8(t *testing.T) {
 // TestMaskingEmail tests the masking functionality for email.
 func TestMaskingEmail(t *testing.T) {
 	masks := map[string]mask.Mask{
-		"station_id": {"test_xenia_data", "station_id", mask.MaskEmail},
-		"name":       {"test_xenia_data", "name", mask.MaskEmail},
-		"temp_f":     {"test_xenia_data", "temp_f", mask.MaskEmail},
+		"station_id": {"*", "station_id", mask.MaskEmail},
+		"name":       {"*", "name", mask.MaskEmail},
+		"temp_f":     {"*", "temp_f", mask.MaskEmail},
 	}
 
 	t.Logf("Given the need to mask fields as left.")

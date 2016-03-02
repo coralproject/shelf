@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/coralproject/xenia/pkg/mask"
 	"github.com/coralproject/xenia/pkg/query"
 	"github.com/coralproject/xenia/pkg/regex"
 	"github.com/coralproject/xenia/pkg/script"
@@ -74,6 +75,27 @@ func LoadRegex(context interface{}, path string) (regex.Regex, error) {
 
 	log.Dev(context, "LoadRegex", "Completed")
 	return rgx, nil
+}
+
+// LoadMask serializes the content of a Mask from a file using the
+// given file path. Returns the serialized Mask value.
+func LoadMask(context interface{}, path string) (mask.Mask, error) {
+	log.Dev(context, "LoadMask", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadMask", err, "Completed")
+		return mask.Mask{}, err
+	}
+
+	var msk mask.Mask
+	if err = json.NewDecoder(file).Decode(&msk); err != nil {
+		log.Error(context, "LoadMask", err, "Completed")
+		return mask.Mask{}, err
+	}
+
+	log.Dev(context, "LoadMask", "Completed")
+	return msk, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

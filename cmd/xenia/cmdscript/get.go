@@ -72,7 +72,7 @@ func runGetDB(cmd *cobra.Command) {
 		return
 	}
 
-	data, err := json.MarshalIndent(&set, "", "    ")
+	data, err := json.MarshalIndent(set, "", "    ")
 	if err != nil {
 		cmd.Println("Getting Script : ", err)
 		return

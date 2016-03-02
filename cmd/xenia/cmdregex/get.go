@@ -66,13 +66,13 @@ func runGetDB(cmd *cobra.Command) {
 		return
 	}
 
-	set, err := regex.GetByName("", conn, get.name)
+	rgx, err := regex.GetByName("", conn, get.name)
 	if err != nil {
 		cmd.Println("Getting Regex : ", err)
 		return
 	}
 
-	data, err := json.MarshalIndent(&set, "", "    ")
+	data, err := json.MarshalIndent(rgx, "", "    ")
 	if err != nil {
 		cmd.Println("Getting Regex : ", err)
 		return

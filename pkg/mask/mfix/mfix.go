@@ -56,7 +56,7 @@ func Add(db *db.DB, msk mask.Mask) error {
 // Remove is used to clear out all the test masks from the collection.
 func Remove(db *db.DB, collection string) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"collection": collection}
+		q := bson.M{"$or": []bson.M{bson.M{"collection": collection}, bson.M{"collection": "*", "field": "test"}}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
@@ -66,7 +66,7 @@ func Remove(db *db.DB, collection string) error {
 	}
 
 	f = func(c *mgo.Collection) error {
-		q := bson.M{"collection": collection}
+		q := bson.M{"$or": []bson.M{bson.M{"collection": collection}, bson.M{"collection": "*", "field": "test"}}}
 		_, err := c.RemoveAll(q)
 		return err
 	}

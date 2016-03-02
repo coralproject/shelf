@@ -121,15 +121,12 @@ func TestGetMasks(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := mask.Upsert(tests.Context, db, masks[0]); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a query mask : %s", tests.Failed, err)
+			for _, msk := range masks {
+				if err := mask.Upsert(tests.Context, db, msk); err != nil {
+					t.Fatalf("\t%s\tShould be able to create a query mask : %s", tests.Failed, err)
+				}
+				t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
 			}
-			t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
-
-			if err := mask.Upsert(tests.Context, db, masks[1]); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a second query mask : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to create a second query mask.", tests.Success)
 
 			msks, err := mask.GetAll(tests.Context, db, nil)
 			if err != nil {
@@ -139,12 +136,12 @@ func TestGetMasks(t *testing.T) {
 
 			var count int
 			for _, msk := range msks {
-				if msk.Collection == collection {
+				if msk.Collection == collection || (msk.Collection == "*" && msk.Field == "test") {
 					count++
 				}
 			}
 
-			if count != 2 {
+			if count != len(masks) {
 				t.Fatalf("\t%s\tShould have two query masks : %d", tests.Failed, count)
 			}
 			t.Logf("\t%s\tShould have two query masks.", tests.Success)
@@ -181,15 +178,12 @@ func TestGetMaskByCollection(t *testing.T) {
 	{
 		t.Log("\tWhen using fixture", fixture)
 		{
-			if err := mask.Upsert(tests.Context, db, masks[0]); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a query mask : %s", tests.Failed, err)
+			for _, msk := range masks {
+				if err := mask.Upsert(tests.Context, db, msk); err != nil {
+					t.Fatalf("\t%s\tShould be able to create a query mask : %s", tests.Failed, err)
+				}
+				t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
 			}
-			t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
-
-			if err := mask.Upsert(tests.Context, db, masks[1]); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a second query mask : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to create a second query mask.", tests.Success)
 
 			msks, err := mask.GetByCollection(tests.Context, db, masks[0].Collection)
 			if err != nil {
@@ -199,12 +193,12 @@ func TestGetMaskByCollection(t *testing.T) {
 
 			var count int
 			for _, msk := range msks {
-				if msk.Collection == collection {
+				if msk.Collection == collection || (msk.Collection == "*" && msk.Field == "test") {
 					count++
 				}
 			}
 
-			if count != 2 {
+			if count != len(masks) {
 				t.Fatalf("\t%s\tShould have two query masks : %d", tests.Failed, count)
 			}
 			t.Logf("\t%s\tShould have two query masks.", tests.Success)
