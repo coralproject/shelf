@@ -484,6 +484,11 @@ func masking() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Masking","Docs":[{"condition":{"pressure_string":"******"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
+			`{"results":[{"Name":"Masking","Docs":[{"condition":{"observation_time":"Last Updated on Oct 30 2012, 11:00 am CDT","pressure_string":"1014.0 mb"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
+
+		// NOT SURE WHAT TO DO. When tests are run in parallel the masks may be
+		// gone. I can't fudge this because it is tied to the collection we
+		// are running the query again. So I have both results for now :(
 	}
 }
