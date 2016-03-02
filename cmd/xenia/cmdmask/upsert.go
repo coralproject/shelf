@@ -1,4 +1,4 @@
-package cmdregex
+package cmdmask
 
 import (
 	"bytes"
@@ -8,18 +8,18 @@ import (
 
 	"github.com/coralproject/xenia/cmd/xenia/disk"
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/pkg/regex"
+	"github.com/coralproject/xenia/pkg/mask"
 
 	"github.com/spf13/cobra"
 )
 
-var upsertLong = `Use upsert to add or update a regex in the system.
+var upsertLong = `Use upsert to add or update a mask in the system.
 Adding can be done per file or per directory.
 
 Example:
-	regex upsert -p alpha.json
+	mask upsert -p mask.json
 
-	regex upsert -p ./regexs
+	mask upsert -p ./masks
 `
 
 // upsert contains the state for this command.
@@ -27,23 +27,23 @@ var upsert struct {
 	path string
 }
 
-// addUpsert handles the add or update of Regex records into the db.
+// addUpsert handles the add or update of mask records into the db.
 func addUpsert() {
 	cmd := &cobra.Command{
 		Use:   "upsert",
-		Short: "Upsert adds or updates a Regex from a file or directory.",
+		Short: "Upsert adds or updates a mask from a file or directory.",
 		Long:  upsertLong,
 		Run:   runUpsert,
 	}
 
-	cmd.Flags().StringVarP(&upsert.path, "path", "p", "", "Path of Regex file or directory.")
+	cmd.Flags().StringVarP(&upsert.path, "path", "p", "", "Path of mask file or directory.")
 
-	regexCmd.AddCommand(cmd)
+	maskCmd.AddCommand(cmd)
 }
 
 // runUpsert is the code that implements the upsert command.
 func runUpsert(cmd *cobra.Command, args []string) {
-	cmd.Printf("Upserting Regex : Path[%s]\n", upsert.path)
+	cmd.Printf("Upserting Mask : Path[%s]\n", upsert.path)
 
 	if upsert.path == "" {
 		cmd.Help()
@@ -52,7 +52,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 
 	pwd, err := os.Getwd()
 	if err != nil {
-		cmd.Println("Upserting Regex : ", err)
+		cmd.Println("Upserting Mask : ", err)
 		return
 	}
 
@@ -60,61 +60,61 @@ func runUpsert(cmd *cobra.Command, args []string) {
 
 	stat, err := os.Stat(file)
 	if err != nil {
-		cmd.Println("Upserting Regex : ", err)
+		cmd.Println("Upserting Mask : ", err)
 		return
 	}
 
 	if !stat.IsDir() {
-		rgx, err := disk.LoadRegex("", file)
+		msk, err := disk.LoadMask("", file)
 		if err != nil {
-			cmd.Println("Upserting Regex : ", err)
+			cmd.Println("Upserting Mask : ", err)
 			return
 		}
 
 		if conn != nil {
-			cmd.Printf("\n%+v\n", rgx)
-			if err := regex.Upsert("", conn, rgx); err != nil {
-				cmd.Println("Upserting Regex : ", err)
+			cmd.Printf("\n%+v\n", msk)
+			if err := mask.Upsert("", conn, msk); err != nil {
+				cmd.Println("Upserting Mask : ", err)
 				return
 			}
 		} else {
-			if err := runUpsertWeb(cmd, rgx); err != nil {
-				cmd.Println("Upserting Regex : ", err)
+			if err := runUpsertWeb(cmd, msk); err != nil {
+				cmd.Println("Upserting Mask : ", err)
 				return
 			}
 		}
 
-		cmd.Println("\n", "Upserting Regex : Upserted")
+		cmd.Println("\n", "Upserting Mask : Upserted")
 		return
 	}
 
 	f := func(path string) error {
-		rgx, err := disk.LoadRegex("", path)
+		msk, err := disk.LoadMask("", path)
 		if err != nil {
 			return err
 		}
 
 		if conn != nil {
-			return regex.Upsert("", conn, rgx)
+			return mask.Upsert("", conn, msk)
 		}
 
-		return runUpsertWeb(cmd, rgx)
+		return runUpsertWeb(cmd, msk)
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {
-		cmd.Println("Upserting Regex : ", err)
+		cmd.Println("Upserting Mask : ", err)
 		return
 	}
 
-	cmd.Println("\n", "Upserting Regex : Upserted")
+	cmd.Println("\n", "Upserting Mask : Upserted")
 }
 
 // runUpsertWeb issues the command talking to the web service.
-func runUpsertWeb(cmd *cobra.Command, rgx regex.Regex) error {
+func runUpsertWeb(cmd *cobra.Command, msk mask.Mask) error {
 	verb := "PUT"
-	url := "/1.0/regex"
+	url := "/1.0/mask"
 
-	data, err := json.Marshal(rgx)
+	data, err := json.Marshal(msk)
 	if err != nil {
 		return err
 	}

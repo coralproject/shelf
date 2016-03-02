@@ -33,7 +33,7 @@ func TestExec(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -78,7 +78,7 @@ func TestExecCustom(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`
+			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`
 
 			if resp != recv {
 				t.Log(resp)
@@ -111,7 +111,7 @@ func TestExecJSONP(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false})`
+			resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]})`
 
 			if resp != recv {
 				t.Log(resp)

@@ -22,7 +22,7 @@ type Script struct {
 }
 
 // Validate checks the query value for consistency.
-func (scr *Script) Validate() error {
+func (scr Script) Validate() error {
 	if err := validate.Struct(scr); err != nil {
 		return err
 	}
@@ -35,7 +35,7 @@ func (scr *Script) Validate() error {
 }
 
 // PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
-func (scr *Script) PrepareForInsert() {
+func (scr Script) PrepareForInsert() {
 
 	// Fix the commands so it can be inserted.
 	for c := range scr.Commands {
@@ -44,7 +44,7 @@ func (scr *Script) PrepareForInsert() {
 }
 
 // PrepareForUse replaces the `_$` to `$` when found in the front of field names.
-func (scr *Script) PrepareForUse() {
+func (scr Script) PrepareForUse() {
 
 	// Fix the commands so it can be inserted.
 	for c := range scr.Commands {

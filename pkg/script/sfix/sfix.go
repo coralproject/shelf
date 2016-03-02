@@ -21,10 +21,10 @@ func init() {
 //==============================================================================
 
 // Get retrieves a set document from the filesystem for testing.
-func Get(fileName string) (*script.Script, error) {
+func Get(fileName string) (script.Script, error) {
 	file, err := os.Open(path + fileName)
 	if err != nil {
-		return nil, err
+		return script.Script{}, err
 	}
 
 	defer file.Close()
@@ -32,14 +32,14 @@ func Get(fileName string) (*script.Script, error) {
 	var scr script.Script
 	err = json.NewDecoder(file).Decode(&scr)
 	if err != nil {
-		return nil, err
+		return script.Script{}, err
 	}
 
-	return &scr, nil
+	return scr, nil
 }
 
 // Add inserts a script for testing.
-func Add(db *db.DB, scr *script.Script) error {
+func Add(db *db.DB, scr script.Script) error {
 	if err := script.Upsert("", db, scr); err != nil {
 		return err
 	}

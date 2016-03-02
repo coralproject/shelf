@@ -88,7 +88,7 @@ func TestUpsertCreateRegex(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to compile the regex.", tests.Success)
 
-			if !reflect.DeepEqual(*rgx1, *rgx2) {
+			if !reflect.DeepEqual(rgx1, rgx2) {
 				t.Logf("\t%+v", rgx1)
 				t.Logf("\t%+v", rgx2)
 				t.Errorf("\t%s\tShould be able to get back the same regex values.", tests.Failed)
@@ -135,9 +135,9 @@ func TestGetRegexNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a regex.", tests.Success)
 
-			rgx2 := *rgx1
+			rgx2 := rgx1
 			rgx2.Name += "2"
-			if err := regex.Upsert(tests.Context, db, &rgx2); err != nil {
+			if err := regex.Upsert(tests.Context, db, rgx2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second regex : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second regex.", tests.Success)
@@ -209,7 +209,7 @@ func TestGetRegexs(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a second regex.", tests.Success)
 
-			rgxs, err := regex.GetRegexs(tests.Context, db, nil)
+			rgxs, err := regex.GetAll(tests.Context, db, nil)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the regexs : %v", tests.Failed, err)
 			}
@@ -264,9 +264,9 @@ func TestGetRegexByNames(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a regex.", tests.Success)
 
-			rgx2 := *rgx1
+			rgx2 := rgx1
 			rgx2.Name += "2"
-			if err := regex.Upsert(tests.Context, db, &rgx2); err != nil {
+			if err := regex.Upsert(tests.Context, db, rgx2); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a second regex : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a second regex.", tests.Success)
@@ -348,7 +348,7 @@ func TestGetLastRegexHistoryByName(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the last regex from history.", tests.Success)
 
-			if !reflect.DeepEqual(*rgx1, *rgx2) {
+			if !reflect.DeepEqual(rgx1, rgx2) {
 				t.Logf("\t%+v", rgx1)
 				t.Logf("\t%+v", rgx2)
 				t.Errorf("\t%s\tShould be able to get back the same regex values.", tests.Failed)
@@ -393,10 +393,10 @@ func TestUpsertUpdateRegex(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a regex.", tests.Success)
 
-			rgx2 := *rgx1
+			rgx2 := rgx1
 			rgx2.Expr = "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
 
-			if err := regex.Upsert(tests.Context, db, &rgx2); err != nil {
+			if err := regex.Upsert(tests.Context, db, rgx2); err != nil {
 				t.Fatalf("\t%s\tShould be able to update a regex record: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a regex record.", tests.Success)
@@ -509,6 +509,12 @@ func TestAPIFailureRegexs(t *testing.T) {
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
 			_, err = regex.GetNames(tests.Context, nil)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
+
+			_, err = regex.GetAll(tests.Context, nil, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

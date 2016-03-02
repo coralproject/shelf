@@ -57,14 +57,14 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "c6ccb42e117732d4b12caf6e29a9b6f8e51f646d",
-			"revisionTime": "2016-02-15T10:54:41-05:00"
+			"revision": "deea9649409746326bfb118a246d1880a0ad1677",
+			"revisionTime": "2016-02-24T11:12:40-05:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
 			"path": "github.com/ardanlabs/kit/web/midware",
-			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
-			"revisionTime": "2016-02-15T10:47:25-05:00"
+			"revision": "deea9649409746326bfb118a246d1880a0ad1677",
+			"revisionTime": "2016-02-24T11:12:40-05:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",

@@ -1,0 +1,17 @@
+[
+	{
+		"collection": "test_xenia_data",
+		"field": "observation_time",
+		"type": "remove"
+	},
+	{
+		"collection": "test_xenia_data",
+		"field": "pressure_string",
+		"type": "all"
+	},
+	{
+		"collection": "*",
+		"field": "test",
+		"type": "remove"
+	}
+]

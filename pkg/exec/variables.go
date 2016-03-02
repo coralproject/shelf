@@ -13,8 +13,7 @@ import (
 )
 
 // ProcessVariables walks the document performing variable substitutions.
-// This function is exported because it is accessed by the tstdata package
-// and tests.
+// This function is exported because it is accessed by the tstdata package.
 func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 
 	// commands: Contains the mongodb pipeline with any extenstions.
@@ -74,7 +73,7 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 func varSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
-	// 		key:"field"  variable:"#cmd:variable_name"
+	// key: "field"  variable:"#cmd:variable_name"
 
 	// Remove the # characters from the left.
 	value := variable[1:]

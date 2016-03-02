@@ -62,7 +62,7 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 	// Final results of running the set of queries.
 	var results []docs
 
-	// Iterate of the set of queries.
+	// Iterate over the set of queries.
 	for _, q := range set.Queries {
 		var result docs
 		var commands []map[string]interface{}
@@ -85,7 +85,6 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 			// We need to return an error result with the commands.
 			r := query.Result{
 				Results: bson.M{"error": err.Error(), "commands": commands},
-				Error:   true,
 			}
 
 			log.Error(context, "errResult", err, "Completed : Executing Result")
@@ -111,7 +110,6 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 func errResult(context interface{}, err error, msg string) *query.Result {
 	r := query.Result{
 		Results: bson.M{"error": err.Error()},
-		Error:   true,
 	}
 
 	log.Error(context, "errResult", err, "Completed : %s", msg)

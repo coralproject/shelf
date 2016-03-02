@@ -4,6 +4,7 @@ package main
 import (
 	"os"
 
+	"github.com/coralproject/xenia/cmd/xenia/cmdmask"
 	"github.com/coralproject/xenia/cmd/xenia/cmdquery"
 	"github.com/coralproject/xenia/cmd/xenia/cmdregex"
 	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
@@ -84,6 +85,7 @@ func main() {
 		cmdquery.GetCommands(conn),
 		cmdscript.GetCommands(conn),
 		cmdregex.GetCommands(conn),
+		cmdmask.GetCommands(conn),
 	)
 	xenia.Execute()
 }

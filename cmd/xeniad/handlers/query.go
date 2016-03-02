@@ -22,7 +22,7 @@ var Query queryHandle
 // List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
 func (queryHandle) List(c *app.Context) error {
-	sets, err := query.GetSets(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
+	sets, err := query.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == query.ErrNotFound {
 			err = app.ErrNotFound
@@ -54,12 +54,12 @@ func (queryHandle) Retrieve(c *app.Context) error {
 // Upsert inserts or updates the posted Set document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (queryHandle) Upsert(c *app.Context) error {
-	var set *query.Set
+	var set query.Set
 	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
 		return err
 	}
 
-	if err := query.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), set); err != nil {
+	if err := query.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &set); err != nil {
 		return err
 	}
 

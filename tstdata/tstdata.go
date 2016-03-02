@@ -25,28 +25,38 @@ func init() {
 
 //==============================================================================
 
-// Generate creates a temp collection with data
-// that can be used for testing things.
-func Generate(db *db.DB) error {
+// Docs reads the fixture and returns the documents.
+func Docs() ([]map[string]interface{}, error) {
 	file, err := os.Open(path + "test_data.json")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	defer file.Close()
 
 	data, err := ioutil.ReadAll(file)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var docs []map[string]interface{}
 	if err := json.Unmarshal(data, &docs); err != nil {
-		return err
+		return nil, err
 	}
 
 	for i := range docs {
 		exec.ProcessVariables("", docs[i], map[string]string{}, nil)
+	}
+
+	return docs, nil
+}
+
+// Generate creates a temp collection with data
+// that can be used for testing things.
+func Generate(db *db.DB) error {
+	docs, err := Docs()
+	if err != nil {
+		return err
 	}
 
 	// The Insert calls requires this converstion.

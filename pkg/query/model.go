@@ -23,9 +23,10 @@ func init() {
 //==============================================================================
 
 // Result contains the result of an query set execution.
+// This had more fields in the past that have been removed. We
+// can't change this out without breaking the API.
 type Result struct {
 	Results interface{} `json:"results"`
-	Error   bool        `json:"error"`
 }
 
 //==============================================================================

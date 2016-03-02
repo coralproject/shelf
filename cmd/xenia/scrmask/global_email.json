@@ -1,0 +1,5 @@
+{
+	"collection": "*",
+	"field": "email",
+	"type": "email"
+}

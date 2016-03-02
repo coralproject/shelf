@@ -41,7 +41,7 @@ var cache = gc.New(expiration, cleanup)
 // =============================================================================
 
 // Upsert is used to create or update an existing Script document.
-func Upsert(context interface{}, db *db.DB, scr *Script) error {
+func Upsert(context interface{}, db *db.DB, scr Script) error {
 	log.Dev(context, "Upsert", "Started : Name[%s]", scr.Name)
 
 	// Validate the set that is provided.
@@ -105,7 +105,7 @@ func Upsert(context interface{}, db *db.DB, scr *Script) error {
 		su := bson.M{
 			"$push": bson.M{
 				"scripts": bson.M{
-					"$each":     []*Script{scr},
+					"$each":     []Script{scr},
 					"$position": 0,
 				},
 			},
@@ -173,20 +173,20 @@ func GetNames(context interface{}, db *db.DB) ([]string, error) {
 	return names, nil
 }
 
-// GetScripts retrieves a list of scripts.
-func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error) {
-	log.Dev(context, "GetScripts", "Started : Tags[%v]", tags)
+// GetAll retrieves a list of scripts.
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error) {
+	log.Dev(context, "GetAll", "Started : Tags[%v]", tags)
 
 	key := "gss" + strings.Join(tags, "-")
 	if v, found := cache.Get(key); found {
 		scrs := v.([]Script)
-		log.Dev(context, "GetScripts", "Completed : CACHE : Scripts[%d]", len(scrs))
+		log.Dev(context, "GetAll", "Completed : CACHE : Scripts[%d]", len(scrs))
 		return scrs, nil
 	}
 
 	var scrs []Script
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "GetScripts", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
+		log.Dev(context, "GetAll", "MGO : db.%s.find({}).sort([\"name\"])", c.Name)
 		return c.Find(nil).All(&scrs)
 	}
 
@@ -195,12 +195,12 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 			err = ErrNotFound
 		}
 
-		log.Error(context, "GetScripts", err, "Completed")
+		log.Error(context, "GetAll", err, "Completed")
 		return nil, err
 	}
 
 	if scrs == nil {
-		log.Error(context, "GetScripts", ErrNotFound, "Completed")
+		log.Error(context, "GetAll", ErrNotFound, "Completed")
 		return nil, ErrNotFound
 	}
 
@@ -211,19 +211,19 @@ func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
 
 	cache.Set(key, scrs, gc.DefaultExpiration)
 
-	log.Dev(context, "GetScripts", "Completed : Scripts[%d]", len(scrs))
+	log.Dev(context, "GetAll", "Completed : Scripts[%d]", len(scrs))
 	return scrs, nil
 }
 
 // GetByName retrieves the document for the specified name.
-func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
+func GetByName(context interface{}, db *db.DB, name string) (Script, error) {
 	log.Dev(context, "GetByName", "Started : Name[%s]", name)
 
 	key := "gbn" + name
 	if v, found := cache.Get(key); found {
 		scr := v.(Script)
 		log.Dev(context, "GetByName", "Completed : CACHE : Script[%+v]", &scr)
-		return &scr, nil
+		return scr, nil
 	}
 
 	var scr Script
@@ -239,7 +239,7 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 		}
 
 		log.Error(context, "GetByName", err, "Completed")
-		return nil, err
+		return Script{}, err
 	}
 
 	// Fix the script so it can be used for processing.
@@ -248,7 +248,7 @@ func GetByName(context interface{}, db *db.DB, name string) (*Script, error) {
 	cache.Set(key, scr, gc.DefaultExpiration)
 
 	log.Dev(context, "GetByName", "Completed : Script[%+v]", &scr)
-	return &scr, nil
+	return scr, nil
 }
 
 // GetByNames retrieves the documents for the specified names.
@@ -321,7 +321,7 @@ next:
 }
 
 // GetLastHistoryByName gets the last written Script within the history.
-func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error) {
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Script, error) {
 	log.Dev(context, "GetLastHistoryByName", "Started : Name[%s]", name)
 
 	type rslt struct {
@@ -333,7 +333,7 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 	if v, found := cache.Get(key); found {
 		result := v.(rslt)
 		log.Dev(context, "GetLastHistoryByName", "Completed : CACHE : Script[%+v]", &result.Scripts[0])
-		return &result.Scripts[0], nil
+		return result.Scripts[0], nil
 	}
 
 	var result rslt
@@ -352,13 +352,13 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 		}
 
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
-		return nil, err
+		return Script{}, err
 	}
 
 	if result.Scripts == nil {
 		err := errors.New("History not found")
 		log.Error(context, "GetLastHistoryByName", err, "Complete")
-		return nil, err
+		return Script{}, err
 	}
 
 	// Fix the script so it can be used for processing.
@@ -367,7 +367,7 @@ func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script,
 	cache.Set(key, result, gc.DefaultExpiration)
 
 	log.Dev(context, "GetLastHistoryByName", "Completed : Script[%+v]", &result.Scripts[0])
-	return &result.Scripts[0], nil
+	return result.Scripts[0], nil
 }
 
 // =============================================================================

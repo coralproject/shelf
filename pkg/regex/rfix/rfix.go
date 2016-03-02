@@ -21,10 +21,10 @@ func init() {
 //==============================================================================
 
 // Get retrieves a regex document from the filesystem for testing.
-func Get(fileName string) (*regex.Regex, error) {
+func Get(fileName string) (regex.Regex, error) {
 	file, err := os.Open(path + fileName)
 	if err != nil {
-		return nil, err
+		return regex.Regex{}, err
 	}
 
 	defer file.Close()
@@ -32,14 +32,14 @@ func Get(fileName string) (*regex.Regex, error) {
 	var rgx regex.Regex
 	err = json.NewDecoder(file).Decode(&rgx)
 	if err != nil {
-		return nil, err
+		return regex.Regex{}, err
 	}
 
-	return &rgx, nil
+	return rgx, nil
 }
 
 // Add inserts a regex for testing.
-func Add(db *db.DB, rgx *regex.Regex) error {
+func Add(db *db.DB, rgx regex.Regex) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"name": rgx.Name}
 		_, err := c.Upsert(q, rgx)

@@ -194,7 +194,7 @@ func TestGetSets(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a second query set.", tests.Success)
 
-			sets, err := query.GetSets(tests.Context, db, nil)
+			sets, err := query.GetAll(tests.Context, db, nil)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query sets : %v", tests.Failed, err)
 			}
@@ -529,6 +529,12 @@ func TestAPIFailureSet(t *testing.T) {
 			t.Logf("\t%s\tShould be refused create by api with bad session: %s", tests.Success, err)
 
 			_, err = query.GetNames(tests.Context, nil)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be refused get request by api with bad session: %s", tests.Success, err)
+
+			_, err = query.GetAll(tests.Context, nil, nil)
 			if err == nil {
 				t.Fatalf("\t%s\tShould be refused get request by api with bad session", tests.Failed)
 			}

@@ -79,6 +79,11 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		results = []bson.M{}
 	}
 
+	// Perform any masking that is required.
+	if err := processMasks(context, db, q.Collection, results); err != nil {
+		return docs{}, commands, err
+	}
+
 	// Do we need to save the result.
 	if save != nil {
 		if err := saveResult(context, save, results, data); err != nil {
