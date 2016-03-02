@@ -95,7 +95,7 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/1.0/mask", handlers.Mask.Upsert)
 	a.Handle("GET", "/1.0/mask/:collection/:field", handlers.Mask.Retrieve)
 	a.Handle("GET", "/1.0/mask/:collection", handlers.Mask.Retrieve)
-	a.Handle("DELETE", "/1.0/mask/:collection", handlers.Mask.Delete)
+	a.Handle("DELETE", "/1.0/mask/:collection/:field", handlers.Mask.Delete)
 
 	a.Handle("POST", "/1.0/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/1.0/exec/:name", handlers.Exec.Name)

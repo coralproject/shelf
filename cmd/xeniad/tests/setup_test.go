@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
+	"github.com/coralproject/xenia/pkg/mask/mfix"
 	"github.com/coralproject/xenia/pkg/query/qfix"
 	"github.com/coralproject/xenia/pkg/script/sfix"
 	"github.com/coralproject/xenia/tstdata"
@@ -61,6 +62,9 @@ func runTest(m *testing.M) int {
 	loadScript(db, "basic_script_pst.json")
 	defer sfix.Remove(db, "STEST_O")
 
+	loadMasks(db, "basic.json")
+	defer mfix.Remove(db, "test_xenia_data")
+
 	return m.Run()
 }
 
@@ -87,6 +91,22 @@ func loadScript(db *db.DB, file string) error {
 
 	if err := sfix.Add(db, scr); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// loadMasks adds masks to run tests.
+func loadMasks(db *db.DB, file string) error {
+	masks, err := mfix.Get(file)
+	if err != nil {
+		return err
+	}
+
+	for _, msk := range masks {
+		if err := mfix.Add(db, msk); err != nil {
+			return err
+		}
 	}
 
 	return nil

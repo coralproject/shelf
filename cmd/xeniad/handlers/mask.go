@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/coralproject/xenia/pkg/mask"
-	"github.com/coralproject/xenia/pkg/regex"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
@@ -24,7 +23,7 @@ var Mask maskHandle
 func (maskHandle) List(c *app.Context) error {
 	masks, err := mask.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
-		if err == regex.ErrNotFound {
+		if err == mask.ErrNotFound {
 			err = app.ErrNotFound
 		}
 		return err
@@ -47,7 +46,7 @@ func (maskHandle) Retrieve(c *app.Context) error {
 	if field == "" {
 		masks, err := mask.GetByCollection(c.SessionID, c.Ctx["DB"].(*db.DB), collection)
 		if err != nil {
-			if err == regex.ErrNotFound {
+			if err == mask.ErrNotFound {
 				err = app.ErrNotFound
 			}
 			return err
@@ -59,7 +58,7 @@ func (maskHandle) Retrieve(c *app.Context) error {
 
 	msk, err := mask.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), collection, field)
 	if err != nil {
-		if err == regex.ErrNotFound {
+		if err == mask.ErrNotFound {
 			err = app.ErrNotFound
 		}
 		return err
@@ -93,7 +92,7 @@ func (maskHandle) Upsert(c *app.Context) error {
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (maskHandle) Delete(c *app.Context) error {
 	if err := mask.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["collection"], c.Params["field"]); err != nil {
-		if err == regex.ErrNotFound {
+		if err == mask.ErrNotFound {
 			err = app.ErrNotFound
 		}
 		return err
