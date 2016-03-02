@@ -1,12 +1,12 @@
 [
 	{
 		"collection": "test_xenia_data",
-		"field": "name",
+		"field": "observation_time",
 		"type": "remove"
 	},
 	{
 		"collection": "test_xenia_data",
-		"field": "station_id",
-		"type": "remove"
+		"field": "pressure_string",
+		"type": "all"
 	}
 ]

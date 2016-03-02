@@ -16,15 +16,13 @@ func getPosExecSet() []execSet {
 		withShortTime(),
 		withMultiResults(),
 		basicVars(),
-		basicMissingVars(),
 		basicParamDefault(),
 		basicVarRegex(),
-		basicVarRegexFail(),
-		basicVarRegexMissing(),
 		basicSaveIn(),
 		basicSaveVar(),
 		multiFieldLookup(),
 		mongoRegex(),
+		masking(),
 	}
 }
 
@@ -49,7 +47,7 @@ func noResults() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"NoResults","Docs":[]}],"error":false}`,
+			`{"results":[{"Name":"NoResults","Docs":[]}]}`,
 		},
 	}
 }
@@ -75,7 +73,7 @@ func basic() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -101,7 +99,7 @@ func basicArray() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Basic Array","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+			`{"results":[{"Name":"Basic Array","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
 		},
 	}
 }
@@ -128,7 +126,7 @@ func basicPrePost() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Basic PrePost","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+			`{"results":[{"Name":"Basic PrePost","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -155,8 +153,8 @@ func withTime() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
-			`{"results":[{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+			`{"results":[{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
 		},
 	}
 }
@@ -183,8 +181,8 @@ func withShortTime() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Short Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
-			`{"results":[{"Name":"Short Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+			`{"results":[{"Name":"Short Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Short Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
 		},
 	}
 }
@@ -221,8 +219,8 @@ func withMultiResults() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}],"error":false}`,
-			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}],"error":false}`,
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]},{"Name":"Time","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
 		},
 	}
 }
@@ -252,36 +250,7 @@ func basicVars() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
-		},
-	}
-}
-
-// basicMissingVars performs simple query with missing parameters.
-func basicMissingVars() execSet {
-	return execSet{
-		fail: true,
-		set: &query.Set{
-			Name:    "Missing Vars",
-			Enabled: true,
-			Params: []query.Param{
-				{Name: "station_id"},
-			},
-			Queries: []query.Query{
-				{
-					Name:       "Vars",
-					Type:       "pipeline",
-					Collection: tstdata.CollectionExecTest,
-					Return:     true,
-					Commands: []map[string]interface{}{
-						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
-						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
-					},
-				},
-			},
-		},
-		results: []string{
-			`{"results":{"error":"Missing[station_id]"},"error":true}`,
+			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -310,7 +279,7 @@ func basicParamDefault() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+			`{"results":[{"Name":"Vars","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -340,69 +309,7 @@ func basicVarRegex() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Basic Var Regex","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
-		},
-	}
-}
-
-// basicVarRegexFail performs simple query with variables and an
-// invalid regex validation.
-func basicVarRegexFail() execSet {
-	return execSet{
-		fail: true,
-		vars: map[string]string{"station_id": "42021"},
-		set: &query.Set{
-			Name:    "Basic Var Regex Fail",
-			Enabled: true,
-			Params: []query.Param{
-				{Name: "station_id", RegexName: "email"},
-			},
-			Queries: []query.Query{
-				{
-					Name:       "Basic Var Regex Fail",
-					Type:       "pipeline",
-					Collection: tstdata.CollectionExecTest,
-					Return:     true,
-					Commands: []map[string]interface{}{
-						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
-						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
-					},
-				},
-			},
-		},
-		results: []string{
-			`{"results":{"error":"Invalid[42021:email:Value \"42021\" does not match \"email\" expression]"},"error":true}`,
-		},
-	}
-}
-
-// basicVarRegexMissing performs simple query with variables and a
-// missing regex validation.
-func basicVarRegexMissing() execSet {
-	return execSet{
-		fail: true,
-		vars: map[string]string{"station_id": "42021"},
-		set: &query.Set{
-			Name:    "Basic Var Regex Missing",
-			Enabled: true,
-			Params: []query.Param{
-				{Name: "station_id", RegexName: "numbers"},
-			},
-			Queries: []query.Query{
-				{
-					Name:       "Basic Var Regex Missing",
-					Type:       "pipeline",
-					Collection: tstdata.CollectionExecTest,
-					Return:     true,
-					Commands: []map[string]interface{}{
-						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
-						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
-					},
-				},
-			},
-		},
-		results: []string{
-			`{"results":{"error":"Invalid[42021:numbers:Regex Not found]"},"error":true}`,
+			`{"results":[{"Name":"Basic Var Regex","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -440,7 +347,7 @@ func basicSaveIn() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}],"error":false}`,
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}]}`,
 		},
 	}
 }
@@ -478,7 +385,7 @@ func basicSaveVar() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -514,7 +421,7 @@ func multiFieldLookup() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}],"error":false}`,
+			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }
@@ -550,7 +457,33 @@ func mongoRegex() execSet {
 			},
 		},
 		results: []string{
-			`{"results":[{"Name":"Mongo Regex 1","Docs":[{"_id":"station_id","count":5}]},{"Name":"Mongo Regex 2","Docs":[{"_id":"station_id","count":3}]}],"error":false}`,
+			`{"results":[{"Name":"Mongo Regex 1","Docs":[{"_id":"station_id","count":5}]},{"Name":"Mongo Regex 2","Docs":[{"_id":"station_id","count":3}]}]}`,
+		},
+	}
+}
+
+// masking projects fields that are configured to be masked.
+func masking() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Masking",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Masking",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "42021"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1, "condition.observation_time": 1, "condition.pressure_string": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Masking","Docs":[{"condition":{"pressure_string":"******"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 	}
 }

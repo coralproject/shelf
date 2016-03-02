@@ -41,12 +41,22 @@ func matchMaskField(context interface{}, masks map[string]mask.Mask, doc map[str
 		// What type of value does this field have.
 		switch fldVal := value.(type) {
 
-		// We have another document.
+		// We have another JSON document.
 		case map[string]interface{}:
 			matchMaskField(context, masks, fldVal)
 
-		// We have an array of documents.
+		// We have another BSON document.
+		case bson.M:
+			matchMaskField(context, masks, fldVal)
+
+		// We have an array of JSON documents.
 		case []map[string]interface{}:
+			for _, subDoc := range fldVal {
+				matchMaskField(context, masks, subDoc)
+			}
+
+		// We have an array of BSON documents.
+		case []bson.M:
 			for _, subDoc := range fldVal {
 				matchMaskField(context, masks, subDoc)
 			}
@@ -103,6 +113,14 @@ func applyMask(context interface{}, msk mask.Mask, doc bson.M, key string) error
 		return nil
 
 	case mask.MaskEmail[0:3]:
+		v := doc[key].(string)
+		i := strings.Index(v, "@")
+		if i == -1 {
+			return errors.New("Invalid email value")
+		}
+
+		doc[key] = "******" + v[i:]
+
 		return nil
 
 	case mask.MaskLeft[0:3]:

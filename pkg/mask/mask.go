@@ -207,7 +207,7 @@ func GetByCollection(context interface{}, db *db.DB, collection string) (map[str
 
 	cache.Set(key, mskMap, gc.DefaultExpiration)
 
-	log.Dev(context, "GetMasks", "Completed : Masks[%d]", len(mskMap))
+	log.Dev(context, "GetByCollection", "Completed : Masks[%d]", len(mskMap))
 	return mskMap, nil
 }
 

@@ -39,7 +39,7 @@ func Get(fileName string) ([]mask.Mask, error) {
 }
 
 // Add inserts a mask for testing.
-func Add(db *db.DB, msk *mask.Mask) error {
+func Add(db *db.DB, msk mask.Mask) error {
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"collection": msk.Collection, "field": msk.Field}
 		_, err := c.Upsert(q, msk)

@@ -24,6 +24,7 @@ type (
 
 	doc struct {
 		StationID string    `json:"station_id"`
+		Name      string    `json:"name"`
 		Location  location  `json:"location"`
 		Condition condition `json:"condition"`
 	}
@@ -343,6 +344,62 @@ func TestMaskingRight8(t *testing.T) {
 				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "59.4 F ********", "condition.temperature_string", fin.Condition.Temp)
 			} else {
 				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "59.4 F ********", "condition.temperature_string")
+			}
+
+			if fin.Condition.TempF != 0.00 {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "0.00", "condition.temp_f", fin.Condition.TempF)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "0.00", "condition.temp_f")
+			}
+		}
+	}
+}
+
+// TestMaskingEmail tests the masking functionality for email.
+func TestMaskingEmail(t *testing.T) {
+	masks := map[string]mask.Mask{
+		"station_id": {"test_xenia_data", "station_id", mask.MaskEmail},
+		"name":       {"test_xenia_data", "name", mask.MaskEmail},
+		"temp_f":     {"test_xenia_data", "temp_f", mask.MaskEmail},
+	}
+
+	t.Logf("Given the need to mask fields as left.")
+	{
+		t.Logf("\tWhen using test fixture data.")
+		{
+			docs, err := fixtures()
+			if err != nil {
+				t.Fatalf("\t%s\tShould retrieve fixture documents.", tests.Failed)
+			}
+
+			docs[0]["station_id"] = "bill.smith@ardanlabs.com"
+			docs[0]["name"] = "b@mydomain.com"
+
+			if err := matchMaskField(tests.Context, masks, docs[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to mask fields : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to mask fields.", tests.Success)
+
+			data, err := json.Marshal(docs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to marshal document.", tests.Failed)
+			}
+
+			var fin doc
+			if err := json.Unmarshal(data, &fin); err != nil {
+				t.Fatalf("\t%s\tShould unmarshal document.", tests.Failed)
+			}
+
+			if fin.StationID != "******@ardanlabs.com" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "******@ardanlabs.com", "station_id", fin.StationID)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "******@ardanlabs.com", "station_id")
+			}
+
+			if fin.Name != "******@mydomain.com" {
+				t.Errorf("\t%s\tShould find %q in the document for field %q : %v", tests.Failed, "******@mydomain.com", "name", fin.Condition.Temp)
+			} else {
+				t.Logf("\t%s\tShould find %q in the document for field %q.", tests.Success, "******@mydomain.com", "name")
 			}
 
 			if fin.Condition.TempF != 0.00 {

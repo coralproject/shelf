@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/pkg/exec"
+	"github.com/coralproject/xenia/pkg/mask/mfix"
 	"github.com/coralproject/xenia/pkg/query"
 	"github.com/coralproject/xenia/pkg/script"
 	"github.com/coralproject/xenia/pkg/script/sfix"
@@ -138,9 +139,9 @@ func loadTestData(t *testing.T, db *db.DB) {
 		for _, file := range scripts {
 			scr, err := sfix.Get(file)
 			if err != nil {
-				t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+				t.Fatalf("\t%s\tShould load script document from file : %v", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould load script record from file.", tests.Success)
+			t.Logf("\t%s\tShould load script document from file.", tests.Success)
 
 			// We need these scripts loaded under another name to allow tests
 			// to run in parallel.
@@ -150,6 +151,19 @@ func loadTestData(t *testing.T, db *db.DB) {
 				t.Fatalf("\t%s\tShould be able to create a script : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a script.", tests.Success)
+		}
+
+		masks, err := mfix.Get("basic.json")
+		if err != nil {
+			t.Fatalf("\t%s\tShould load mask documents from file : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould load mask documents from file.", tests.Success)
+
+		for _, msk := range masks {
+			if err := mfix.Add(db, msk); err != nil {
+				t.Fatalf("\t%s\tShould be able to create a mask : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create a mask.", tests.Success)
 		}
 	}
 }
@@ -164,6 +178,11 @@ func unloadTestData(t *testing.T, db *db.DB) {
 			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
+
+		if err := mfix.Remove(db, "test_xenia_data"); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the masks : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the masks.", tests.Success)
 	}
 }
 

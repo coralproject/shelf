@@ -12,7 +12,10 @@ func getNegExecSet() []execSet {
 		badObjid(),
 		dataMissingOperator(),
 		dataMissingInvldOperator(),
+		basicMissingVars(),
 		dataMissingResults(),
+		basicVarRegexFail(),
+		basicVarRegexMissing(),
 		dataInvldIndex(),
 		dataInMalformed(),
 		mongoRegexMalformed1(),
@@ -42,7 +45,7 @@ func badTime() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"condition.date":{"$gt":"#date:2000-1-1"}}},{"$project":{"_id":0,"name":1}},{"$limit":1}],"error":"Invalid date value \"2000-1-1\""},"error":true}`,
+			`{"results":{"commands":[{"$match":{"condition.date":{"$gt":"#date:2000-1-1"}}},{"$project":{"_id":0,"name":1}},{"$limit":1}],"error":"Invalid date value \"2000-1-1\""}}`,
 		},
 	}
 }
@@ -68,7 +71,7 @@ func badObjid() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":"#objid:5660bc6e16908cae"}},{"$project":{"_id":0,"name":1}}],"error":"Objectid \"5660bc6e16908cae\" is invalid"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":"#objid:5660bc6e16908cae"}},{"$project":{"_id":0,"name":1}}],"error":"Objectid \"5660bc6e16908cae\" is invalid"}}`,
 		},
 	}
 }
@@ -106,7 +109,7 @@ func dataMissingOperator() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":"#data:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Data command is missing the operator"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":"#data:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Data command is missing the operator"}}`,
 		},
 	}
 }
@@ -144,7 +147,7 @@ func dataMissingInvldOperator() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":"#data.?:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Invalid operator command operator \"?\""},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":"#data.?:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Invalid operator command operator \"?\""}}`,
 		},
 	}
 }
@@ -182,7 +185,69 @@ func dataMissingResults() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":"#data.0:list.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Key \"list\" not found in saved results"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":"#data.0:list.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Key \"list\" not found in saved results"}}`,
+		},
+	}
+}
+
+// basicVarRegexFail performs simple query with variables and an
+// invalid regex validation.
+func basicVarRegexFail() execSet {
+	return execSet{
+		fail: true,
+		vars: map[string]string{"station_id": "42021"},
+		set: &query.Set{
+			Name:    "Basic Var Regex Fail",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", RegexName: "email"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Basic Var Regex Fail",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"error":"Invalid[42021:email:Value \"42021\" does not match \"email\" expression]"}}`,
+		},
+	}
+}
+
+// basicVarRegexMissing performs simple query with variables and a
+// missing regex validation.
+func basicVarRegexMissing() execSet {
+	return execSet{
+		fail: true,
+		vars: map[string]string{"station_id": "42021"},
+		set: &query.Set{
+			Name:    "Basic Var Regex Missing",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id", RegexName: "numbers"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Basic Var Regex Missing",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"error":"Invalid[42021:numbers:Regex Not found]"}}`,
 		},
 	}
 }
@@ -220,7 +285,36 @@ func dataInvldIndex() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":"#data.8:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Index \"8\" out of range, total \"1\""},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":"#data.8:station.station_id"}},{"$project":{"_id":0,"name":1}}],"error":"Index \"8\" out of range, total \"1\""}}`,
+		},
+	}
+}
+
+// basicMissingVars performs simple query with missing parameters.
+func basicMissingVars() execSet {
+	return execSet{
+		fail: true,
+		set: &query.Set{
+			Name:    "Missing Vars",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "station_id"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "Vars",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "#string:station_id"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"error":"Missing[station_id]"}}`,
 		},
 	}
 }
@@ -257,7 +351,7 @@ func dataInMalformed() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"station_id":{"$in":"#tada:list.station_id"}}},{"$project":{"_id":0,"name":1}}],"error":"Invalid $in command \"tada\", missing \"data\" keyword or malformed"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"station_id":{"$in":"#tada:list.station_id"}}},{"$project":{"_id":0,"name":1}}],"error":"Invalid $in command \"tada\", missing \"data\" keyword or malformed"}}`,
 		},
 	}
 }
@@ -283,7 +377,7 @@ func mongoRegexMalformed1() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"name":"#regex:east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"east\" is not a regular expression"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"name":"#regex:east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"east\" is not a regular expression"}}`,
 		},
 	}
 }
@@ -309,7 +403,7 @@ func mongoRegexMalformed2() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"commands":[{"$match":{"name":"#regex:/east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"/east\" is not a regular expression"},"error":true}`,
+			`{"results":{"commands":[{"$match":{"name":"#regex:/east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"/east\" is not a regular expression"}}`,
 		},
 	}
 }
