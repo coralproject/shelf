@@ -17,7 +17,9 @@ import (
 func processMasks(context interface{}, db *db.DB, collection string, results []bson.M) error {
 	masks, err := mask.GetByCollection(context, db, collection)
 	if err != nil {
-		return err
+
+		// If there are no masks to process then great.
+		return nil
 	}
 
 	for _, doc := range results {
