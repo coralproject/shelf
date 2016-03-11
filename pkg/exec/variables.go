@@ -126,7 +126,8 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 	// Before: {"field": "#date:variable_name"}    		After: {"field": time.Time}
 	// Before: {"field": "#objid:variable_name"}   		After: {"field": mgo.ObjectId}
 	// Before: {"field": "#regex:/pattern/<options>"}   After: {"field": bson.RegEx}
-	// Before: {"field": "#data:doc.station_id"}   		After: {"field": "23453"}
+	// Before: {"field": "#data.0:doc.station_id"}   	After: {"field": "23453"}
+	// Before: {"field": "#ago:3600"}   				After: {"field": time.Time}
 
 	// If the variable does not exist, use the variable straight up.
 	param, exists := vars[variable]
@@ -134,57 +135,42 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 		param = variable
 	}
 
-	// Let's perform the right action per command.
-	switch cmd {
-	case "number":
-		i, err := strconv.Atoi(param)
-		if err != nil {
-			err = fmt.Errorf("Parameter %q is not a number", param)
-			log.Error(context, "varLookup", err, "Index conversion")
-			return nil, err
-		}
-		return i, nil
+	// Do we have a command that is not known.
+	if len(cmd) < 4 {
+		err := fmt.Errorf("Unknown command %q", cmd)
+		log.Error(context, "varLookup", err, "Checking cmd is proper length")
+		return nil, err
+	}
 
-	case "string":
+	// Let's perform the right action per command.
+	switch cmd[0:4] {
+	case "numb":
+		return number(context, param)
+
+	case "stri":
 		return param, nil
 
 	case "date":
 		return isoDate(context, param)
 
-	case "objid":
+	case "obji":
 		return objID(context, param)
 
-	case "regex":
-		idx := strings.Index(param[1:], "/")
-		if param[0] != '/' || idx == -1 {
-			err := fmt.Errorf("Parameter %q is not a regular expression", param)
-			log.Error(context, "varLookup", err, "Regex parsing")
-			return nil, err
-		}
+	case "rege":
+		return regExp(context, param)
 
-		pattern := param[1 : idx+1]
-		l := len(pattern) + 2
-
-		var options string
-		if l < len(param) {
-			options = param[l:]
-		}
-
-		return bson.RegEx{Pattern: pattern, Options: options}, nil
-
-	default:
-		if len(cmd) == 6 && cmd[0:4] == "data" {
+	case "data":
+		if len(cmd) == 6 {
 			return dataLookup(context, cmd[5:6], param, results)
 		}
 
-		if cmd == "data" {
-			err := errors.New("Data command is missing the operator")
-			log.Error(context, "varLookup", err, "Checking cmd is data")
-			return nil, err
-		}
-
-		err := fmt.Errorf("Unknown command %q", cmd)
+		err := errors.New("Data command is missing the operator")
 		log.Error(context, "varLookup", err, "Checking cmd is data")
+		return nil, err
+
+	default:
+		err := fmt.Errorf("Unknown command %q", cmd)
+		log.Error(context, "varLookup", err, "Checking cmd in default case")
 		return nil, err
 	}
 }
@@ -345,6 +331,19 @@ func docFieldLookup(context interface{}, doc map[string]interface{}, field strin
 	return fldValue, nil
 }
 
+//==============================================================================
+
+// number is ahelper function to convert the value to an integer.
+func number(context interface{}, value string) (int, error) {
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		err = fmt.Errorf("Parameter %q is not a number", value)
+		log.Error(context, "varLookup", err, "Index conversion")
+		return 0, err
+	}
+	return i, nil
+}
+
 // isoDate is a helper function to convert the internal extension for dates
 // into a BSON date. We convert the following string
 func isoDate(context interface{}, value string) (time.Time, error) {
@@ -382,4 +381,24 @@ func objID(context interface{}, value string) (bson.ObjectId, error) {
 	}
 
 	return bson.ObjectIdHex(value), nil
+}
+
+// regExp is a helper function to process regex commands.
+func regExp(context interface{}, value string) (bson.RegEx, error) {
+	idx := strings.Index(value[1:], "/")
+	if value[0] != '/' || idx == -1 {
+		err := fmt.Errorf("Parameter %q is not a regular expression", value)
+		log.Error(context, "varLookup", err, "Regex parsing")
+		return bson.RegEx{}, err
+	}
+
+	pattern := value[1 : idx+1]
+	l := len(pattern) + 2
+
+	var options string
+	if l < len(value) {
+		options = value[l:]
+	}
+
+	return bson.RegEx{Pattern: pattern, Options: options}, nil
 }
