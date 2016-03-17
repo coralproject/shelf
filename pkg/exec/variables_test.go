@@ -1,6 +1,7 @@
 package exec_test
 
 import (
+	"strconv"
 	"testing"
 	"time"
 
@@ -40,39 +41,88 @@ func TestPreProcessing(t *testing.T) {
 	time2, _ := time.Parse("2006-01-02", "2013-01-16")
 
 	commands := []struct {
+		time  bool
 		doc   map[string]interface{}
 		vars  map[string]string
 		after map[string]interface{}
 	}{
 		{
+			false,
 			map[string]interface{}{"field_name": "#string:name"},
 			map[string]string{"name": "bill"},
 			map[string]interface{}{"field_name": "bill"},
 		},
 		{
+			false,
 			map[string]interface{}{"field_name": "#number:value"},
 			map[string]string{"value": "10"},
 			map[string]interface{}{"field_name": 10},
 		},
 		{
+			false,
 			map[string]interface{}{"field_name": "#date:value"},
 			map[string]string{"value": "2013-01-16T00:00:00.000Z"},
 			map[string]interface{}{"field_name": time1},
 		},
 		{
+			false,
 			map[string]interface{}{"field_name": "#date:value"},
 			map[string]string{"value": "2013-01-16"},
 			map[string]interface{}{"field_name": time2},
 		},
 		{
+			false,
 			map[string]interface{}{"field_name": "#date:2013-01-16T00:00:00.000Z"},
 			map[string]string{},
 			map[string]interface{}{"field_name": time1},
 		},
 		{
+			false,
 			map[string]interface{}{"field_name": "#objid:value"},
 			map[string]string{"value": "5660bc6e16908cae692e0593"},
 			map[string]interface{}{"field_name": bson.ObjectIdHex("5660bc6e16908cae692e0593")},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:0"},
+			map[string]string{"dur": "0"},
+			map[string]interface{}{"t": time.Now().UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:3600"},
+			map[string]string{"dur": strconv.Itoa(3600 * int(time.Second))},
+			map[string]interface{}{"t": time.Now().Add(3600 * time.Second).UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:-3600"},
+			map[string]string{"dur": strconv.Itoa(-3600 * int(time.Second))},
+			map[string]interface{}{"t": time.Now().Add(-3600 * time.Second).UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:3s"},
+			map[string]string{"dur": strconv.Itoa(3 * int(time.Second))},
+			map[string]interface{}{"t": time.Now().Add(3 * time.Second).UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:3ns"},
+			map[string]string{"dur": strconv.Itoa(3 * int(time.Nanosecond))},
+			map[string]interface{}{"t": time.Now().Add(3 * time.Nanosecond).UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:-3s"},
+			map[string]string{"dur": strconv.Itoa(-3 * int(time.Second))},
+			map[string]interface{}{"t": time.Now().Add(-3 * time.Second).UTC()},
+		},
+		{
+			true,
+			map[string]interface{}{"t": "#since:-5m"},
+			map[string]string{"dur": strconv.Itoa(-5 * int(time.Minute))},
+			map[string]interface{}{"t": time.Now().Add(-5 * time.Minute).UTC()},
 		},
 	}
 
@@ -81,18 +131,53 @@ func TestPreProcessing(t *testing.T) {
 		for _, cmd := range commands {
 			t.Logf("\tWhen using %+v with %+v", cmd.doc, cmd.vars)
 			{
-				exec.ProcessVariables("", cmd.doc, cmd.vars, nil)
+				err := exec.ProcessVariables("", cmd.doc, cmd.vars, nil)
 
-				if eq := compareBson(cmd.doc, cmd.after); !eq {
-					t.Log(cmd.doc)
-					t.Log(cmd.after)
-					t.Errorf("\t%s\tShould get back the expected document.", tests.Failed)
+				if !cmd.time {
+
+					if eq := compareBson(cmd.doc, cmd.after); !eq {
+						t.Log(cmd.doc)
+						t.Log(cmd.after)
+
+						t.Errorf("\t%s\tShould get back the expected document.", tests.Failed)
+						continue
+					}
+					t.Logf("\t%s\tShould get back the expected document.", tests.Success)
+
 					continue
 				}
-				t.Logf("\t%s\tShould get back the expected document.", tests.Success)
+
+				v, _ := strconv.Atoi(cmd.vars["dur"])
+				dur := time.Duration(v)
+
+				t.Log(time.Now().UTC())
+				t.Log(cmd.after["t"])
+
+				dt, ok := cmd.doc["t"].(time.Time)
+				if !ok {
+					t.Errorf("\t%s\tShould get back a time value within %v of difference : %v", tests.Failed, dur, err)
+					continue
+				}
+
+				if eq := compareTime(dt, cmd.after["t"].(time.Time)); !eq {
+					t.Errorf("\t%s\tShould get back a time value within %v of difference : %v", tests.Failed, dur, err)
+					continue
+				}
+				t.Logf("\t%s\tShould get back a time value within %v of difference.", tests.Success, dur)
 			}
 		}
 	}
+}
+
+// compareTime compares two bson maps for equivalence. This is based
+// on a percent of difference since we are dealing with time.
+func compareTime(t1 time.Time, t2 time.Time) bool {
+	diff := t1.Sub(t2)
+	if diff > time.Second {
+		return false
+	}
+
+	return true
 }
 
 // compareBson compares two bson maps for equivalence.

@@ -126,8 +126,8 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 	// Before: {"field": "#date:variable_name"}    		After: {"field": time.Time}
 	// Before: {"field": "#objid:variable_name"}   		After: {"field": mgo.ObjectId}
 	// Before: {"field": "#regex:/pattern/<options>"}   After: {"field": bson.RegEx}
-	// Before: {"field": "#data.0:doc.station_id"}   	After: {"field": "23453"}
 	// Before: {"field": "#ago:3600"}   				After: {"field": time.Time}
+	// Before: {"field": "#data.0:doc.station_id"}   	After: {"field": "23453"}
 
 	// If the variable does not exist, use the variable straight up.
 	param, exists := vars[variable]
@@ -158,6 +158,9 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 
 	case "rege":
 		return regExp(context, param)
+
+	case "sinc":
+		return since(context, param)
 
 	case "data":
 		if len(cmd) == 6 {
@@ -401,4 +404,106 @@ func regExp(context interface{}, value string) (bson.RegEx, error) {
 	}
 
 	return bson.RegEx{Pattern: pattern, Options: options}, nil
+}
+
+// since is a helper function to take the current time and adjust it based
+// on the provided value.
+func since(context interface{}, value string) (time.Time, error) {
+
+	// The default value is in seconds unless overridden.
+	// #time:0      Current date/time
+	// #time:-3600  3600 seconds in the past
+	// #time:3m  	3 minutes in the future.
+
+	// Possible duration types.
+	// "ns": int64(Nanosecond),
+	// "us": int64(Microsecond),
+	// "ms": int64(Millisecond),
+	// "s":  int64(Second),
+	// "m":  int64(Minute),
+	// "h":  int64(Hour),
+
+	// Do we have a single value?
+	if len(value) == 1 {
+		val, err := strconv.Atoi(value[0:1])
+		if err != nil {
+			return time.Time{}.UTC(), fmt.Errorf("Invalid duration : %q", value[0:1])
+		}
+
+		if val == 0 {
+			return time.Now().UTC(), nil
+		}
+
+		return time.Now().Add(time.Duration(val) * time.Second).UTC(), nil
+	}
+
+	// Do we have a duration type and where does the
+	// actual duration value end
+	var typ string
+	var end int
+
+	// The end byte position for the last character in the string.
+	ePos := len(value) - 1
+
+	// Look at the very last character.
+	t := value[ePos:]
+	switch t {
+
+	// Is this a minute or hour? [3m]
+	case "m", "h":
+		typ = t
+		end = ePos // Position of last chr in value.
+
+	// Is this a second or other duration? [3s or 3us]
+	case "s":
+		typ = t    // s for 3s
+		end = ePos // 3 for 3s
+
+		// Is this smaller than a second? [ns, us, ms]
+		if len(value) > 2 {
+			t := value[ePos-1 : ePos]
+			switch t {
+			case "n", "u", "m":
+				typ = value[ePos-1:] // us for 3us
+				end = ePos - 1       // 3 for 3us
+			}
+		}
+
+	default:
+		typ = "s"      // s for 3600
+		end = ePos + 1 // 0 for 3600
+	}
+
+	// Check if we are to negative the value.
+	var start int
+	if value[0] == '-' {
+		start = 1
+	}
+
+	// Check the remaining bytes is an integer value.
+	val, err := strconv.Atoi(value[start:end])
+	if err != nil {
+		return time.Time{}.UTC(), fmt.Errorf("Invalid duration : %q", value[start:end])
+	}
+
+	// Do we have to negate the value?
+	if start == 1 {
+		val *= -1
+	}
+
+	// Calcuate the time value.
+	switch typ {
+	case "ns":
+		return time.Now().Add(time.Duration(val) * time.Nanosecond).UTC(), nil
+	case "us":
+		return time.Now().Add(time.Duration(val) * time.Microsecond).UTC(), nil
+	case "ms":
+		return time.Now().Add(time.Duration(val) * time.Millisecond).UTC(), nil
+	case "m":
+		return time.Now().Add(time.Duration(val) * time.Minute).UTC(), nil
+	case "h":
+		return time.Now().Add(time.Duration(val) * time.Hour).UTC(), nil
+	default:
+		return time.Now().Add(time.Duration(val) * time.Second).UTC(), nil
+	}
 }
