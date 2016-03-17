@@ -126,7 +126,7 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 	// Before: {"field": "#date:variable_name"}    		After: {"field": time.Time}
 	// Before: {"field": "#objid:variable_name"}   		After: {"field": mgo.ObjectId}
 	// Before: {"field": "#regex:/pattern/<options>"}   After: {"field": bson.RegEx}
-	// Before: {"field": "#ago:3600"}   				After: {"field": time.Time}
+	// Before: {"field": "#since:3600"}   				After: {"field": time.Time}
 	// Before: {"field": "#data.0:doc.station_id"}   	After: {"field": "23453"}
 
 	// If the variable does not exist, use the variable straight up.
