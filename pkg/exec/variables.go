@@ -159,8 +159,8 @@ func varLookup(context interface{}, cmd, variable string, vars map[string]string
 	case "rege":
 		return regExp(context, param)
 
-	case "sinc":
-		return since(context, param)
+	case "time":
+		return adjTime(context, param)
 
 	case "data":
 		if len(cmd) == 6 {
@@ -406,14 +406,14 @@ func regExp(context interface{}, value string) (bson.RegEx, error) {
 	return bson.RegEx{Pattern: pattern, Options: options}, nil
 }
 
-// since is a helper function to take the current time and adjust it based
+// adjTime is a helper function to take the current time and adjust it based
 // on the provided value.
-func since(context interface{}, value string) (time.Time, error) {
+func adjTime(context interface{}, value string) (time.Time, error) {
 
 	// The default value is in seconds unless overridden.
-	// #since:0      Current date/time
-	// #since:-3600  3600 seconds in the past
-	// #since:3m  	 3 minutes in the future.
+	// #time:0      Current date/time
+	// #time:-3600  3600 seconds in the past
+	// #time:3m		3 minutes in the future.
 
 	// Possible duration types.
 	// "ns": int64(Nanosecond),

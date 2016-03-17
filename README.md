@@ -464,10 +464,10 @@ Before: {"field": "#regex:/pattern/{options}"}  After: {"field": bson.RegEx}
 Before: {"field" : {"$in": "#data.*:list.station_id"}}}   After: [{"station_id":"42021"}]
 Before: {"field": "#data.0:doc.station_id"}               After: {"field": "23453"}
 
-// since command manipulates the current time.
-Before: {"field": #since:0}                 After: {"field": time.Time(Current Time)}
-Before: {"field": #since:-3600}             After: {"field": time.Time(3600 seconds in the past)}
-Before: {"field": #since:3m}                After: {"field": time.Time(3 minutes in the future)}
+// time command manipulates the current time.
+Before: {"field": #time:0}                 After: {"field": time.Time(Current Time)}
+Before: {"field": #time:-3600}             After: {"field": time.Time(3600 seconds in the past)}
+Before: {"field": #time:3m}                After: {"field": time.Time(3 minutes in the future)}
 
 Possible duration types. Default is seconds if not provided.
 "ns": Nanosecond

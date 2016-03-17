@@ -23,7 +23,7 @@ func getPosExecSet() []execSet {
 		multiFieldLookup(),
 		mongoRegex(),
 		masking(),
-		withSince(),
+		withAdjTime(),
 	}
 }
 
@@ -494,8 +494,8 @@ func masking() execSet {
 	}
 }
 
-// withSince creates a simple query using the since command.
-func withSince() execSet {
+// withAdjTime creates a simple query using the time command.
+func withAdjTime() execSet {
 	return execSet{
 		fail: false,
 		set: &query.Set{
@@ -508,7 +508,7 @@ func withSince() execSet {
 					Collection: tstdata.CollectionExecTest,
 					Return:     true,
 					Commands: []map[string]interface{}{
-						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#since:-87600h"}}},
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#time:-87600h"}}},
 						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
 						{"$limit": 2},
 					},
