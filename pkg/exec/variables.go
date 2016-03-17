@@ -411,9 +411,9 @@ func regExp(context interface{}, value string) (bson.RegEx, error) {
 func since(context interface{}, value string) (time.Time, error) {
 
 	// The default value is in seconds unless overridden.
-	// #time:0      Current date/time
-	// #time:-3600  3600 seconds in the past
-	// #time:3m  	3 minutes in the future.
+	// #since:0      Current date/time
+	// #since:-3600  3600 seconds in the past
+	// #since:3m  	 3 minutes in the future.
 
 	// Possible duration types.
 	// "ns": int64(Nanosecond),

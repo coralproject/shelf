@@ -456,6 +456,18 @@ Before: {"field": "#number:variable_name"}  After: {"field": 1234}
 Before: {"field": "#string:variable_name"}  After: {"field": "value"}
 Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
 Before: {"field": "#objid:variable_name"}   After: {"field": mgo.ObjectId}
+
+Before: {"field": #since:0}                 After: {"field": time.Time(Current Time)}
+Before: {"field": #since:-3600}             After: {"field": time.Time(3600 seconds in the past)}
+Before: {"field": #since:3m}                After: {"field": time.Time(3 minutes in the future)}
+
+Possible duration types. Default is seconds if not provided.
+"ns": Nanosecond
+"us": Microsecond
+"ms": Millisecond
+"s" : Second
+"m" : Minute
+"h" : Hour
 ```
 
 You can save the result of one query for later use by the next.
