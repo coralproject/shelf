@@ -15,9 +15,17 @@ LoadDir loadsup a given directory, calling a load function for each valid
 json file found.
 
 
+## func LoadMask
+``` go
+func LoadMask(context interface{}, path string) (mask.Mask, error)
+```
+LoadMask serializes the content of a Mask from a file using the
+given file path. Returns the serialized Mask value.
+
+
 ## func LoadRegex
 ``` go
-func LoadRegex(context interface{}, path string) (*regex.Regex, error)
+func LoadRegex(context interface{}, path string) (regex.Regex, error)
 ```
 LoadRegex serializes the content of a regex from a file using the
 given file path. Returns the serialized regex value.
@@ -25,7 +33,7 @@ given file path. Returns the serialized regex value.
 
 ## func LoadScript
 ``` go
-func LoadScript(context interface{}, path string) (*script.Script, error)
+func LoadScript(context interface{}, path string) (script.Script, error)
 ```
 LoadScript serializes the content of a Script from a file using the
 given file path. Returns the serialized Script value.

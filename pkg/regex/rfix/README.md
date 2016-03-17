@@ -9,14 +9,14 @@
 
 ## func Add
 ``` go
-func Add(db *db.DB, rgx *regex.Regex) error
+func Add(db *db.DB, rgx regex.Regex) error
 ```
 Add inserts a regex for testing.
 
 
 ## func Get
 ``` go
-func Get(fileName string) (*regex.Regex, error)
+func Get(fileName string) (regex.Regex, error)
 ```
 Get retrieves a regex document from the filesystem for testing.
 
