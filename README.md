@@ -124,7 +124,7 @@ cd $GOPATH/src/github.com/coralproject/xenia/app/xenia
 1) Run the `db create` command:
 
 ```
-./xenia db create -f ./srcdb/database.json
+./xenia db create -f ./scrdb/database.json
 ```
 
 _You must run this on a new database to create the collections and the proper set of indexes._
@@ -691,4 +691,3 @@ Xenia's CLI tools allow anyone with a basic understanding of document database c
 All software in this repo is Open Source, offered under the MIT license.
 
 For more information about The Coral Project, please visit [our website](https://coralproject.net).  For more information about how this technology is used in our projects, please visit [the reef](https://github.com/coralproject/reef).
-
