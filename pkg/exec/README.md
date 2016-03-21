@@ -25,8 +25,7 @@ Exec executes the specified query set by name.
 func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error
 ```
 ProcessVariables walks the document performing variable substitutions.
-This function is exported because it is accessed by the tstdata package
-and tests.
+This function is exported because it is accessed by the tstdata package.
 
 
 

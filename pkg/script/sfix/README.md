@@ -9,14 +9,14 @@
 
 ## func Add
 ``` go
-func Add(db *db.DB, scr *script.Script) error
+func Add(db *db.DB, scr script.Script) error
 ```
 Add inserts a script for testing.
 
 
 ## func Get
 ``` go
-func Get(fileName string) (*script.Script, error)
+func Get(fileName string) (script.Script, error)
 ```
 Get retrieves a set document from the filesystem for testing.
 

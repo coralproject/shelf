@@ -34,6 +34,13 @@ func Delete(context interface{}, db *db.DB, name string) error
 Delete is used to remove an existing Regex document.
 
 
+## func GetAll
+``` go
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Regex, error)
+```
+GetAll retrieves a list of regexs.
+
+
 ## func GetByNames
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error)
@@ -48,16 +55,9 @@ func GetNames(context interface{}, db *db.DB) ([]string, error)
 GetNames retrieves a list of query regex names.
 
 
-## func GetRegexs
-``` go
-func GetRegexs(context interface{}, db *db.DB, tags []string) ([]Regex, error)
-```
-GetRegexs retrieves a list of regexs.
-
-
 ## func Upsert
 ``` go
-func Upsert(context interface{}, db *db.DB, rgx *Regex) error
+func Upsert(context interface{}, db *db.DB, rgx Regex) error
 ```
 Upsert is used to create or update an existing Regex document.
 
@@ -84,23 +84,23 @@ Regex contains a single regular expresion bound to a name.
 
 ### func GetByName
 ``` go
-func GetByName(context interface{}, db *db.DB, name string) (*Regex, error)
+func GetByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```
 GetByName retrieves the document for the specified Regex.
 
 
 ### func GetLastHistoryByName
 ``` go
-func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Regex, error)
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```
 GetLastHistoryByName gets the last written Regex within the history.
 
 
 
 
-### func (\*Regex) Validate
+### func (Regex) Validate
 ``` go
-func (r *Regex) Validate() error
+func (r Regex) Validate() error
 ```
 Validate checks the regex value for consistency and that it compiles.
 

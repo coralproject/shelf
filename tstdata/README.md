@@ -14,6 +14,13 @@ going to store the xenia test data.
 
 
 
+## func Docs
+``` go
+func Docs() ([]map[string]interface{}, error)
+```
+Docs reads the fixture and returns the documents.
+
+
 ## func Drop
 ``` go
 func Drop(db *db.DB)

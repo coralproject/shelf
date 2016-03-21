@@ -452,10 +452,30 @@ Here is the list of #commands that exist for variable substition.
 
 ```
 {"field": "#cmd:variable"}
-Before: {"field": "#number:variable_name"}  After: {"field": 1234}
-Before: {"field": "#string:variable_name"}  After: {"field": "value"}
-Before: {"field": "#date:variable_name"}    After: {"field": time.Time}
-Before: {"field": "#objid:variable_name"}   After: {"field": mgo.ObjectId}
+
+// Basic commands.
+Before: {"field": "#number:variable_name"}      After: {"field": 1234}
+Before: {"field": "#string:variable_name"}      After: {"field": "value"}
+Before: {"field": "#date:variable_name"}        After: {"field": time.Time}
+Before: {"field": "#objid:variable_name"}       After: {"field": mgo.ObjectId}
+Before: {"field": "#regex:/pattern/{options}"}  After: {"field": bson.RegEx}
+
+// data command can index into saved results.
+Before: {"field" : {"$in": "#data.*:list.station_id"}}}   After: [{"station_id":"42021"}]
+Before: {"field": "#data.0:doc.station_id"}               After: {"field": "23453"}
+
+// time command manipulates the current time.
+Before: {"field": #time:0}                 After: {"field": time.Time(Current Time)}
+Before: {"field": #time:-3600}             After: {"field": time.Time(3600 seconds in the past)}
+Before: {"field": #time:3m}                After: {"field": time.Time(3 minutes in the future)}
+
+Possible duration types. Default is seconds if not provided.
+"ns": Nanosecond
+"us": Microsecond
+"ms": Millisecond
+"s" : Second
+"m" : Minute
+"h" : Hour
 ```
 
 You can save the result of one query for later use by the next.

@@ -17,6 +17,11 @@ var Exec execHandle
 Exec fronts the access to the exec service functionality.
 
 ``` go
+var Mask maskHandle
+```
+Mask fronts the access to the mask service functionality.
+
+``` go
 var Query queryHandle
 ```
 Query fronts the access to the query service functionality.

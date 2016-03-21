@@ -23,6 +23,7 @@ func getPosExecSet() []execSet {
 		multiFieldLookup(),
 		mongoRegex(),
 		masking(),
+		withAdjTime(),
 	}
 }
 
@@ -490,5 +491,33 @@ func masking() execSet {
 		// NOT SURE WHAT TO DO. When tests are run in parallel the masks may be
 		// gone. I can't fudge this because it is tied to the collection we
 		// are running the query again. So I have both results for now :(
+	}
+}
+
+// withAdjTime creates a simple query using the time command.
+func withAdjTime() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Since",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Since",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#time:-87600h"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Since","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Since","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
+		},
 	}
 }

@@ -31,6 +31,13 @@ func Delete(context interface{}, db *db.DB, name string) error
 Delete is used to remove an existing Set document.
 
 
+## func GetAll
+``` go
+func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error)
+```
+GetAll retrieves a list of scripts.
+
+
 ## func GetByNames
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error)
@@ -45,16 +52,9 @@ func GetNames(context interface{}, db *db.DB) ([]string, error)
 GetNames retrieves a list of script names.
 
 
-## func GetScripts
-``` go
-func GetScripts(context interface{}, db *db.DB, tags []string) ([]Script, error)
-```
-GetScripts retrieves a list of scripts.
-
-
 ## func Upsert
 ``` go
-func Upsert(context interface{}, db *db.DB, scr *Script) error
+func Upsert(context interface{}, db *db.DB, scr Script) error
 ```
 Upsert is used to create or update an existing Script document.
 
@@ -79,39 +79,39 @@ Script contain pre and post commands to use per set or per query.
 
 ### func GetByName
 ``` go
-func GetByName(context interface{}, db *db.DB, name string) (*Script, error)
+func GetByName(context interface{}, db *db.DB, name string) (Script, error)
 ```
 GetByName retrieves the document for the specified name.
 
 
 ### func GetLastHistoryByName
 ``` go
-func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Script, error)
+func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Script, error)
 ```
 GetLastHistoryByName gets the last written Script within the history.
 
 
 
 
-### func (\*Script) PrepareForInsert
+### func (Script) PrepareForInsert
 ``` go
-func (scr *Script) PrepareForInsert()
+func (scr Script) PrepareForInsert()
 ```
 PrepareForInsert replaces the `$` to `_$` when found in the front of field names.
 
 
 
-### func (\*Script) PrepareForUse
+### func (Script) PrepareForUse
 ``` go
-func (scr *Script) PrepareForUse()
+func (scr Script) PrepareForUse()
 ```
 PrepareForUse replaces the `_$` to `$` when found in the front of field names.
 
 
 
-### func (\*Script) Validate
+### func (Script) Validate
 ``` go
-func (scr *Script) Validate() error
+func (scr Script) Validate() error
 ```
 Validate checks the query value for consistency.
 

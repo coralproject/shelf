@@ -4,50 +4,61 @@
 	"package": [
 		{
 			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "4a1c3ade3600c3869672c07fcdeeaf2871e05fc3",
-			"revisionTime": "2016-01-26T17:19:55-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
+		},
+		{
+			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/auth/crypto",
+			"path": "github.com/ardanlabs/kit/auth/crypto",
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/auth/session",
 			"path": "github.com/ardanlabs/kit/auth/session",
-			"revision": "4a1c3ade3600c3869672c07fcdeeaf2871e05fc3",
-			"revisionTime": "2016-01-26T17:19:55-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
-			"revisionTime": "2016-02-15T10:47:25-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
+		},
+		{
+			"path": "github.com/ardanlabs/kit/cmd/kit",
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/cmd/kit/cmddb",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db/mongo",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/log",
-			"revision": "7bcdf4a856e32d31a9b46c1e1ead0b10e550db5e",
-			"revisionTime": "2016-02-15T10:47:25-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "e8d0db7c73118bfc534c28a52792977b3e1eaa82",
-			"revisionTime": "2016-01-27T15:58:24-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
@@ -57,14 +68,14 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "deea9649409746326bfb118a246d1880a0ad1677",
-			"revisionTime": "2016-02-24T11:12:40-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/midware",
 			"path": "github.com/ardanlabs/kit/web/midware",
-			"revision": "deea9649409746326bfb118a246d1880a0ad1677",
-			"revisionTime": "2016-02-24T11:12:40-05:00"
+			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
+			"revisionTime": "2016-03-14T11:07:07-04:00"
 		},
 		{
 			"path": "github.com/cpuguy83/go-md2man/md2man",
