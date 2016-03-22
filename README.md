@@ -573,6 +573,36 @@ After : {"field" : "42021"}
     results: {"list": [{"station_id":"42021"}, {"station_id":"23567"}]}
 ```
 
+You can also replace field names in the query commands.
+
+```
+Variables
+{
+  "cond": "condition",
+  "dt": "date"
+}
+
+Query Set
+{
+   "name":"basic",
+   "desc":"Shows field substitution.",
+   "enabled":true,
+   "queries":[
+      {
+         "name":"Time",
+         "type":"pipeline",
+         "collection":"test_bill",
+         "return":true,
+         "scripts":[
+            {"$match": {"{cond}.{dt}" : {"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+            {"$project": {"_id": 0, "name": 1}},
+            {"$limit": 2}
+         ]
+      }
+   ]
+}
+```
+
 ## API Authentication
 
 The [auth](https://github.com/ardanlabs/kit/tree/master/auth) package provides API's for managing users who will be accessing the xenia API. This includes all the CRUD related support for users and authentication. There are two collections in MongoDB called `auth_users` and `auth_sessions` that contain API user information and authentication. The `auth_users` collection contains registered users and `auth_sessions` contain sessions that allows users to be active in the system.
