@@ -24,6 +24,7 @@ func getPosExecSet() []execSet {
 		mongoRegex(),
 		masking(),
 		withAdjTime(),
+		fieldReplace(),
 	}
 }
 
@@ -518,6 +519,35 @@ func withAdjTime() execSet {
 		results: []string{
 			`{"results":[{"Name":"Since","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
 			`{"results":[{"Name":"Since","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
+		},
+	}
+}
+
+// fieldReplace tests the replacement of fields.
+func fieldReplace() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{"cond": "condition", "dt": "date"},
+		set: &query.Set{
+			Name:    "Find Replace",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Find Replace",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"{cond}.{dt}": map[string]interface{}{"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Find Replace","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Find Replace","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
 		},
 	}
 }

@@ -116,7 +116,7 @@ func applyMask(context interface{}, msk mask.Mask, doc bson.M, key string) error
 
 	case mask.MaskEmail[0:3]:
 		v := doc[key].(string)
-		i := strings.Index(v, "@")
+		i := strings.IndexByte(v, '@')
 		if i == -1 {
 			return errors.New("Invalid email value")
 		}

@@ -10,10 +10,10 @@ import (
 /*
 	$ go test -run none -bench BenchmarkPP -benchtime 3s -benchmem
 	PASS
-	BenchmarkPPNumber-8	20000000	       815 ns/op	      16 B/op	       1 allocs/op
-	BenchmarkPPString-8	20000000	       945 ns/op	      16 B/op	       1 allocs/op
-	BenchmarkPPDate-8  	 5000000	      1129 ns/op	      32 B/op	       1 allocs/op
-	ok  	github.com/coralproject/xenia/pkg/exec	123.666s
+	BenchmarkPPNumber-8	10000000	       592 ns/op	      24 B/op	       2 allocs/op
+	BenchmarkPPString-8	10000000	       561 ns/op	      32 B/op	       2 allocs/op
+	BenchmarkPPDate-8  	 3000000	      1070 ns/op	      48 B/op	       2 allocs/op
+	ok  	github.com/coralproject/xenia/pkg/exec	41.942s
 */
 
 // TODO: Review these benchmarks with community. Since these function alter

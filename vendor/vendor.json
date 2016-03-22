@@ -47,8 +47,8 @@
 		{
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db/mongo",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "ecb7416d45bf81d12d12b7e3766f8c6cf9359e51",
-			"revisionTime": "2016-03-14T11:07:07-04:00"
+			"revision": "be0d0e91511ebba5b3aff7796a89bb888489982d",
+			"revisionTime": "2016-03-22T15:44:29-04:00"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/log",
