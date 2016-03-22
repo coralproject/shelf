@@ -1,0 +1,21 @@
+{
+   "name":"QTEST_O_basic_fldsub",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic Fldsub",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+		    "indexes": [
+			   {"key": ["station_id"], "unique": true} 
+		    ],
+         "commands":[
+            {"$match": {"{cond}.{dt}" : {"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
+}
