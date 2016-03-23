@@ -71,7 +71,7 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 		// We only have pipeline right now.
 		switch strings.ToLower(q.Type) {
 		case "pipeline":
-			result, commands, err = execPipeline(context, db, &q, vars, data)
+			result, commands, err = execPipeline(context, db, &q, vars, data, set.Explain)
 		}
 
 		// Was there an error processing the query.

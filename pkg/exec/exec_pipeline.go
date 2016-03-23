@@ -16,13 +16,13 @@ import (
 )
 
 // execPipeline executes the sepcified pipeline query.
-func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}) (docs, []map[string]interface{}, error) {
+func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}, explain bool) (docs, []map[string]interface{}, error) {
 
 	// I am returning commands as the second return value because if there
 	// is an error I need to send how far we got back to the client. If not,
 	// the user will not understand the error message.
 
-	// We need to check the last command for the extended $save command.
+	// We need to check to see if the last command is the extended $save command.
 	commands := q.Commands
 	l := len(q.Commands) - 1
 
@@ -62,6 +62,24 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		agg += mongo.Query(command) + ",\n"
 	}
 
+	// Do we want the explain output.
+	if explain {
+
+		// Build the pipeline function for the execution for explain.
+		var m bson.M
+		f := func(c *mgo.Collection) error {
+			log.Dev(context, "executePipeline", "MGO :\ndb.%s.aggregate([\n%s])", c.Name, agg)
+			return c.Pipe(pipeline).Explain(&m)
+		}
+
+		// Execute the pipeline.
+		if err := db.ExecuteMGO(context, q.Collection, f); err != nil {
+			return docs{}, commands, err
+		}
+
+		return docs{q.Name, []bson.M{m}}, commands, nil
+	}
+
 	// Build the pipeline function for the execution.
 	var results []bson.M
 	f := func(c *mgo.Collection) error {
@@ -76,7 +94,7 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 
 	// If there were no results, return an empty array.
 	if results == nil {
-		results = []bson.M{}
+		return docs{q.Name, []bson.M{}}, commands, nil
 	}
 
 	// Perform any masking that is required.
