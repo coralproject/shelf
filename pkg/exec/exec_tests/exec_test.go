@@ -98,6 +98,17 @@ func TestExecuteSet(t *testing.T) {
 					// to check when data value order can be underterminstic.
 					var found bool
 					for _, rslt := range es.results {
+
+						// We just need to find the string inside the result.
+						if strings.HasPrefix(rslt, "#find:") {
+							if strings.Contains(string(data), rslt[6:]) {
+								found = true
+								break
+							}
+							continue
+						}
+
+						// Compare the entire result.
 						if string(data) == rslt {
 							found = true
 							break
