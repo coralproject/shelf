@@ -65,14 +65,6 @@ func (c *Context) Respond(data interface{}, code int) {
 
 	c.Status = code
 
-	if code == http.StatusNoContent {
-		c.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	// Set application default header values.
-	c.Header().Set("Content-Type", "application/json")
-
 	// Load any user defined header values.
 	if app.userHeaders != nil {
 		for key, value := range app.userHeaders {
@@ -81,6 +73,16 @@ func (c *Context) Respond(data interface{}, code int) {
 		}
 	}
 
+	// Just set the status code and we are done.
+	if code == http.StatusNoContent {
+		c.WriteHeader(code)
+		return
+	}
+
+	// Set the content type.
+	c.Header().Set("Content-Type", "application/json")
+
+	// Write the status code.
 	c.WriteHeader(code)
 
 	// Marshal the data into a JSON string.
