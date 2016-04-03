@@ -15,7 +15,7 @@ type verHandle struct {
 	IntVersion  string
 }
 
-// Ver fronts the access to the ver service functionality.
+// Version fronts the access to the ver service functionality.
 var Version verHandle
 
 //==============================================================================
