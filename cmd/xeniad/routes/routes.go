@@ -74,6 +74,8 @@ func API(testing ...bool) http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
+	a.Handle("GET", "/1.0/version", handlers.Version.List)
+
 	a.Handle("GET", "/1.0/script", handlers.Script.List)
 	a.Handle("PUT", "/1.0/script", handlers.Script.Upsert)
 	a.Handle("GET", "/1.0/script/:name", handlers.Script.Retrieve)
