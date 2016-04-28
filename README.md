@@ -74,6 +74,12 @@ export XENIA_HOST=:4000          # Default is `:4000` if missing
 export XENIA_LOGGING_LEVEL=1     # Default is `2` if missing (User)
 export XENIA_HEADERS=key:value   # Ignored is missing
 export XENIA_AUTH=false          # Default is `true` if missing
+
+// CLI
+export XENIA_WEB_HOST=10.0.1.84:4000 # Points to Xenia so tooling talks to web service
+export XENIA_WEB_AUTH="Basic token"  # Not needed is AUTH is off
+
+Note: It is best for the CLI tooling to talk with the web service so caches are updated on changes.
 ```
 
 _Be careful not to commit any database passwords back to the repo!!_
@@ -192,6 +198,7 @@ If you set the authorization header properly in your browser you can run the fol
 1) Get a list of configured queries:
 
 ```
+GET
 http://localhost:4000/1.0/query
 
 output:
@@ -202,6 +209,7 @@ output:
 2) Get the query set document for the `basic` query set:
 
 ```
+GET
 http://localhost:4000/1.0/query/basic
 
 output:
@@ -230,7 +238,8 @@ output:
 3) Execute the query for the `basic` query set:
 
 ```
-http://localhost:4000/1.0/query/basic/exec
+GET
+http://localhost:4000/1.0/exec/basic
 
 set:
 
@@ -273,7 +282,8 @@ output:
 4) Execute the query for the `basic_var` query set with variables:
 
 ```
-http://localhost:4000/1.0/query/basic_var/exec?station_id=42021
+GET
+http://localhost:4000/1.0/exec/basic_var?station_id=42021
 
 set:
 
@@ -310,6 +320,33 @@ output:
     }
   ],
   "error":false
+}
+```
+
+5) You can execute a dynamic query set:
+
+```
+POST
+http://localhost:4000/1.0/exec
+
+Post Data:
+{
+   "name":"basic",
+   "desc":"",
+   "enabled":true,
+   "params":[],
+   "queries":[
+      {
+         "name":"Basic",
+         "type":"pipeline",
+         "collection":"test_xenia_data",
+         "return":true,
+         "commands":[
+            {"$match": {"station_id" : "42021"}},
+            {"$project": {"_id": 0, "name": 1}}
+         ]
+      }
+   ]
 }
 ```
 
@@ -416,7 +453,8 @@ Writing a set is mostly about creating a MongoDB aggregation pipeline. Xenia has
 Multi query set with variable substitution and date processing.
 
 ```
-http://localhost:4000/1.0/query/basic/exec?station_id=42021
+GET
+http://localhost:4000/1.0/exec/basic?station_id=42021
 
 {
    "name":"basic",
@@ -481,7 +519,8 @@ Possible duration types. Default is seconds if not provided.
 You can save the result of one query for later use by the next.
 
 ```
-http://localhost:4000/1.0/query/basic_save/exec
+GET
+http://localhost:4000/1.0/exec/basic_save
 
 {
    "name":"basic_save",
