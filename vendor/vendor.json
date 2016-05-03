@@ -3,32 +3,14 @@
 	"ignore": "",
 	"package": [
 		{
-			"checksumSHA1": "F7BZbUk2EGY0J8tNPNeECvjVk10=",
-			"path": "github.com/ardanlabs/kit/auth",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
-		},
-		{
-			"checksumSHA1": "jLfItrlYi3UlMad8WNmZC5FRSu4=",
-			"path": "github.com/ardanlabs/kit/auth/crypto",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
-		},
-		{
-			"checksumSHA1": "8owX9ClCaiQW6DeEM8TkxQSaLOg=",
-			"path": "github.com/ardanlabs/kit/auth/session",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
+			"checksumSHA1": "rF7KvNcRjzqvwSC5aeSTWDJ4XUM=",
+			"path": "github.com/anvilresearch/go-anvil",
+			"revision": "9530b9115e7b958b11a3f113bf28546bc076005f",
+			"revisionTime": "2016-05-03T02:00:42Z"
 		},
 		{
 			"checksumSHA1": "PjHe3NkUqsMhbthk9qpv56U/TG0=",
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
-		},
-		{
-			"checksumSHA1": "ArvbCRMi1fbLaGMt28x+SuW0KkE=",
-			"path": "github.com/ardanlabs/kit/cmd/kit/cmdauth",
 			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
 			"revisionTime": "2016-04-27T16:48:56Z"
 		},
@@ -68,16 +50,10 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "W3cbMoLhGmhMAhgmFBgQmmoWfhI=",
+			"checksumSHA1": "553ocu2Fqbojogvtl5Nm/iXOdoA=",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
-		},
-		{
-			"checksumSHA1": "kREMmkofXlatiW3Twwxrm6z+m2A=",
-			"path": "github.com/ardanlabs/kit/web/midware",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
+			"revision": "71de3085b9a21bf1bc8336142325669c211fcc5a",
+			"revisionTime": "2016-05-03T05:31:44Z"
 		},
 		{
 			"checksumSHA1": "zZKFQ2lcwqkOhs3gIs3NKeLG2i8=",
@@ -132,30 +108,6 @@
 			"path": "github.com/spf13/pflag",
 			"revision": "cb88ea77998c3f024757528e3305022ab50b43be",
 			"revisionTime": "2016-03-17T00:02:28Z"
-		},
-		{
-			"checksumSHA1": "5HymxKSV8zcw6eiNV5Z/MZBPmuU=",
-			"path": "golang.org/x/crypto/bcrypt",
-			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
-			"revisionTime": "2016-04-26T12:32:32Z"
-		},
-		{
-			"checksumSHA1": "iuAAm/pl3SoUWM39eUWX7Os+yPg=",
-			"path": "golang.org/x/crypto/blowfish",
-			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
-			"revisionTime": "2016-04-26T12:32:32Z"
-		},
-		{
-			"checksumSHA1": "JOJHxFm3ArTV3oUSH6Q2sjeMnrs=",
-			"path": "golang.org/x/crypto/pbkdf2",
-			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
-			"revisionTime": "2016-04-26T12:32:32Z"
-		},
-		{
-			"checksumSHA1": "VF8aIOMNmMESQoEskizCQ6QFvVM=",
-			"path": "golang.org/x/crypto/scrypt",
-			"revision": "285fb2ed20d1dc450fc743a1b3ff7c36bef372b9",
-			"revisionTime": "2016-04-26T12:32:32Z"
 		},
 		{
 			"checksumSHA1": "8MQPi1qBuFKaQW+1+CZ3Zcer9VY=",

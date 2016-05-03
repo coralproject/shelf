@@ -7,23 +7,24 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/coralproject/xenia/cmd/xeniad/handlers"
-
+	"github.com/anvilresearch/go-anvil"
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/ardanlabs/kit/web/midware"
+	"github.com/coralproject/xenia/cmd/xeniad/handlers"
+	"github.com/coralproject/xenia/cmd/xeniad/midware"
 )
 
-// Mongo config environmental variables.
+// Environmental variables.
 const (
 	cfgMongoHost     = "MONGO_HOST"
 	cfgMongoAuthDB   = "MONGO_AUTHDB"
 	cfgMongoDB       = "MONGO_DB"
 	cfgMongoUser     = "MONGO_USER"
 	cfgMongoPassword = "MONGO_PASS"
+	cfgAnvilHost     = "ANVIL_HOST"
 )
 
 func init() {
@@ -55,7 +56,21 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API(testing ...bool) http.Handler {
+
+	// If authentication is on then configure Anvil.
+	var anv *anvil.Anvil
+	if url, err := cfg.String(cfgAnvilHost); err == nil {
+
+		log.Dev("startup", "Init", "Initalizing Anvil")
+		anv, err = anvil.New(url)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Anvil: %s", url)
+			os.Exit(1)
+		}
+	}
+
 	a := app.New(midware.Mongo, midware.Auth)
+	a.Ctx["anvil"] = anv
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)
