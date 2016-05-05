@@ -11,7 +11,7 @@ fi
 
 # Update queries if the environment variable XENIA_UPDATE_QUERY is present.
 # XENIA_QUERY_JSON - the location of the scrquery directory.
-if [ ! -z ${XENIA_UPDATE_QUERY:-}]; then
+if [ ! -z ${XENIA_UPDATE_QUERY:-} ]; then
     /go/bin/xenia query upsert -p ${XENIA_QUERY_JSON:-${DEFAULT_XENIA_COMMAND_PATH}/scrquery/}
 fi
 # Run the Xenia daemon last and always to maintain backwards compatibility with previous Dockerfile version.
