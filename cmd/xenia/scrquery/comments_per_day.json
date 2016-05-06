@@ -6,7 +6,7 @@
       {
          "name":"comments_by_asset",
          "type":"pipeline",
-         "collection":"comment",
+         "collection":"comments",
          "return":true,
          "commands":[
             { "$match": { "date_created": {"$gt" : "#date:start_date"} } },

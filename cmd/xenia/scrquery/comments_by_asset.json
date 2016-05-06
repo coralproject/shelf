@@ -6,10 +6,10 @@
       {
          "name":"comments_by_asset",
          "type":"pipeline",
-         "collection":"nyt_coral_assets",
+         "collection":"comments",
          "return":true,
          "commands":[
-            { "$match": { "asset_id": "#number:asset_id" } },
+            { "$match": { "asset_id": "#objid:asset_id" } },
             { "$sort": { "createDate": -1 } }
          ]
       }
