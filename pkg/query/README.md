@@ -178,6 +178,7 @@ type Set struct {
     Params      []Param `bson:"params" json:"params"`                       // Collection of parameters.
     Queries     []Query `bson:"queries" json:"queries"`                     // Collection of queries.
     Enabled     bool    `bson:"enabled" json:"enabled"`                     // If the query set is enabled to run.
+    Explain     bool    `bson:"explain" json:"explain"`                     // If we want the explain output.
 }
 ```
 Set contains the configuration details for a rule set.

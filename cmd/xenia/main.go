@@ -10,7 +10,6 @@ import (
 	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/cmd/kit/cmdauth"
 	"github.com/ardanlabs/kit/cmd/kit/cmddb"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -80,7 +79,6 @@ func main() {
 	}
 
 	xenia.AddCommand(
-		cmdauth.GetCommands(conn),
 		cmddb.GetCommands(conn),
 		cmdquery.GetCommands(conn),
 		cmdscript.GetCommands(conn),

@@ -68,7 +68,7 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		// Build the pipeline function for the execution for explain.
 		var m bson.M
 		f := func(c *mgo.Collection) error {
-			log.Dev(context, "executePipeline", "MGO :\ndb.%s.aggregate([\n%s])", c.Name, agg)
+			log.Dev(context, "executePipeline", "MGO Explain :\ndb.%s.aggregate([\n%s])", c.Name, agg)
 			return c.Pipe(pipeline).Explain(&m)
 		}
 

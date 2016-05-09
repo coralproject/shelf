@@ -1,6 +1,6 @@
 
 # midware
-    import "github.com/ardanlabs/kit/web/midware"
+    import "github.com/coralproject/xenia/cmd/xeniad/midware"
 
 
 
@@ -12,14 +12,6 @@
 func Auth(h app.Handler) app.Handler
 ```
 Auth handles token authentication.
-
-
-## func FixedTime
-``` go
-func FixedTime(now time.Time) func(h app.Handler) app.Handler
-```
-FixedTime is useful when testing time dependent APIs as it sets the Now
-property of all Contexts to a fixed time.
 
 
 ## func Mongo
