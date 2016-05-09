@@ -17,7 +17,7 @@ var (
 	GitRevision = "<unknown>"
 	GitVersion  = "<unknown>"
 	BuildDate   = "<unknown>"
-	IntVersion  = "201604030945"
+	IntVersion  = "201605091500"
 )
 
 func main() {

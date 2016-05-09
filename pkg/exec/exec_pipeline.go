@@ -5,6 +5,8 @@ package exec
 import (
 	"errors"
 	"fmt"
+	"net"
+	"time"
 
 	"github.com/coralproject/xenia/pkg/query"
 
@@ -80,17 +82,65 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		return docs{q.Name, []bson.M{m}}, commands, nil
 	}
 
+	// Set the default timeout for the session.
+	timeout := 25 * time.Second
+	if q.Timeout != "" {
+		if d, err := time.ParseDuration(q.Timeout); err != nil {
+			log.Dev(context, "executePipeline", "WARNING : Unable to Set Timeout[%s], using default.", q.Timeout)
+		} else {
+			timeout = d
+		}
+	}
+
+	log.Dev(context, "executePipeline", "MGO Timeout Set[%s]", timeout)
+
 	// Build the pipeline function for the execution.
 	var results []bson.M
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "executePipeline", "MGO :\ndb.%s.aggregate([\n%s])", c.Name, agg)
-		return c.Pipe(pipeline).All(&results)
+		log.Dev(context, "executePipeline", "MGO Started\ndb.%s.aggregate([\n%s])", c.Name, agg)
+		err := c.Pipe(pipeline).All(&results)
+		return err
 	}
 
+	// Set the channel to one because we might not be around
+	// waiting for the result on timeouts.
+	wait := make(chan error, 1)
+
 	// Execute the pipeline.
-	if err := db.ExecuteMGO(context, q.Collection, f); err != nil {
+	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Dev(context, "executePipeline", "******> Recovered from timing out")
+			}
+			log.Dev(context, "executePipeline", "MGO Response Complete")
+		}()
+
+		wait <- db.ExecuteMGOTimeout(context, timeout, q.Collection, f)
+	}()
+
+	// Did any errors occur.
+	select {
+
+	// Wait for the response from executing the pipeline.
+	case err := <-wait:
+		if err != nil {
+			if _, ok := err.(*net.OpError); ok {
+				log.Error(context, "executePipeline", err, "Timed out Network")
+				return docs{}, commands, errors.New("Completed : Timed out executing commands")
+			}
+
+			log.Error(context, "executePipeline", err, "Completed")
+			return docs{}, commands, err
+		}
+
+	// Wait to timeout the entire operation.
+	case <-time.After(timeout):
+		err := errors.New("Timedout executing commands")
+		log.Error(context, "executePipeline", err, "Completed : Timed out Processing")
 		return docs{}, commands, err
 	}
+
+	log.Dev(context, "executePipeline", "Completed")
 
 	// If there were no results, return an empty array.
 	if results == nil {
