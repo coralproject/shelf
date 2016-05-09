@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/anvilresearch/go-anvil"
 	"github.com/ardanlabs/kit/cfg"
@@ -40,6 +41,7 @@ func init() {
 			DB:       cfg.MustString(cfgMongoDB),
 			User:     cfg.MustString(cfgMongoUser),
 			Password: cfg.MustString(cfgMongoPassword),
+			Timeout:  25 * time.Second,
 		}
 
 		// The web framework middleware for Mongo is using the name of the

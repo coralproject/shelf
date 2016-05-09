@@ -48,6 +48,7 @@ type Query struct {
 	Description string                   `bson:"desc,omitempty" json:"desc,omitempty"`                                       // Description of this specific query.
 	Type        string                   `bson:"type" json:"type" validate:"required,min=8"`                                 // TypePipeline, TypeTemplate
 	Collection  string                   `bson:"collection,omitempty" json:"collection,omitempty" validate:"required,min=3"` // Name of the collection to use for processing the query.
+	Timeout     string                   `bson:"timeout,omitempty" json:"timeout,omitempty"`                                 // Provides a timeout for the query if it does not return.
 	Commands    []map[string]interface{} `bson:"commands" json:"commands"`                                                   // Commands to process for the query.
 	Indexes     []Index                  `bson:"indexes" json:"indexes"`                                                     // Set of indexes required to optimize the execution of the query.
 	Continue    bool                     `bson:"continue,omitempty" json:"continue,omitempty"`                               // Indicates that on failure to process the next query.
