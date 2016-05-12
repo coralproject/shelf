@@ -70,6 +70,7 @@ func TestInvalidRegex(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould error on Regex with too short a pattern.", tests.Success)
 		}
+
 		t.Log("\tWhen using fixture", fixture2)
 		{
 			err = rgx2.Validate()
