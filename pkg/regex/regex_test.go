@@ -38,6 +38,49 @@ func init() {
 
 //==============================================================================
 
+// TestInvalidRegex tests that bad regex expressions cause errors.
+func TestInvalidRegex(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	const fixture1 = "invalid.json"
+	const fixture2 = "badpattern.json"
+
+	// Load and validate a Regex with too short of a pattern.
+	rgx1, err := rfix.Get(fixture1)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
+
+	// Load a Regex with a pattern that doesn't compile.
+	rgx2, err := rfix.Get(fixture2)
+	if err != nil {
+		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
+	}
+	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
+
+	t.Log("Given the need to reject an invalid or too short a pattern regex from the database.")
+	{
+		t.Log("\tWhen using fixture", fixture1)
+		{
+			err = rgx1.Validate()
+			if err == nil {
+				t.Errorf("\t%s\tShould error on Regex with too short a pattern.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould error on Regex with too short a pattern.", tests.Success)
+		}
+		t.Log("\tWhen using fixture", fixture2)
+		{
+			err = rgx2.Validate()
+			if err == nil {
+				t.Errorf("\t%s\tShould error on Regex with an invalid pattern.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould error on Regex with an invalid pattern.", tests.Success)
+		}
+	}
+}
+
 // TestUpsertCreateRegex tests if we can create a regex record in the db.
 func TestUpsertCreateRegex(t *testing.T) {
 	tests.ResetLog()
