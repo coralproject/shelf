@@ -20,7 +20,18 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 	// vars    : Key/Value pairs passed into the set execution for variable substituion.
 	// results : Any result from previous sets that have been saved.
 
+	// A map of keys that may need to be replaced.
+	keyReplace := make(map[string]string)
+
 	for key, value := range commands {
+
+		// Does the key have a variable syntax.
+		idx := strings.IndexByte(key, '{')
+		if idx != -1 {
+			if err := fldSub(context, key, vars, keyReplace); err != nil {
+				return err
+			}
+		}
 
 		// Test for the type of value we have.
 		switch doc := value.(type) {
@@ -34,7 +45,7 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 		// We have a string value so check it.
 		case string:
 			if doc != "" && doc[0] == '#' {
-				if err := varSub(context, key, doc, commands, vars, results); err != nil {
+				if err := valSub(context, key, doc, commands, vars, results); err != nil {
 					return err
 				}
 			}
@@ -57,7 +68,7 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 				// We have a string value so check it.
 				case string:
 					if arrDoc != "" && arrDoc[0] == '#' {
-						if err := varSub(context, key, arrDoc, commands, vars, results); err != nil {
+						if err := valSub(context, key, arrDoc, commands, vars, results); err != nil {
 							return err
 						}
 					}
@@ -66,11 +77,68 @@ func ProcessVariables(context interface{}, commands map[string]interface{}, vars
 		}
 	}
 
+	// Are there fields to replace.
+	if len(keyReplace) > 0 {
+		for k, v := range keyReplace {
+
+			// Add a new key with this data.
+			commands[v] = commands[k]
+
+			// Remove the old key.
+			delete(commands, k)
+		}
+	}
+
 	return nil
 }
 
-// varSub replaces variables inside the command set with values.
-func varSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
+// fldSub appends to the replace map the fields that need to change and what the
+// new field name is.
+func fldSub(context interface{}, key string, vars map[string]string, replace map[string]string) error {
+
+	// Before: statstics.comments.{dimension}.{commentStatus}.{value}
+	// After:  statstics.comments.dim.cstat.v
+
+	parts := strings.Split(key, ".")
+	for i, p := range parts {
+
+		// If there is not variable, move to the next part.
+		if p[0] != '{' {
+			continue
+		}
+
+		l := len(p) - 1
+
+		if l < 3 {
+			err := fmt.Errorf("Invalid field variable : %q", p)
+			log.Error(context, "fldSub", err, "validating field variable length")
+			return err
+		}
+
+		if p[l] != '}' {
+			err := fmt.Errorf("Invalid field variable : %q", p)
+			log.Error(context, "fldSub", err, "validating field variable syntax")
+			return err
+		}
+
+		fld := p[1:l]
+
+		nFld, exists := vars[fld]
+		if !exists {
+			err := fmt.Errorf("Field variable does not exist : %q", fld)
+			log.Error(context, "fldSub", err, "field variable lookup")
+			return err
+		}
+
+		parts[i] = nFld
+	}
+
+	replace[key] = strings.Join(parts, ".")
+	return nil
+}
+
+// valSub replaces variables inside the command set with values.
+func valSub(context interface{}, key, variable string, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error {
 
 	// Before: {"field": "#number:variable_name"}  After: {"field": 1234}
 	// key: "field"  variable:"#cmd:variable_name"
@@ -79,7 +147,7 @@ func varSub(context interface{}, key, variable string, commands map[string]inter
 	value := variable[1:]
 
 	// Find the first instance of the separator.
-	idx := strings.Index(value, ":")
+	idx := strings.IndexByte(value, ':')
 	if idx == -1 {
 		err := fmt.Errorf("Invalid variable format %q, missing :", variable)
 		log.Error(context, "varSub", err, "Parsing variable")
@@ -258,7 +326,7 @@ func findResultData(context interface{}, lookup string, results map[string]inter
 	//		field: station_id				field: condition.wind_string
 
 	// Split the lookup into the data key and document field key.
-	idx := strings.Index(lookup, ".")
+	idx := strings.IndexByte(lookup, '.')
 	if idx == -1 {
 		err := fmt.Errorf("Invalid formated lookup %q", lookup)
 		log.Error(context, "findResultData", err, "Parsing lookup")
@@ -296,7 +364,7 @@ func docFieldLookup(context interface{}, doc map[string]interface{}, field strin
 	// Extract the first field for lookup and the remaining fields
 	// if we need to recurse deeper into the result document.
 	var nextFld string
-	idx := strings.Index(field, ".")
+	idx := strings.IndexByte(field, '.')
 	if idx > 0 {
 		nextFld = field[idx+1:]
 		field = field[0:idx]
@@ -388,7 +456,7 @@ func objID(context interface{}, value string) (bson.ObjectId, error) {
 
 // regExp is a helper function to process regex commands.
 func regExp(context interface{}, value string) (bson.RegEx, error) {
-	idx := strings.Index(value[1:], "/")
+	idx := strings.IndexByte(value[1:], '/')
 	if value[0] != '/' || idx == -1 {
 		err := fmt.Errorf("Parameter %q is not a regular expression", value)
 		log.Error(context, "varLookup", err, "Regex parsing")

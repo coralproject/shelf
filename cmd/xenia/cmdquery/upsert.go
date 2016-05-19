@@ -50,13 +50,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pwd, err := os.Getwd()
+	file, err := filepath.Abs(upsert.path)
 	if err != nil {
 		cmd.Println("Upserting Set : ", err)
 		return
 	}
-
-	file := filepath.Join(pwd, upsert.path)
 
 	stat, err := os.Stat(file)
 	if err != nil {

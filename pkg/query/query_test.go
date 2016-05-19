@@ -41,7 +41,7 @@ func TestUpsertCreateSet(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	const fixture = "basic_sub.json"
+	const fixture = "basic_fldsub.json"
 	set1, err := qfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("\t%s\tShould load query set record from file : %v", tests.Failed, err)

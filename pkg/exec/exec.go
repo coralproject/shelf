@@ -10,7 +10,6 @@ import (
 	"github.com/coralproject/xenia/pkg/script"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -71,7 +70,7 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 		// We only have pipeline right now.
 		switch strings.ToLower(q.Type) {
 		case "pipeline":
-			result, commands, err = execPipeline(context, db, &q, vars, data)
+			result, commands, err = execPipeline(context, db, &q, vars, data, set.Explain)
 		}
 
 		// Was there an error processing the query.
@@ -102,7 +101,7 @@ func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string
 		Results: results,
 	}
 
-	log.Dev(context, "Exec", "Completed : \n%s\n", mongo.Query(results))
+	log.Dev(context, "Exec", "Completed")
 	return &r
 }
 

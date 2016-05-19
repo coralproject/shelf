@@ -48,6 +48,24 @@ func TestPreProcessing(t *testing.T) {
 	}{
 		{
 			false,
+			map[string]interface{}{"{field_name}": "bill"},
+			map[string]string{"field_name": "name"},
+			map[string]interface{}{"name": "bill"},
+		},
+		{
+			false,
+			map[string]interface{}{"statstics.comments.{dimension}.{commentStatus}.{value}": "bill"},
+			map[string]string{"dimension": "dim", "commentStatus": "cstat", "value": "v"},
+			map[string]interface{}{"statstics.comments.dim.cstat.v": "bill"},
+		},
+		{
+			false,
+			map[string]interface{}{"{dimension}": map[string]interface{}{"{commentStatus}": map[string]interface{}{"{value}": "bill"}}},
+			map[string]string{"dimension": "dim", "commentStatus": "cstat", "value": "v"},
+			map[string]interface{}{"dim": map[string]interface{}{"cstat": map[string]interface{}{"v": "bill"}}},
+		},
+		{
+			false,
 			map[string]interface{}{"field_name": "#string:name"},
 			map[string]string{"name": "bill"},
 			map[string]interface{}{"field_name": "bill"},
@@ -187,12 +205,32 @@ func compareBson(m1 bson.M, m2 bson.M) bool {
 	}
 
 	for k, v := range m1 {
+		if bv, ok := v.(bson.M); ok {
+			compareBson(bv, m2)
+			continue
+		}
+
+		if bv, ok := v.(map[string]interface{}); ok {
+			compareBson(bv, m2)
+			continue
+		}
+
 		if m2[k] != v {
 			return false
 		}
 	}
 
 	for k, v := range m2 {
+		if bv, ok := v.(bson.M); ok {
+			compareBson(m1, bv)
+			continue
+		}
+
+		if bv, ok := v.(map[string]interface{}); ok {
+			compareBson(m1, bv)
+			continue
+		}
+
 		if m1[k] != v {
 			return false
 		}

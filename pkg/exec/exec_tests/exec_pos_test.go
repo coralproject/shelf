@@ -24,6 +24,8 @@ func getPosExecSet() []execSet {
 		mongoRegex(),
 		masking(),
 		withAdjTime(),
+		fieldReplace(),
+		explain(),
 	}
 }
 
@@ -486,11 +488,13 @@ func masking() execSet {
 		results: []string{
 			`{"results":[{"Name":"Masking","Docs":[{"condition":{"pressure_string":"******"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 			`{"results":[{"Name":"Masking","Docs":[{"condition":{"observation_time":"Last Updated on Oct 30 2012, 11:00 am CDT","pressure_string":"1014.0 mb"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
+			`{"results":[{"Name":"Masking","Docs":[{"condition":{"pressure_string":"1014.0 mb"},"name":"C14 - Pasco County Buoy, FL"}]}]}`,
 		},
 
 		// NOT SURE WHAT TO DO. When tests are run in parallel the masks may be
 		// gone. I can't fudge this because it is tied to the collection we
-		// are running the query again. So I have both results for now :(
+		// are running the query again. So I have both results for now and I will
+		// check for both. One will be right :)
 	}
 }
 
@@ -518,6 +522,73 @@ func withAdjTime() execSet {
 		results: []string{
 			`{"results":[{"Name":"Since","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
 			`{"results":[{"Name":"Since","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
+		},
+	}
+}
+
+// fieldReplace tests the replacement of fields.
+func fieldReplace() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{"cond": "condition", "dt": "date"},
+		set: &query.Set{
+			Name:    "Find Replace",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Find Replace",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"{cond}.{dt}": map[string]interface{}{"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Find Replace","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"}]}]}`,
+			`{"results":[{"Name":"Find Replace","Docs":[{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"}]}]}`,
+		},
+	}
+}
+
+// explain tests the use of the explain output.
+func explain() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Explain",
+			Enabled: true,
+			Explain: true,
+			Queries: []query.Query{
+				{
+					Name:       "Basic",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"station_id": "42021"}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+				{
+					Name:       "Time",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"condition.date": map[string]interface{}{"$gt": "#date:2013-01-01T00:00:00.000Z"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+						{"$limit": 2},
+					},
+				},
+			},
+		},
+		results: []string{
+			`#find:queryPlanner`,
 		},
 	}
 }
