@@ -4,7 +4,7 @@ Alpha Release
 
 A configurable service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).
 
-Xenia is part of [The Coral Project Ecosystem](https://github.com/CoralProject/reef/tree/master/ecosystem).
+Xenia is part of [The Coral Project Ecosystem](https://github.com/coralproject/reef/blob/master/ECOSYSTEM.md).
 
 ## Installation
 
