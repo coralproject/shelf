@@ -80,6 +80,6 @@
                         "fields" : [{"name" : "name", "type":1}]
                     }
                 ]
-        },
+        }
     ]
 }
