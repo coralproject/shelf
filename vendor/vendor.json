@@ -52,10 +52,17 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "553ocu2Fqbojogvtl5Nm/iXOdoA=",
+			"checksumSHA1": "FDLcrgSQnA0XxfvjbTkbmJWmn14=",
+			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "71de3085b9a21bf1bc8336142325669c211fcc5a",
-			"revisionTime": "2016-05-03T05:31:44Z"
+			"revision": "4e2fd6c1e0b5af78d35de3db9e9109bbd8177bf7",
+			"revisionTime": "2016-06-08T14:17:11Z"
+		},
+		{
+			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",
+			"path": "github.com/braintree/manners",
+			"revision": "82a8879fc5fd0381fa8b2d8033b19bf255252088",
+			"revisionTime": "2016-04-18T04:36:13Z"
 		},
 		{
 			"checksumSHA1": "zZKFQ2lcwqkOhs3gIs3NKeLG2i8=",
