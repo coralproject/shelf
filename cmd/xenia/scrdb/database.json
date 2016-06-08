@@ -47,7 +47,7 @@
                 [
                     {   "name" : "name",
                         "unique" : true,
-                        "fields" : [{"name" : "name", "type":1}]
+                        "fields" : [{"collection" : "collection", "type":1},{"field" : "field", "type":1}]
                     }
                 ]
         },
@@ -57,7 +57,7 @@
                 [
                     {   "name" : "name",
                         "unique" : true,
-                        "fields" : [{"name" : "name", "type":1}]
+                        "fields" : [{"collection" : "collection", "type":1},{"field" : "field", "type":1}]
                     }
                 ]
         },
