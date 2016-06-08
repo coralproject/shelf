@@ -15,12 +15,6 @@
 			"revisionTime": "2016-04-27T16:48:56Z"
 		},
 		{
-			"checksumSHA1": "AUNxk85JWeg0oVsh1HEt4xo54dM=",
-			"path": "github.com/ardanlabs/kit/cmd/kit/cmddb",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
-		},
-		{
 			"checksumSHA1": "L3bu4NPBOnj8Jrfxqzadh8CG5uU=",
 			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db",
 			"path": "github.com/ardanlabs/kit/db",

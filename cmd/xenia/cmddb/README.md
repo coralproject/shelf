@@ -1,6 +1,6 @@
 
 # cmddb
-    import "github.com/ardanlabs/kit/cmd/kit/cmddb"
+    import "github.com/coralproject/xenia/cmd/xenia/cmddb"
 
 
 
