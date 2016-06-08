@@ -2,34 +2,6 @@
     "collections":
     [
         {
-            "name": "auth_sessions",
-            "indexes":
-                [
-                    {   "name" : "session_id",
-                        "unique" : true,
-                        "fields" : [{"name" : "session_id", "type":1}]
-                    },
-                    {   "name" : "public_id",
-                        "unique" : true,
-                        "fields" : [{"name" : "public_id", "type":1}]
-                    }
-                ]
-        },
-        {
-            "name": "auth_users",
-            "indexes":
-                [
-                    {   "name" : "public_id",
-                        "unique" : true,
-                        "fields" : [{"name" : "public_id", "type":1}]
-                    },
-                    {   "name" : "email",
-                        "unique" : true,
-                        "fields" : [{"name" : "email", "type":1}]
-                    }
-                ]
-        },
-        {
             "name": "query_sets",
             "indexes":
                 [
@@ -50,7 +22,7 @@
                 ]
         },
         {
-            "name": "scripts",
+            "name": "query_scripts",
             "indexes":
                 [
                     {   "name" : "name",
@@ -60,7 +32,7 @@
                 ]
         },
         {
-            "name": "scripts_history",
+            "name": "query_scripts_history",
             "indexes":
                 [
                     {   "name" : "name",
@@ -70,52 +42,44 @@
                 ]
         },
         {
-            "name": "users",
-            "indexes": 
+            "name": "query_masks",
+            "indexes":
                 [
-                    {
-                        "name" : "email",
+                    {   "name" : "name",
                         "unique" : true,
-                        "fields" : [{"name": "email", "type":1}] 
-                    },
-                    {
-                        "name" : "user_name",
-                        "unique" : true,
-                        "fields" : [{"name": "user_name", "type":1}] 
+                        "fields" : [{"name" : "name", "type":1}]
                     }
                 ]
         },
         {
-            "name": "comments",
-            "indexes": 
+            "name": "query_masks_history",
+            "indexes":
                 [
-                    {
-                        "name" : "user",
-                        "unique" : false,
-                        "fields" : [{"name": "user_id", "type":-1}] 
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
                     }
                 ]
         },
         {
-            "name": "actions",
-            "indexes": 
+            "name": "query_regexs",
+            "indexes":
                 [
-                    {
-                        "name" : "user",
-                        "unique" : false,
-                        "fields" : [{"name": "user_id", "type":-1}] 
-                    },
-                    {
-                        "name" : "comment",
-                        "unique" : false,
-                        "fields" : [{"name": "comment_id", "type":-1}] 
-                    },
-                    {
-                        "name" : "type",
-                        "unique" : false,
-                        "fields" : [{"name": "type", "type":1}] 
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
                     }
                 ]
-        }
+        },
+        {
+            "name": "query_regexs_history",
+            "indexes":
+                [
+                    {   "name" : "name",
+                        "unique" : true,
+                        "fields" : [{"name" : "name", "type":1}]
+                    }
+                ]
+        },
     ]
 }
