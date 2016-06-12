@@ -46,11 +46,10 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "FDLcrgSQnA0XxfvjbTkbmJWmn14=",
-			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
+			"checksumSHA1": "oF12lBsVGbALtYaMlVx/za/3bIk=",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "4e2fd6c1e0b5af78d35de3db9e9109bbd8177bf7",
-			"revisionTime": "2016-06-08T14:17:11Z"
+			"revision": "4b6636d577916c75b0e2cba1393a4e8e39969320",
+			"revisionTime": "2016-06-12T20:30:08Z"
 		},
 		{
 			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",
