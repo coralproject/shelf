@@ -105,7 +105,7 @@ type Command struct {
 ## Flags
 
 A Flag is a way to modify the behavior of a command. Cobra supports
-fully POSIX-compliant flags as well as the Go [flag package](https://golang.org/pkg/flag/).
+fully POSIX-compliant flags as well as the Go [flag package](https://golang.org/internal/flag/).
 A Cobra command can define flags that persist through to children commands
 and flags that are only available to that command.
 

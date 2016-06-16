@@ -5,8 +5,8 @@ import (
 	"strings"
 
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/pkg/exec"
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/internal/exec"
+	"github.com/coralproject/xenia/internal/query"
 
 	"github.com/spf13/cobra"
 )
