@@ -9,7 +9,7 @@ import (
         "io/ioutil"
         "os"
 
-        "github.com/GoogleCloudPlatform/kubernetes/pkg/kubectl/cmd"
+        "github.com/GoogleCloudPlatform/kubernetes/internal/kubectl/cmd"
 )
 
 func main() {

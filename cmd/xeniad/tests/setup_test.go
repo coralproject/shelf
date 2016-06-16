@@ -7,9 +7,9 @@ import (
 	"testing"
 
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
-	"github.com/coralproject/xenia/pkg/mask/mfix"
-	"github.com/coralproject/xenia/pkg/query/qfix"
-	"github.com/coralproject/xenia/pkg/script/sfix"
+	"github.com/coralproject/xenia/internal/mask/mfix"
+	"github.com/coralproject/xenia/internal/query/qfix"
+	"github.com/coralproject/xenia/internal/script/sfix"
 	"github.com/coralproject/xenia/tstdata"
 
 	"github.com/ardanlabs/kit/cfg"

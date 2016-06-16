@@ -2,7 +2,7 @@ package cmdregex
 
 import (
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/pkg/regex"
+	"github.com/coralproject/xenia/internal/regex"
 
 	"github.com/spf13/cobra"
 )

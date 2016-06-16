@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/pkg/mask"
-	"github.com/coralproject/xenia/pkg/mask/mfix"
+	"github.com/coralproject/xenia/internal/mask"
+	"github.com/coralproject/xenia/internal/mask/mfix"
 
 	"github.com/ardanlabs/kit/tests"
 )

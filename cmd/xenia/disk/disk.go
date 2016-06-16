@@ -6,10 +6,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/xenia/pkg/mask"
-	"github.com/coralproject/xenia/pkg/query"
-	"github.com/coralproject/xenia/pkg/regex"
-	"github.com/coralproject/xenia/pkg/script"
+	"github.com/coralproject/xenia/internal/mask"
+	"github.com/coralproject/xenia/internal/query"
+	"github.com/coralproject/xenia/internal/regex"
+	"github.com/coralproject/xenia/internal/script"
 
 	"github.com/ardanlabs/kit/log"
 )

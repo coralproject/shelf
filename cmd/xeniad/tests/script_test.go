@@ -7,8 +7,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/pkg/script"
-	"github.com/coralproject/xenia/pkg/script/sfix"
+	"github.com/coralproject/xenia/internal/script"
+	"github.com/coralproject/xenia/internal/script/sfix"
 
 	"github.com/ardanlabs/kit/tests"
 )
