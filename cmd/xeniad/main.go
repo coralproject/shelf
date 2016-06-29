@@ -3,6 +3,7 @@ package main
 
 import (
 	"runtime"
+	"time"
 
 	"github.com/coralproject/xenia/cmd/xeniad/handlers"
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
@@ -17,7 +18,7 @@ var (
 	GitRevision = "<unknown>"
 	GitVersion  = "<unknown>"
 	BuildDate   = "<unknown>"
-	IntVersion  = "201606081030"
+	IntVersion  = "201606291000"
 )
 
 func main() {
@@ -35,5 +36,15 @@ func main() {
 	handlers.Version.BuildDate = BuildDate
 	handlers.Version.IntVersion = IntVersion
 
-	app.Run(":4000", routes.API())
+	// These are the absolute read and write timeouts.
+
+	// ReadTimeout covers the time from when the connection is accepted to when the
+	// request body is fully read.
+	readTimeout := 10 * time.Second
+
+	// WriteTimeout normally covers the time from the end of the request header read
+	// to the end of the response write.
+	writeTimeout := 30 * time.Second
+
+	app.Run(":4000", routes.API(), readTimeout, writeTimeout)
 }
