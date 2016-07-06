@@ -6,8 +6,8 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/coralproject/xenia/pkg/exec"
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/internal/exec"
+	"github.com/coralproject/xenia/internal/query"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"

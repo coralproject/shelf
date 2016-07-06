@@ -6,7 +6,7 @@
       {
          "name":"top_commenters_by_count",
          "type":"pipeline",
-         "collection":"nyt_coral_comments",
+         "collection":"comments",
          "return":true,
          "commands":[
             { "$group": { "_id": { "user_id": "$user_id" }, "comments": { "$sum": 1 } } },

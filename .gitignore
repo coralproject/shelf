@@ -29,3 +29,6 @@ _testmain.go
 # Build files
 cmd/xenia/xenia
 cmd/xeniad/xeniad
+
+# Local development Config files
+config/gaba.cfg

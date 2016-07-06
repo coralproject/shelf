@@ -26,7 +26,7 @@ Validation Functions Return Type error
 Doing things this way is actually the way the standard library does, see the
 file.Open method here:
 
-	https://golang.org/pkg/os/#Open.
+	https://golang.org/internal/os/#Open.
 
 The authors return type "error" to avoid the issue discussed in the following,
 where err is always != nil:

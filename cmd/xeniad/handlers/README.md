@@ -6,6 +6,8 @@ Package handlers contains the handler logic for processing requests.
 
 Package handlers contains the handler logic for processing requests.
 
+Package handlers contains the handler logic for processing requests.
+
 
 
 
@@ -35,6 +37,11 @@ Regex fronts the access to the regex service functionality.
 var Script scriptHandle
 ```
 Script fronts the access to the script service functionality.
+
+``` go
+var Version verHandle
+```
+Version fronts the access to the ver service functionality.
 
 
 

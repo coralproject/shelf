@@ -6,10 +6,10 @@
       {
          "name":"comments_by_user",
          "type":"pipeline",
-         "collection":"nyt_coral_comments",
+         "collection":"comments",
          "return":true,
          "commands":[
-            { "$match": { "user_id": "#number:user_id" } },
+            { "$match": { "user_id": "#objid:user_id" } },
             { "$sort": { "createDate": -1 } }
          ]
       }

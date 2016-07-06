@@ -8,7 +8,7 @@ import (
 
 	"github.com/coralproject/xenia/cmd/xenia/disk"
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/pkg/query"
+	"github.com/coralproject/xenia/internal/query"
 
 	"github.com/spf13/cobra"
 )
@@ -50,13 +50,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	pwd, err := os.Getwd()
+	file, err := filepath.Abs(upsert.path)
 	if err != nil {
 		cmd.Println("Upserting Set : ", err)
 		return
 	}
-
-	file := filepath.Join(pwd, upsert.path)
 
 	stat, err := os.Stat(file)
 	if err != nil {

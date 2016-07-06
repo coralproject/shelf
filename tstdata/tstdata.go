@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/coralproject/xenia/pkg/exec"
+	"github.com/coralproject/xenia/internal/exec"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"

@@ -40,6 +40,7 @@ type Context struct {
 	SessionID string
 	Status    int
 	Ctx       map[string]interface{}
+	App       *App
 }
 
 // Error handles all error responses for the API.
@@ -65,27 +66,30 @@ func (c *Context) Respond(data interface{}, code int) {
 
 	c.Status = code
 
-	if code == http.StatusNoContent {
-		c.WriteHeader(http.StatusNoContent)
-		return
-	}
-
-	// Set application default header values.
-	c.Header().Set("Content-Type", "application/json")
-
 	// Load any user defined header values.
 	if app.userHeaders != nil {
 		for key, value := range app.userHeaders {
-			log.User("startup", "Init", "Setting user headers : %s:%s", key, value)
+			log.User("startup", "api : Respond", "Setting user headers : %s:%s", key, value)
 			c.Header().Set(key, value)
 		}
 	}
 
+	// Just set the status code and we are done.
+	if code == http.StatusNoContent {
+		c.WriteHeader(code)
+		return
+	}
+
+	// Set the content type.
+	c.Header().Set("Content-Type", "application/json")
+
+	// Write the status code.
 	c.WriteHeader(code)
 
 	// Marshal the data into a JSON string.
 	jsonData, err := json.Marshal(data)
 	if err != nil {
+		log.Error(c.SessionID, "api : Respond", err, "Marshalling JSON response")
 		jsonData = []byte("{}")
 	}
 

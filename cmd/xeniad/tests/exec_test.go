@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/coralproject/xenia/pkg/query/qfix"
+	"github.com/coralproject/xenia/internal/query/qfix"
 
 	"github.com/ardanlabs/kit/tests"
 )

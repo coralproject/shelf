@@ -85,7 +85,7 @@ fmt.Println("flagvar has value ", flagvar)
 ```
 
 There are helpers function to get values later if you have the FlagSet but
-it was difficult to keep up with all of the the flag pointers in your code.
+it was difficult to keep up with all of the flag pointers in your code.
 If you have a pflag.FlagSet with a flag called 'flagname' of type int you
 can use GetInt() to get the int value. But notice that 'flagname' must exist
 and it must be an int. GetString("flagname") will fail.
@@ -249,8 +249,8 @@ flags.MarkHidden("secretFlag")
 You can see the full reference documentation of the pflag package
 [at godoc.org][3], or through go's standard documentation system by
 running `godoc -http=:6060` and browsing to
-[http://localhost:6060/pkg/github.com/ogier/pflag][2] after
+[http://localhost:6060/internal/github.com/ogier/pflag][2] after
 installation.
 
-[2]: http://localhost:6060/pkg/github.com/ogier/pflag
+[2]: http://localhost:6060/internal/github.com/ogier/pflag
 [3]: http://godoc.org/github.com/ogier/pflag

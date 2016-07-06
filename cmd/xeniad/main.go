@@ -3,7 +3,9 @@ package main
 
 import (
 	"runtime"
+	"time"
 
+	"github.com/coralproject/xenia/cmd/xeniad/handlers"
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
 
 	"github.com/ardanlabs/kit/log"
@@ -16,20 +18,33 @@ var (
 	GitRevision = "<unknown>"
 	GitVersion  = "<unknown>"
 	BuildDate   = "<unknown>"
-
-	// raceDetector will be set only if -race option was specified during compile time.
-	raceDetector bool
+	IntVersion  = "201606291000"
 )
 
 func main() {
 	log.User("startup", "Init", "Revision     : %q", GitRevision)
 	log.User("startup", "Init", "Version      : %q", GitVersion)
 	log.User("startup", "Init", "Build Date   : %q", BuildDate)
+	log.User("startup", "Init", "Int Version  : %q", IntVersion)
 	log.User("startup", "Init", "Go Version   : %q", runtime.Version())
 	log.User("startup", "Init", "Go Compiler  : %q", runtime.Compiler)
 	log.User("startup", "Init", "Go ARCH      : %q", runtime.GOARCH)
 	log.User("startup", "Init", "Go OS        : %q", runtime.GOOS)
-	log.User("startup", "Init", "Race Detector: %v", raceDetector)
 
-	app.Run(":4000", routes.API())
+	handlers.Version.GitRevision = GitRevision
+	handlers.Version.GitVersion = GitVersion
+	handlers.Version.BuildDate = BuildDate
+	handlers.Version.IntVersion = IntVersion
+
+	// These are the absolute read and write timeouts.
+
+	// ReadTimeout covers the time from when the connection is accepted to when the
+	// request body is fully read.
+	readTimeout := 10 * time.Second
+
+	// WriteTimeout normally covers the time from the end of the request header read
+	// to the end of the response write.
+	writeTimeout := 30 * time.Second
+
+	app.Run(":4000", routes.API(), readTimeout, writeTimeout)
 }

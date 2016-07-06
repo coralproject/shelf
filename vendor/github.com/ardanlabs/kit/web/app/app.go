@@ -15,6 +15,7 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
+	"github.com/braintree/manners"
 	"github.com/dimfeld/httptreemux"
 	"github.com/pborman/uuid"
 )
@@ -68,6 +69,8 @@ var app = struct {
 // data/logic on this App struct
 type App struct {
 	*httptreemux.TreeMux
+	Ctx map[string]interface{}
+
 	mw []Middleware
 }
 
@@ -77,6 +80,7 @@ type App struct {
 func New(mw ...Middleware) *App {
 	return &App{
 		TreeMux: httptreemux.New(),
+		Ctx:     make(map[string]interface{}),
 		mw:      mw,
 	}
 }
@@ -94,6 +98,7 @@ func (a *App) Handle(verb, path string, handler Handler, mw ...Middleware) {
 			Params:         p,
 			SessionID:      uuid.New(),
 			Ctx:            make(map[string]interface{}),
+			App:            a,
 		}
 
 		log.User(c.SessionID, "Request", "Started : Method[%s] URL[%s] RADDR[%s]", c.Request.Method, c.Request.URL.Path, c.Request.RemoteAddr)
@@ -180,7 +185,7 @@ func Init(p cfg.Provider) {
 }
 
 // Run is called to start the web service.
-func Run(defaultHost string, routes http.Handler) {
+func Run(defaultHost string, routes http.Handler, readTimeout, writeTimeout time.Duration) {
 	log.Dev("startup", "Run", "Start : defaultHost[%s]", defaultHost)
 
 	// Check for a configured host value.
@@ -189,16 +194,30 @@ func Run(defaultHost string, routes http.Handler) {
 		host = defaultHost
 	}
 
-	// Create this goroutine to run the web server.
+	// Create a new server and set timeout values.
+	s := manners.NewWithServer(&http.Server{
+		Addr:           host,
+		Handler:        routes,
+		ReadTimeout:    readTimeout,
+		WriteTimeout:   writeTimeout,
+		MaxHeaderBytes: 1 << 20,
+	})
+
+	// Support for shutting down cleanly.
 	go func() {
-		log.Dev("listener", "Run", "Listening on: %s", host)
-		http.ListenAndServe(host, routes)
+
+		// Listen for an interrupt signal from the OS.
+		sigChan := make(chan os.Signal, 1)
+		signal.Notify(sigChan, os.Interrupt)
+		<-sigChan
+
+		// We have been asked to shutdown the server.
+		log.Dev("shutdown", "Run", "Starting shutdown...")
+		s.Close()
 	}()
 
-	// Listen for an interrupt signal from the OS.
-	sigChan := make(chan os.Signal, 1)
-	signal.Notify(sigChan, os.Interrupt)
-	<-sigChan
+	log.Dev("listener", "Run", "Listening on: %s", host)
+	s.ListenAndServe()
 
 	log.Dev("shutdown", "Run", "Complete")
 }
