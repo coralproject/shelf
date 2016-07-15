@@ -1,0 +1,42 @@
+[
+	{
+		"name": "coral_comment",
+		"id": "id",
+		"content": [
+			{
+				"name": "body",
+				"field": "CommentBody",
+				"dataType": "longText", 
+				"index": "text"
+			}
+		],
+		"rels": [
+			{
+				"type": "coral_asset",
+				"field": "asset_id",
+				"name": "context",
+				"required": true
+			},
+			{
+				"type": "coral_user",
+				"field": "user_id",
+				"name": "author",
+				"required": true
+			},
+			{
+				"type": "coral_comment",
+				"field": "parent_id",
+				"name": "parent",
+				"required": false
+			}
+		]
+	},
+	{
+		"name": "coral_user",
+		"id": "id"
+	},
+	{
+		"name": "coral_asset",
+		"id": "id"
+	}
+]
