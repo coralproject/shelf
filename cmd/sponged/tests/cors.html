@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<head>
+<script>
+var createCORSRequest = function(method, url) {
+  var xhr = new XMLHttpRequest();
+  if ("withCredentials" in xhr) {
+    // Most browsers.
+    xhr.open(method, url, true);
+  } else if (typeof XDomainRequest != "undefined") {
+    // IE8 & IE9
+    xhr = new XDomainRequest();
+    xhr.open(method, url);
+  } else {
+    // CORS not supported.
+    xhr = null;
+  }
+  return xhr;
+};
+
+function test() {
+  var url = 'http://localhost:1618/1.0/version';
+  var method = 'GET';
+  var xhr = createCORSRequest(method, url);
+
+  xhr.onload = function() {
+    // Success code goes here.
+    alert(url + ":" + xhr.status + ":" + xhr.responseText)
+  };
+
+  xhr.onerror = function() {
+    // Error code goes here.
+    alert("NOT WORKED")
+  };
+
+  xhr.send();
+}
+</script>
+</head>
+<html>
+<body>
+
+<h1>Sponged CORS test</h1>
+
+<input type="button" value="test" onclick="test()"/>
+
+</body>
+</html>
