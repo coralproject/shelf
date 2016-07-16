@@ -15,18 +15,16 @@
 			"revisionTime": "2016-04-27T16:48:56Z"
 		},
 		{
-			"checksumSHA1": "L3bu4NPBOnj8Jrfxqzadh8CG5uU=",
-			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db",
+			"checksumSHA1": "FnNh+WrRznfgrmwn0r4ZjXd8mbk=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "7b7fe9419174579b43907588043b2eb29668fcb7",
-			"revisionTime": "2016-05-09T18:52:05Z"
+			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
+			"revisionTime": "2016-07-16T01:09:33Z"
 		},
 		{
-			"checksumSHA1": "JoTLoJCW8AYEYslPh+R01R8gIl8=",
-			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/db/mongo",
+			"checksumSHA1": "LtvZGFkHom2jtvFxc+rdJ+u++es=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "f738f70816c437cf1276c4b27261395eaf55742e",
-			"revisionTime": "2016-05-09T18:43:30Z"
+			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
+			"revisionTime": "2016-07-16T01:09:33Z"
 		},
 		{
 			"checksumSHA1": "By/iy3mbtLH0tZbDxSqAhqm/r0E=",
@@ -46,11 +44,10 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "9omsubUwmo5qaPRcOsVApqtkr2Y=",
-			"origin": "github.com/coralproject/xenia/vendor/github.com/ardanlabs/kit/web/app",
+			"checksumSHA1": "uJviBFfoynCvM0piSX38we1F6yE=",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "9fe6ee156949859c75c8eae0761e85d9dac3b5a7",
-			"revisionTime": "2016-06-29T13:50:19Z"
+			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
+			"revisionTime": "2016-07-16T01:09:33Z"
 		},
 		{
 			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",
