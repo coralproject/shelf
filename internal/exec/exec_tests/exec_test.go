@@ -116,9 +116,9 @@ func TestExecuteSet(t *testing.T) {
 					}
 
 					if !found {
-						t.Log(string(data))
+						t.Log("Exp:", string(data))
 						for _, rslt := range es.results {
-							t.Log(rslt)
+							t.Log("Rsl:", rslt)
 						}
 						t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
 						continue
