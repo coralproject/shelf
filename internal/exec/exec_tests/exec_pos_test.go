@@ -19,6 +19,7 @@ func getPosExecSet() []execSet {
 		basicParamDefault(),
 		basicVarRegex(),
 		basicSaveIn(),
+		basicSaveInObjectID(),
 		basicSaveVar(),
 		multiFieldLookup(),
 		mongoRegex(),
@@ -351,6 +352,44 @@ func basicSaveIn() execSet {
 		},
 		results: []string{
 			`{"results":[{"Name":"Get Documents","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}]}`,
+		},
+	}
+}
+
+// basicSaveInObjectID performs a simple query where the result of the first query
+// is used in an $In statement with ObjectId's.
+func basicSaveInObjectID() execSet {
+	return execSet{
+		fail: false,
+		set: &query.Set{
+			Name:    "Basic Save In ObjectID",
+			Enabled: true,
+			Queries: []query.Query{
+				{
+					Name:       "Get Object Ids",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     false,
+					Commands: []map[string]interface{}{
+						{"$project": map[string]interface{}{"_id": 1, "station_id": 1}},
+						{"$limit": 5},
+						{"$save": map[string]interface{}{"$map": "list"}},
+					},
+				},
+				{
+					Name:       "Get Documents ObjectId",
+					Type:       "pipeline",
+					Collection: tstdata.CollectionExecTest,
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"_id": map[string]interface{}{"$in": "#data.*:list._id"}}},
+						{"$project": map[string]interface{}{"_id": 0, "name": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"Get Documents ObjectId","Docs":[{"name":"C14 - Pasco County Buoy, FL"},{"name":"GULF OF MAINE 78 NM EAST OF PORTSMOUTH,NH"},{"name":"NANTUCKET 54NM Southeast of Nantucket"},{"name":"GEORGES BANK 170 NM East of Hyannis, MA"},{"name":"SE Cape Cod 30NM East of Nantucket, MA"}]}]}`,
 		},
 	}
 }
