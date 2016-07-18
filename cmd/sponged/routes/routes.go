@@ -15,6 +15,8 @@ import (
 
 	"github.com/coralproject/xenia/cmd/sponged/handlers"
 	"github.com/coralproject/xenia/cmd/sponged/midware"
+
+	"github.com/coralproject/xenia/internal/item"
 )
 
 // Environmental variables.
@@ -51,6 +53,14 @@ func init() {
 			os.Exit(1)
 		}
 	}
+
+	// Initialize the item / relationship system
+	err := item.Initialize()
+	if err != nil {
+		log.Dev("startup", "Main", "Error Initializing Items: %s", err)
+
+	}
+
 }
 
 //==============================================================================
@@ -84,6 +94,8 @@ func API(testing ...bool) http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
+
+	a.Handle("GET", "/1.0/item/types", handlers.Item.Types)
 
 	a.Handle("GET", "/1.0/version", handlers.Version.List)
 
