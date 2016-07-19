@@ -50,21 +50,51 @@ func (itemHandle) Upsert(c *app.Context) error {
 	data := make(map[string]interface{})
 	if err := json.NewDecoder(c.Request.Body).Decode(&data); err != nil {
 		c.Respond(err, http.StatusInternalServerError)
-		return nil
+		return err
 	}
 
 	// create an item from it
 	i, err := item.Create(c, c.Ctx["DB"].(*db.DB), tn, 0, data)
 	if err != nil {
 		c.Respond(err, http.StatusInternalServerError)
-		return nil
+		return err
 	}
 
 	// upsert the item
 	err = item.Upsert(c, c.Ctx["DB"].(*db.DB), &i)
 	if err != nil {
 		c.Respond(err, http.StatusInternalServerError)
-		return nil
+		return err
+	}
+
+	c.Respond(i, http.StatusOK)
+	return nil
+}
+
+// Get takes an id in string form and responds with the item
+func (itemHandle) Get(c *app.Context) error {
+
+	id := c.Params["id"]
+
+	i, err := item.GetByIdString(c, c.Ctx["DB"].(*db.DB), id)
+	if err != nil {
+		c.Respond(err, http.StatusInternalServerError)
+		return err
+	}
+
+	c.Respond(i, http.StatusOK)
+	return nil
+
+}
+
+func (itemHandle) GetRels(c *app.Context) error {
+
+	id := c.Params["id"]
+
+	i, err := item.GetRelsByIdString(c, c.Ctx["DB"].(*db.DB), id)
+	if err != nil {
+		c.Respond(err, http.StatusInternalServerError)
+		return err
 	}
 
 	c.Respond(i, http.StatusOK)
