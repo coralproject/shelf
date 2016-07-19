@@ -1,0 +1,54 @@
+[
+	{
+		"id": 1,
+		"user_id": 1,
+		"asset_id": 2,
+		"body": "The world is all that is the case."
+	},
+	{
+		"id": 2,
+		"user_id": 1,
+		"asset_id": 1,
+		"parent_id": 1,
+		"body": "The world is made up of facts, not things."
+	},
+	{
+		"id": 3,
+		"user_id": 2,
+		"asset_id": 1,
+		"body": "Two and one have come"
+	},
+	{
+		"id": 4,
+		"user_id": 3,
+		"asset_id": 1,
+		"parent_id": 3,
+		"body": "I think that Three and One are some"
+	},
+	{
+		"id": 5,
+		"user_id": 1,
+		"asset_id": 2,
+		"body": "Sometimes I believe it, sometimes I LIVE it."
+	},
+	{
+		"id": 6,
+		"user_id": 3,
+		"asset_id": 2,
+		"body": "Things that can be said can be said clearly. All else must be passed over in silence."
+	},
+	{
+		"id": 7,
+		"user_id": 3,
+		"asset_id": 1,
+		"parent_id": 2,
+		"body": "The world is all that is the case."
+	},
+	{
+		"id": 8,
+		"user_id": 1,
+		"asset_id": 1,
+		"parent_id": 7,
+		"body": "I already said that.  Read the thread next time."
+	}
+]
