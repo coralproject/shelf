@@ -3,7 +3,7 @@ package item
 import (
 	"time"
 
-	"gopkg.in/bluesuncorp/validator.v8"
+	validator "gopkg.in/bluesuncorp/validator.v8"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -32,7 +32,7 @@ type Result struct {
 
 // ItemData is what an Item can hold
 //  Should be the intersection of the db and transport protocols supported
-type ItemData interface{}
+// type ItemData map[string]interface{}
 
 //==============================================================================
 
@@ -40,11 +40,11 @@ type ItemData interface{}
 //  practical wrapper: Id, Type and Version
 // this will be high volume so db and json field names are truncated
 type Item struct {
-	Id      bson.ObjectId `bson:"_id" json:"id"`
-	Type    string        `bson:"t" json:"t"` // ItemType.Name
-	Version int           `bson:"v" json:"v"`
-	Data    ItemData      `bson:"d" json:"d"`
-	Rels    []Rel         `bson:"rels,omitempty" json:"rels,omitempty"`
+	Id      bson.ObjectId          `bson:"_id" json:"id"`
+	Type    string                 `bson:"t" json:"t"` // ItemType.Name
+	Version int                    `bson:"v" json:"v"`
+	Data    map[string]interface{} `bson:"d" json:"d"`
+	Rels    []Rel                  `bson:"rels,omitempty" json:"rels,omitempty"`
 }
 
 func (i *Item) Validate() error {

@@ -98,8 +98,6 @@ func routes(a *app.App) {
 	a.Handle("POST", "/1.0/item/:type", handlers.Item.Upsert)
 	a.Handle("PUT", "/1.0/item/:type", handlers.Item.Upsert)
 
-	a.Handle("GET", "/1.0/item/:type/:id", handlers.Item.Get)
-
 	a.Handle("GET", "/1.0/types", handlers.Item.Types)
 	a.Handle("GET", "/1.0/version", handlers.Version.List)
 

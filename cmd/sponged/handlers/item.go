@@ -70,9 +70,3 @@ func (itemHandle) Upsert(c *app.Context) error {
 	c.Respond(i, http.StatusOK)
 	return nil
 }
-
-// Get receives an item _id and returns it,
-func (itemHandle) Get(c *app.Context) error {
-
-	return nil
-}
