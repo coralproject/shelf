@@ -32,7 +32,7 @@ const (
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
+	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
 
 	// Initialize MongoDB.
 	if _, err := cfg.String(cfgMongoHost); err == nil {
