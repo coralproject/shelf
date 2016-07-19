@@ -21,7 +21,7 @@ func init() {
 //==============================================================================
 
 // Get retrieves some ItemData for testing
-func Get(fileName string) (*[]item.ItemData, error) {
+func Get(fileName string) (*[]map[string]interface{}, error) {
 	file, err := os.Open(path + fileName)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func Get(fileName string) (*[]item.ItemData, error) {
 
 	defer file.Close()
 
-	var data []item.ItemData
+	var data []map[string]interface{}
 	err = json.NewDecoder(file).Decode(&data)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,7 @@ func InsertItemsFromDataFile(context interface{}, db *db.DB, fileName string, t 
 	defer file.Close()
 
 	// grab the item type fixture file
-	var data []item.ItemData
+	var data []map[string]interface{}
 	err = json.NewDecoder(file).Decode(&data)
 
 	if err != nil {
