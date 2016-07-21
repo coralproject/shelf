@@ -15,8 +15,6 @@ import (
 
 	"github.com/coralproject/xenia/cmd/sponged/handlers"
 	"github.com/coralproject/xenia/cmd/sponged/midware"
-
-	"github.com/coralproject/xenia/internal/item"
 )
 
 // Environmental variables.
@@ -32,7 +30,7 @@ const (
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
+	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
 
 	// Initialize MongoDB.
 	if _, err := cfg.String(cfgMongoHost); err == nil {
@@ -53,14 +51,6 @@ func init() {
 			os.Exit(1)
 		}
 	}
-
-	// Initialize the item / relationship system
-	err := item.Initialize()
-	if err != nil {
-		log.Dev("startup", "Main", "Error Initializing Items: %s", err)
-
-	}
-
 }
 
 //==============================================================================
@@ -95,13 +85,6 @@ func API(testing ...bool) http.Handler {
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
 
-	a.Handle("POST", "/1.0/item/type/:type", handlers.Item.Upsert)
-	a.Handle("PUT", "/1.0/item/type/:type", handlers.Item.Upsert)
-
-	a.Handle("GET", "/1.0/item/:id", handlers.Item.Get)
-	a.Handle("GET", "/1.0/item/:id/rels", handlers.Item.GetRels)
-
-	a.Handle("GET", "/1.0/types", handlers.Item.Types)
 	a.Handle("GET", "/1.0/version", handlers.Version.List)
 
 }

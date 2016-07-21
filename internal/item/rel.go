@@ -52,36 +52,19 @@ func getDatumByKey(k string, d interface{}) interface{} {
 
 }
 
-func GetRelsByIdString(context interface{}, db *db.DB, idString string) (*[]Rel, error) {
-	// can we make this into a valid bson ObjectId?
-	id := bson.ObjectIdHex(idString)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-
-	// if so, use the traditional GetById to find the item
-	i, err := GetById(context, db, id)
-	if err != nil {
-		return nil, err
-	}
-
-	// and look up it's rels
-	return GetRels(context, db, i)
-}
-
 // GetRels looks up an item's relationships and returns them
-func GetRels(context interface{}, db *db.DB, i *Item) (*[]Rel, error) {
+func GetRels(context interface{}, db *db.DB, item *Item) (*[]Rel, error) {
 
 	var rels []Rel
 
 	// get the rel types for this item's type
-	rts := Types[i.Type].Rels
+	rts := Types[item.Type].Rels
 
 	// for each reltype
 	for _, rt := range rts {
 
 		// find the foreign key value in the item data
-		fkv := getDatumByKey(rt.Field, i.Data)
+		fkv := getDatumByKey(rt.Field, item.Data)
 
 		// if there is not value, skip this rel
 		if fkv == nil {
@@ -89,7 +72,7 @@ func GetRels(context interface{}, db *db.DB, i *Item) (*[]Rel, error) {
 		}
 
 		// create the field path for the foreign key field
-		fkf := "d." + Types[i.Type].IdField
+		fkf := "d." + Types[item.Type].IdField
 
 		// try string or int keys force keys to strings
 		//   todo, better handle keys, all should be bson?

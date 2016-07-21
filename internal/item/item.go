@@ -41,7 +41,7 @@ var cache = gc.New(expiration, cleanup)
 
 // create an item out of its type, version and data or die trying
 //  if the item already exists, adopt it's Id but do not presume to update
-func Create(context interface{}, db *db.DB, t string, v int, d map[string]interface{}) (Item, error) {
+func Create(context interface{}, db *db.DB, t string, v int, d ItemData) (Item, error) {
 
 	i := Item{}
 
@@ -147,19 +147,6 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 	}
 
 	return nil
-}
-
-// GetById retrieves an item by its id, given the id as a string.
-func GetByIdString(context interface{}, db *db.DB, i string) (*Item, error) {
-
-	// can we make this into a valid bson ObjectId?
-	id := bson.ObjectIdHex(i)
-	//	if err != nil {
-	//		return nil, err
-	//	}
-
-	// if so, use the traditional GetById
-	return GetById(context, db, id)
 }
 
 // GetById retrieves an item by its id.
