@@ -39,7 +39,7 @@
 			"out_string": "flagged by"
 		}
 	],
-       "views: [
+       "views": [
 		{
 			"id": "d95eac5d-4ea2-4468-8ab1-055b085869d8",
 			"name": "thread",
@@ -74,7 +74,7 @@
 		},
 		{
 			"id": "82b980d9-1cf0-4b18-9169-a41a88b7897c",
-			"name": "comments from authors flagged by a user"
+			"name": "comments from authors flagged by a user",
 			"start_type": "coral_user",
 			"path": [
 				{
