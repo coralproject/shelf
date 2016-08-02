@@ -1,0 +1,100 @@
+{
+	"relationships": [
+		{
+			"id": "4c25fa45-d8ff-47ec-8379-aed63e731604",
+			"subject_types": [
+				"coral_comment"
+			],
+			"predicate": "on",
+			"object_types": [
+				"coral_asset"
+			],
+			"in_string": "on",
+			"out_string": "having"
+		},
+		{
+			"id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
+			"subject_types": [
+				"coral_user"
+			],
+			"predicate": "authored",
+			"object_types": [
+				"coral_comment"
+			],
+			"in_string": "authored",
+			"out_string": "authored by"
+		},
+		{
+			"id": "32420143-376e-482a-b4d2-709ea9e31e8e",
+			"subject_types": [
+				"coral_user"
+			],
+			"predicate": "flagged",
+			"object_types": [
+				"coral_comment",
+				"coral_asset",
+				"coral_user"
+			],
+			"in_string": "flagged",
+			"out_string": "flagged by"
+		}
+	],
+       "views: [
+		{
+			"id": "d95eac5d-4ea2-4468-8ab1-055b085869d8",
+			"name": "thread",
+			"start_type": "coral_asset",
+			"path": [
+				{
+					"level": 1,
+					"direction": "in",
+					"relationship_id": "4c25fa45-d8ff-47ec-8379-aed63e731604",
+					"tag": "comment"
+				},
+				{
+					"level": 2,
+					"direction": "in",
+					"relationship_id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
+					"tag": "author"
+				}
+			]
+		},
+		{
+			"id": "28d58623-073e-4efe-b8bb-62cfce178752",
+			"name": "user comments",
+			"start_type": "coral_user",
+			"path": [
+				{
+					"level": 1,
+					"direction": "out",
+					"relationship_id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
+					"tag": "comment"
+				}
+			]
+		},
+		{
+			"id": "82b980d9-1cf0-4b18-9169-a41a88b7897c",
+			"name": "comments from authors flagged by a user"
+			"start_type": "coral_user",
+			"path": [
+				{
+					"level": 1,
+					"direction": "out",
+					"relationship_id": "32420143-376e-482a-b4d2-709ea9e31e8e"
+				},
+				{
+					"level": 2,
+					"direction": "in",
+					"relationship_id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
+					"tag": "author"
+				},
+				{
+					"level": 3,
+					"direction": "out",
+					"relationship_id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
+					"tag": "comment"
+				}
+			]
+		}
+	] 	
+}

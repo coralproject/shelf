@@ -43,12 +43,12 @@ func (rm RelManger) Validate() error {
 // Relationship contains metadata about a relationship.
 // Note, predicate should be unique.
 type Relationship struct {
-	ID          string `bson:"id" json:"id" validate:"required, min=1"`
-	SubjectType string `bson:"subject" json:"subject" validate:"required,min=3"`
-	Predicate   string `bson:"predicate" json:"predicate" validate:"required,min=3"`
-	ObjectType  string `bson:"object" json:"object" validate:"required,min=3"`
-	InString    string `bson:"in_string,omitempty" json:"in_string,omitempty"`
-	OutString   string `bson:"out_string,omitempty" json:"out_string,omitempty"`
+	ID           string   `bson:"id" json:"id" validate:"required, min=1"`
+	SubjectTypes []string `bson:"subject_types" json:"subject_types" validate:"required,min=1"`
+	Predicate    string   `bson:"predicate" json:"predicate" validate:"required,min=3"`
+	ObjectTypes  []string `bson:"object_types" json:"object_types" validate:"required,min=1"`
+	InString     string   `bson:"in_string,omitempty" json:"in_string,omitempty"`
+	OutString    string   `bson:"out_string,omitempty" json:"out_string,omitempty"`
 }
 
 // Validate checks the Relationship value for consistency.
@@ -71,6 +71,7 @@ type View struct {
 // PathSegment contains metadata about a segment of a path,
 // which path partially defines a View.
 type PathSegment struct {
+	Level          int    `bson:"level" json:"level" validate:"required,min=1"`
 	Direction      string `bson:"direction" json:"direction" validate:"required,min=2"`
 	RelationshipID string `bson:"relationship_id" json:"relationship_id" validate:"required, min=1"`
 	Tag            string `bson:"tag,omitempty" json:"tag,omitempty"`
