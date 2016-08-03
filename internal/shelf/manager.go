@@ -11,6 +11,11 @@ import (
 // Collection is the MongoDB collection housing metadata about relationships and views.
 const Collection = "relationship_manager"
 
+// Set of error variables.
+var (
+	ErrNotFound = errors.New("Set Not found")
+)
+
 // NewRelManager creates a new relationship manager, either with defaults
 // or based on a provided JSON config.
 func NewRelManager(context interface{}, db *db.DB, rm RelManager) error {
@@ -52,4 +57,22 @@ func ClearRelManager(context interface{}, db *db.DB) error {
 		return errors.Wrap(err, "Could not execute Mongo remove statement")
 	}
 	return nil
+}
+
+// GetRelManager retrieves the current relationship manager from Mongo.
+func GetRelManager(context interface{}, db *db.DB) (RelManager, error) {
+
+	var rm RelManager
+	f := func(c *mgo.Collection) error {
+		return c.Find(bson.M{"id": 1}).One(&rm)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+		return RelManager{}, errors.Wrap(err, "Could not retrieve relationship manager")
+	}
+
+	return rm, nil
 }

@@ -2,6 +2,7 @@ package shelf
 
 import (
 	"encoding/json"
+	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -54,14 +55,25 @@ func TestNewRelManager(t *testing.T) {
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve relationship manager fixture : %s", tests.Failed, err)
 			}
-			var rm RelManager
-			if err := json.Unmarshal(raw, &rm); err != nil {
+			var rm1 RelManager
+			if err := json.Unmarshal(raw, &rm1); err != nil {
 				t.Fatalf("\t%s\tShould be able unmarshal relationship manager fixture : %s", tests.Failed, err)
 			}
-			if err := NewRelManager(tests.Context, db, rm); err != nil {
+			if err := NewRelManager(tests.Context, db, rm1); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a relationship manager : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a relationship manager.", tests.Success)
+			rm2, err := GetRelManager(tests.Context, db)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve a relationship manager : %s", tests.Failed, err)
+			}
+			if !reflect.DeepEqual(rm1, rm2) {
+				t.Logf("\t%+v", rm1)
+				t.Logf("\t%+v", rm2)
+				t.Errorf("\t%s\tShould be able to get back the same relationship manager.", tests.Failed)
+			} else {
+				t.Logf("\t%s\tShould be able to get back the same relationship manager.", tests.Success)
+			}
 		}
 	}
 }
