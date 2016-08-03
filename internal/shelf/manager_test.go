@@ -1,12 +1,14 @@
 package shelf
 
 import (
+	"encoding/json"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/xenia/internal/shelf/sfix"
 )
 
 func init() {
@@ -26,8 +28,8 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
-// TestDefaultRelManager tests if we can create a default relationship manager in the db.
-func TestDefaultRelManager(t *testing.T) {
+// TestNewRelManager tests if we can create a new relationship manager in the db.
+func TestNewRelManager(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -48,7 +50,15 @@ func TestDefaultRelManager(t *testing.T) {
 	{
 		t.Log("\tWhen using the default relationship manager")
 		{
-			if err := NewRelManager(tests.Context, db, RelManager{}); err != nil {
+			raw, err := sfix.LoadRelManagerData()
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able retrieve relationship manager fixture : %s", tests.Failed, err)
+			}
+			var rm RelManager
+			if err := json.Unmarshal(raw, &rm); err != nil {
+				t.Fatalf("\t%s\tShould be able unmarshal relationship manager fixture : %s", tests.Failed, err)
+			}
+			if err := NewRelManager(tests.Context, db, rm); err != nil {
 				t.Fatalf("\t%s\tShould be able to create a relationship manager : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to create a relationship manager.", tests.Success)
