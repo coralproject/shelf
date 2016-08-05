@@ -49,7 +49,7 @@ func TestNewRelManager(t *testing.T) {
 
 	t.Log("Given the need to save a relationship manager into the database.")
 	{
-		t.Log("\tWhen using the default relationship manager")
+		t.Log("\tWhen using the relmanager.json test fixture")
 		{
 			raw, err := sfix.LoadRelManagerData()
 			if err != nil {

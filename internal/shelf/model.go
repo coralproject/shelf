@@ -1,6 +1,10 @@
 package shelf
 
-import validator "gopkg.in/bluesuncorp/validator.v8"
+import (
+	"fmt"
+
+	validator "gopkg.in/bluesuncorp/validator.v8"
+)
 
 //==============================================================================
 
@@ -28,14 +32,24 @@ func (rm RelManager) Validate() error {
 		return err
 	}
 
+	// For a valid relationship manager, we want to ensure that there are
+	// relationships and views.  Also, we want to ensure that the relationships
+	// used to define the views are themselves defined.
+	var relIDs []string
 	for _, rel := range rm.Relationships {
 		if err := rel.Validate(); err != nil {
 			return err
 		}
+		relIDs = append(relIDs, rel.ID)
 	}
 	for _, view := range rm.Views {
 		if err := view.Validate(); err != nil {
 			return err
+		}
+		for _, segment := range view.Path {
+			if !stringContains(relIDs, segment.RelationshipID) {
+				return fmt.Errorf("Views contain undefined relationships")
+			}
 		}
 	}
 	return nil
