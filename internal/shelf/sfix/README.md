@@ -1,7 +1,7 @@
 
 
 # sfix
-`import "/home/dwhitena/Dropbox/go-projects/src/github.com/coralproject/xenia/internal/shelf/sfix"`
+`import "coralproject/xenia/internal/shelf/sfix"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)

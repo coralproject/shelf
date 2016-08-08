@@ -1,7 +1,7 @@
 
 
 # shelf
-`import "/home/dwhitena/Dropbox/go-projects/src/github.com/coralproject/xenia/internal/shelf"`
+`import "github.com/coralproject/xenia/internal/shelf"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
