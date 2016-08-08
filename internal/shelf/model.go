@@ -47,8 +47,19 @@ func (rm RelManager) Validate() error {
 			return err
 		}
 		for _, segment := range view.Path {
+			if err := segment.Validate(); err != nil {
+				return err
+			}
 			if !stringContains(relIDs, segment.RelationshipID) {
 				return fmt.Errorf("Views contain undefined relationships")
+			}
+			switch segment.Direction {
+			case "in":
+				continue
+			case "out":
+				continue
+			default:
+				return fmt.Errorf("Path segment includes undefined direction")
 			}
 		}
 	}

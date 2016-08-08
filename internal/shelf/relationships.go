@@ -7,16 +7,19 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/log"
 	"github.com/pkg/errors"
 	uuid "github.com/satori/go.uuid"
 )
 
 // AddRelationship adds a relationship to the relationship manager.
 func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, error) {
+	log.Dev(context, "AddRelationship", "Started")
 
 	// Get the current relationship manager.
 	rm, err := GetRelManager(context, db)
 	if err != nil {
+		log.Error(context, "AddRelationship", err, "Completed")
 		return "", errors.Wrap(err, "Could not get the current relationship manager")
 	}
 
@@ -26,6 +29,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 		predicates = append(predicates, prevRel.Predicate)
 	}
 	if stringContains(predicates, rel.Predicate) {
+		log.Error(context, "AddRelationship", err, "Completed")
 		return "", fmt.Errorf("Predicate already exists")
 	}
 
@@ -35,18 +39,22 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 
 	// Update the relationship manager.
 	if err := NewRelManager(context, db, rm); err != nil {
+		log.Error(context, "AddRelationship", err, "Completed")
 		return "", errors.Wrap(err, "Could not update the relationship manager")
 	}
 
+	log.Dev(context, "AddRelationship", "Completed")
 	return rel.ID, nil
 }
 
 // RemoveRelationship removes a relationship from the relationship manager.
 func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
+	log.Dev(context, "RemoveRelationship", "Started")
 
 	// Get the current relationship manager.
 	rm, err := GetRelManager(context, db)
 	if err != nil {
+		log.Error(context, "RemoveRelationship", err, "Completed")
 		return errors.Wrap(err, "Could not get the current relationship manager")
 	}
 
@@ -58,6 +66,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 		}
 	}
 	if stringContains(relIDs, relID) {
+		log.Error(context, "RemoveRelationship", err, "Completed")
 		return fmt.Errorf("Active view is utilizing relationship %s", relID)
 	}
 
@@ -68,17 +77,21 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 		return err
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "RemoveRelationship", err, "Completed")
 		return errors.Wrap(err, "Could not execute Mongo update statement")
 	}
 
+	log.Dev(context, "RemoveRelationship", "Completed")
 	return nil
 }
 
 // UpdateRelationship updates a relationship in the relationship manager.
 func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error {
+	log.Dev(context, "UpdateRelationship", "Started")
 
 	// Validate the relationship.
 	if err := rel.Validate(); err != nil {
+		log.Error(context, "UpdateRelationship", err, "Completed")
 		return errors.Wrap(err, "Could not validate the provided relationship")
 	}
 
@@ -89,8 +102,10 @@ func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error 
 		return err
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "UpdateRelationship", err, "Completed")
 		return errors.Wrap(err, "Could not execute Mongo update statement")
 	}
 
+	log.Dev(context, "UpdateRelationship", "Completed")
 	return nil
 }
