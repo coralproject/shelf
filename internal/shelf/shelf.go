@@ -1,12 +1,13 @@
 package shelf
 
 import (
+	"errors"
+
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/pkg/errors"
 )
 
 // Collection is the MongoDB collection housing metadata about relationships and views.
@@ -25,13 +26,13 @@ func NewRelManager(context interface{}, db *db.DB, rm RelManager) error {
 	// Validate the relationship manager.
 	if err := rm.Validate(); err != nil {
 		log.Error(context, "NewRelManager", err, "Completed")
-		return errors.Wrap(err, "Could not validate the provided relationship manager")
+		return err
 	}
 
 	// Insert or update the default relationship manager.
 	if err := upsertRelManager(context, db, rm); err != nil {
 		log.Error(context, "NewRelManager", err, "Completed")
-		return errors.Wrap(err, "Could not upsert default relationship manager")
+		return err
 	}
 
 	log.Dev(context, "NewRelManager", "Completed")
@@ -46,7 +47,7 @@ func upsertRelManager(context interface{}, db *db.DB, rm RelManager) error {
 		return err
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-		return errors.Wrap(err, "Could not execute Mongo upsert statement")
+		return err
 	}
 	return nil
 }
@@ -61,7 +62,7 @@ func ClearRelManager(context interface{}, db *db.DB) error {
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "ClearRelManager", err, "Completed")
-		return errors.Wrap(err, "Could not execute Mongo remove statement")
+		return err
 	}
 	log.Dev(context, "ClearRelManager", "Completed")
 	return nil
@@ -81,7 +82,7 @@ func GetRelManager(context interface{}, db *db.DB) (RelManager, error) {
 			err = ErrNotFound
 		}
 		log.Error(context, "GetRelManager", err, "Completed")
-		return RelManager{}, errors.Wrap(err, "Could not retrieve relationship manager")
+		return RelManager{}, err
 	}
 
 	log.Dev(context, "GetRelManager", "Completed")

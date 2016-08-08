@@ -8,8 +8,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 // AddRelationship adds a relationship to the relationship manager.
@@ -20,7 +18,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	rm, err := GetRelManager(context, db)
 	if err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
-		return "", errors.Wrap(err, "Could not get the current relationship manager")
+		return "", err
 	}
 
 	// Make sure the given predicate does not exist already.
@@ -34,13 +32,18 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	}
 
 	// Assign a relationship ID, and add the relationship to the relationship manager.
-	rel.ID = uuid.NewV4().String()
+	relID, err := newUUID()
+	if err != nil {
+		log.Error(context, "AddRelationship", err, "Completed")
+		return "", err
+	}
+	rel.ID = relID
 	rm.Relationships = append(rm.Relationships, rel)
 
 	// Update the relationship manager.
 	if err := NewRelManager(context, db, rm); err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
-		return "", errors.Wrap(err, "Could not update the relationship manager")
+		return "", err
 	}
 
 	log.Dev(context, "AddRelationship", "Completed")
@@ -55,7 +58,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 	rm, err := GetRelManager(context, db)
 	if err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
-		return errors.Wrap(err, "Could not get the current relationship manager")
+		return err
 	}
 
 	// Make sure the given ID is not used in an active view.
@@ -78,7 +81,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
-		return errors.Wrap(err, "Could not execute Mongo update statement")
+		return err
 	}
 
 	log.Dev(context, "RemoveRelationship", "Completed")
@@ -92,7 +95,7 @@ func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error 
 	// Validate the relationship.
 	if err := rel.Validate(); err != nil {
 		log.Error(context, "UpdateRelationship", err, "Completed")
-		return errors.Wrap(err, "Could not validate the provided relationship")
+		return err
 	}
 
 	// Remove the relationship.
@@ -103,7 +106,7 @@ func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error 
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateRelationship", err, "Completed")
-		return errors.Wrap(err, "Could not execute Mongo update statement")
+		return err
 	}
 
 	log.Dev(context, "UpdateRelationship", "Completed")

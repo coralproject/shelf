@@ -8,8 +8,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/pkg/errors"
-	uuid "github.com/satori/go.uuid"
 )
 
 // AddView adds a view to the relationship manager.
@@ -20,7 +18,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	rm, err := GetRelManager(context, db)
 	if err != nil {
 		log.Error(context, "AddView", err, "Completed")
-		return "", errors.Wrap(err, "Could not get the current relationship manager")
+		return "", err
 	}
 
 	// Make sure the given view name does not exist already.
@@ -46,13 +44,18 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	}
 
 	// Assign a relationship ID, and add the relationship to the relationship manager.
-	view.ID = uuid.NewV4().String()
+	viewID, err := newUUID()
+	if err != nil {
+		log.Error(context, "AddView", err, "Completed")
+		return "", err
+	}
+	view.ID = viewID
 	rm.Views = append(rm.Views, view)
 
 	// Update the relationship manager.
 	if err := NewRelManager(context, db, rm); err != nil {
 		log.Error(context, "AddView", err, "Completed")
-		return "", errors.Wrap(err, "Could not update the relationship manager")
+		return "", err
 	}
 
 	log.Dev(context, "AddView", "Completed")
@@ -70,7 +73,7 @@ func RemoveView(context interface{}, db *db.DB, viewID string) error {
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "RemoveView", err, "Completed")
-		return errors.Wrap(err, "Could not execute Mongo update statement")
+		return err
 	}
 
 	log.Dev(context, "RemoveView", "Completed")
@@ -84,7 +87,7 @@ func UpdateView(context interface{}, db *db.DB, view View) error {
 	// Validate the view.
 	if err := view.Validate(); err != nil {
 		log.Error(context, "UpdateView", err, "Completed")
-		return errors.Wrap(err, "Could not validate the provided view")
+		return err
 	}
 
 	// Update the view.
@@ -95,7 +98,7 @@ func UpdateView(context interface{}, db *db.DB, view View) error {
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateView", err, "Completed")
-		return errors.Wrap(err, "Could not execute Mongo update statement")
+		return err
 	}
 
 	log.Dev(context, "UpdateView", "Completed")
