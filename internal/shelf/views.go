@@ -15,7 +15,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	log.Dev(context, "AddView", "Started")
 
 	// Get the current relationships and views.
-	rm, err := GetRelsAndViews(context, db)
+	rv, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "AddView", err, "Completed")
 		return view.ID, err
@@ -23,7 +23,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 
 	// Make sure the given view name does not exist already.
 	var names []string
-	for _, prevView := range rm.Views {
+	for _, prevView := range rv.Views {
 		names = append(names, prevView.Name)
 	}
 	if stringContains(names, view.Name) {
@@ -33,7 +33,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 
 	// Make sure that the relationships referenced in the view exist.
 	var existingRels []string
-	for _, existingRel := range rm.Relationships {
+	for _, existingRel := range rv.Relationships {
 		existingRels = append(existingRels, existingRel.ID)
 	}
 	for _, segment := range view.Path {

@@ -25,9 +25,9 @@ type RelsAndViews struct {
 }
 
 // Validate checks the RelsAndViews value for consistency.
-func (rm RelsAndViews) Validate() error {
+func (rv RelsAndViews) Validate() error {
 
-	if err := validate.Struct(rm); err != nil {
+	if err := validate.Struct(rv); err != nil {
 		return err
 	}
 
@@ -35,13 +35,13 @@ func (rm RelsAndViews) Validate() error {
 	// relationships and views.  Also, we want to ensure that the relationships
 	// used to define the views are themselves defined.
 	var relIDs []string
-	for _, rel := range rm.Relationships {
+	for _, rel := range rv.Relationships {
 		if err := rel.Validate(); err != nil {
 			return err
 		}
 		relIDs = append(relIDs, rel.ID)
 	}
-	for _, view := range rm.Views {
+	for _, view := range rv.Views {
 		if err := view.Validate(); err != nil {
 			return err
 		}

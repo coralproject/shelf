@@ -15,7 +15,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	log.Dev(context, "AddRelationship", "Started")
 
 	// Get the current relationships and views.
-	rm, err := GetRelsAndViews(context, db)
+	rv, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
 		return rel.ID, err
@@ -23,7 +23,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 
 	// Make sure the given predicate does not exist already.
 	var predicates []string
-	for _, prevRel := range rm.Relationships {
+	for _, prevRel := range rv.Relationships {
 		predicates = append(predicates, prevRel.Predicate)
 	}
 	if stringContains(predicates, rel.Predicate) {
@@ -61,7 +61,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 	log.Dev(context, "RemoveRelationship", "Started")
 
 	// Get the current relationships and views.
-	rm, err := GetRelsAndViews(context, db)
+	rv, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
 		return err
@@ -69,7 +69,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 
 	// Make sure the given ID is not used in an active view.
 	var relIDs []string
-	for _, view := range rm.Views {
+	for _, view := range rv.Views {
 		for _, segment := range view.Path {
 			relIDs = append(relIDs, segment.RelationshipID)
 		}

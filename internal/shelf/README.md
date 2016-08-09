@@ -17,7 +17,7 @@
 * [func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, error)](#AddRelationship)
 * [func AddView(context interface{}, db *db.DB, view View) (string, error)](#AddView)
 * [func ClearRelsAndViews(context interface{}, db *db.DB) error](#ClearRelsAndViews)
-* [func NewRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error](#NewRelsAndViews)
+* [func NewRelsAndViews(context interface{}, db *db.DB, rv RelsAndViews) error](#NewRelsAndViews)
 * [func RemoveRelationship(context interface{}, db *db.DB, relID string) error](#RemoveRelationship)
 * [func RemoveView(context interface{}, db *db.DB, viewID string) error](#RemoveView)
 * [func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error](#UpdateRelationship)
@@ -28,7 +28,7 @@
   * [func (r Relationship) Validate() error](#Relationship.Validate)
 * [type RelsAndViews](#RelsAndViews)
   * [func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error)](#GetRelsAndViews)
-  * [func (rm RelsAndViews) Validate() error](#RelsAndViews.Validate)
+  * [func (rv RelsAndViews) Validate() error](#RelsAndViews.Validate)
 * [type View](#View)
   * [func (v View) Validate() error](#View.Validate)
 
@@ -73,17 +73,17 @@ AddView adds a view to the current views.
 
 
 
-## <a name="ClearRelsAndViews">func</a> [ClearRelsAndViews](/src/target/shelf.go?s=1550:1610#L55)
+## <a name="ClearRelsAndViews">func</a> [ClearRelsAndViews](/src/target/shelf.go?s=1548:1608#L55)
 ``` go
 func ClearRelsAndViews(context interface{}, db *db.DB) error
 ```
-ClearRelsAndViews clears a current relationships and views from Mongo.
+ClearRelsAndViews clears current relationships and views from Mongo.
 
 
 
 ## <a name="NewRelsAndViews">func</a> [NewRelsAndViews](/src/target/shelf.go?s=496:571#L15)
 ``` go
-func NewRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error
+func NewRelsAndViews(context interface{}, db *db.DB, rv RelsAndViews) error
 ```
 NewRelsAndViews creates new relationships and views, based on input JSON.
 
@@ -200,7 +200,7 @@ being utilized in the system.
 
 
 
-### <a name="GetRelsAndViews">func</a> [GetRelsAndViews](/src/target/shelf.go?s=2220:2294#L79)
+### <a name="GetRelsAndViews">func</a> [GetRelsAndViews](/src/target/shelf.go?s=2218:2292#L79)
 ``` go
 func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error)
 ```
@@ -212,7 +212,7 @@ GetRelsAndViews retrieves the current relationships and views from Mongo.
 
 ### <a name="RelsAndViews.Validate">func</a> (RelsAndViews) [Validate](/src/target/model.go?s=807:846#L18)
 ``` go
-func (rm RelsAndViews) Validate() error
+func (rv RelsAndViews) Validate() error
 ```
 Validate checks the RelsAndViews value for consistency.
 

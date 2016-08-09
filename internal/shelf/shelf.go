@@ -22,17 +22,17 @@ var (
 )
 
 // NewRelsAndViews creates new relationships and views, based on input JSON.
-func NewRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
+func NewRelsAndViews(context interface{}, db *db.DB, rv RelsAndViews) error {
 	log.Dev(context, "NewRelsAndViews", "Started")
 
 	// Validate the RelsAndViews value.
-	if err := rm.Validate(); err != nil {
+	if err := rv.Validate(); err != nil {
 		log.Error(context, "NewRelsAndViews", err, "Completed")
 		return err
 	}
 
 	// Insert or update the relationships and views.
-	if err := upsertRelsAndViews(context, db, rm); err != nil {
+	if err := upsertRelsAndViews(context, db, rv); err != nil {
 		log.Error(context, "NewRelsAndViews", err, "Completed")
 		return err
 	}
@@ -42,17 +42,17 @@ func NewRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
 }
 
 // upsertRelsAndViews upserts relationships and views into Mongo.
-func upsertRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
+func upsertRelsAndViews(context interface{}, db *db.DB, rv RelsAndViews) error {
 
 	// Upsert the relationships.
-	for _, rel := range rm.Relationships {
+	for _, rel := range rv.Relationships {
 		if _, err := AddRelationship(context, db, rel); err != nil {
 			return err
 		}
 	}
 
 	// Upsert the views.
-	for _, view := range rm.Views {
+	for _, view := range rv.Views {
 		if _, err := AddView(context, db, view); err != nil {
 			return err
 		}
@@ -61,7 +61,7 @@ func upsertRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
 	return nil
 }
 
-// ClearRelsAndViews clears a current relationships and views from Mongo.
+// ClearRelsAndViews clears current relationships and views from Mongo.
 func ClearRelsAndViews(context interface{}, db *db.DB) error {
 	log.Dev(context, "ClearRelsAndViews", "Started")
 
@@ -89,6 +89,7 @@ func ClearRelsAndViews(context interface{}, db *db.DB) error {
 func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error) {
 	log.Dev(context, "GetRelsAndViews", "Started")
 
+	// Get the relationships and views from Mongo.
 	var rels []Relationship
 	var views []View
 	relFunc := func(c *mgo.Collection) error {
@@ -113,11 +114,12 @@ func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error) {
 		return RelsAndViews{}, err
 	}
 
-	rm := RelsAndViews{
+	// Form a RelsAndViews value.
+	rv := RelsAndViews{
 		Relationships: rels,
 		Views:         views,
 	}
 
 	log.Dev(context, "GetRelsAndViews", "Completed")
-	return rm, nil
+	return rv, nil
 }
