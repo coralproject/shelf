@@ -2,12 +2,14 @@ package shelf
 
 import (
 	"encoding/json"
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
+	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/xenia/internal/shelf/sfix"
 )
@@ -27,6 +29,12 @@ func init() {
 		Password: cfg.MustString("MONGO_PASS"),
 	}
 	tests.InitMongo(cfg)
+
+	// Initialize the logging system.
+	logLevel := func() int {
+		return log.DEV
+	}
+	log.Init(os.Stdout, logLevel, log.Ldefault)
 }
 
 // TestNewRelsAndViews tests if we can create a new relationships and views in the db.
