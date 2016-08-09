@@ -4,14 +4,17 @@ import (
 	"errors"
 
 	mgo "gopkg.in/mgo.v2"
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 )
 
-// Collection is the MongoDB collection housing metadata about relationships and views.
-const Collection = "relationship_manager"
+const (
+	// ViewCollection is the Mongo collection containing view metadata.
+	ViewCollection = "views"
+	// RelCollection is the Mongo collection containing relationship metadata.
+	RelCollection = "relationships"
+)
 
 // Set of error variables.
 var (
@@ -29,7 +32,7 @@ func NewRelManager(context interface{}, db *db.DB, rm RelManager) error {
 		return err
 	}
 
-	// Insert or update the default relationship manager.
+	// Insert or update the relationships and views.
 	if err := upsertRelManager(context, db, rm); err != nil {
 		log.Error(context, "NewRelManager", err, "Completed")
 		return err
@@ -41,29 +44,44 @@ func NewRelManager(context interface{}, db *db.DB, rm RelManager) error {
 
 // upsertRelManager upserts a relationship manager into Mongo.
 func upsertRelManager(context interface{}, db *db.DB, rm RelManager) error {
-	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1}
-		_, err := c.Upsert(q, &rm)
-		return err
+
+	// Upsert the relationships.
+	for _, rel := range rm.Relationships {
+		if _, err := AddRelationship(context, db, rel); err != nil {
+			return err
+		}
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-		return err
+
+	// Upsert the views.
+	for _, view := range rm.Views {
+		if _, err := AddView(context, db, view); err != nil {
+			return err
+		}
 	}
+
 	return nil
 }
 
 // ClearRelManager clears a current relationship manager from Mongo.
 func ClearRelManager(context interface{}, db *db.DB) error {
 	log.Dev(context, "ClearRelManager", "Started")
+
+	// Clear relationships.
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1}
-		err := c.Remove(q)
+		_, err := c.RemoveAll(nil)
 		return err
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "ClearRelManager", err, "Completed")
 		return err
 	}
+
+	// Clear views.
+	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
+		log.Error(context, "ClearRelManager", err, "Completed")
+		return err
+	}
+
 	log.Dev(context, "ClearRelManager", "Completed")
 	return nil
 }
@@ -72,17 +90,33 @@ func ClearRelManager(context interface{}, db *db.DB) error {
 func GetRelManager(context interface{}, db *db.DB) (RelManager, error) {
 	log.Dev(context, "GetRelManager", "Started")
 
-	var rm RelManager
-	f := func(c *mgo.Collection) error {
-		return c.Find(bson.M{"id": 1}).One(&rm)
+	var rels []Relationship
+	var views []View
+	relFunc := func(c *mgo.Collection) error {
+		return c.Find(nil).All(&rels)
+	}
+	viewFunc := func(c *mgo.Collection) error {
+		return c.Find(nil).All(&views)
 	}
 
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, RelCollection, relFunc); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}
 		log.Error(context, "GetRelManager", err, "Completed")
 		return RelManager{}, err
+	}
+	if err := db.ExecuteMGO(context, ViewCollection, viewFunc); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+		log.Error(context, "GetRelManager", err, "Completed")
+		return RelManager{}, err
+	}
+
+	rm := RelManager{
+		Relationships: rels,
+		Views:         views,
 	}
 
 	log.Dev(context, "GetRelManager", "Completed")

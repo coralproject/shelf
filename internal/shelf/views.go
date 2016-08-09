@@ -18,7 +18,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	rm, err := GetRelManager(context, db)
 	if err != nil {
 		log.Error(context, "AddView", err, "Completed")
-		return "", err
+		return view.ID, err
 	}
 
 	// Make sure the given view name does not exist already.
@@ -28,7 +28,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	}
 	if stringContains(names, view.Name) {
 		log.Error(context, "AddView", err, "Completed")
-		return "", fmt.Errorf("View name already exists")
+		return view.ID, fmt.Errorf("View name already exists")
 	}
 
 	// Make sure that the relationships referenced in the view exist.
@@ -39,23 +39,29 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	for _, segment := range view.Path {
 		if !stringContains(existingRels, segment.RelationshipID) {
 			log.Error(context, "AddView", err, "Completed")
-			return "", fmt.Errorf("Referenced relationship %s does not exist", segment.RelationshipID)
+			return view.ID, fmt.Errorf("Referenced relationship %s does not exist", segment.RelationshipID)
 		}
 	}
 
 	// Assign a relationship ID, and add the relationship to the relationship manager.
-	viewID, err := newUUID()
-	if err != nil {
-		log.Error(context, "AddView", err, "Completed")
-		return "", err
+	if view.ID == "" {
+		viewID, err := newUUID()
+		if err != nil {
+			log.Error(context, "AddView", err, "Completed")
+			return view.ID, err
+		}
+		view.ID = viewID
 	}
-	view.ID = viewID
-	rm.Views = append(rm.Views, view)
 
-	// Update the relationship manager.
-	if err := NewRelManager(context, db, rm); err != nil {
+	// Upsert the view.
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"id": view.ID}
+		_, err := c.Upsert(q, &view)
+		return err
+	}
+	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
 		log.Error(context, "AddView", err, "Completed")
-		return "", err
+		return view.ID, err
 	}
 
 	log.Dev(context, "AddView", "Completed")
@@ -67,11 +73,11 @@ func RemoveView(context interface{}, db *db.DB, viewID string) error {
 	log.Dev(context, "RemoveView", "Started")
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1}
-		err := c.Update(q, bson.M{"$pull": bson.M{"views": bson.M{"id": viewID}}})
+		q := bson.M{"id": viewID}
+		err := c.Remove(q)
 		return err
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
 		log.Error(context, "RemoveView", err, "Completed")
 		return err
 	}
@@ -92,11 +98,11 @@ func UpdateView(context interface{}, db *db.DB, view View) error {
 
 	// Update the view.
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1, "views.id": view.ID}
-		err := c.Update(q, bson.M{"$set": bson.M{"views.$": &view}})
+		q := bson.M{"id": view.ID}
+		err := c.Update(q, &view)
 		return err
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
 		log.Error(context, "UpdateView", err, "Completed")
 		return err
 	}

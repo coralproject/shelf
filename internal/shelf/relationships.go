@@ -18,7 +18,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	rm, err := GetRelManager(context, db)
 	if err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
-		return "", err
+		return rel.ID, err
 	}
 
 	// Make sure the given predicate does not exist already.
@@ -28,22 +28,28 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	}
 	if stringContains(predicates, rel.Predicate) {
 		log.Error(context, "AddRelationship", err, "Completed")
-		return "", fmt.Errorf("Predicate already exists")
+		return rel.ID, fmt.Errorf("Predicate already exists")
 	}
 
 	// Assign a relationship ID, and add the relationship to the relationship manager.
-	relID, err := newUUID()
-	if err != nil {
-		log.Error(context, "AddRelationship", err, "Completed")
-		return "", err
+	if rel.ID == "" {
+		relID, err := newUUID()
+		if err != nil {
+			log.Error(context, "AddRelationship", err, "Completed")
+			return rel.ID, err
+		}
+		rel.ID = relID
 	}
-	rel.ID = relID
-	rm.Relationships = append(rm.Relationships, rel)
 
-	// Update the relationship manager.
-	if err := NewRelManager(context, db, rm); err != nil {
+	// Upsert the relationship.
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"id": rel.ID}
+		_, err := c.Upsert(q, &rel)
+		return err
+	}
+	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
-		return "", err
+		return rel.ID, err
 	}
 
 	log.Dev(context, "AddRelationship", "Completed")
@@ -75,11 +81,11 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 
 	// Remove the relationship.
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1}
-		err := c.Update(q, bson.M{"$pull": bson.M{"relationships": bson.M{"id": relID}}})
+		q := bson.M{"id": relID}
+		err := c.Remove(q)
 		return err
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
 		return err
 	}
@@ -100,11 +106,11 @@ func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error 
 
 	// Remove the relationship.
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": 1, "relationships.id": rel.ID}
-		err := c.Update(q, bson.M{"$set": bson.M{"relationships.$": &rel}})
+		q := bson.M{"id": rel.ID}
+		err := c.Update(q, &rel)
 		return err
 	}
-	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "UpdateRelationship", err, "Completed")
 		return err
 	}

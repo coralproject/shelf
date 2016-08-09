@@ -20,7 +20,6 @@ func init() {
 // RelManager contains metadata about what relationships and views are currenlty
 // being utilized in the system.
 type RelManager struct {
-	ID            int            `bson:"id" json:"id"`
 	Relationships []Relationship `bson:"relationships" json:"relationships" validate:"required,min=1"`
 	Views         []View         `bson:"views" json:"views" validate:"required,min=1"`
 }
