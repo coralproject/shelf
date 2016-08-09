@@ -10,12 +10,12 @@ import (
 	"github.com/ardanlabs/kit/log"
 )
 
-// AddRelationship adds a relationship to the relationship manager.
+// AddRelationship adds a relationship to the currently utilized relationships.
 func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, error) {
 	log.Dev(context, "AddRelationship", "Started")
 
-	// Get the current relationship manager.
-	rm, err := GetRelManager(context, db)
+	// Get the current relationships and views.
+	rm, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "AddRelationship", err, "Completed")
 		return rel.ID, err
@@ -31,7 +31,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 		return rel.ID, fmt.Errorf("Predicate already exists")
 	}
 
-	// Assign a relationship ID, and add the relationship to the relationship manager.
+	// Assign a relationship ID, if necessary.
 	if rel.ID == "" {
 		relID, err := newUUID()
 		if err != nil {
@@ -56,12 +56,12 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	return rel.ID, nil
 }
 
-// RemoveRelationship removes a relationship from the relationship manager.
+// RemoveRelationship removes a relationship from the current relationships.
 func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 	log.Dev(context, "RemoveRelationship", "Started")
 
-	// Get the current relationship manager.
-	rm, err := GetRelManager(context, db)
+	// Get the current relationships and views.
+	rm, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
 		return err
@@ -94,7 +94,7 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 	return nil
 }
 
-// UpdateRelationship updates a relationship in the relationship manager.
+// UpdateRelationship updates a relationship in the current relationships.
 func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error {
 	log.Dev(context, "UpdateRelationship", "Started")
 

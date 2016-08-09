@@ -17,21 +17,21 @@ func init() {
 
 //==============================================================================
 
-// RelManager contains metadata about what relationships and views are currenlty
+// RelsAndViews contains metadata about what relationships and views are currently
 // being utilized in the system.
-type RelManager struct {
+type RelsAndViews struct {
 	Relationships []Relationship `bson:"relationships" json:"relationships" validate:"required,min=1"`
 	Views         []View         `bson:"views" json:"views" validate:"required,min=1"`
 }
 
-// Validate checks the RelManager value for consistency.
-func (rm RelManager) Validate() error {
+// Validate checks the RelsAndViews value for consistency.
+func (rm RelsAndViews) Validate() error {
 
 	if err := validate.Struct(rm); err != nil {
 		return err
 	}
 
-	// For a valid relationship manager, we want to ensure that there are
+	// For a valid RelsAndViews value, we want to ensure that there are
 	// relationships and views.  Also, we want to ensure that the relationships
 	// used to define the views are themselves defined.
 	var relIDs []string

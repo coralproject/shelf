@@ -21,28 +21,28 @@ func TestAddRemoveView(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := ClearRelManager(tests.Context, db); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the relationship manager : %v", tests.Failed, err)
+		if err := ClearRelsAndViews(tests.Context, db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the relationships and views : %v", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould be able to remove the relationship manager.", tests.Success)
+		t.Logf("\t%s\tShould be able to remove the relationships and views.", tests.Success)
 	}()
 
 	t.Log("Given the need to save a new view into the database.")
 	{
-		t.Log("\tWhen starting from the relmanager.json test fixture")
+		t.Log("\tWhen starting from the relsandviews.json test fixture")
 		{
-			raw, err := sfix.LoadRelManagerData()
+			raw, err := sfix.LoadRelAndViewData()
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve relationship manager fixture : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able retrieve relationship and view fixture : %s", tests.Failed, err)
 			}
-			var rm RelManager
+			var rm RelsAndViews
 			if err := json.Unmarshal(raw, &rm); err != nil {
-				t.Fatalf("\t%s\tShould be able unmarshal relationship manager fixture : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able unmarshal relationship and view fixture : %s", tests.Failed, err)
 			}
-			if err := NewRelManager(tests.Context, db, rm); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a relationship manager : %s", tests.Failed, err)
+			if err := NewRelsAndViews(tests.Context, db, rm); err != nil {
+				t.Fatalf("\t%s\tShould be able to create new relationships and views : %s", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to create a relationship manager.", tests.Success)
+			t.Logf("\t%s\tShould be able to create relationships and views.", tests.Success)
 			newView := View{
 				Name:      "test_view",
 				StartType: "coral_user",
@@ -57,9 +57,9 @@ func TestAddRemoveView(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to add a new view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to add a new view.", tests.Success)
-			rm, err = GetRelManager(tests.Context, db)
+			rm, err = GetRelsAndViews(tests.Context, db)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to retrieve a relationship manager : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve relationships and views : %s", tests.Failed, err)
 			}
 			var viewIDs []string
 			for _, view := range rm.Views {
@@ -74,18 +74,18 @@ func TestAddRemoveView(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to remove a view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to remove a view.", tests.Success)
-			rm, err = GetRelManager(tests.Context, db)
+			rm, err = GetRelsAndViews(tests.Context, db)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to retrieve a relationship manager : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve relationships and views : %s", tests.Failed, err)
 			}
 			viewIDs = []string{}
 			for _, view := range rm.Views {
 				viewIDs = append(viewIDs, view.ID)
 			}
 			if stringContains(viewIDs, newViewID) {
-				t.Errorf("\t%s\tShould be able to get back the rel. manager without the removed ID.", tests.Failed)
+				t.Errorf("\t%s\tShould be able to get back the views without the removed ID.", tests.Failed)
 			} else {
-				t.Logf("\t%s\tShould be able to get back the rel. manager without the removed ID.", tests.Success)
+				t.Logf("\t%s\tShould be able to get back the views without the removed ID.", tests.Success)
 			}
 
 		}
@@ -104,28 +104,28 @@ func TestUpdateView(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := ClearRelManager(tests.Context, db); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the relationship manager : %v", tests.Failed, err)
+		if err := ClearRelsAndViews(tests.Context, db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the relationships and views : %v", tests.Failed, err)
 		}
-		t.Logf("\t%s\tShould be able to remove the relationship manager.", tests.Success)
+		t.Logf("\t%s\tShould be able to remove the relationships and views.", tests.Success)
 	}()
 
 	t.Log("Given the need to update a view in the database.")
 	{
-		t.Log("\tWhen starting from the relmanager.json test fixture")
+		t.Log("\tWhen starting from the relsandviews.json test fixture")
 		{
-			raw, err := sfix.LoadRelManagerData()
+			raw, err := sfix.LoadRelAndViewData()
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve relationship manager fixture : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able retrieve relationship and view fixture : %s", tests.Failed, err)
 			}
-			var rm RelManager
+			var rm RelsAndViews
 			if err := json.Unmarshal(raw, &rm); err != nil {
-				t.Fatalf("\t%s\tShould be able unmarshal relationship manager fixture : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able unmarshal relationship and view fixture : %s", tests.Failed, err)
 			}
-			if err := NewRelManager(tests.Context, db, rm); err != nil {
-				t.Fatalf("\t%s\tShould be able to create a relationship manager : %s", tests.Failed, err)
+			if err := NewRelsAndViews(tests.Context, db, rm); err != nil {
+				t.Fatalf("\t%s\tShould be able to create relationships and views : %s", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to create a relationship manager.", tests.Success)
+			t.Logf("\t%s\tShould be able to create relationships and views.", tests.Success)
 			updatedView := View{
 				ID:        "28d58623-073e-4efe-b8bb-62cfce178752",
 				Name:      "updated name",
@@ -140,9 +140,9 @@ func TestUpdateView(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to update a view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to update a view.", tests.Success)
-			rm, err = GetRelManager(tests.Context, db)
+			rm, err = GetRelsAndViews(tests.Context, db)
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to retrieve a relationship manager : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve a relationships and views : %s", tests.Failed, err)
 			}
 			var names []string
 			for _, view := range rm.Views {

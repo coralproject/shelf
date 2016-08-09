@@ -21,29 +21,28 @@ var (
 	ErrNotFound = errors.New("Set Not found")
 )
 
-// NewRelManager creates a new relationship manager, either with defaults
-// or based on a provided JSON config.
-func NewRelManager(context interface{}, db *db.DB, rm RelManager) error {
-	log.Dev(context, "NewRelManager", "Started")
+// NewRelsAndViews creates new relationships and views, based on input JSON.
+func NewRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
+	log.Dev(context, "NewRelsAndViews", "Started")
 
-	// Validate the relationship manager.
+	// Validate the RelsAndViews value.
 	if err := rm.Validate(); err != nil {
-		log.Error(context, "NewRelManager", err, "Completed")
+		log.Error(context, "NewRelsAndViews", err, "Completed")
 		return err
 	}
 
 	// Insert or update the relationships and views.
-	if err := upsertRelManager(context, db, rm); err != nil {
-		log.Error(context, "NewRelManager", err, "Completed")
+	if err := upsertRelsAndViews(context, db, rm); err != nil {
+		log.Error(context, "NewRelsAndViews", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "NewRelManager", "Completed")
+	log.Dev(context, "NewRelsAndViews", "Completed")
 	return nil
 }
 
-// upsertRelManager upserts a relationship manager into Mongo.
-func upsertRelManager(context interface{}, db *db.DB, rm RelManager) error {
+// upsertRelsAndViews upserts relationships and views into Mongo.
+func upsertRelsAndViews(context interface{}, db *db.DB, rm RelsAndViews) error {
 
 	// Upsert the relationships.
 	for _, rel := range rm.Relationships {
@@ -62,9 +61,9 @@ func upsertRelManager(context interface{}, db *db.DB, rm RelManager) error {
 	return nil
 }
 
-// ClearRelManager clears a current relationship manager from Mongo.
-func ClearRelManager(context interface{}, db *db.DB) error {
-	log.Dev(context, "ClearRelManager", "Started")
+// ClearRelsAndViews clears a current relationships and views from Mongo.
+func ClearRelsAndViews(context interface{}, db *db.DB) error {
+	log.Dev(context, "ClearRelsAndViews", "Started")
 
 	// Clear relationships.
 	f := func(c *mgo.Collection) error {
@@ -72,23 +71,23 @@ func ClearRelManager(context interface{}, db *db.DB) error {
 		return err
 	}
 	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
-		log.Error(context, "ClearRelManager", err, "Completed")
+		log.Error(context, "ClearRelsAndViews", err, "Completed")
 		return err
 	}
 
 	// Clear views.
 	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
-		log.Error(context, "ClearRelManager", err, "Completed")
+		log.Error(context, "ClearRelsAndViews", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "ClearRelManager", "Completed")
+	log.Dev(context, "ClearRelsAndViews", "Completed")
 	return nil
 }
 
-// GetRelManager retrieves the current relationship manager from Mongo.
-func GetRelManager(context interface{}, db *db.DB) (RelManager, error) {
-	log.Dev(context, "GetRelManager", "Started")
+// GetRelsAndViews retrieves the current relationships and views from Mongo.
+func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error) {
+	log.Dev(context, "GetRelsAndViews", "Started")
 
 	var rels []Relationship
 	var views []View
@@ -103,22 +102,22 @@ func GetRelManager(context interface{}, db *db.DB) (RelManager, error) {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}
-		log.Error(context, "GetRelManager", err, "Completed")
-		return RelManager{}, err
+		log.Error(context, "GetRelsAndViews", err, "Completed")
+		return RelsAndViews{}, err
 	}
 	if err := db.ExecuteMGO(context, ViewCollection, viewFunc); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}
-		log.Error(context, "GetRelManager", err, "Completed")
-		return RelManager{}, err
+		log.Error(context, "GetRelsAndViews", err, "Completed")
+		return RelsAndViews{}, err
 	}
 
-	rm := RelManager{
+	rm := RelsAndViews{
 		Relationships: rels,
 		Views:         views,
 	}
 
-	log.Dev(context, "GetRelManager", "Completed")
+	log.Dev(context, "GetRelsAndViews", "Completed")
 	return rm, nil
 }

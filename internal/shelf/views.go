@@ -10,12 +10,12 @@ import (
 	"github.com/ardanlabs/kit/log"
 )
 
-// AddView adds a view to the relationship manager.
+// AddView adds a view to the current views.
 func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	log.Dev(context, "AddView", "Started")
 
-	// Get the current relationship manager.
-	rm, err := GetRelManager(context, db)
+	// Get the current relationships and views.
+	rm, err := GetRelsAndViews(context, db)
 	if err != nil {
 		log.Error(context, "AddView", err, "Completed")
 		return view.ID, err
@@ -43,7 +43,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 		}
 	}
 
-	// Assign a relationship ID, and add the relationship to the relationship manager.
+	// Assign a relationship ID, if necessary.
 	if view.ID == "" {
 		viewID, err := newUUID()
 		if err != nil {
@@ -68,7 +68,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	return view.ID, nil
 }
 
-// RemoveView removes a view from the relationship manager.
+// RemoveView removes a view from the current views.
 func RemoveView(context interface{}, db *db.DB, viewID string) error {
 	log.Dev(context, "RemoveView", "Started")
 
@@ -86,7 +86,7 @@ func RemoveView(context interface{}, db *db.DB, viewID string) error {
 	return nil
 }
 
-// UpdateView updates a view in the relationship manager.
+// UpdateView updates a view in the current views.
 func UpdateView(context interface{}, db *db.DB, view View) error {
 	log.Dev(context, "UpdateView", "Started")
 
