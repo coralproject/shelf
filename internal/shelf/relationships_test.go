@@ -88,6 +88,54 @@ func TestAddRemoveRelationship(t *testing.T) {
 	}
 }
 
+// TestAddRelationshipFail tests if we can properly throw an error for an illegal relationship.
+func TestAddRelationshipFail(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	defer func() {
+		if err := ClearRelsAndViews(tests.Context, db); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the relationships and views : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the relationships and views.", tests.Success)
+	}()
+
+	t.Log("Given the need to save a new relationship into the database.")
+	{
+		t.Log("\tWhen starting from the relsandviews.json test fixture")
+		{
+			raw, err := sfix.LoadRelAndViewData()
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able retrieve relationship and view fixture : %s", tests.Failed, err)
+			}
+			var rm RelsAndViews
+			if err := json.Unmarshal(raw, &rm); err != nil {
+				t.Fatalf("\t%s\tShould be able unmarshal relationship and view fixture : %s", tests.Failed, err)
+			}
+			if err := NewRelsAndViews(tests.Context, db, rm); err != nil {
+				t.Fatalf("\t%s\tShould be able to create relationships and views : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to create relationships and views.", tests.Success)
+			newRel := Relationship{
+				SubjectTypes: []string{"coral_user"},
+				Predicate:    "authored",
+				ObjectTypes:  []string{"coral_comment"},
+			}
+			_, err = AddRelationship(tests.Context, db, newRel)
+			if err == nil {
+				t.Fatalf("\t%s\tShould be able to throw error on preexisting predicate : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to throw error on preexisting predicate.", tests.Success)
+		}
+	}
+}
+
 // TestUpdateRelationship tests if we can update a relationship in the db.
 func TestUpdateRelationship(t *testing.T) {
 	tests.ResetLog()

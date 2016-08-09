@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 )
 
@@ -27,8 +28,9 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 		names = append(names, prevView.Name)
 	}
 	if stringContains(names, view.Name) {
+		err = fmt.Errorf("View name already exists")
 		log.Error(context, "AddView", err, "Completed")
-		return view.ID, fmt.Errorf("View name already exists")
+		return view.ID, err
 	}
 
 	// Make sure that the relationships referenced in the view exist.
@@ -38,8 +40,9 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	}
 	for _, segment := range view.Path {
 		if !stringContains(existingRels, segment.RelationshipID) {
+			err = fmt.Errorf("Referenced relationship %s does not exist", segment.RelationshipID)
 			log.Error(context, "AddView", err, "Completed")
-			return view.ID, fmt.Errorf("Referenced relationship %s does not exist", segment.RelationshipID)
+			return view.ID, err
 		}
 	}
 
@@ -56,6 +59,7 @@ func AddView(context interface{}, db *db.DB, view View) (string, error) {
 	// Upsert the view.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": view.ID}
+		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(view))
 		_, err := c.Upsert(q, &view)
 		return err
 	}
@@ -74,8 +78,8 @@ func RemoveView(context interface{}, db *db.DB, viewID string) error {
 
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": viewID}
-		err := c.Remove(q)
-		return err
+		log.Dev(context, "Remove", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
+		return c.Remove(q)
 	}
 	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
 		log.Error(context, "RemoveView", err, "Completed")
@@ -99,8 +103,8 @@ func UpdateView(context interface{}, db *db.DB, view View) error {
 	// Update the view.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": view.ID}
-		err := c.Update(q, &view)
-		return err
+		log.Dev(context, "Update", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(view))
+		return c.Update(q, &view)
 	}
 	if err := db.ExecuteMGO(context, ViewCollection, f); err != nil {
 		log.Error(context, "UpdateView", err, "Completed")

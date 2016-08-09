@@ -67,6 +67,7 @@ func ClearRelsAndViews(context interface{}, db *db.DB) error {
 
 	// Clear relationships.
 	f := func(c *mgo.Collection) error {
+		log.Dev(context, "Remove", "MGO : db.%s.remove({})", c.Name)
 		_, err := c.RemoveAll(nil)
 		return err
 	}
@@ -93,9 +94,11 @@ func GetRelsAndViews(context interface{}, db *db.DB) (RelsAndViews, error) {
 	var rels []Relationship
 	var views []View
 	relFunc := func(c *mgo.Collection) error {
+		log.Dev(context, "Find", "MGO : db.%s.find()", c.Name)
 		return c.Find(nil).All(&rels)
 	}
 	viewFunc := func(c *mgo.Collection) error {
+		log.Dev(context, "Find", "MGO : db.%s.find()", c.Name)
 		return c.Find(nil).All(&views)
 	}
 

@@ -7,6 +7,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 )
 
@@ -27,8 +28,9 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 		predicates = append(predicates, prevRel.Predicate)
 	}
 	if stringContains(predicates, rel.Predicate) {
+		err := fmt.Errorf("Predicate already exists")
 		log.Error(context, "AddRelationship", err, "Completed")
-		return rel.ID, fmt.Errorf("Predicate already exists")
+		return rel.ID, err
 	}
 
 	// Assign a relationship ID, if necessary.
@@ -44,6 +46,7 @@ func AddRelationship(context interface{}, db *db.DB, rel Relationship) (string, 
 	// Upsert the relationship.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": rel.ID}
+		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(rel))
 		_, err := c.Upsert(q, &rel)
 		return err
 	}
@@ -75,15 +78,16 @@ func RemoveRelationship(context interface{}, db *db.DB, relID string) error {
 		}
 	}
 	if stringContains(relIDs, relID) {
+		err = fmt.Errorf("Active view is utilizing relationship %s", relID)
 		log.Error(context, "RemoveRelationship", err, "Completed")
-		return fmt.Errorf("Active view is utilizing relationship %s", relID)
+		return err
 	}
 
 	// Remove the relationship.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": relID}
-		err := c.Remove(q)
-		return err
+		log.Dev(context, "Remove", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
+		return c.Remove(q)
 	}
 	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "RemoveRelationship", err, "Completed")
@@ -107,8 +111,8 @@ func UpdateRelationship(context interface{}, db *db.DB, rel Relationship) error 
 	// Remove the relationship.
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"id": rel.ID}
-		err := c.Update(q, &rel)
-		return err
+		log.Dev(context, "Update", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(q), mongo.Query(rel))
+		return c.Update(q, &rel)
 	}
 	if err := db.ExecuteMGO(context, RelCollection, f); err != nil {
 		log.Error(context, "UpdateRelationship", err, "Completed")
