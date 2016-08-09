@@ -1,7 +1,7 @@
 
 
 # sfix
-`import "coralproject/xenia/internal/shelf/sfix"`
+`import "github.com/coralproject/xenia/internal/shelf/sfix"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -11,7 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func LoadRelManagerData() ([]byte, error)](#LoadRelManagerData)
+* [func LoadRelAndViewData() ([]byte, error)](#LoadRelAndViewData)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -21,11 +21,11 @@
 
 
 
-## <a name="LoadRelManagerData">func</a> [LoadRelManagerData](/src/target/sfix.go?s=277:318#L7)
+## <a name="LoadRelAndViewData">func</a> [LoadRelAndViewData](/src/target/sfix.go?s=277:318#L7)
 ``` go
-func LoadRelManagerData() ([]byte, error)
+func LoadRelAndViewData() ([]byte, error)
 ```
-LoadRelManagerData loads the default relationship manager based on default.json.
+LoadRelAndViewData loads the default relationship manager based on default.json.
 
 
 
