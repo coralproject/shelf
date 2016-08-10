@@ -2,8 +2,7 @@ package cmdmask
 
 import (
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/mask"
-
+	"github.com/coralproject/xenia/internal/xenia/mask"
 	"github.com/spf13/cobra"
 )
 
