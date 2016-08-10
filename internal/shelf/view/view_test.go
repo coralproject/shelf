@@ -8,7 +8,6 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix"
 	"github.com/coralproject/xenia/internal/shelf/view"
 	"github.com/coralproject/xenia/internal/shelf/view/viewfix"
 )
@@ -99,7 +98,7 @@ func TestGetAll(t *testing.T) {
 	defer db.CloseMGO(tests.Context)
 
 	defer func() {
-		if err := relationshipfix.Remove(tests.Context, db, prefix); err != nil {
+		if err := viewfix.Remove(tests.Context, db, prefix); err != nil {
 			t.Fatalf("\t%s\tShould be able to remove the views : %v", tests.Failed, err)
 		}
 		t.Logf("\t%s\tShould be able to remove the views.", tests.Success)
