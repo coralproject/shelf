@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/internal/mask"
-	"github.com/coralproject/xenia/internal/mask/mfix"
-
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/xenia/internal/xenia/mask"
+	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
 )
 
 // mCollection is the collection to use for everything.

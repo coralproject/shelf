@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/internal/query"
-	"github.com/coralproject/xenia/internal/query/qfix"
-
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/xenia/internal/xenia/query"
+	"github.com/coralproject/xenia/internal/xenia/query/qfix"
 )
 
 // qPrefix is the base name for everything.

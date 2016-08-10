@@ -4,8 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/regex"
-
+	"github.com/coralproject/xenia/internal/xenia/regex"
 	"github.com/spf13/cobra"
 )
 

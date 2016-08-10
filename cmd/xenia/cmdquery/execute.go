@@ -5,9 +5,8 @@ import (
 	"strings"
 
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/exec"
-	"github.com/coralproject/xenia/internal/query"
-
+	"github.com/coralproject/xenia/internal/xenia"
+	"github.com/coralproject/xenia/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 
@@ -104,7 +103,7 @@ func runExecDB(cmd *cobra.Command, vars map[string]string) {
 		return
 	}
 
-	result := exec.Exec("", conn, set, vars)
+	result := xenia.Exec("", conn, set, vars)
 
 	data, err := json.MarshalIndent(result, "", "    ")
 	if err != nil {

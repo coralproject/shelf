@@ -6,12 +6,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/xenia/internal/mask"
-	"github.com/coralproject/xenia/internal/query"
-	"github.com/coralproject/xenia/internal/regex"
-	"github.com/coralproject/xenia/internal/script"
-
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/xenia/internal/xenia/mask"
+	"github.com/coralproject/xenia/internal/xenia/query"
+	"github.com/coralproject/xenia/internal/xenia/regex"
+	"github.com/coralproject/xenia/internal/xenia/script"
 )
 
 // LoadSet serializes the content of a Set from a file using the

@@ -7,7 +7,6 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/db"
-
 	"github.com/spf13/cobra"
 	"gopkg.in/mgo.v2"
 )

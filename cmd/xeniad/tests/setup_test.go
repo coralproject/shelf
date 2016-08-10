@@ -6,15 +6,14 @@ import (
 	"os"
 	"testing"
 
-	"github.com/coralproject/xenia/cmd/xeniad/routes"
-	"github.com/coralproject/xenia/internal/mask/mfix"
-	"github.com/coralproject/xenia/internal/query/qfix"
-	"github.com/coralproject/xenia/internal/script/sfix"
-	"github.com/coralproject/xenia/tstdata"
-
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/coralproject/xenia/cmd/xeniad/routes"
+	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
+	"github.com/coralproject/xenia/internal/xenia/query/qfix"
+	"github.com/coralproject/xenia/internal/xenia/script/sfix"
+	"github.com/coralproject/xenia/tstdata"
 )
 
 var a *app.App
