@@ -6,10 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/coralproject/xenia/internal/exec"
-
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/xenia/internal/xenia"
 	"gopkg.in/mgo.v2"
 )
 
@@ -45,7 +44,7 @@ func Docs() ([]map[string]interface{}, error) {
 	}
 
 	for i := range docs {
-		exec.ProcessVariables("", docs[i], map[string]string{}, nil)
+		xenia.ProcessVariables("", docs[i], map[string]string{}, nil)
 	}
 
 	return docs, nil

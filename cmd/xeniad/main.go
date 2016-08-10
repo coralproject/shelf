@@ -5,11 +5,10 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/coralproject/xenia/cmd/xeniad/handlers"
-	"github.com/coralproject/xenia/cmd/xeniad/routes"
-
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/coralproject/xenia/cmd/xeniad/handlers"
+	"github.com/coralproject/xenia/cmd/xeniad/routes"
 )
 
 // These are set by the makefile with:

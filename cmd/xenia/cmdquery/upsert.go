@@ -8,8 +8,7 @@ import (
 
 	"github.com/coralproject/xenia/cmd/xenia/disk"
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/query"
-
+	"github.com/coralproject/xenia/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 

@@ -4,17 +4,15 @@ package main
 import (
 	"os"
 
+	"github.com/ardanlabs/kit/cfg"
+	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
+	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/xenia/cmd/xenia/cmddb"
 	"github.com/coralproject/xenia/cmd/xenia/cmdmask"
 	"github.com/coralproject/xenia/cmd/xenia/cmdquery"
 	"github.com/coralproject/xenia/cmd/xenia/cmdregex"
 	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
-
-	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
-	"github.com/ardanlabs/kit/log"
-
 	"github.com/spf13/cobra"
 )
 
