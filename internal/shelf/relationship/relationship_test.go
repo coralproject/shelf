@@ -2,6 +2,7 @@ package relationship_test
 
 import (
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -39,8 +40,8 @@ func init() {
 // prefix is what we are looking to delete after the test.
 const prefix = "RTEST_"
 
-// TestAddRemoveRelationship tests if we can add/remove a relationship to/from the db.
-func TestAddRemoveRelationship(t *testing.T) {
+// TestUpsertDelete tests if we can add/remove a relationship to/from the db.
+func TestUpsertDelete(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -57,7 +58,7 @@ func TestAddRemoveRelationship(t *testing.T) {
 		t.Logf("\t%s\tShould be able to remove the relationships.", tests.Success)
 	}()
 
-	t.Log("Given the need to save a new relationship into the database.")
+	t.Log("Given the need to upsert and delete relationships.")
 	{
 		t.Log("\tWhen starting from an empty relationships collection")
 		{
@@ -65,10 +66,78 @@ func TestAddRemoveRelationship(t *testing.T) {
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
 			}
-			if err := relationship.Upsert(tests.Context, db, rels[0]); err != nil {
+			if err := relationship.Upsert(tests.Context, db, &rels[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a relationship : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a relationship.", tests.Success)
+			rel, err := relationship.GetByPredicate(tests.Context, db, rels[0].Predicate)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to get the relationship by predicate : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get the relationship by predicate.", tests.Success)
+			if !reflect.DeepEqual(rels[0], *rel) {
+				t.Logf("\t%+v", rels[0])
+				t.Logf("\t%+v", rel)
+				t.Fatalf("\t%s\tShould be able to get back the same relationship.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get back the same relationship.", tests.Success)
+			if err := relationship.Delete(tests.Context, db, rels[0].Predicate); err != nil {
+				t.Fatalf("\t%s\tShould be able to delete the relationship : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to delete the relationship.", tests.Success)
+			rel, err = relationship.GetByPredicate(tests.Context, db, rels[0].Predicate)
+			if err == nil {
+				t.Fatalf("\t%s\tShould generate an error when getting a relationship with the deleted predicate : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould generate an error when getting a relationship with the deleted predicate.", tests.Success)
+
+		}
+	}
+}
+
+// TestGetAll tests if we can get all relationships from the db.
+func TestGetAll(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	defer func() {
+		if err := relationshipfix.Remove(tests.Context, db, prefix); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the relationships : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the relationships.", tests.Success)
+	}()
+
+	t.Log("Given the need to get all the relationships in the database.")
+	{
+		t.Log("\tWhen starting from an empty relationships collection")
+		{
+			rels1, err := relationshipfix.Get()
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
+			}
+			for _, rel := range rels1 {
+				if err := relationship.Upsert(tests.Context, db, &rel); err != nil {
+					t.Fatalf("\t%s\tShould be able to upsert a relationship : %s", tests.Failed, err)
+				}
+				t.Logf("\t%s\tShould be able to upsert a relationship.", tests.Success)
+			}
+			rels2, err := relationship.GetAll(tests.Context, db)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to get all relationships : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get all relationships.", tests.Success)
+			if !reflect.DeepEqual(rels1, rels2) {
+				t.Logf("\t%+v", rels1)
+				t.Logf("\t%+v", rels2)
+				t.Fatalf("\t%s\tShould be able to get back the same relationships.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get back the same relationships.", tests.Success)
 		}
 	}
 }

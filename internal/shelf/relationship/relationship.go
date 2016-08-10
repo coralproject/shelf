@@ -80,7 +80,7 @@ func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relation
 			err = ErrNotFound
 		}
 		log.Error(context, "GetByPredicate", err, "Completed")
-		return Relationship{}, err
+		return &Relationship{}, err
 	}
 
 	log.Dev(context, "GetByPredicate", "Completed")
