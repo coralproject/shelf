@@ -46,7 +46,7 @@ func Upsert(context interface{}, db *db.DB, rel *Relationship) error {
 func GetAll(context interface{}, db *db.DB) ([]Relationship, error) {
 	log.Dev(context, "GetAll", "Started")
 
-	// Get the relationships and views from Mongo.
+	// Get the relationships from Mongo.
 	var rels []Relationship
 	f := func(c *mgo.Collection) error {
 		log.Dev(context, "Find", "MGO : db.%s.find()", c.Name)
@@ -68,7 +68,7 @@ func GetAll(context interface{}, db *db.DB) ([]Relationship, error) {
 func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error) {
 	log.Dev(context, "GetByPredicate", "Started : Predicate[%s]", predicate)
 
-	// Get the relationships and views from Mongo.
+	// Get the relationship from Mongo.
 	var rel Relationship
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"predicate": predicate}
@@ -80,7 +80,7 @@ func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relation
 			err = ErrNotFound
 		}
 		log.Error(context, "GetByPredicate", err, "Completed")
-		return &Relationship{}, err
+		return &rel, err
 	}
 
 	log.Dev(context, "GetByPredicate", "Completed")

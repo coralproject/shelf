@@ -1,0 +1,55 @@
+ [
+	{
+		"name": "VTEST_thread",
+		"start_type": "coral_asset",
+		"path": [
+			{
+				"level": 1,
+				"direction": "in",
+				"predicate": "on",
+				"tag": "comment"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "authored",
+				"tag": "author"
+			}
+		]
+	},
+	{
+		"name": "VTEST_user comments",
+		"start_type": "coral_user",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "authored",
+				"tag": "comment"
+			}
+		]
+	},
+	{
+		"name": "VTEST_comments from authors flagged by a user",
+		"start_type": "coral_user",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "flagged"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "authored",
+				"tag": "author"
+			},
+			{
+				"level": 3,
+				"direction": "out",
+				"predicate": "authored",
+				"tag": "comment"
+			}
+		]
+	}
+] 	

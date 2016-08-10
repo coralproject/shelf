@@ -1,14 +1,12 @@
 package relationship_test
 
 import (
-	"os"
 	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
-	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/xenia/internal/shelf/relationship"
 	"github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix"
@@ -29,12 +27,6 @@ func init() {
 		Password: cfg.MustString("MONGO_PASS"),
 	}
 	tests.InitMongo(cfg)
-
-	// Initialize the logging system.
-	logLevel := func() int {
-		return log.DEV
-	}
-	log.Init(os.Stdout, logLevel, log.Ldefault)
 }
 
 // prefix is what we are looking to delete after the test.
@@ -90,7 +82,6 @@ func TestUpsertDelete(t *testing.T) {
 				t.Fatalf("\t%s\tShould generate an error when getting a relationship with the deleted predicate : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould generate an error when getting a relationship with the deleted predicate.", tests.Success)
-
 		}
 	}
 }
@@ -123,10 +114,10 @@ func TestGetAll(t *testing.T) {
 			}
 			for _, rel := range rels1 {
 				if err := relationship.Upsert(tests.Context, db, &rel); err != nil {
-					t.Fatalf("\t%s\tShould be able to upsert a relationship : %s", tests.Failed, err)
+					t.Fatalf("\t%s\tShould be able to upsert a relationships : %s", tests.Failed, err)
 				}
-				t.Logf("\t%s\tShould be able to upsert a relationship.", tests.Success)
 			}
+			t.Logf("\t%s\tShould be able to upsert relationships.", tests.Success)
 			rels2, err := relationship.GetAll(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get all relationships : %s", tests.Failed, err)
