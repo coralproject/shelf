@@ -33,6 +33,17 @@ func Get() ([]relationship.Relationship, error) {
 	return rels, nil
 }
 
+// Add inserts relationships for testing.
+func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error {
+	for _, rel := range rels {
+		if err := relationship.Upsert(context, db, &rel); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Remove removes relationships in Mongo that match a given pattern.
 func Remove(context interface{}, db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {

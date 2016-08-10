@@ -33,6 +33,17 @@ func Get() ([]view.View, error) {
 	return views, nil
 }
 
+// Add inserts views for testing.
+func Add(context interface{}, db *db.DB, views []view.View) error {
+	for _, v := range views {
+		if err := view.Upsert(context, db, &v); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // Remove removes views in Mongo that match a given pattern.
 func Remove(context interface{}, db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {
