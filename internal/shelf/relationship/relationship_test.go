@@ -54,29 +54,52 @@ func TestUpsertDelete(t *testing.T) {
 	{
 		t.Log("\tWhen starting from an empty relationships collection")
 		{
+			//----------------------------------------------------------------------
+			// Get the fixture.
+
 			rels, err := relationshipfix.Get()
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
 			}
+
+			//----------------------------------------------------------------------
+			// Upsert the relationship.
+
 			if err := relationship.Upsert(tests.Context, db, &rels[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a relationship : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a relationship.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the relationship.
+
 			rel, err := relationship.GetByPredicate(tests.Context, db, rels[0].Predicate)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get the relationship by predicate : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get the relationship by predicate.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check that we got the relationship we expected.
+
 			if !reflect.DeepEqual(rels[0], *rel) {
 				t.Logf("\t%+v", rels[0])
 				t.Logf("\t%+v", rel)
 				t.Fatalf("\t%s\tShould be able to get back the same relationship.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same relationship.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Delete the relationship.
+
 			if err := relationship.Delete(tests.Context, db, rels[0].Predicate); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete the relationship : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to delete the relationship.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the relationship.
+
 			rel, err = relationship.GetByPredicate(tests.Context, db, rels[0].Predicate)
 			if err == nil {
 				t.Fatalf("\t%s\tShould generate an error when getting a relationship with the deleted predicate : %s", tests.Failed, err)
@@ -112,17 +135,20 @@ func TestGetAll(t *testing.T) {
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
 			}
+
 			for _, rel := range rels1 {
 				if err := relationship.Upsert(tests.Context, db, &rel); err != nil {
 					t.Fatalf("\t%s\tShould be able to upsert a relationships : %s", tests.Failed, err)
 				}
 			}
 			t.Logf("\t%s\tShould be able to upsert relationships.", tests.Success)
+
 			rels2, err := relationship.GetAll(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get all relationships : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get all relationships.", tests.Success)
+
 			if !reflect.DeepEqual(rels1, rels2) {
 				t.Logf("\t%+v", rels1)
 				t.Logf("\t%+v", rels2)

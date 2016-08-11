@@ -54,29 +54,53 @@ func TestUpsertDelete(t *testing.T) {
 	{
 		t.Log("\tWhen starting from an empty views collection")
 		{
+
+			//----------------------------------------------------------------------
+			// Get the fixture.
+
 			views, err := viewfix.Get()
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve view fixture : %s", tests.Failed, err)
 			}
+
+			//----------------------------------------------------------------------
+			// Upsert the view.
+
 			if err := view.Upsert(tests.Context, db, &views[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a view.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the view.
+
 			v, err := view.GetByName(tests.Context, db, views[0].Name)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get the view by name : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get the view by name.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check that we got the expected view.
+
 			if !reflect.DeepEqual(views[0], *v) {
 				t.Logf("\t%+v", views[0])
 				t.Logf("\t%+v", v)
 				t.Fatalf("\t%s\tShould be able to get back the same view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same view.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Delete the view.
+
 			if err := view.Delete(tests.Context, db, views[0].Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete the view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to delete the view.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the view.
+
 			v, err = view.GetByName(tests.Context, db, views[0].Name)
 			if err == nil {
 				t.Fatalf("\t%s\tShould generate an error when getting a view with the deleted name : %s", tests.Failed, err)
@@ -112,17 +136,20 @@ func TestGetAll(t *testing.T) {
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able retrieve view fixture : %s", tests.Failed, err)
 			}
+
 			for _, v := range views1 {
 				if err := view.Upsert(tests.Context, db, &v); err != nil {
 					t.Fatalf("\t%s\tShould be able to upsert views : %s", tests.Failed, err)
 				}
 			}
 			t.Logf("\t%s\tShould be able to upsert views.", tests.Success)
+
 			views2, err := view.GetAll(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get all views : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get all views.", tests.Success)
+
 			if !reflect.DeepEqual(views1, views2) {
 				t.Logf("\t%+v", views1)
 				t.Logf("\t%+v", views2)

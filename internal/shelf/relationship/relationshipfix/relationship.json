@@ -1,6 +1,5 @@
 [
 	{
-		"id": "4c25fa45-d8ff-47ec-8379-aed63e731604",
 		"subject_types": [
 			"coral_comment"
 		],
@@ -12,7 +11,6 @@
 		"out_string": "having"
 	},
 	{
-		"id": "c9f8df2e-c301-4a90-8abc-02cf201f9cf0",
 		"subject_types": [
 			"coral_user"
 		],
@@ -24,7 +22,6 @@
 		"out_string": "authored by"
 	},
 	{
-		"id": "32420143-376e-482a-b4d2-709ea9e31e8e",
 		"subject_types": [
 			"coral_user"
 		],
