@@ -10,6 +10,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/xenia/cmd/xeniad/routes"
+	"github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix"
+	"github.com/coralproject/xenia/internal/shelf/view/viewfix"
 	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
 	"github.com/coralproject/xenia/internal/xenia/query/qfix"
 	"github.com/coralproject/xenia/internal/xenia/script/sfix"
@@ -64,6 +66,12 @@ func runTest(m *testing.M) int {
 	loadMasks(db, "basic.json")
 	defer mfix.Remove(db, "test_xenia_data")
 
+	loadRelationships("context", db)
+	defer relationshipfix.Remove("context", db, relPrefix)
+
+	loadViews("context", db)
+	defer viewfix.Remove("context", db, viewPrefix)
+
 	return m.Run()
 }
 
@@ -106,6 +114,34 @@ func loadMasks(db *db.DB, file string) error {
 		if err := mfix.Add(db, msk); err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+// loadRelationships adds relationships to run tests.
+func loadRelationships(context interface{}, db *db.DB) error {
+	rels, err := relationshipfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := relationshipfix.Add(context, db, rels[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadViews adds views to run tests.
+func loadViews(context interface{}, db *db.DB) error {
+	views, err := viewfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := viewfix.Add(context, db, views[0:2]); err != nil {
+		return err
 	}
 
 	return nil

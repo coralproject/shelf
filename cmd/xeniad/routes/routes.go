@@ -118,6 +118,16 @@ func routes(a *app.App) {
 
 	a.Handle("POST", "/1.0/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/1.0/exec/:name", handlers.Exec.Name)
+
+	a.Handle("GET", "/1.0/relationship", handlers.Relationship.List)
+	a.Handle("PUT", "/1.0/relationship", handlers.Relationship.Upsert)
+	a.Handle("GET", "/1.0/relationship/:predicate", handlers.Relationship.Retrieve)
+	a.Handle("DELETE", "/1.0/relationship/:predicate", handlers.Relationship.Delete)
+
+	a.Handle("GET", "/1.0/view", handlers.View.List)
+	a.Handle("PUT", "/1.0/view", handlers.View.Upsert)
+	a.Handle("GET", "/1.0/view/:name", handlers.View.Retrieve)
+	a.Handle("DELETE", "/1.0/view/:name", handlers.View.Delete)
 }
 
 // website manages the serving of web files for the project.

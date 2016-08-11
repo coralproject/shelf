@@ -92,6 +92,18 @@
 			"revisionTime": "2016-02-16T16:37:10Z"
 		},
 		{
+			"checksumSHA1": "bvByunT521VIbbB20IJiWT/if28=",
+			"path": "github.com/pkg/errors",
+			"revision": "d814416a46cbb066b728cfff58d30a986bc9ddbe",
+			"revisionTime": "2016-05-10T21:41:07Z"
+		},
+		{
+			"checksumSHA1": "D16898BDeCktWft5KXY5+e2MG+Q=",
+			"path": "github.com/satori/go.uuid",
+			"revision": "d41af8bb6a7704f00bc3b7cba9355ae6a5a80048",
+			"revisionTime": "2015-10-28T23:17:19Z"
+		},
+		{
 			"checksumSHA1": "nvBDBHTcW+YFdvUudLVBZBuXbGc=",
 			"path": "github.com/shurcooL/sanitized_anchor_name",
 			"revision": "10ef21a441db47d8b13ebcc5fd2310f636973c77",
