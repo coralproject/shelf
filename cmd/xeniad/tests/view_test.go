@@ -208,7 +208,7 @@ func TestUpsertView(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if vUpdated.Name != "better_name" {
+			if vUpdated.Name != "VTEST_better_name" {
 				t.Log(w.Body.String())
 				t.Fatalf("\t%s\tShould get the expected result.", tests.Failed)
 			}
