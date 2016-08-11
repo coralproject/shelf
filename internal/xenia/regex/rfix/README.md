@@ -1,6 +1,6 @@
 
 # rfix
-    import "github.com/coralproject/xenia/internal/regex/rfix"
+    import "github.com/coralproject/xenia/internal/xenia/regex/rfix"
 
 
 

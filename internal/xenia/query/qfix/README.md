@@ -1,6 +1,6 @@
 
 # qfix
-    import "github.com/coralproject/xenia/internal/query/qfix"
+    import "github.com/coralproject/xenia/internal/xenia/query/qfix"
 
 
 

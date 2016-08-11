@@ -1,40 +1,32 @@
 
-
 # relationshipfix
-`import "github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Get() ([]relationship.Relationship, error)](#Get)
-* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[relationship_fix.go](/src/target/relationship_fix.go) 
+    import "github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix"
 
 
 
 
 
-## <a name="Get">func</a> [Get](/src/target/relationship_fix.go?s=406:453#L10)
+
+## func Add
+``` go
+func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error
+```
+Add inserts relationships for testing.
+
+
+## func Get
 ``` go
 func Get() ([]relationship.Relationship, error)
 ```
 Get loads relationship data based on relationships.json.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/relationship_fix.go?s=775:840#L27)
+## func Remove
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes relationships in Mongo that match a given pattern.
+
 
 
 

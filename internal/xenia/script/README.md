@@ -1,6 +1,6 @@
 
 # script
-    import "github.com/coralproject/xenia/internal/script"
+    import "github.com/coralproject/xenia/internal/xenia/script"
 
 
 
