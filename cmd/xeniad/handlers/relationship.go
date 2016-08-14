@@ -7,7 +7,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/internal/shelf/relationship"
+	"github.com/coralproject/xenia/internal/wire/relationship"
 )
 
 // relationshipHandle maintains the set of handlers for the relationship api.

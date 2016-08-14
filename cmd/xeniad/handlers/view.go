@@ -7,7 +7,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/internal/shelf/view"
+	"github.com/coralproject/xenia/internal/wire/view"
 )
 
 // viewHandle maintains the set of handlers for the view api.
