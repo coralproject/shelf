@@ -80,10 +80,10 @@ func main() {
 
 	xenia.AddCommand(
 		cmddb.GetCommands(conn),
-		cmdquery.GetCommands(conn),
-		cmdscript.GetCommands(conn),
-		cmdregex.GetCommands(conn),
-		cmdmask.GetCommands(conn),
+		cmdquery.GetCommands(),
+		cmdscript.GetCommands(),
+		cmdregex.GetCommands(),
+		cmdmask.GetCommands(),
 		cmdrelationship.GetCommands(),
 		cmdview.GetCommands(),
 	)

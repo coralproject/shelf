@@ -1,9 +1,6 @@
 package cmdmask
 
-import (
-	"github.com/ardanlabs/kit/db"
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 // maskCmd represents the parent for all mask cli commands.
 var maskCmd = &cobra.Command{
@@ -11,13 +8,8 @@ var maskCmd = &cobra.Command{
 	Short: "mask provides a xenia CLI for managing and executing masks.",
 }
 
-// Capture the database connection.
-var conn *db.DB
-
-// GetCommands returns the query commands.
-func GetCommands(db *db.DB) *cobra.Command {
-	conn = db
-
+// GetCommands returns the mask commands.
+func GetCommands() *cobra.Command {
 	addUpsert()
 	addGet()
 	addDel()

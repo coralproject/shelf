@@ -70,17 +70,9 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if conn != nil {
-			cmd.Printf("\n%+v\n", scr)
-			if err := script.Upsert("", conn, scr); err != nil {
-				cmd.Println("Upserting Script : ", err)
-				return
-			}
-		} else {
-			if err := runUpsertWeb(cmd, scr); err != nil {
-				cmd.Println("Upserting Script : ", err)
-				return
-			}
+		if err := runUpsertWeb(cmd, scr); err != nil {
+			cmd.Println("Upserting Script : ", err)
+			return
 		}
 
 		cmd.Println("\n", "Upserting Script : Upserted")
@@ -91,10 +83,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		scr, err := disk.LoadScript("", path)
 		if err != nil {
 			return err
-		}
-
-		if conn != nil {
-			return script.Upsert("", conn, scr)
 		}
 
 		return runUpsertWeb(cmd, scr)

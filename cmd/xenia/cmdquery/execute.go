@@ -1,12 +1,9 @@
 package cmdquery
 
 import (
-	"encoding/json"
 	"strings"
 
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/xenia"
-	"github.com/coralproject/xenia/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 
@@ -53,12 +50,7 @@ func runExec(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	if conn == nil {
-		runExecWeb(cmd, vars)
-		return
-	}
-
-	runExecDB(cmd, vars)
+	runExecWeb(cmd, vars)
 }
 
 // runExecWeb issues the command talking to the web service.
@@ -86,30 +78,4 @@ func runExecWeb(cmd *cobra.Command, vars map[string]string) {
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
-}
-
-// runExecDB issues the command talking to the DB.
-func runExecDB(cmd *cobra.Command, vars map[string]string) {
-	cmd.Printf("Exec Set : Name[%s] Vars[%v]\n", exe.name, exe.vars)
-
-	if exe.name == "" {
-		cmd.Help()
-		return
-	}
-
-	set, err := query.GetByName("", conn, exe.name)
-	if err != nil {
-		cmd.Println("Exec Set : ", err)
-		return
-	}
-
-	result := xenia.Exec("", conn, set, vars)
-
-	data, err := json.MarshalIndent(result, "", "    ")
-	if err != nil {
-		cmd.Println("Exec Set : ", err)
-		return
-	}
-
-	cmd.Printf("\n%s\n\n", string(data))
 }

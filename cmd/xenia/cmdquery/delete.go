@@ -2,7 +2,6 @@ package cmdquery
 
 import (
 	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 
@@ -31,40 +30,13 @@ func addDel() {
 	queryCmd.AddCommand(cmd)
 }
 
-// runDelete is the code that implements the delete command.
+// runDelete issues the command talking to the web service.
 func runDelete(cmd *cobra.Command, args []string) {
-	if conn == nil {
-		runDeleteWeb(cmd)
-		return
-	}
-
-	runDeleteDB(cmd)
-}
-
-// runDeleteWeb issues the command talking to the web service.
-func runDeleteWeb(cmd *cobra.Command) {
 	verb := "DELETE"
-	url := "/1.0/query/" + get.name
+	url := "/1.0/query/" + delete.name
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
 		cmd.Println("Deleting Set : ", err)
-	}
-
-	cmd.Println("Deleting Set : Deleted")
-}
-
-// runDeleteDB issues the command talking to the DB.
-func runDeleteDB(cmd *cobra.Command) {
-	cmd.Printf("Deleting Set : Name[%s]\n", delete.name)
-
-	if delete.name == "" {
-		cmd.Help()
-		return
-	}
-
-	if err := query.Delete("", conn, delete.name); err != nil {
-		cmd.Println("Deleting Set : ", err)
-		return
 	}
 
 	cmd.Println("Deleting Set : Deleted")
