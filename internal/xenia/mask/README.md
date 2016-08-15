@@ -1,14 +1,37 @@
 
-# mask
-    import "github.com/coralproject/xenia/internal/xenia/mask"
 
+# mask
+`import "github.com/coralproject/shelf/internal/xenia/mask"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 Package mask provides the service layer for managing masks that need
 to be applied to results before they are returned.
 
 
 
 
-## Constants
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, collection string, field string) error](#Delete)
+* [func GetAll(context interface{}, db *db.DB, tags []string) (map[string]Mask, error)](#GetAll)
+* [func GetByCollection(context interface{}, db *db.DB, collection string) (map[string]Mask, error)](#GetByCollection)
+* [func Upsert(context interface{}, db *db.DB, mask Mask) error](#Upsert)
+* [type Mask](#Mask)
+  * [func GetByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)](#GetByName)
+  * [func GetLastHistoryByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)](#GetLastHistoryByName)
+  * [func (m Mask) Validate() error](#Mask.Validate)
+
+
+#### <a name="pkg-files">Package files</a>
+[mask.go](/src/github.com/coralproject/shelf/internal/xenia/mask/mask.go) [model.go](/src/github.com/coralproject/shelf/internal/xenia/mask/model.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const (
     Collection        = "query_masks"
@@ -29,7 +52,7 @@ const (
 Set of query types we expect to receive.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var (
     ErrNotFound = errors.New("Mask Not found")
@@ -38,28 +61,32 @@ var (
 Set of error variables.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/mask.go?s=8238:8320#L286)
 ``` go
 func Delete(context interface{}, db *db.DB, collection string, field string) error
 ```
 Delete is used to remove an existing query mask document.
 
 
-## func GetAll
+
+## <a name="GetAll">func</a> [GetAll](/src/target/mask.go?s=3312:3395#L119)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) (map[string]Mask, error)
 ```
 GetAll retrieves a list of query masks.
 
 
-## func GetByCollection
+
+## <a name="GetByCollection">func</a> [GetByCollection](/src/target/mask.go?s=4443:4539#L161)
 ``` go
 func GetByCollection(context interface{}, db *db.DB, collection string) (map[string]Mask, error)
 ```
 GetByCollection retrieves the masks for the specified collection.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/mask.go?s=1088:1148#L35)
 ``` go
 func Upsert(context interface{}, db *db.DB, mask Mask) error
 ```
@@ -67,7 +94,8 @@ Upsert is used to create or update an existing query Mask document.
 
 
 
-## type Mask
+
+## <a name="Mask">type</a> [Mask](/src/target/model.go?s=820:1055#L20)
 ``` go
 type Mask struct {
     Collection string `bson:"collection" json:"collection" validate:"required"`
@@ -83,16 +111,14 @@ Mask contains information about what needs to be masked.
 
 
 
-
-
-### func GetByName
+### <a name="GetByName">func</a> [GetByName](/src/target/mask.go?s=5729:5822#L204)
 ``` go
 func GetByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)
 ```
 GetByName retrieves the document for the specified query mask.
 
 
-### func GetLastHistoryByName
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/mask.go?s=6729:6833#L237)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)
 ```
@@ -101,12 +127,12 @@ GetLastHistoryByName gets the last written query mask within the history.
 
 
 
-### func (Mask) Validate
+
+### <a name="Mask.Validate">func</a> (Mask) [Validate](/src/target/model.go?s=1107:1137#L27)
 ``` go
 func (m Mask) Validate() error
 ```
 Validate checks the set value for consistency.
-
 
 
 

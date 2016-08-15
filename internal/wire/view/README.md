@@ -1,39 +1,65 @@
 
+
 # view
-    import "github.com/coralproject/xenia/internal/shelf/view"
+`import "github.com/coralproject/shelf/internal/wire/view"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, name string) error](#Delete)
+* [func GetAll(context interface{}, db *db.DB) ([]View, error)](#GetAll)
+* [func Upsert(context interface{}, db *db.DB, view *View) error](#Upsert)
+* [type PathSegment](#PathSegment)
+  * [func (ps *PathSegment) Validate() error](#PathSegment.Validate)
+* [type View](#View)
+  * [func GetByName(context interface{}, db *db.DB, name string) (*View, error)](#GetByName)
+  * [func (v *View) Validate() error](#View.Validate)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[model.go](/src/github.com/coralproject/shelf/internal/wire/view/model.go) [view.go](/src/github.com/coralproject/shelf/internal/wire/view/view.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const Collection = "views"
 ```
 Collection is the Mongo collection containing view metadata.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrNotFound = errors.New("Set Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/view.go?s=2458:2520#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
 Delete removes a view from from Mongo.
 
 
-## func GetAll
+
+## <a name="GetAll">func</a> [GetAll](/src/target/view.go?s=1218:1277#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]View, error)
 ```
 GetAll retrieves the current views from Mongo.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/view.go?s=487:548#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, view *View) error
 ```
@@ -41,7 +67,8 @@ Upsert upserts a view to the collection of currently utilized views.
 
 
 
-## type PathSegment
+
+## <a name="PathSegment">type</a> [PathSegment](/src/target/model.go?s=517:838#L12)
 ``` go
 type PathSegment struct {
     Level     int    `bson:"level" json:"level" validate:"required,min=1"`
@@ -62,8 +89,7 @@ which path partially defines a View.
 
 
 
-
-### func (\*PathSegment) Validate
+### <a name="PathSegment.Validate">func</a> (\*PathSegment) [Validate](/src/target/model.go?s=898:937#L20)
 ``` go
 func (ps *PathSegment) Validate() error
 ```
@@ -71,7 +97,8 @@ Validate checks the PathSegment value for consistency.
 
 
 
-## type View
+
+## <a name="View">type</a> [View](/src/target/model.go?s=1056:1319#L28)
 ``` go
 type View struct {
     Name      string        `bson:"name" json:"name" validate:"required,min=3"`
@@ -87,9 +114,7 @@ View contains metadata about a view.
 
 
 
-
-
-### func GetByName
+### <a name="GetByName">func</a> [GetByName](/src/target/view.go?s=1801:1875#L58)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (*View, error)
 ```
@@ -98,12 +123,12 @@ GetByName retrieves a view by name from Mongo.
 
 
 
-### func (\*View) Validate
+
+### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1372:1403#L35)
 ``` go
 func (v *View) Validate() error
 ```
 Validate checks the View value for consistency.
-
 
 
 

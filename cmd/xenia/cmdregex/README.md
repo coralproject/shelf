@@ -1,18 +1,31 @@
 
+
 # cmdregex
-    import "github.com/coralproject/xenia/cmd/xenia/cmdregex"
+`import "github.com/coralproject/shelf/cmd/xenia/cmdregex"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func GetCommands() *cobra.Command](#GetCommands)
+
+
+#### <a name="pkg-files">Package files</a>
+[commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdregex/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdregex/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdregex/get.go) [list.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdregex/list.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdregex/upsert.go) 
 
 
 
 
 
-
-## func GetCommands
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=266:299#L2)
 ``` go
-func GetCommands(db *db.DB) *cobra.Command
+func GetCommands() *cobra.Command
 ```
 GetCommands returns the regex commands.
-
 
 
 

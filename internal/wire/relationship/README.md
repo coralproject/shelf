@@ -1,39 +1,63 @@
 
+
 # relationship
-    import "github.com/coralproject/xenia/internal/shelf/relationship"
+`import "github.com/coralproject/shelf/internal/wire/relationship"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, predicate string) error](#Delete)
+* [func GetAll(context interface{}, db *db.DB) ([]Relationship, error)](#GetAll)
+* [func Upsert(context interface{}, db *db.DB, rel *Relationship) error](#Upsert)
+* [type Relationship](#Relationship)
+  * [func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error)](#GetByPredicate)
+  * [func (r *Relationship) Validate() error](#Relationship.Validate)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[model.go](/src/github.com/coralproject/shelf/internal/wire/relationship/model.go) [relationship.go](/src/github.com/coralproject/shelf/internal/wire/relationship/relationship.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const Collection = "relationships"
 ```
 Collection is the Mongo collection containing relationship metadata.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrNotFound = errors.New("Set Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/relationship.go?s=2656:2723#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, predicate string) error
 ```
 Delete removes a relationship from from Mongo.
 
 
-## func GetAll
+
+## <a name="GetAll">func</a> [GetAll](/src/target/relationship.go?s=1304:1371#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]Relationship, error)
 ```
 GetAll retrieves the current relationships from Mongo.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/relationship.go?s=527:595#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, rel *Relationship) error
 ```
@@ -41,7 +65,8 @@ Upsert upserts a relationship to the collection of currently utilized relationsh
 
 
 
-## type Relationship
+
+## <a name="Relationship">type</a> [Relationship](/src/target/model.go?s=505:962#L8)
 ``` go
 type Relationship struct {
     SubjectTypes []string `bson:"subject_types" json:"subject_types" validate:"required,min=1"`
@@ -60,9 +85,7 @@ Note, predicate should be unique.
 
 
 
-
-
-### func GetByPredicate
+### <a name="GetByPredicate">func</a> [GetByPredicate](/src/target/relationship.go?s=1926:2018#L58)
 ``` go
 func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error)
 ```
@@ -71,12 +94,12 @@ GetByPredicate retrieves a relationship by predicate from Mongo.
 
 
 
-### func (\*Relationship) Validate
+
+### <a name="Relationship.Validate">func</a> (\*Relationship) [Validate](/src/target/model.go?s=1023:1062#L17)
 ``` go
 func (r *Relationship) Validate() error
 ```
 Validate checks the Relationship value for consistency.
-
 
 
 

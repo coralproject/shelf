@@ -1,13 +1,33 @@
 
+
 # disk
-    import "github.com/coralproject/xenia/cmd/xenia/disk"
+`import "github.com/coralproject/shelf/cmd/xenia/disk"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
+* [func LoadMask(context interface{}, path string) (mask.Mask, error)](#LoadMask)
+* [func LoadRegex(context interface{}, path string) (regex.Regex, error)](#LoadRegex)
+* [func LoadRelationship(context interface{}, path string) (relationship.Relationship, error)](#LoadRelationship)
+* [func LoadScript(context interface{}, path string) (script.Script, error)](#LoadScript)
+* [func LoadSet(context interface{}, path string) (*query.Set, error)](#LoadSet)
+* [func LoadView(context interface{}, path string) (view.View, error)](#LoadView)
+
+
+#### <a name="pkg-files">Package files</a>
+[disk.go](/src/github.com/coralproject/shelf/cmd/xenia/disk/disk.go) 
 
 
 
 
 
-
-## func LoadDir
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=4264:4321#L136)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -15,7 +35,8 @@ LoadDir loadsup a given directory, calling a load function for each valid
 json file found.
 
 
-## func LoadMask
+
+## <a name="LoadMask">func</a> [LoadMask](/src/target/disk.go?s=2376:2442#L73)
 ``` go
 func LoadMask(context interface{}, path string) (mask.Mask, error)
 ```
@@ -23,7 +44,8 @@ LoadMask serializes the content of a Mask from a file using the
 given file path. Returns the serialized Mask value.
 
 
-## func LoadRegex
+
+## <a name="LoadRegex">func</a> [LoadRegex](/src/target/disk.go?s=1766:1835#L52)
 ``` go
 func LoadRegex(context interface{}, path string) (regex.Regex, error)
 ```
@@ -31,7 +53,17 @@ LoadRegex serializes the content of a regex from a file using the
 given file path. Returns the serialized regex value.
 
 
-## func LoadScript
+
+## <a name="LoadRelationship">func</a> [LoadRelationship](/src/target/disk.go?s=2997:3087#L94)
+``` go
+func LoadRelationship(context interface{}, path string) (relationship.Relationship, error)
+```
+LoadRelationship serializes the content of a Relationship from a file using the
+given file path. Returns the serialized Relationship value.
+
+
+
+## <a name="LoadScript">func</a> [LoadScript](/src/target/disk.go?s=1140:1212#L31)
 ``` go
 func LoadScript(context interface{}, path string) (script.Script, error)
 ```
@@ -39,13 +71,22 @@ LoadScript serializes the content of a Script from a file using the
 given file path. Returns the serialized Script value.
 
 
-## func LoadSet
+
+## <a name="LoadSet">func</a> [LoadSet](/src/target/disk.go?s=556:622#L10)
 ``` go
 func LoadSet(context interface{}, path string) (*query.Set, error)
 ```
 LoadSet serializes the content of a Set from a file using the
 given file path. Returns the serialized Set value.
 
+
+
+## <a name="LoadView">func</a> [LoadView](/src/target/disk.go?s=3698:3764#L115)
+``` go
+func LoadView(context interface{}, path string) (view.View, error)
+```
+LoadView serializes the content of a View from a file using the
+given file path. Returns the serialized View value.
 
 
 

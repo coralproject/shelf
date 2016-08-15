@@ -1,7 +1,12 @@
 
+
 # handlers
-    import "github.com/coralproject/xenia/cmd/xeniad/handlers"
+`import "github.com/coralproject/shelf/cmd/xeniad/handlers"`
 
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package handlers contains the handler logic for processing requests.
 
 Package handlers contains the handler logic for processing requests.
@@ -15,8 +20,16 @@ Package handlers contains the handler logic for processing requests.
 
 
 
+## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
 
-## Variables
+
+#### <a name="pkg-files">Package files</a>
+[exec.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/exec.go) [mask.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/mask.go) [query.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/query.go) [regex.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/regex.go) [relationship.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/relationship.go) [script.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/script.go) [version.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/version.go) [view.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/view.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
 ``` go
 var Exec execHandle
 ```
@@ -56,7 +69,6 @@ Version fronts the access to the ver service functionality.
 var View viewHandle
 ```
 View fronts the access to the view service functionality.
-
 
 
 
