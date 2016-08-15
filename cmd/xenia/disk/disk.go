@@ -7,6 +7,8 @@ import (
 	"path/filepath"
 
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/xenia/internal/wire/relationship"
+	"github.com/coralproject/xenia/internal/wire/view"
 	"github.com/coralproject/xenia/internal/xenia/mask"
 	"github.com/coralproject/xenia/internal/xenia/query"
 	"github.com/coralproject/xenia/internal/xenia/regex"
@@ -95,6 +97,48 @@ func LoadMask(context interface{}, path string) (mask.Mask, error) {
 
 	log.Dev(context, "LoadMask", "Completed")
 	return msk, nil
+}
+
+// LoadRelationship serializes the content of a Relationship from a file using the
+// given file path. Returns the serialized Relationship value.
+func LoadRelationship(context interface{}, path string) (relationship.Relationship, error) {
+	log.Dev(context, "LoadRelationship", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadRelationship", err, "Completed")
+		return relationship.Relationship{}, err
+	}
+
+	var rel relationship.Relationship
+	if err = json.NewDecoder(file).Decode(&rel); err != nil {
+		log.Error(context, "LoadRelationship", err, "Completed")
+		return relationship.Relationship{}, err
+	}
+
+	log.Dev(context, "LoadRelationship", "Completed")
+	return rel, nil
+}
+
+// LoadView serializes the content of a View from a file using the
+// given file path. Returns the serialized View value.
+func LoadView(context interface{}, path string) (view.View, error) {
+	log.Dev(context, "LoadView", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadView", err, "Completed")
+		return view.View{}, err
+	}
+
+	var v view.View
+	if err = json.NewDecoder(file).Decode(&v); err != nil {
+		log.Error(context, "LoadView", err, "Completed")
+		return view.View{}, err
+	}
+
+	log.Dev(context, "LoadView", "Completed")
+	return v, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid
