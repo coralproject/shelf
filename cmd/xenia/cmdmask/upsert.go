@@ -70,17 +70,9 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if conn != nil {
-			cmd.Printf("\n%+v\n", msk)
-			if err := mask.Upsert("", conn, msk); err != nil {
-				cmd.Println("Upserting Mask : ", err)
-				return
-			}
-		} else {
-			if err := runUpsertWeb(cmd, msk); err != nil {
-				cmd.Println("Upserting Mask : ", err)
-				return
-			}
+		if err := runUpsertWeb(cmd, msk); err != nil {
+			cmd.Println("Upserting Mask : ", err)
+			return
 		}
 
 		cmd.Println("\n", "Upserting Mask : Upserted")
@@ -91,10 +83,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		msk, err := disk.LoadMask("", path)
 		if err != nil {
 			return err
-		}
-
-		if conn != nil {
-			return mask.Upsert("", conn, msk)
 		}
 
 		return runUpsertWeb(cmd, msk)

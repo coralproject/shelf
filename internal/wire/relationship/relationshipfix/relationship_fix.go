@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/coralproject/xenia/internal/shelf/relationship"
+	"github.com/coralproject/xenia/internal/wire/relationship"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +13,7 @@ import (
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/internal/shelf/relationship/relationshipfix/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/internal/wire/relationship/relationshipfix/"
 }
 
 // Get loads relationship data based on relationships.json.

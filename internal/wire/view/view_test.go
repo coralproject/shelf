@@ -8,8 +8,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/shelf/view"
-	"github.com/coralproject/xenia/internal/shelf/view/viewfix"
+	"github.com/coralproject/xenia/internal/wire/view"
+	"github.com/coralproject/xenia/internal/wire/view/viewfix"
 )
 
 func init() {

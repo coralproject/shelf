@@ -12,7 +12,9 @@ import (
 	"github.com/coralproject/xenia/cmd/xenia/cmdmask"
 	"github.com/coralproject/xenia/cmd/xenia/cmdquery"
 	"github.com/coralproject/xenia/cmd/xenia/cmdregex"
+	"github.com/coralproject/xenia/cmd/xenia/cmdrelationship"
 	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
+	"github.com/coralproject/xenia/cmd/xenia/cmdview"
 	"github.com/spf13/cobra"
 )
 
@@ -78,10 +80,12 @@ func main() {
 
 	xenia.AddCommand(
 		cmddb.GetCommands(conn),
-		cmdquery.GetCommands(conn),
-		cmdscript.GetCommands(conn),
-		cmdregex.GetCommands(conn),
-		cmdmask.GetCommands(conn),
+		cmdquery.GetCommands(),
+		cmdscript.GetCommands(),
+		cmdregex.GetCommands(),
+		cmdmask.GetCommands(),
+		cmdrelationship.GetCommands(),
+		cmdview.GetCommands(),
 	)
 	xenia.Execute()
 }

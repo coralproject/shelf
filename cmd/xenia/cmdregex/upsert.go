@@ -70,17 +70,9 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if conn != nil {
-			cmd.Printf("\n%+v\n", rgx)
-			if err := regex.Upsert("", conn, rgx); err != nil {
-				cmd.Println("Upserting Regex : ", err)
-				return
-			}
-		} else {
-			if err := runUpsertWeb(cmd, rgx); err != nil {
-				cmd.Println("Upserting Regex : ", err)
-				return
-			}
+		if err := runUpsertWeb(cmd, rgx); err != nil {
+			cmd.Println("Upserting Regex : ", err)
+			return
 		}
 
 		cmd.Println("\n", "Upserting Regex : Upserted")
@@ -91,10 +83,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		rgx, err := disk.LoadRegex("", path)
 		if err != nil {
 			return err
-		}
-
-		if conn != nil {
-			return regex.Upsert("", conn, rgx)
 		}
 
 		return runUpsertWeb(cmd, rgx)
