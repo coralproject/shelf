@@ -7,8 +7,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/sponge/item"
-	"github.com/coralproject/xenia/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
 func init() {

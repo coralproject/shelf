@@ -9,8 +9,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/mask"
-	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
+	"github.com/coralproject/shelf/internal/xenia/mask"
+	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
 )
 
 // collection is what we are looking to delete after the test.

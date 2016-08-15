@@ -10,8 +10,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/script"
-	"github.com/coralproject/xenia/internal/xenia/script/sfix"
+	"github.com/coralproject/shelf/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/xenia/script/sfix"
 )
 
 // prefix is what we are looking to delete after the test.

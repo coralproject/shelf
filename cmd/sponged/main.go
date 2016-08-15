@@ -7,8 +7,8 @@ import (
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/cmd/sponged/handlers"
-	"github.com/coralproject/xenia/cmd/sponged/routes"
+	"github.com/coralproject/shelf/cmd/sponged/handlers"
+	"github.com/coralproject/shelf/cmd/sponged/routes"
 )
 
 // These are set by the makefile with:

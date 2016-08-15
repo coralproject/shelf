@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/script"
-	"github.com/coralproject/xenia/internal/xenia/script/sfix"
+	"github.com/coralproject/shelf/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/xenia/script/sfix"
 )
 
 // sPrefix is the base name for everything.

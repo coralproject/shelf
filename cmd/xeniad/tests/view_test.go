@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/wire/view"
-	"github.com/coralproject/xenia/internal/wire/view/viewfix"
+	"github.com/coralproject/shelf/internal/wire/view"
+	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 )
 
 // viewPrefix is the base name for everything.

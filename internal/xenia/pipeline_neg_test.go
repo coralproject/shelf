@@ -1,8 +1,8 @@
 package xenia_test
 
 import (
-	"github.com/coralproject/xenia/internal/xenia/query"
-	"github.com/coralproject/xenia/tstdata"
+	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/tstdata"
 )
 
 // getNegExecSet returns the table for the testing.

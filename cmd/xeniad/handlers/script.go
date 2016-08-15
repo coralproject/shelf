@@ -6,7 +6,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/xenia/script"
 )
 
 // scriptHandle maintains the set of handlers for the script api.

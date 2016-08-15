@@ -11,8 +11,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/regex"
-	"github.com/coralproject/xenia/internal/xenia/regex/rfix"
+	"github.com/coralproject/shelf/internal/xenia/regex"
+	"github.com/coralproject/shelf/internal/xenia/regex/rfix"
 )
 
 // prefix is what we are looking to delete after the test.

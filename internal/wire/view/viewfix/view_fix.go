@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/coralproject/xenia/internal/wire/view"
+	"github.com/coralproject/shelf/internal/wire/view"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +13,7 @@ import (
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/internal/wire/view/viewfix/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/wire/view/viewfix/"
 }
 
 // Get loads view data based on view.json.

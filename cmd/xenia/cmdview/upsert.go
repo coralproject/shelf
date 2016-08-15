@@ -6,9 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/xenia/cmd/xenia/disk"
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/wire/view"
+	"github.com/coralproject/shelf/cmd/xenia/disk"
+	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/internal/wire/view"
 	"github.com/spf13/cobra"
 )
 
