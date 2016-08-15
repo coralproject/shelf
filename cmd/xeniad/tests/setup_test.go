@@ -9,13 +9,13 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/cmd/xeniad/routes"
-	"github.com/coralproject/xenia/internal/wire/relationship/relationshipfix"
-	"github.com/coralproject/xenia/internal/wire/view/viewfix"
-	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
-	"github.com/coralproject/xenia/internal/xenia/query/qfix"
-	"github.com/coralproject/xenia/internal/xenia/script/sfix"
-	"github.com/coralproject/xenia/tstdata"
+	"github.com/coralproject/shelf/cmd/xeniad/routes"
+	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
+	"github.com/coralproject/shelf/internal/wire/view/viewfix"
+	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
+	"github.com/coralproject/shelf/internal/xenia/query/qfix"
+	"github.com/coralproject/shelf/internal/xenia/script/sfix"
+	"github.com/coralproject/shelf/tstdata"
 )
 
 var a *app.App

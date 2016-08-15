@@ -8,7 +8,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia"
+	"github.com/coralproject/shelf/internal/xenia"
 	"gopkg.in/mgo.v2"
 )
 
@@ -19,7 +19,7 @@ const CollectionExecTest = "test_xenia_data"
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/tstdata/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/tstdata/"
 }
 
 //==============================================================================

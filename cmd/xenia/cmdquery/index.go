@@ -4,8 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/xenia/query"
+	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 

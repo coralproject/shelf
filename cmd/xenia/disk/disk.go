@@ -7,12 +7,12 @@ import (
 	"path/filepath"
 
 	"github.com/ardanlabs/kit/log"
-	"github.com/coralproject/xenia/internal/wire/relationship"
-	"github.com/coralproject/xenia/internal/wire/view"
-	"github.com/coralproject/xenia/internal/xenia/mask"
-	"github.com/coralproject/xenia/internal/xenia/query"
-	"github.com/coralproject/xenia/internal/xenia/regex"
-	"github.com/coralproject/xenia/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/wire/relationship"
+	"github.com/coralproject/shelf/internal/wire/view"
+	"github.com/coralproject/shelf/internal/xenia/mask"
+	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/regex"
+	"github.com/coralproject/shelf/internal/xenia/script"
 )
 
 // LoadSet serializes the content of a Set from a file using the

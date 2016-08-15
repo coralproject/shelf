@@ -9,8 +9,8 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/cmd/sponged/routes"
-	"github.com/coralproject/xenia/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/cmd/sponged/routes"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
 var a *app.App

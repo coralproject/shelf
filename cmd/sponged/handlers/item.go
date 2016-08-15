@@ -8,7 +8,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
 // itemHandle maintains the set of handlers for theitem api.

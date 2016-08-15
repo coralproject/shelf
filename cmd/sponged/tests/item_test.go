@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/sponge/item"
-	"github.com/coralproject/xenia/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
 // itemPrefix is the base name for everything.

@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/query/qfix"
+	"github.com/coralproject/shelf/internal/xenia/query/qfix"
 )
 
 // TestExec tests the execution of a specific query.

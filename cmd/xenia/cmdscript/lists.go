@@ -1,7 +1,7 @@
 package cmdscript
 
 import (
-	"github.com/coralproject/xenia/cmd/xenia/web"
+	"github.com/coralproject/shelf/cmd/xenia/web"
 	"github.com/spf13/cobra"
 )
 

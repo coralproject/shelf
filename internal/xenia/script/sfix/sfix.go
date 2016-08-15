@@ -6,7 +6,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/xenia/script"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -14,7 +14,7 @@ import (
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/internal/xenia/script/sfix/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/xenia/script/sfix/"
 }
 
 //==============================================================================

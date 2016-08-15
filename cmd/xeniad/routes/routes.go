@@ -14,8 +14,8 @@ import (
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/xenia/cmd/xeniad/handlers"
-	"github.com/coralproject/xenia/cmd/xeniad/midware"
+	"github.com/coralproject/shelf/cmd/xeniad/handlers"
+	"github.com/coralproject/shelf/cmd/xeniad/midware"
 )
 
 // Environmental variables.

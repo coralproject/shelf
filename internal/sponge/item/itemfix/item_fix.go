@@ -5,7 +5,7 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/coralproject/xenia/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/sponge/item"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +13,7 @@ import (
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/internal/sponge/item/itemfix/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/sponge/item/itemfix/"
 }
 
 // Get loads item data based on item.json.

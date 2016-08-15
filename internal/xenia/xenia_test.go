@@ -9,12 +9,12 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia"
-	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
-	"github.com/coralproject/xenia/internal/xenia/query"
-	"github.com/coralproject/xenia/internal/xenia/script"
-	"github.com/coralproject/xenia/internal/xenia/script/sfix"
-	"github.com/coralproject/xenia/tstdata"
+	"github.com/coralproject/shelf/internal/xenia"
+	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
+	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/script"
+	"github.com/coralproject/shelf/internal/xenia/script/sfix"
+	"github.com/coralproject/shelf/tstdata"
 	"gopkg.in/mgo.v2/bson"
 )
 

@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/mask"
+	"github.com/coralproject/shelf/internal/xenia/mask"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -414,7 +414,7 @@ func TestMaskingEmail(t *testing.T) {
 
 // fixtures reads the test data fixture for documents to use for this testing.
 func fixtures() ([]bson.M, error) {
-	path := os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/tstdata/test_data.json"
+	path := os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/tstdata/test_data.json"
 
 	file, err := os.Open(path)
 	if err != nil {

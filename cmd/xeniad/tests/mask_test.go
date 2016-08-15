@@ -8,8 +8,8 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/xenia/mask"
-	"github.com/coralproject/xenia/internal/xenia/mask/mfix"
+	"github.com/coralproject/shelf/internal/xenia/mask"
+	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
 )
 
 // mCollection is the collection to use for everything.

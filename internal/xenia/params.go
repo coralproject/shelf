@@ -7,8 +7,8 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/coralproject/xenia/internal/xenia/query"
-	"github.com/coralproject/xenia/internal/xenia/regex"
+	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/regex"
 )
 
 // processParams validates the variables against the query string of parameters.

@@ -9,8 +9,8 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/coralproject/xenia/internal/wire/relationship"
-	"github.com/coralproject/xenia/internal/wire/relationship/relationshipfix"
+	"github.com/coralproject/shelf/internal/wire/relationship"
+	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 )
 
 // relPrefix is the base name for everything.
