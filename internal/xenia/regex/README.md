@@ -1,6 +1,6 @@
 
 # regex
-    import "github.com/coralproject/xenia/internal/regex"
+    import "github.com/coralproject/xenia/internal/xenia/regex"
 
 Package regex provides the service layer for building apps using
 regex functionality.

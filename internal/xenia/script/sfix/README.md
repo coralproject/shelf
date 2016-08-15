@@ -1,6 +1,6 @@
 
 # sfix
-    import "github.com/coralproject/xenia/internal/script/sfix"
+    import "github.com/coralproject/xenia/internal/xenia/script/sfix"
 
 
 

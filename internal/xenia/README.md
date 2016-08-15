@@ -1,11 +1,8 @@
 
-# exec
-    import "github.com/coralproject/xenia/internal/exec"
+# xenia
+    import "github.com/coralproject/xenia/internal/xenia"
 
-Package exec provides support for executing Sets and their different types
-of commands.
-
-Package exec provides support for executing Sets and their different types
+Package xenia provides support for executing Sets and their different types
 of commands.
 
 

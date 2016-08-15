@@ -1,40 +1,32 @@
 
-
 # viewfix
-`import "github.com/coralproject/xenia/internal/shelf/view/viewfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Get() ([]view.View, error)](#Get)
-* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[view_fix.go](/src/target/view_fix.go) 
+    import "github.com/coralproject/xenia/internal/shelf/view/viewfix"
 
 
 
 
 
-## <a name="Get">func</a> [Get](/src/target/view_fix.go?s=357:388#L10)
+
+## func Add
+``` go
+func Add(context interface{}, db *db.DB, views []view.View) error
+```
+Add inserts views for testing.
+
+
+## func Get
 ``` go
 func Get() ([]view.View, error)
 ```
 Get loads view data based on view.json.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/view_fix.go?s=681:746#L27)
+## func Remove
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes views in Mongo that match a given pattern.
+
 
 
 

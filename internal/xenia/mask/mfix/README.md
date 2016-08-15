@@ -1,6 +1,6 @@
 
 # mfix
-    import "github.com/coralproject/xenia/internal/mask/mfix"
+    import "github.com/coralproject/xenia/internal/xenia/mask/mfix"
 
 
 

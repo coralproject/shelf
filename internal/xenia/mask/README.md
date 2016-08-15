@@ -1,6 +1,6 @@
 
 # mask
-    import "github.com/coralproject/xenia/internal/mask"
+    import "github.com/coralproject/xenia/internal/xenia/mask"
 
 Package mask provides the service layer for managing masks that need
 to be applied to results before they are returned.
