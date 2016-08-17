@@ -52,7 +52,7 @@ func viewPathToGraphPath(v *view.View, viewParams *ViewParams) (*path.Path, erro
 
 			// Add the tag, if present.
 			if segment.Tag != "" {
-				graphPath = graphPath.Tag(segment.Tag)
+				graphPath = graphPath.Clone().Tag(segment.Tag)
 			}
 
 			level++
@@ -62,14 +62,14 @@ func viewPathToGraphPath(v *view.View, viewParams *ViewParams) (*path.Path, erro
 		// Add the relationship.
 		switch segment.Direction {
 		case "in":
-			graphPath = graphPath.In(quad.String(segment.Predicate))
+			graphPath = graphPath.Clone().In(quad.String(segment.Predicate))
 		case "out":
-			graphPath = graphPath.Out(quad.String(segment.Predicate))
+			graphPath = graphPath.Clone().Out(quad.String(segment.Predicate))
 		}
 
 		// Add the tag, if present.
 		if segment.Tag != "" {
-			graphPath = graphPath.Tag(segment.Tag)
+			graphPath = graphPath.Clone().Tag(segment.Tag)
 		}
 
 		level++
