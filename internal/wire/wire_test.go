@@ -1,7 +1,6 @@
 package wire_test
 
 import (
-	"fmt"
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
@@ -58,10 +57,11 @@ func TestGenerateView(t *testing.T) {
 	}
 	defer db.CloseMGO(tests.Context)
 
-	mongoHostPort := fmt.Sprintf("%s:27017", cfg.MustString("MONGO_HOST"))
 	opts := make(map[string]interface{})
-	opts["database_name"] = "cayley_test"
-	store, err := cayley.NewGraph("mongo", mongoHostPort, opts)
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
 	}
@@ -132,10 +132,11 @@ func TestPersistView(t *testing.T) {
 	}
 	defer db.CloseMGO(tests.Context)
 
-	mongoHostPort := fmt.Sprintf("%s:27017", cfg.MustString("MONGO_HOST"))
 	opts := make(map[string]interface{})
-	opts["database_name"] = "cayley_test"
-	store, err := cayley.NewGraph("mongo", mongoHostPort, opts)
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
 	}
@@ -207,6 +208,17 @@ func TestPersistView(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
+
+			// Delete the persisted collection to clean up.
+			f = func(c *mgo.Collection) error {
+				return c.DropCollection()
+			}
+
+			if err := db.ExecuteMGO(tests.Context, result.CollectionOut, f); err != nil {
+				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
+
 		}
 	}
 }
@@ -255,10 +267,11 @@ func loadTestData(context interface{}, db *db.DB) error {
 	// -----------------------------------------------------------
 	// Build the example graph.
 
-	mongoHostPort := fmt.Sprintf("%s:27017", cfg.MustString("MONGO_HOST"))
 	opts := make(map[string]interface{})
-	opts["database_name"] = "cayley_test"
-	if err := graph.InitQuadStore("mongo", mongoHostPort, opts); err != nil {
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
+	if err := graph.InitQuadStore("mongo", cfg.MustString("MONGO_HOST"), opts); err != nil {
 		return err
 	}
 
@@ -275,7 +288,7 @@ func loadTestData(context interface{}, db *db.DB) error {
 		tx.AddQuad(quad)
 	}
 
-	store, err := cayley.NewGraph("mongo", mongoHostPort, opts)
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
 	if err != nil {
 		return err
 	}
@@ -300,9 +313,10 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	// ------------------------------------------------------------
 	// Clear cayley graph.
 
-	mongoHostPort := fmt.Sprintf("%s:27017", cfg.MustString("MONGO_HOST"))
 	opts := make(map[string]interface{})
-	opts["database_name"] = "cayley_test"
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
 
 	var quads []quad.Quad
 	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
@@ -317,7 +331,7 @@ func unloadTestData(context interface{}, db *db.DB) error {
 		tx.RemoveQuad(quad)
 	}
 
-	store, err := cayley.NewGraph("mongo", mongoHostPort, opts)
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
 	if err != nil {
 		return err
 	}
