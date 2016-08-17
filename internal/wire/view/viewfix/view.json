@@ -6,13 +6,13 @@
 			{
 				"level": 1,
 				"direction": "in",
-				"predicate": "on",
+				"predicate": "RTEST_on",
 				"tag": "comment"
 			},
 			{
 				"level": 2,
 				"direction": "in",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "author"
 			}
 		]
@@ -24,7 +24,7 @@
 			{
 				"level": 1,
 				"direction": "out",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "comment"
 			}
 		]
@@ -36,18 +36,18 @@
 			{
 				"level": 1,
 				"direction": "out",
-				"predicate": "flagged"
+				"predicate": "RTEST_flagged"
 			},
 			{
 				"level": 2,
 				"direction": "in",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "author"
 			},
 			{
 				"level": 3,
 				"direction": "out",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "comment"
 			}
 		]
