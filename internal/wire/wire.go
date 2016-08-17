@@ -109,5 +109,7 @@ func Generate(context interface{}, db *db.DB, v *view.View, viewParams *ViewPara
 		CollectionIn: viewParams.CollectionIn,
 		Items:        items,
 	}
+
+	log.Dev(context, "Generate", "Completed")
 	return &result
 }
