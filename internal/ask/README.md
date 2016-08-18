@@ -31,6 +31,14 @@ var ErrInvalidID = errors.New("ID is not in it's proper form")
 ErrInvalidID occurs when an ID is not in a valid form.
 
 
+## func CountFormSubmissions
+``` go
+func CountFormSubmissions(context interface{}, db *db.DB, formID string) (int, error)
+```
+CountFormSubmissions returns the count of current submissions for a given
+form id in the Form Submissions MongoDB database collection.
+
+
 ## func DeleteForm
 ``` go
 func DeleteForm(context interface{}, db *db.DB, id string) error
@@ -47,6 +55,14 @@ DeleteFormSubmission removes a given Form Submission from the MongoDB
 database collection.
 
 
+## func HydrateFormGalleries
+``` go
+func HydrateFormGalleries(context interface{}, db *db.DB, galleries []FormGallery) error
+```
+HydrateFormGalleries loads an array of form galleries with form submissions
+from the MongoDB database collection.
+
+
 ## func HydrateFormGallery
 ``` go
 func HydrateFormGallery(context interface{}, db *db.DB, gallery *FormGallery) error
@@ -55,12 +71,28 @@ HydrateFormGallery loads a FormGallery with form submissions from the MongoDB
 database collection.
 
 
+## func MergeSubmissionsIntoGalleryAnswers
+``` go
+func MergeSubmissionsIntoGalleryAnswers(gallery *FormGallery, submissions []FormSubmission)
+```
+MergeSubmissionsIntoGalleryAnswers associates the array of submissions onto
+matching gallery answers.
+
+
 ## func RetrieveFormGalleriesForForm
 ``` go
 func RetrieveFormGalleriesForForm(context interface{}, db *db.DB, formID string) ([]FormGallery, error)
 ```
 RetrieveFormGalleriesForForm retrives the form galleries for a given form
 from the MongoDB database collection.
+
+
+## func RetrieveFormSubmissions
+``` go
+func RetrieveFormSubmissions(context interface{}, db *db.DB, ids []string) ([]FormSubmission, error)
+```
+RetrieveFormSubmissions retrieves a list of FormSubmission's from the MongoDB
+database collection.
 
 
 ## func RetrieveManyForms
@@ -97,7 +129,7 @@ UpsertForm upserts the provided form into the MongoDB database collection.
 ## type Form
 ``` go
 type Form struct {
-    ID             bson.ObjectId `json:"id" bson:"_id"`
+    ID             bson.ObjectId `json:"id" bson:"_id" validate:"required,len=24"`
     Status         string        `json:"status" bson:"status"`
     Theme          interface{}   `json:"theme" bson:"theme"`
     Settings       interface{}   `json:"settings" bson:"settings"`
@@ -142,11 +174,19 @@ the MongodB database collection.
 
 
 
+### func (\*Form) Validate
+``` go
+func (f *Form) Validate() error
+```
+Validate checks the Form value for consistency.
+
+
+
 ## type FormGallery
 ``` go
 type FormGallery struct {
-    ID          bson.ObjectId          `json:"id" bson:"_id"`
-    FormID      bson.ObjectId          `json:"form_id" bson:"form_id"`
+    ID          bson.ObjectId          `json:"id" bson:"_id" validate:"required,len=24"`
+    FormID      bson.ObjectId          `json:"form_id" bson:"form_id" validate:"required,len=24"`
     Headline    string                 `json:"headline" bson:"headline"`
     Description string                 `json:"description" bson:"description"`
     Config      map[string]interface{} `json:"config" bson:"config"`
@@ -199,11 +239,19 @@ collection as well as hydrating the form gallery with form submissions.
 
 
 
+### func (\*FormGallery) Validate
+``` go
+func (fg *FormGallery) Validate() error
+```
+Validate checks the FormGallery value for consistency.
+
+
+
 ## type FormGalleryAnswer
 ``` go
 type FormGalleryAnswer struct {
-    SubmissionID    bson.ObjectId          `json:"submission_id" bson:"submission_id"`
-    AnswerID        string                 `json:"answer_id" bson:"answer_id"`
+    SubmissionID    bson.ObjectId          `json:"submission_id" bson:"submission_id" validate:"required,len=24"`
+    AnswerID        string                 `json:"answer_id" bson:"answer_id" validate:"required,len=24"`
     Answer          FormSubmissionAnswer   `json:"answer,omitempty" bson:"-"`
     IdentityAnswers []FormSubmissionAnswer `json:"identity_answers,omitempty" bson:"-"`
 }
@@ -349,7 +397,7 @@ MongoDB database collection.
 ## type FormSubmissionAnswer
 ``` go
 type FormSubmissionAnswer struct {
-    WidgetID     string      `json:"widget_id" bson:"widget_id"`
+    WidgetID     string      `json:"widget_id" bson:"widget_id" validate:"required,len=24"`
     Identity     bool        `json:"identity" bson:"identity"`
     Answer       interface{} `json:"answer" bson:"answer"`
     EditedAnswer interface{} `json:"edited" bson:"edited"`
@@ -373,8 +421,8 @@ with the specific question asked included as well.
 ## type FormSubmissionAnswerInput
 ``` go
 type FormSubmissionAnswerInput struct {
-    WidgetID string      `json:"widget_id"`
-    Answer   interface{} `json:"answer"`
+    WidgetID string      `json:"widget_id" validate:"required,len=24"`
+    Answer   interface{} `json:"answer" validate:"exists"`
 }
 ```
 FormSubmissionAnswerInput describes the input accepted for a new submission
@@ -387,6 +435,14 @@ answer.
 
 
 
+
+
+
+### func (\*FormSubmissionAnswerInput) Validate
+``` go
+func (f *FormSubmissionAnswerInput) Validate() error
+```
+Validate checks the FormSubmissionAnswerInput value for consistency.
 
 
 
