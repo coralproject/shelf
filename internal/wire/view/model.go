@@ -54,9 +54,11 @@ func (slice Path) Swap(i, j int) {
 
 // View contains metadata about a view.
 type View struct {
-	Name      string `bson:"name" json:"name" validate:"required,min=3"`
-	StartType string `bson:"start_type" json:"start_type" validate:"required,min=3"`
-	Path      Path   `bson:"path" json:"path" validate:"required,min=1"`
+	Name                string `bson:"name" json:"name" validate:"required,min=3"`
+	CollectionOutPrefix string `bson:"collection_out_prefix,omitempty" json:"collection_out_prefix,omitempty"`
+	CollectionInName    string `bson:"collection_in_name" json:"collection_in_name" validate:"required,min=2"`
+	StartType           string `bson:"start_type" json:"start_type" validate:"required,min=3"`
+	Path                Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 
 // Validate checks the View value for consistency.

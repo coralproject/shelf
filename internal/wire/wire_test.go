@@ -17,7 +17,6 @@ import (
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
-	"github.com/coralproject/shelf/internal/wire/view"
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 )
 
@@ -95,28 +94,25 @@ func TestGenerateView(t *testing.T) {
 		t.Log("\tWhen using the view, relationship, and item fixtures.")
 		{
 
-			// Get the view.
-			v, err := view.GetByName(tests.Context, db, viewPrefix+"thread")
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to get the view by name : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to get the view by name.", tests.Success)
-
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				StartID:      "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-				StartType:    "coral_asset",
-				Persist:      false,
-				CollectionIn: "items",
-				GraphHandle:  store,
+				ViewName: viewPrefix + "user comments",
+				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
-			result := wire.Generate(tests.Context, db, v, &viewParams)
-			if result.Results != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
+			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the resulting items.
+			items, ok := result.Results.([]bson.M)
+			if !ok || len(items) != 2 {
+				t.Fatalf("\t%s\tShould be able to get 2 items in the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
 		}
 	}
 }
@@ -170,25 +166,22 @@ func TestPersistView(t *testing.T) {
 		t.Log("\tWhen using the view, relationship, and item fixtures.")
 		{
 
-			// Get the view.
-			v, err := view.GetByName(tests.Context, db, viewPrefix+"thread")
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to get the view by name : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to get the view by name.", tests.Success)
-
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				StartID:      "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-				StartType:    "coral_asset",
-				Persist:      true,
-				CollectionIn: "items",
-				GraphHandle:  store,
+				ViewName: viewPrefix + "thread",
+				ItemKey:  "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 			}
 
 			// Generate the view.
-			result := wire.Generate(tests.Context, db, v, &viewParams)
-			if result.Results != 5 {
+			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the result message.
+			msg, ok := result.Results.(bson.M)
+			if !ok || msg["number_of_results"] != 5 {
 				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
@@ -199,7 +192,7 @@ func TestPersistView(t *testing.T) {
 				return c.Find(nil).All(&viewItems)
 			}
 
-			if err := db.ExecuteMGO(tests.Context, result.CollectionOut, f); err != nil {
+			if err := db.ExecuteMGO(tests.Context, "thread_ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", f); err != nil {
 				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
@@ -214,7 +207,7 @@ func TestPersistView(t *testing.T) {
 				return c.DropCollection()
 			}
 
-			if err := db.ExecuteMGO(tests.Context, result.CollectionOut, f); err != nil {
+			if err := db.ExecuteMGO(tests.Context, "thread_ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", f); err != nil {
 				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"sort"
-	"strings"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/cayleygraph/cayley"
@@ -12,7 +11,6 @@ import (
 	"github.com/cayleygraph/cayley/graph/path"
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/wire/view"
-	uuid "github.com/pborman/uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -22,7 +20,7 @@ var ErrNotFound = errors.New("View items Not found")
 
 // viewPathToGraphPath translates the path in a view into a "path"
 // utilized in graph queries.
-func viewPathToGraphPath(v *view.View, viewParams *ViewParams) (*path.Path, error) {
+func viewPathToGraphPath(v *view.View, viewParams *ViewParams, graphDB *cayley.Handle) (*path.Path, error) {
 
 	// Sort the view Path value.
 	sort.Sort(v.Path)
@@ -45,9 +43,9 @@ func viewPathToGraphPath(v *view.View, viewParams *ViewParams) (*path.Path, erro
 			// Add the first level relationship.
 			switch segment.Direction {
 			case "in":
-				graphPath = cayley.StartPath(viewParams.GraphHandle, quad.String(viewParams.StartID)).In(quad.String(segment.Predicate))
+				graphPath = cayley.StartPath(graphDB, quad.String(viewParams.ItemKey)).In(quad.String(segment.Predicate))
 			case "out":
-				graphPath = cayley.StartPath(viewParams.GraphHandle, quad.String(viewParams.StartID)).Out(quad.String(segment.Predicate))
+				graphPath = cayley.StartPath(graphDB, quad.String(viewParams.ItemKey)).Out(quad.String(segment.Predicate))
 			}
 
 			// Add the tag, if present.
@@ -79,7 +77,7 @@ func viewPathToGraphPath(v *view.View, viewParams *ViewParams) (*path.Path, erro
 }
 
 // viewIDs retrieves the item IDs associated with the view.
-func viewIDs(v *view.View, path *path.Path, viewParams *ViewParams) ([]string, error) {
+func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, error) {
 
 	// Build the Cayley iterator.
 	it := path.BuildIterator()
@@ -105,7 +103,7 @@ func viewIDs(v *view.View, path *path.Path, viewParams *ViewParams) ([]string, e
 		// Extract the tagged item IDs.
 		for _, tag := range viewTags {
 			if t, ok := resultTags[tag]; ok {
-				ids = append(ids, quad.NativeOf(viewParams.GraphHandle.NameOf(t)).(string))
+				ids = append(ids, quad.NativeOf(graphDB.NameOf(t)).(string))
 			}
 		}
 	}
@@ -129,23 +127,19 @@ func viewIDs(v *view.View, path *path.Path, viewParams *ViewParams) ([]string, e
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
-func viewSave(context interface{}, db *db.DB, viewParams *ViewParams, ids []string) error {
+func viewSave(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
 
-	// Generate the collection name if not provided in the view parameters.
-	if viewParams.CollectionOut == "" {
-		newCol := uuid.New()
-		newCol = strings.Replace(newCol, "-", "", -1)
-		viewParams.CollectionOut = newCol
-	}
+	// Generate the unique collection name prefixed by the collection prefix.
+	collection := v.CollectionOutPrefix + "_" + viewParams.ItemKey
 
 	// Form the query.
 	var results []bson.M
 	f := func(c *mgo.Collection) error {
-		return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": viewParams.CollectionOut}}).All(&results)
+		return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": collection}}).All(&results)
 	}
 
 	// Execute the query.
-	if err := db.ExecuteMGO(context, viewParams.CollectionIn, f); err != nil {
+	if err := db.ExecuteMGO(context, v.CollectionInName, f); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}
@@ -156,7 +150,7 @@ func viewSave(context interface{}, db *db.DB, viewParams *ViewParams, ids []stri
 }
 
 // viewItems retrieves the items corresponding to the provided list of item IDs.
-func viewItems(context interface{}, db *db.DB, viewParams *ViewParams, ids []string) ([]bson.M, error) {
+func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bson.M, error) {
 
 	// Form the query.
 	var results []bson.M
@@ -165,7 +159,7 @@ func viewItems(context interface{}, db *db.DB, viewParams *ViewParams, ids []str
 	}
 
 	// Execute the query.
-	if err := db.ExecuteMGO(context, viewParams.CollectionIn, f); err != nil {
+	if err := db.ExecuteMGO(context, v.CollectionInName, f); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}

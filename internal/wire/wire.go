@@ -2,31 +2,23 @@
 package wire
 
 import (
-	"time"
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/wire/view"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // Result represents what a user will receive after generating a view.
 type Result struct {
-	Name          string    `json:"name"`
-	Updated       time.Time `json:"last_updated,omitempty"`
-	Results       int       `json:"number_of_results"`
-	CollectionOut string    `json:"collection_out,omitempty"`
-	CollectionIn  string    `json:"collection_in"`
-	Items         []bson.M  `json:"items,omitempty"`
-	Error         string    `json:"error,omitempty"`
+	Results interface{} `json:"results"`
 }
 
 // errResult returns a Result value with an error message.
-func errResult(v *view.View, err error) *Result {
+func errResult(err error) *Result {
 	result := Result{
-		Name:  v.Name,
-		Error: err.Error(),
+		Results: bson.M{"error": err.Error()},
 	}
 
 	return &result
@@ -34,82 +26,71 @@ func errResult(v *view.View, err error) *Result {
 
 // ViewParams represents how the View will be generated and persisted.
 type ViewParams struct {
-	StartID       string
-	StartType     string
-	Persist       bool
-	CollectionOut string
-	CollectionIn  string
-	GraphHandle   *cayley.Handle
+	ViewName string
+	ItemKey  string
 }
 
 //==============================================================================
 
 // Generate generates the specified view.
-func Generate(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams) *Result {
-	log.Dev(context, "Generate", "Started : Name[%s]", v.Name)
+func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error) {
+	log.Dev(context, "Generate", "Started : Name[%s]", viewParams.ViewName)
 
-	// Validate the view that is provided.
-	if err := v.Validate(); err != nil {
+	// Get the view.
+	v, err := view.GetByName(context, mgoDB, viewParams.ViewName)
+	if err != nil {
 		log.Error(context, "Generate", err, "Completed")
-		return errResult(v, err)
+		return errResult(err), err
 	}
 
 	// Validate the start type.
-	if err := verifyStartType(context, db, v, viewParams); err != nil {
+	if err := verifyStartType(context, mgoDB, v); err != nil {
 		log.Error(context, "Generate", err, "Completed")
-		return errResult(v, err)
+		return errResult(err), err
 	}
 
 	// Translate the view path into a graph query path.
-	graphPath, err := viewPathToGraphPath(v, viewParams)
+	graphPath, err := viewPathToGraphPath(v, viewParams, graphDB)
 	if err != nil {
 		log.Error(context, "Generate", err, "Completed")
-		return errResult(v, err)
+		return errResult(err), err
 	}
 
 	// Retrieve the item IDs for the view.
-	ids, err := viewIDs(v, graphPath, viewParams)
+	ids, err := viewIDs(v, graphPath, graphDB)
 	if err != nil {
 		log.Error(context, "Generate", err, "Completed")
-		return errResult(v, err)
+		return errResult(err), err
 	}
 
 	// Save the items out to a collection if enabled.
-	if viewParams.Persist {
+	if v.CollectionOutPrefix != "" {
 
 		// Output to the collection.
-		if err := viewSave(context, db, viewParams, ids); err != nil {
+		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
 			log.Error(context, "Generate", err, "Completed")
-			return errResult(v, err)
+			return errResult(err), err
 		}
 
 		// Output the results.
 		result := Result{
-			Name:          v.Name,
-			Updated:       time.Now(),
-			Results:       len(ids),
-			CollectionIn:  viewParams.CollectionIn,
-			CollectionOut: viewParams.CollectionOut,
+			Results: bson.M{"number_of_results": len(ids)},
 		}
-		return &result
+		return &result, nil
 	}
 
-	// Get the view items if it is not persisted.
-	items, err := viewItems(context, db, viewParams, ids)
+	// Get the view items if the view is not persisted.
+	items, err := viewItems(context, mgoDB, v, ids)
 	if err != nil {
 		log.Error(context, "Generate", err, "Completed")
-		return errResult(v, err)
+		return errResult(err), err
 	}
 
 	// Form the result.
 	result := Result{
-		Name:         v.Name,
-		Updated:      time.Now(),
-		Results:      len(ids),
-		CollectionIn: viewParams.CollectionIn,
-		Items:        items,
+		Results: items,
 	}
 
 	log.Dev(context, "Generate", "Completed")
-	return &result
+	return &result, nil
 }

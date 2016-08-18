@@ -9,12 +9,12 @@ import (
 )
 
 // verifyStartType verifies the start type of a view path.
-func verifyStartType(context interface{}, db *db.DB, view *view.View, viewParams *ViewParams) error {
+func verifyStartType(context interface{}, db *db.DB, v *view.View) error {
 
 	// Extract the first level relationship predicate.
 	var firstRel string
 	var firstDir string
-	for _, segment := range view.Path {
+	for _, segment := range v.Path {
 		if segment.Level == 1 {
 			firstRel = segment.Predicate
 			firstDir = segment.Direction
@@ -32,20 +32,20 @@ func verifyStartType(context interface{}, db *db.DB, view *view.View, viewParams
 	switch firstDir {
 	case "out":
 		for _, itemType := range rel.SubjectTypes {
-			if itemType == viewParams.StartType {
+			if itemType == v.StartType {
 				verify = true
 			}
 		}
 	case "in":
 		for _, itemType := range rel.ObjectTypes {
-			if itemType == viewParams.StartType {
+			if itemType == v.StartType {
 				verify = true
 			}
 		}
 	}
 
 	if !verify {
-		return fmt.Errorf("Start type %s does not match relationship subject types %v", viewParams.StartType, rel.SubjectTypes)
+		return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, rel.SubjectTypes)
 	}
 
 	return nil

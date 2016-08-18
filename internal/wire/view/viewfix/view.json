@@ -1,6 +1,8 @@
  [
 	{
 		"name": "VTEST_thread",
+		"collection_out_prefix": "thread",
+		"collection_in_name": "items",
 		"start_type": "coral_asset",
 		"path": [
 			{
@@ -20,6 +22,7 @@
 	{
 		"name": "VTEST_user comments",
 		"start_type": "coral_user",
+		"collection_in_name": "items",
 		"path": [
 			{
 				"level": 1,
@@ -32,6 +35,7 @@
 	{
 		"name": "VTEST_comments from authors flagged by a user",
 		"start_type": "coral_user",
+		"collection_in_name": "items",
 		"path": [
 			{
 				"level": 1,
