@@ -48,7 +48,7 @@ Result represents what a user will receive after generating a view.
 
 
 
-### <a name="Generate">func</a> [Generate](/src/target/wire.go?s=822:935#L26)
+### <a name="Generate">func</a> [Generate](/src/target/wire.go?s=868:981#L27)
 ``` go
 func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
@@ -58,11 +58,12 @@ Generate generates the specified view.
 
 
 
-## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=636:696#L18)
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=636:742#L18)
 ``` go
 type ViewParams struct {
-    ViewName string
-    ItemKey  string
+    ViewName          string
+    ItemKeys          []string
+    ResultsCollection string
 }
 ```
 ViewParams represents how the View will be generated and persisted.
