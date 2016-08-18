@@ -38,14 +38,23 @@ type FormSubmissionSearchOpts struct {
 // FormSubmissionAnswerInput describes the input accepted for a new submission
 // answer.
 type FormSubmissionAnswerInput struct {
-	WidgetID string      `json:"widget_id"`
-	Answer   interface{} `json:"answer"`
+	WidgetID string      `json:"widget_id" validate:"required,len=24"`
+	Answer   interface{} `json:"answer" validate:"exists"`
+}
+
+// Validate checks the FormSubmissionAnswerInput value for consistency.
+func (f *FormSubmissionAnswerInput) Validate() error {
+	if err := validate.Struct(f); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // FormSubmissionAnswer describes an answer submitted for a specific Form widget
 // with the specific question asked included as well.
 type FormSubmissionAnswer struct {
-	WidgetID     string      `json:"widget_id" bson:"widget_id"`
+	WidgetID     string      `json:"widget_id" bson:"widget_id" validate:"required,len=24"`
 	Identity     bool        `json:"identity" bson:"identity"`
 	Answer       interface{} `json:"answer" bson:"answer"`
 	EditedAnswer interface{} `json:"edited" bson:"edited"`
@@ -82,6 +91,14 @@ func CreateFormSubmission(context interface{}, db *db.DB, formID string, answers
 		return nil, ErrInvalidID
 	}
 
+	// validate that the answers are not invalid
+	for _, answer := range answers {
+		if err := answer.Validate(); err != nil {
+			log.Error(context, "CreateFormSubmission", err, "Completed")
+			return nil, err
+		}
+	}
+
 	form, err := RetrieveForm(context, db, formID)
 	if err != nil {
 		log.Error(context, "CreateFormSubmission", err, "Completed")
@@ -99,7 +116,7 @@ func CreateFormSubmission(context interface{}, db *db.DB, formID string, answers
 		DateUpdated: time.Now(),
 	}
 
-	// FIXME: handle Number field maybe with https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/
+	// TODO: handle Number field maybe with https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/
 
 	// for each answer
 	for _, answer := range answers {
@@ -169,7 +186,7 @@ func RetrieveFormSubmission(context interface{}, db *db.DB, id string) (*FormSub
 
 	var submission FormSubmission
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "RetrieveFormSubmission", "MGO : db.%s.find(%s)", c.Name, mongo.Query(objectID.Hex()))
+		log.Dev(context, "RetrieveFormSubmission", "MGO : db.%s.find(%s)", c.Name, mongo.Query(objectID))
 		return c.FindId(objectID).One(&submission)
 	}
 
@@ -180,6 +197,42 @@ func RetrieveFormSubmission(context interface{}, db *db.DB, id string) (*FormSub
 
 	log.Dev(context, "RetrieveFormSubmission", "Started")
 	return &submission, nil
+}
+
+// RetrieveFormSubmissions retrieves a list of FormSubmission's from the MongoDB
+// database collection.
+func RetrieveFormSubmissions(context interface{}, db *db.DB, ids []string) ([]FormSubmission, error) {
+	log.Dev(context, "RetrieveFormSubmissions", "Started")
+
+	var objectIDs = make([]bson.ObjectId, len(ids))
+
+	for i, id := range ids {
+		if !bson.IsObjectIdHex(id) {
+			log.Error(context, "RetrieveFormSubmissions", ErrInvalidID, "Completed")
+			return nil, ErrInvalidID
+		}
+
+		objectIDs[i] = bson.ObjectIdHex(id)
+	}
+
+	var submissions []FormSubmission
+	f := func(c *mgo.Collection) error {
+		q := bson.M{
+			"_id": bson.M{
+				"$in": objectIDs,
+			},
+		}
+		log.Dev(context, "RetrieveFormSubmissions", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
+		return c.Find(q).All(&submissions)
+	}
+
+	if err := db.ExecuteMGO(context, FormSubmissionsCollection, f); err != nil {
+		log.Error(context, "RetrieveFormSubmissions", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "RetrieveFormSubmissions", "Started")
+	return submissions, nil
 }
 
 // UpdateFormSubmissionStatus updates a form submissions status inside the
@@ -201,7 +254,7 @@ func UpdateFormSubmissionStatus(context interface{}, db *db.DB, id, status strin
 				"date_updated": time.Now(),
 			},
 		}
-		log.Dev(context, "UpdateFormSubmissionStatus", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID.Hex()), mongo.Query(u))
+		log.Dev(context, "UpdateFormSubmissionStatus", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
 		return c.UpdateId(objectID, u)
 	}
 
@@ -268,6 +321,39 @@ func UpdateFormSubmissionAnswer(context interface{}, db *db.DB, id, answerID str
 
 	log.Dev(context, "UpdateFormSubmissionAnswer", "Completed")
 	return submission, nil
+}
+
+// CountFormSubmissions returns the count of current submissions for a given
+// form id in the Form Submissions MongoDB database collection.
+func CountFormSubmissions(context interface{}, db *db.DB, formID string) (int, error) {
+	log.Dev(context, "CountFormSubmissions", "Completed")
+
+	if !bson.IsObjectIdHex(formID) {
+		log.Error(context, "CountFormSubmissions", ErrInvalidID, "Completed")
+		return 0, ErrInvalidID
+	}
+
+	formObjectID := bson.ObjectIdHex(formID)
+
+	var count int
+	f := func(c *mgo.Collection) error {
+		var err error
+
+		q := bson.M{
+			"form_id": formObjectID,
+		}
+		log.Dev(context, "CountFormSubmissions", "MGO : db.%s.find(%s).count()", c.Name, mongo.Query(q))
+		count, err = c.Find(q).Count()
+		return err
+	}
+
+	if err := db.ExecuteMGO(context, FormSubmissionsCollection, f); err != nil {
+		log.Error(context, "CountFormSubmissions", err, "Completed")
+		return 0, err
+	}
+
+	log.Dev(context, "CountFormSubmissions", "Completed")
+	return count, nil
 }
 
 // SearchFormSubmissions searches through form submissions for a given form
@@ -380,15 +466,75 @@ func SearchFormSubmissions(context interface{}, db *db.DB, formID string, limit,
 // AddFlagToFormSubmission adds, and de-duplicates a flag to a given
 // FormSubmission in the MongoDB database collection.
 func AddFlagToFormSubmission(context interface{}, db *db.DB, id, flag string) (*FormSubmission, error) {
-	// TODO: implement
-	return nil, nil
+	log.Dev(context, "AddFlagToFormSubmission", "Started")
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "AddFlagToFormSubmission", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	objectID := bson.ObjectIdHex(id)
+
+	f := func(c *mgo.Collection) error {
+		u := bson.M{
+			"$addToSet": bson.M{
+				"flags": flag,
+			},
+		}
+		log.Dev(context, "AddFlagToFormSubmission", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
+		return c.UpdateId(objectID, u)
+	}
+
+	if err := db.ExecuteMGO(context, FormSubmissionsCollection, f); err != nil {
+		log.Error(context, "AddFlagToFormSubmission", err, "Completed")
+		return nil, err
+	}
+
+	submission, err := RetrieveFormSubmission(context, db, id)
+	if err != nil {
+		log.Error(context, "AddFlagToFormSubmission", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "AddFlagToFormSubmission", "Completed")
+	return submission, nil
 }
 
 // RemoveFlagFromFormSubmission removes a flag from a given FormSubmission in
 // the MongoDB database collection.
 func RemoveFlagFromFormSubmission(context interface{}, db *db.DB, id, flag string) (*FormSubmission, error) {
-	// TODO: implement
-	return nil, nil
+	log.Dev(context, "RemoveFlagFromFormSubmission", "Started")
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "RemoveFlagFromFormSubmission", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	objectID := bson.ObjectIdHex(id)
+
+	f := func(c *mgo.Collection) error {
+		u := bson.M{
+			"$pull": bson.M{
+				"flags": flag,
+			},
+		}
+		log.Dev(context, "RemoveFlagFromFormSubmission", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
+		return c.UpdateId(objectID, u)
+	}
+
+	if err := db.ExecuteMGO(context, FormSubmissionsCollection, f); err != nil {
+		log.Error(context, "RemoveFlagFromFormSubmission", err, "Completed")
+		return nil, err
+	}
+
+	submission, err := RetrieveFormSubmission(context, db, id)
+	if err != nil {
+		log.Error(context, "RemoveFlagFromFormSubmission", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "RemoveFlagFromFormSubmission", "Completed")
+	return submission, nil
 }
 
 // DeleteFormSubmission removes a given Form Submission from the MongoDB
@@ -410,7 +556,7 @@ func DeleteFormSubmission(context interface{}, db *db.DB, id, formID string) err
 	objectID := bson.ObjectIdHex(id)
 
 	f := func(c *mgo.Collection) error {
-		log.Dev(context, "DeleteFormSubmission", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(objectID.Hex()))
+		log.Dev(context, "DeleteFormSubmission", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(objectID))
 		return c.RemoveId(objectID)
 	}
 

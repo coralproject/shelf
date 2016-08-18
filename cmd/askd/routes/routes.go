@@ -98,7 +98,7 @@ func oldRoutes(a *app.App) {
 	// form submissions
 	a.Handle("POST", "/api/form_submission/{form_id}", handlers.FormSubmission.Create)
 	a.Handle("PUT", "/api/form_submission/{id}/status/{status}", handlers.FormSubmission.UpdateStatus)
-	a.Handle("GET", "/api/form_submissions/{form_id}", handlers.FormSubmission.RetrieveByForm)
+	a.Handle("GET", "/api/form_submissions/{form_id}", handlers.FormSubmission.Search)
 	a.Handle("GET", "/api/form_submission/{id}", handlers.FormSubmission.Retrieve)
 	a.Handle("PUT", "/api/form_submission/{id}/{answer_id}", handlers.FormSubmission.UpdateAnswer)
 	a.Handle("PUT", "/api/form_submission/{id}/flag/{flag}", handlers.FormSubmission.AddFlag)
@@ -125,7 +125,7 @@ func routes(a *app.App) {
 
 	// form form submissions
 	a.Handle("POST", "/1.0/form/{form_id}/submission", handlers.FormSubmission.Create)
-	a.Handle("GET", "/1.0/form/{form_id}/submission", handlers.FormSubmission.RetrieveByForm)
+	a.Handle("GET", "/1.0/form/{form_id}/submission", handlers.FormSubmission.Search)
 	a.Handle("GET", "/1.0/form/{form_id}/submission/{id}", handlers.FormSubmission.Retrieve)
 	a.Handle("PUT", "/1.0/form/{form_id}/submission/{id}/status/{status}", handlers.FormSubmission.UpdateStatus)
 	a.Handle("POST", "/1.0/form/{form_id}/submission/{id}/flag/{flag}", handlers.FormSubmission.AddFlag)

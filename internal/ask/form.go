@@ -41,7 +41,7 @@ type FormStats struct {
 // Form contains the conatical representation of a Form, containing all the
 // Steps, and help text relating to completing the Form.
 type Form struct {
-	ID             bson.ObjectId `json:"id" bson:"_id"`
+	ID             bson.ObjectId `json:"id" bson:"_id" validate:"required,len=24"`
 	Status         string        `json:"status" bson:"status"`
 	Theme          interface{}   `json:"theme" bson:"theme"`
 	Settings       interface{}   `json:"settings" bson:"settings"`
@@ -58,15 +58,27 @@ type Form struct {
 	DateDeleted    time.Time     `json:"date_deleted,omitempty" bson:"date_deleted,omitempty"`
 }
 
+// Validate checks the Form value for consistency.
+func (f *Form) Validate() error {
+	if err := validate.Struct(f); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // UpsertForm upserts the provided form into the MongoDB database collection.
 func UpsertForm(context interface{}, db *db.DB, form *Form) error {
 	log.Dev(context, "UpsertForm", "Started")
 
-	// TODO: validate
-
 	// if there was no ID provided, we should set one
 	if form.ID == "" {
 		form.ID = bson.NewObjectId()
+	}
+
+	if err := form.Validate(); err != nil {
+		log.Error(context, "UpsertForm", err, "Completed")
+		return err
 	}
 
 	f := func(c *mgo.Collection) error {
@@ -81,19 +93,48 @@ func UpsertForm(context interface{}, db *db.DB, form *Form) error {
 		return err
 	}
 
-	if _, err := UpdateFormStats(context, db, form.ID.Hex()); err != nil {
-		log.Error(context, "UpsertForm", err, "Completed")
-		return err
-	}
-
 	log.Dev(context, "UpsertForm", "Completed")
 	return nil
 }
 
 // UpdateFormStats updates the FormStats on a given Form.
 func UpdateFormStats(context interface{}, db *db.DB, id string) (*FormStats, error) {
-	// TODO: implement
-	return nil, nil
+	log.Dev(context, "UpdateFormStats", "Started")
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "UpdateFormStats", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	objectID := bson.ObjectIdHex(id)
+
+	count, err := CountFormSubmissions(context, db, id)
+	if err != nil {
+		log.Error(context, "UpdateFormStats", ErrInvalidID, "Completed")
+		return nil, err
+	}
+
+	stats := FormStats{
+		Responses: count,
+	}
+	f := func(c *mgo.Collection) error {
+		u := bson.M{
+			"$set": bson.M{
+				"stats":        stats,
+				"date_updated": time.Now(),
+			},
+		}
+		log.Dev(context, "UpdateFormStats", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
+		return c.UpdateId(objectID, u)
+	}
+
+	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+		log.Error(context, "UpdateFormStats", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "UpdateFormStats", "Completed")
+	return &stats, nil
 }
 
 // UpdateFormStatus updates the forms status and returns the updated form from
@@ -109,9 +150,14 @@ func UpdateFormStatus(context interface{}, db *db.DB, id, status string) (*Form,
 	objectID := bson.ObjectIdHex(id)
 
 	f := func(c *mgo.Collection) error {
-		m := bson.M{}
-		log.Dev(context, "UpdateFormStatus", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(m))
-		return c.UpdateId(objectID, m)
+		u := bson.M{
+			"$set": bson.M{
+				"status":       status,
+				"date_updated": time.Now(),
+			},
+		}
+		log.Dev(context, "UpdateFormStatus", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
+		return c.UpdateId(objectID, u)
 	}
 
 	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
@@ -188,9 +234,8 @@ func DeleteForm(context interface{}, db *db.DB, id string) error {
 	objectID := bson.ObjectIdHex(id)
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"_id": objectID}
-		log.Dev(context, "DeleteForm", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(q))
-		return c.Remove(q)
+		log.Dev(context, "DeleteForm", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(objectID))
+		return c.RemoveId(objectID)
 	}
 
 	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {

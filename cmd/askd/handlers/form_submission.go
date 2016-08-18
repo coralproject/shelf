@@ -78,10 +78,10 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 	return nil
 }
 
-// RetrieveByForm retrieves a set of FormSubmission's based on the search params
+// Search retrieves a set of FormSubmission's based on the search params
 // provided in the query string.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) RetrieveByForm(c *app.Context) error {
+func (formSubmissionHandle) Search(c *app.Context) error {
 	formID := c.Params["form_id"]
 
 	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))

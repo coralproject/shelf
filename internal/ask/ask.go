@@ -3,9 +3,22 @@ package ask
 import (
 	"errors"
 
+	validator "gopkg.in/bluesuncorp/validator.v8"
+
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 )
+
+//==============================================================================
+
+// validate is used to perform model field validation.
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New(&validator.Config{TagName: "validate"})
+}
+
+//==============================================================================
 
 // ErrInvalidID occurs when an ID is not in a valid form.
 var ErrInvalidID = errors.New("ID is not in it's proper form")
