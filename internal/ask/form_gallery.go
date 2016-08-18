@@ -110,7 +110,10 @@ func RetrieveFormGallery(context interface{}, db *db.DB, id string) (*FormGaller
 // HydrateFormGallery loads a FormGallery with form submissions from the MongoDB
 // database collection.
 func HydrateFormGallery(context interface{}, db *db.DB, gallery *FormGallery) error {
+	log.Dev(context, "HydrateFormGallery", "Started")
+
 	if err := gallery.Validate(); err != nil {
+		log.Error(context, "HydrateFormGallery", err, "Completed")
 		return err
 	}
 
@@ -124,12 +127,14 @@ func HydrateFormGallery(context interface{}, db *db.DB, gallery *FormGallery) er
 	// so we can fetch all the form submissions in one request
 	submissions, err := RetrieveFormSubmissions(context, db, submissionIDs)
 	if err != nil {
+		log.Error(context, "HydrateFormGallery", err, "Completed")
 		return err
 	}
 
 	// merge the submissions into the given gallery
 	MergeSubmissionsIntoGalleryAnswers(gallery, submissions)
 
+	log.Dev(context, "HydrateFormGallery", "Completed")
 	return nil
 }
 
@@ -195,8 +200,11 @@ func MergeSubmissionsIntoGalleryAnswers(gallery *FormGallery, submissions []Form
 // HydrateFormGalleries loads an array of form galleries with form submissions
 // from the MongoDB database collection.
 func HydrateFormGalleries(context interface{}, db *db.DB, galleries []FormGallery) error {
+	log.Dev(context, "HydrateFormGalleries", "Started")
+
 	for _, gallery := range galleries {
 		if err := gallery.Validate(); err != nil {
+			log.Error(context, "HydrateFormGalleries", err, "Completed")
 			return err
 		}
 	}
@@ -214,6 +222,7 @@ func HydrateFormGalleries(context interface{}, db *db.DB, galleries []FormGaller
 	// so we can fetch all the form submissions in one request
 	submissions, err := RetrieveFormSubmissions(context, db, submissionIDs)
 	if err != nil {
+		log.Error(context, "HydrateFormGalleries", err, "Completed")
 		return err
 	}
 
@@ -223,6 +232,7 @@ func HydrateFormGalleries(context interface{}, db *db.DB, galleries []FormGaller
 		MergeSubmissionsIntoGalleryAnswers(&galleries[i], submissions)
 	}
 
+	log.Dev(context, "HydrateFormGalleries", "Completed")
 	return nil
 }
 
