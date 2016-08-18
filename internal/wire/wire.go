@@ -26,8 +26,9 @@ func errResult(err error) *Result {
 
 // ViewParams represents how the View will be generated and persisted.
 type ViewParams struct {
-	ViewName string
-	ItemKey  string
+	ViewName          string
+	ItemKeys          []string
+	ResultsCollection string
 }
 
 //==============================================================================
@@ -49,46 +50,54 @@ func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPar
 		return errResult(err), err
 	}
 
-	// Translate the view path into a graph query path.
-	graphPath, err := viewPathToGraphPath(v, viewParams, graphDB)
-	if err != nil {
-		log.Error(context, "Generate", err, "Completed")
-		return errResult(err), err
-	}
+	// Loop over item keys in the parameters persisting or gathering items.
+	var count int
+	var items []bson.M
+	for _, key := range viewParams.ItemKeys {
 
-	// Retrieve the item IDs for the view.
-	ids, err := viewIDs(v, graphPath, graphDB)
-	if err != nil {
-		log.Error(context, "Generate", err, "Completed")
-		return errResult(err), err
-	}
-
-	// Save the items out to a collection if enabled.
-	if v.CollectionOutPrefix != "" {
-
-		// Output to the collection.
-		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
+		// Translate the view path into a graph query path.
+		graphPath, err := viewPathToGraphPath(v, key, graphDB)
+		if err != nil {
 			log.Error(context, "Generate", err, "Completed")
 			return errResult(err), err
 		}
 
-		// Output the results.
-		result := Result{
-			Results: bson.M{"number_of_results": len(ids)},
+		// Retrieve the item IDs for the view.
+		ids, err := viewIDs(v, graphPath, graphDB)
+		if err != nil {
+			log.Error(context, "Generate", err, "Completed")
+			return errResult(err), err
 		}
-		return &result, nil
-	}
 
-	// Get the view items if the view is not persisted.
-	items, err := viewItems(context, mgoDB, v, ids)
-	if err != nil {
-		log.Error(context, "Generate", err, "Completed")
-		return errResult(err), err
+		// Persist or gather the resulting items.
+		switch {
+		case viewParams.ResultsCollection != "":
+			if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
+				log.Error(context, "Generate", err, "Completed")
+				return errResult(err), err
+			}
+			count += len(ids)
+		default:
+			itemsOut, err := viewItems(context, mgoDB, v, ids)
+			if err != nil {
+				log.Error(context, "Generate", err, "Completed")
+				return errResult(err), err
+			}
+			items = append(items, itemsOut...)
+		}
 	}
 
 	// Form the result.
-	result := Result{
-		Results: items,
+	var result Result
+	switch {
+	case viewParams.ResultsCollection != "":
+		result = Result{
+			Results: bson.M{"number_of_results": count},
+		}
+	default:
+		result = Result{
+			Results: items,
+		}
 	}
 
 	log.Dev(context, "Generate", "Completed")

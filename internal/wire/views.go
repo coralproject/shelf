@@ -20,7 +20,7 @@ var ErrNotFound = errors.New("View items Not found")
 
 // viewPathToGraphPath translates the path in a view into a "path"
 // utilized in graph queries.
-func viewPathToGraphPath(v *view.View, viewParams *ViewParams, graphDB *cayley.Handle) (*path.Path, error) {
+func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*path.Path, error) {
 
 	// Sort the view Path value.
 	sort.Sort(v.Path)
@@ -43,9 +43,9 @@ func viewPathToGraphPath(v *view.View, viewParams *ViewParams, graphDB *cayley.H
 			// Add the first level relationship.
 			switch segment.Direction {
 			case "in":
-				graphPath = cayley.StartPath(graphDB, quad.String(viewParams.ItemKey)).In(quad.String(segment.Predicate))
+				graphPath = cayley.StartPath(graphDB, quad.String(key)).In(quad.String(segment.Predicate))
 			case "out":
-				graphPath = cayley.StartPath(graphDB, quad.String(viewParams.ItemKey)).Out(quad.String(segment.Predicate))
+				graphPath = cayley.StartPath(graphDB, quad.String(key)).Out(quad.String(segment.Predicate))
 			}
 
 			// Add the tag, if present.
@@ -129,17 +129,14 @@ func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, e
 // viewSave retrieve items for a view and saves those items to a new collection.
 func viewSave(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
 
-	// Generate the unique collection name prefixed by the collection prefix.
-	collection := v.CollectionOutPrefix + "_" + viewParams.ItemKey
-
 	// Form the query.
 	var results []bson.M
 	f := func(c *mgo.Collection) error {
-		return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": collection}}).All(&results)
+		return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": viewParams.ResultsCollection}}).All(&results)
 	}
 
 	// Execute the query.
-	if err := db.ExecuteMGO(context, v.CollectionInName, f); err != nil {
+	if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}
@@ -159,7 +156,7 @@ func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bs
 	}
 
 	// Execute the query.
-	if err := db.ExecuteMGO(context, v.CollectionInName, f); err != nil {
+	if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
 		if err == mgo.ErrNotFound {
 			err = ErrNotFound
 		}

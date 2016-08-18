@@ -97,7 +97,7 @@ func TestGenerateView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: viewPrefix + "user comments",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKeys: []string{"ITEST_80aa936a-f618-4234-a7be-df59a14cf8de"},
 			}
 
 			// Generate the view.
@@ -168,8 +168,9 @@ func TestPersistView(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "thread",
-				ItemKey:  "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+				ViewName:          viewPrefix + "thread",
+				ItemKeys:          []string{"ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"},
+				ResultsCollection: "testcollection",
 			}
 
 			// Generate the view.
@@ -192,7 +193,7 @@ func TestPersistView(t *testing.T) {
 				return c.Find(nil).All(&viewItems)
 			}
 
-			if err := db.ExecuteMGO(tests.Context, "thread_ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", f); err != nil {
+			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
 				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
@@ -207,7 +208,7 @@ func TestPersistView(t *testing.T) {
 				return c.DropCollection()
 			}
 
-			if err := db.ExecuteMGO(tests.Context, "thread_ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", f); err != nil {
+			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
 				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
