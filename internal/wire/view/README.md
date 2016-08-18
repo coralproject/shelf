@@ -144,12 +144,14 @@ Validate checks the PathSegment value for consistency.
 
 
 
-## <a name="View">type</a> [View](/src/target/model.go?s=1485:1727#L46)
+## <a name="View">type</a> [View](/src/target/model.go?s=1485:1973#L46)
 ``` go
 type View struct {
-    Name      string `bson:"name" json:"name" validate:"required,min=3"`
-    StartType string `bson:"start_type" json:"start_type" validate:"required,min=3"`
-    Path      Path   `bson:"path" json:"path" validate:"required,min=1"`
+    Name                string `bson:"name" json:"name" validate:"required,min=3"`
+    CollectionOutPrefix string `bson:"collection_out_prefix,omitempty" json:"collection_out_prefix,omitempty"`
+    CollectionInName    string `bson:"collection_in_name" json:"collection_in_name" validate:"required,min=2"`
+    StartType           string `bson:"start_type" json:"start_type" validate:"required,min=3"`
+    Path                Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 ```
 View contains metadata about a view.
@@ -170,7 +172,7 @@ GetByName retrieves a view by name from Mongo.
 
 
 
-### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1780:1811#L53)
+### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=2026:2057#L55)
 ``` go
 func (v *View) Validate() error
 ```

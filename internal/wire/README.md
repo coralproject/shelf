@@ -16,7 +16,7 @@ Package wire provides support for generating views.
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
 * [type Result](#Result)
-  * [func Generate(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams) *Result](#Generate)
+  * [func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Generate)
 * [type ViewParams](#ViewParams)
 
 
@@ -34,16 +34,10 @@ ErrNotFound is an error variable thrown when no results are returned from a Mong
 
 
 
-## <a name="Result">type</a> [Result](/src/target/wire.go?s=333:710#L5)
+## <a name="Result">type</a> [Result](/src/target/wire.go?s=325:385#L4)
 ``` go
 type Result struct {
-    Name          string    `json:"name"`
-    Updated       time.Time `json:"last_updated,omitempty"`
-    Results       int       `json:"number_of_results"`
-    CollectionOut string    `json:"collection_out,omitempty"`
-    CollectionIn  string    `json:"collection_in"`
-    Items         []bson.M  `json:"items,omitempty"`
-    Error         string    `json:"error,omitempty"`
+    Results interface{} `json:"results"`
 }
 ```
 Result represents what a user will receive after generating a view.
@@ -54,9 +48,9 @@ Result represents what a user will receive after generating a view.
 
 
 
-### <a name="Generate">func</a> [Generate](/src/target/wire.go?s=1263:1354#L38)
+### <a name="Generate">func</a> [Generate](/src/target/wire.go?s=822:935#L26)
 ``` go
-func Generate(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams) *Result
+func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
 Generate generates the specified view.
 
@@ -64,15 +58,11 @@ Generate generates the specified view.
 
 
 
-## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=973:1137#L26)
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=636:696#L18)
 ``` go
 type ViewParams struct {
-    StartID       string
-    StartType     string
-    Persist       bool
-    CollectionOut string
-    CollectionIn  string
-    GraphHandle   *cayley.Handle
+    ViewName string
+    ItemKey  string
 }
 ```
 ViewParams represents how the View will be generated and persisted.
