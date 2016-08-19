@@ -17,7 +17,7 @@ const FormGalleryCollection = "form_galleries"
 // FormGalleryAnswer describes an answer from a form which has been added to a
 // FormGallery.
 type FormGalleryAnswer struct {
-	SubmissionID    bson.ObjectId          `json:"submission_id" bson:"submission_id" validate:"required,len=24"`
+	SubmissionID    bson.ObjectId          `json:"submission_id" bson:"submission_id" validate:"required"`
 	AnswerID        string                 `json:"answer_id" bson:"answer_id" validate:"required,len=24"`
 	Answer          FormSubmissionAnswer   `json:"answer,omitempty" bson:"-"`
 	IdentityAnswers []FormSubmissionAnswer `json:"identity_answers,omitempty" bson:"-"`
@@ -25,8 +25,8 @@ type FormGalleryAnswer struct {
 
 // FormGallery is a Form that has been moved to a shared space.
 type FormGallery struct {
-	ID          bson.ObjectId          `json:"id" bson:"_id" validate:"required,len=24"`
-	FormID      bson.ObjectId          `json:"form_id" bson:"form_id" validate:"required,len=24"`
+	ID          bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
+	FormID      bson.ObjectId          `json:"form_id" bson:"form_id" validate:"required"`
 	Headline    string                 `json:"headline" bson:"headline"`
 	Description string                 `json:"description" bson:"description"`
 	Config      map[string]interface{} `json:"config" bson:"config"`
