@@ -13,6 +13,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/askd/handlers"
 	"github.com/coralproject/shelf/cmd/askd/midware"
+	"github.com/coralproject/shelf/internal/ask"
 )
 
 // Environmental variables.
@@ -55,6 +56,10 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
+	if err := ensureDBIndexes(); err != nil {
+		log.Error("startup", "Init", err, "Initializing DB Indexes")
+		os.Exit(1)
+	}
 
 	// If authentication is on then configure Anvil.
 	var anv *anvil.Anvil
@@ -141,4 +146,21 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/1.0/form_gallery/{id}", handlers.FormGallery.Update)
 	a.Handle("POST", "/1.0/form_gallery/{id}/submission/{submission_id}/{answer_id}", handlers.FormGallery.AddAnswer)
 	a.Handle("DELETE", "/1.0/form_gallery/{id}/submission/{submission_id}/{answer_id}", handlers.FormGallery.RemoveAnswer)
+}
+
+func ensureDBIndexes() error {
+	// Check if mongodb is configured.
+	dbName, err := cfg.String(cfgMongoDB)
+	if err != nil {
+		log.Dev("startup", "Init", "MongoDB Disabled")
+		return nil
+	}
+
+	mgoDB, err := db.NewMGO("startup", dbName)
+	if err != nil {
+		return err
+	}
+	defer mgoDB.CloseMGO("startup")
+
+	return ask.EnsureIndexes("startup", mgoDB)
 }

@@ -55,6 +55,14 @@ DeleteFormSubmission removes a given Form Submission from the MongoDB
 database collection.
 
 
+## func EnsureIndexes
+``` go
+func EnsureIndexes(context interface{}, db *db.DB) error
+```
+EnsureIndexes perform index create commands against Mongo for the indexes
+needed for the ask package to run.
+
+
 ## func HydrateFormGalleries
 ``` go
 func HydrateFormGalleries(context interface{}, db *db.DB, galleries []FormGallery) error
