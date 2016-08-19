@@ -2,13 +2,19 @@ package handlers
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
+	"net/url"
 	"strconv"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
 )
+
+// ErrInvalidCaptcha is returned when a captcha is required for a form but it
+// is not valid on the request.
+var ErrInvalidCaptcha = errors.New("captcha invalid")
 
 // formSubmissionHandle maintains the set of handlers for the form submission api.
 type formSubmissionHandle struct{}
@@ -21,13 +27,54 @@ var FormSubmission formSubmissionHandle
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) Create(c *app.Context) error {
 	var payload struct {
-		Answers []ask.FormSubmissionAnswerInput `json:"replies"`
+		Recaptcha string
+		Answers   []ask.FormSubmissionAnswerInput `json:"replies"`
 	}
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
 		return err
 	}
 
 	formID := c.Params["form_id"]
+
+	{
+		// we should check to see if the form has a recaptcha property
+		form, err := ask.RetrieveForm(c, c.Ctx["DB"].(*db.DB), formID)
+		if err != nil {
+			return err
+		}
+
+		// if the recaptcha is enabled on the form
+		if form.Settings["recaptcha"].(bool) {
+			// and if we have a recaptcha value
+			if len(payload.Recaptcha) <= 0 {
+				return ErrInvalidCaptcha
+			}
+
+			// we should validate the recaptcha with google
+			body := url.Values{
+				"secret":   []string{""},
+				"response": []string{payload.Recaptcha},
+				"remoteip": []string{""},
+			}
+
+			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
+			if err != nil {
+				return err
+			}
+			defer resp.Body.Close()
+
+			var rr struct {
+				Success bool `json:"success"`
+			}
+			if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
+				return err
+			}
+
+			if !rr.Success {
+				return ErrInvalidCaptcha
+			}
+		}
+	}
 
 	submission, err := ask.CreateFormSubmission(c, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
 	if err != nil {

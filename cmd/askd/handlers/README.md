@@ -10,6 +10,12 @@ Package handlers contains the handler logic for processing requests.
 
 ## Variables
 ``` go
+var ErrInvalidCaptcha = errors.New("captcha invalid")
+```
+ErrInvalidCaptcha is returned when a captcha is required for a form but it
+is not valid on the request.
+
+``` go
 var Form formHandle
 ```
 Form fronts the access to the form service functionality.

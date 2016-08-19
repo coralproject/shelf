@@ -41,21 +41,21 @@ type FormStats struct {
 // Form contains the conatical representation of a Form, containing all the
 // Steps, and help text relating to completing the Form.
 type Form struct {
-	ID             bson.ObjectId `json:"id" bson:"_id" validate:"required,len=24"`
-	Status         string        `json:"status" bson:"status"`
-	Theme          interface{}   `json:"theme" bson:"theme"`
-	Settings       interface{}   `json:"settings" bson:"settings"`
-	Header         interface{}   `json:"header" bson:"header"`
-	Footer         interface{}   `json:"footer" bson:"footer"`
-	FinishedScreen interface{}   `json:"finishedScreen" bson:"finishedScreen"`
-	Steps          []FormStep    `json:"steps" bson:"steps"`
-	Stats          FormStats     `json:"stats" bson:"stats"`
-	CreatedBy      interface{}   `json:"created_by" bson:"created_by"`
-	UpdatedBy      interface{}   `json:"updated_by" bson:"updated_by"`
-	DeletedBy      interface{}   `json:"deleted_by" bson:"deleted_by"`
-	DateCreated    time.Time     `json:"date_created,omitempty" bson:"date_created,omitempty"`
-	DateUpdated    time.Time     `json:"date_updated,omitempty" bson:"date_updated,omitempty"`
-	DateDeleted    time.Time     `json:"date_deleted,omitempty" bson:"date_deleted,omitempty"`
+	ID             bson.ObjectId          `json:"id" bson:"_id" validate:"required,len=24"`
+	Status         string                 `json:"status" bson:"status"`
+	Theme          interface{}            `json:"theme" bson:"theme"`
+	Settings       map[string]interface{} `json:"settings" bson:"settings"`
+	Header         interface{}            `json:"header" bson:"header"`
+	Footer         interface{}            `json:"footer" bson:"footer"`
+	FinishedScreen interface{}            `json:"finishedScreen" bson:"finishedScreen"`
+	Steps          []FormStep             `json:"steps" bson:"steps"`
+	Stats          FormStats              `json:"stats" bson:"stats"`
+	CreatedBy      interface{}            `json:"created_by" bson:"created_by"`
+	UpdatedBy      interface{}            `json:"updated_by" bson:"updated_by"`
+	DeletedBy      interface{}            `json:"deleted_by" bson:"deleted_by"`
+	DateCreated    time.Time              `json:"date_created,omitempty" bson:"date_created,omitempty"`
+	DateUpdated    time.Time              `json:"date_updated,omitempty" bson:"date_updated,omitempty"`
+	DateDeleted    time.Time              `json:"date_deleted,omitempty" bson:"date_deleted,omitempty"`
 }
 
 // Validate checks the Form value for consistency.
