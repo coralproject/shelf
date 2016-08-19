@@ -116,8 +116,6 @@ func CreateFormSubmission(context interface{}, db *db.DB, formID string, answers
 		DateUpdated: time.Now(),
 	}
 
-	// TODO: handle Number field maybe with https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/
-
 	// for each answer
 	for _, answer := range answers {
 		var found bool
@@ -152,6 +150,15 @@ func CreateFormSubmission(context interface{}, db *db.DB, formID string, answers
 		}
 
 	}
+
+	// FIXME: handle Number field maybe with https://docs.mongodb.com/v3.0/tutorial/create-an-auto-incrementing-field/ to resolve race condition
+	count, err := CountFormSubmissions(context, db, formID)
+	if err != nil {
+		log.Error(context, "CreateFormSubmission", err, "Completed")
+		return nil, err
+	}
+
+	fs.Number = count + 1
 
 	f := func(c *mgo.Collection) error {
 		log.Dev(context, "CreateFormSubmission", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(fs))
