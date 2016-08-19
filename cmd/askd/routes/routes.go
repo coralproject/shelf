@@ -18,12 +18,13 @@ import (
 
 // Environmental variables.
 const (
-	cfgMongoHost     = "MONGO_HOST"
-	cfgMongoAuthDB   = "MONGO_AUTHDB"
-	cfgMongoDB       = "MONGO_DB"
-	cfgMongoUser     = "MONGO_USER"
-	cfgMongoPassword = "MONGO_PASS"
-	cfgAnvilHost     = "ANVIL_HOST"
+	cfgMongoHost       = "MONGO_HOST"
+	cfgMongoAuthDB     = "MONGO_AUTHDB"
+	cfgMongoDB         = "MONGO_DB"
+	cfgMongoUser       = "MONGO_USER"
+	cfgMongoPassword   = "MONGO_PASS"
+	cfgAnvilHost       = "ANVIL_HOST"
+	cfgRecaptchaSecret = "RECAPTCHA_SECRET"
 )
 
 func init() {
@@ -75,6 +76,14 @@ func API() http.Handler {
 
 	a := app.New(midware.Mongo, midware.Auth)
 	a.Ctx["anvil"] = anv
+
+	// load in the recaptcha secret
+	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
+		a.Ctx["recaptcha"] = recaptcha
+		log.Dev("startup", "Init", "Recaptcha Enabled")
+	} else {
+		log.Dev("startup", "Init", "Recaptcha Disabled")
+	}
 
 	log.Dev("startup", "Init", "Initalizing routes")
 

@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"errors"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -52,9 +53,13 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 
 			// we should validate the recaptcha with google
 			body := url.Values{
-				"secret":   []string{""},
+				"secret":   []string{c.Ctx["recaptcha"].(string)},
 				"response": []string{payload.Recaptcha},
-				"remoteip": []string{""},
+			}
+
+			ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
+			if err == nil {
+				body["remoteip"] = []string{ip}
 			}
 
 			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
