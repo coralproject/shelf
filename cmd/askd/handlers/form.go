@@ -27,7 +27,7 @@ func (formHandle) Upsert(c *app.Context) error {
 	}
 
 	// perform the upsert operation
-	err := ask.Upsert(c, c.Ctx["DB"].(*db.DB), &form)
+	err := ask.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &form)
 	if err != nil {
 		return err
 	}
@@ -43,7 +43,7 @@ func (formHandle) UpdateStatus(c *app.Context) error {
 	status := c.Params["status"]
 
 	// actually update the form status
-	form, err := ask.UpdateFormStatus(c, c.Ctx["DB"].(*db.DB), id, status)
+	form, err := ask.UpdateFormStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
 	if err != nil {
 		return err
 	}
@@ -66,7 +66,7 @@ func (formHandle) List(c *app.Context) error {
 		skip = 0
 	}
 
-	forms, err := ask.RetrieveManyForms(c, c.Ctx["DB"].(*db.DB), limit, skip)
+	forms, err := ask.RetrieveManyForms(c.SessionID, c.Ctx["DB"].(*db.DB), limit, skip)
 	if err != nil {
 		return err
 	}
@@ -81,7 +81,7 @@ func (formHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
 	// fetch the document from the store
-	form, err := ask.RetrieveForm(c, c.Ctx["DB"].(*db.DB), id)
+	form, err := ask.RetrieveForm(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
@@ -96,7 +96,7 @@ func (formHandle) Delete(c *app.Context) error {
 	id := c.Params["id"]
 
 	// perform the delete operation
-	err := ask.DeleteForm(c, c.Ctx["DB"].(*db.DB), id)
+	err := ask.DeleteForm(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}

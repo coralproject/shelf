@@ -39,7 +39,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 
 	{
 		// we should check to see if the form has a recaptcha property
-		form, err := ask.RetrieveForm(c, c.Ctx["DB"].(*db.DB), formID)
+		form, err := ask.RetrieveForm(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 		if err != nil {
 			return err
 		}
@@ -81,7 +81,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		}
 	}
 
-	submission, err := ask.CreateFormSubmission(c, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
+	submission, err := ask.CreateFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
 	if err != nil {
 		return err
 	}
@@ -98,7 +98,7 @@ func (formSubmissionHandle) UpdateStatus(c *app.Context) error {
 	id := c.Params["id"]
 	status := c.Params["status"]
 
-	submission, err := ask.UpdateFormStatus(c, c.Ctx["DB"].(*db.DB), id, status)
+	submission, err := ask.UpdateFormStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
 	if err != nil {
 		return err
 	}
@@ -120,7 +120,7 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 	id := c.Params["id"]
 	answerID := c.Params["answer_id"]
 
-	submission, err := ask.UpdateFormSubmissionAnswer(c, c.Ctx["DB"].(*db.DB), id, answerID, editedAnswer)
+	submission, err := ask.UpdateFormSubmissionAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, answerID, editedAnswer)
 	if err != nil {
 		return err
 	}
@@ -155,7 +155,7 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		opts.DscOrder = true
 	}
 
-	results, err := ask.SearchFormSubmissions(c, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
+	results, err := ask.SearchFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
 	if err != nil {
 		return err
 	}
@@ -170,7 +170,7 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 func (formSubmissionHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
-	submission, err := ask.RetrieveFormSubmission(c, c.Ctx["DB"].(*db.DB), id)
+	submission, err := ask.RetrieveFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
@@ -194,7 +194,7 @@ func (formSubmissionHandle) Delete(c *app.Context) error {
 		formID = ""
 	}
 
-	err := ask.DeleteFormSubmission(c, c.Ctx["DB"].(*db.DB), id, formID)
+	err := ask.DeleteFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, formID)
 	if err != nil {
 		return err
 	}
@@ -211,7 +211,7 @@ func (formSubmissionHandle) AddFlag(c *app.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 
-	submission, err := ask.AddFlagToFormSubmission(c, c.Ctx["DB"].(*db.DB), id, flag)
+	submission, err := ask.AddFlagToFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
 	if err != nil {
 		return err
 	}
@@ -228,7 +228,7 @@ func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 
-	submission, err := ask.RemoveFlagFromFormSubmission(c, c.Ctx["DB"].(*db.DB), id, flag)
+	submission, err := ask.RemoveFlagFromFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
 	if err != nil {
 		return err
 	}

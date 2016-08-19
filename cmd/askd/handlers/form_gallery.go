@@ -22,7 +22,7 @@ func (formGalleryHandle) AddAnswer(c *app.Context) error {
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
 
-	gallery, err := ask.AddFormGalleryAnswer(c, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
+	gallery, err := ask.AddFormGalleryAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
 
-	gallery, err := ask.RemoveFormGalleryAnswer(c, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
+	gallery, err := ask.RemoveFormGalleryAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
 func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
 	formID := c.Params["form_id"]
 
-	galleries, err := ask.RetrieveFormGalleriesForForm(c, c.Ctx["DB"].(*db.DB), formID)
+	galleries, err := ask.RetrieveFormGalleriesForForm(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
 func (formGalleryHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
-	gallery, err := ask.RetrieveFormGallery(c, c.Ctx["DB"].(*db.DB), id)
+	gallery, err := ask.RetrieveFormGallery(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
@@ -86,7 +86,7 @@ func (formGalleryHandle) Update(c *app.Context) error {
 
 	id := c.Params["id"]
 
-	err := ask.UpdateFormGallery(c, c.Ctx["DB"].(*db.DB), id, &gallery)
+	err := ask.UpdateFormGallery(c.SessionID, c.Ctx["DB"].(*db.DB), id, &gallery)
 	if err != nil {
 		return err
 	}
