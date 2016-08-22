@@ -8,8 +8,8 @@ import (
 	"github.com/coralproject/shelf/internal/wire/view"
 )
 
-// verifyStartType verifies the start type of a view path.
-func verifyStartType(context interface{}, db *db.DB, v *view.View) error {
+// validateStartType verifies the start type of a view path.
+func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 
 	// Extract the first level relationship predicate.
 	var firstRel string

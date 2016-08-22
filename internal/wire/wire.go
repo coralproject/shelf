@@ -45,12 +45,12 @@ func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPar
 	}
 
 	// Validate the start type.
-	if err := verifyStartType(context, mgoDB, v); err != nil {
+	if err := validateStartType(context, mgoDB, v); err != nil {
 		log.Error(context, "Generate", err, "Completed")
 		return errResult(err), err
 	}
 
-	// Loop over item keys in the parameters persisting or gathering items.
+	// Loop over item keys persisting or gathering items.
 	var count int
 	var items []bson.M
 	for _, key := range viewParams.ItemKeys {
@@ -69,34 +69,29 @@ func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPar
 			return errResult(err), err
 		}
 
-		// Persist or gather the resulting items.
-		switch {
-		case viewParams.ResultsCollection != "":
-			if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
-				log.Error(context, "Generate", err, "Completed")
-				return errResult(err), err
-			}
-			count += len(ids)
-		default:
-			itemsOut, err := viewItems(context, mgoDB, v, ids)
-			if err != nil {
-				log.Error(context, "Generate", err, "Completed")
-				return errResult(err), err
-			}
-			items = append(items, itemsOut...)
+		// Persist the items in the view.
+		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
+			log.Error(context, "Generate", err, "Completed")
+			return errResult(err), err
 		}
+		count += len(ids)
+
+		// Gather the items in the view.
+		itemsOut, err := viewItems(context, mgoDB, v, viewParams, ids)
+		if err != nil {
+			log.Error(context, "Generate", err, "Completed")
+			return errResult(err), err
+		}
+		items = append(items, itemsOut...)
 	}
 
 	// Form the result.
-	var result Result
-	switch {
-	case viewParams.ResultsCollection != "":
+	result := Result{
+		Results: items,
+	}
+	if viewParams.ResultsCollection != "" {
 		result = Result{
 			Results: bson.M{"number_of_results": count},
-		}
-	default:
-		result = Result{
-			Results: items,
 		}
 	}
 

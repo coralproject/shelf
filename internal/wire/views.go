@@ -128,39 +128,43 @@ func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, e
 
 // viewSave retrieve items for a view and saves those items to a new collection.
 func viewSave(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
+	if viewParams.ResultsCollection != "" {
 
-	// Form the query.
-	var results []bson.M
-	f := func(c *mgo.Collection) error {
-		return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": viewParams.ResultsCollection}}).All(&results)
-	}
-
-	// Execute the query.
-	if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
-		if err == mgo.ErrNotFound {
-			err = ErrNotFound
+		// Form the query.
+		var results []bson.M
+		f := func(c *mgo.Collection) error {
+			return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": viewParams.ResultsCollection}}).All(&results)
 		}
-		return err
+
+		// Execute the query.
+		if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
+			if err == mgo.ErrNotFound {
+				err = ErrNotFound
+			}
+			return err
+		}
 	}
 
 	return nil
 }
 
 // viewItems retrieves the items corresponding to the provided list of item IDs.
-func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bson.M, error) {
-
-	// Form the query.
+func viewItems(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) ([]bson.M, error) {
 	var results []bson.M
-	f := func(c *mgo.Collection) error {
-		return c.Find(bson.M{"item_id": bson.M{"$in": ids}}).All(&results)
-	}
+	if viewParams.ResultsCollection == "" {
 
-	// Execute the query.
-	if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
-		if err == mgo.ErrNotFound {
-			err = ErrNotFound
+		// Form the query.
+		f := func(c *mgo.Collection) error {
+			return c.Find(bson.M{"item_id": bson.M{"$in": ids}}).All(&results)
 		}
-		return nil, err
+
+		// Execute the query.
+		if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
+			if err == mgo.ErrNotFound {
+				err = ErrNotFound
+			}
+			return nil, err
+		}
 	}
 
 	return results, nil

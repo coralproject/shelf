@@ -128,31 +128,31 @@ func dialMongo(addr string, options graph.Options) (*mgo.Session, error) {
 	var dialInfo mgo.DialInfo
 	dialInfo.Addrs = strings.Split(addr, ",")
 	user, ok, err := options.StringKey("username")
-	switch {
-	case err != nil:
-		return &mgo.Session{}, err
-	case ok:
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		dialInfo.Username = user
 		password, ok, err := options.StringKey("password")
-		switch {
-		case err != nil:
-			return &mgo.Session{}, err
-		case ok:
+		if err != nil {
+			return nil, err
+		}
+		if ok {
 			dialInfo.Password = password
 		}
 	}
 	dbName := DefaultDBName
 	val, ok, err := options.StringKey("database_name")
-	switch {
-	case err != nil:
-		return &mgo.Session{}, err
-	case ok:
+	if err != nil {
+		return nil, err
+	}
+	if ok {
 		dbName = val
 	}
 	dialInfo.Database = dbName
 	conn, err := mgo.DialWithInfo(&dialInfo)
 	if err != nil {
-		return &mgo.Session{}, err
+		return nil, err
 	}
 	return conn, nil
 }

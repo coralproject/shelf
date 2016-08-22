@@ -64,92 +64,92 @@
 		{
 			"checksumSHA1": "sBoqInMiA1mKLzU36brsMQ+iWPU=",
 			"path": "github.com/cayleygraph/cayley",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "lGV9Ancv4KwwoYtv8MIVHA2BUHQ=",
 			"path": "github.com/cayleygraph/cayley/clog",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "wQJLqKeIxUM0PBVxW0uAy5r9tVU=",
 			"path": "github.com/cayleygraph/cayley/graph",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "uMx1u4TLyULOx89q0r+Yxn6tuFw=",
 			"path": "github.com/cayleygraph/cayley/graph/graphtest",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "7vOQ7OG52jq3onp9Yc7w2oWz1nI=",
 			"path": "github.com/cayleygraph/cayley/graph/iterator",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "d37I6E5H1UkKW/4LtuulL06SZdM=",
 			"path": "github.com/cayleygraph/cayley/graph/memstore",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "zFRXFHIxYTAOOF7zqYiTv7cj4rQ=",
 			"path": "github.com/cayleygraph/cayley/graph/memstore/b",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
-			"checksumSHA1": "PQknCfdY/dUSwyKdTnp9bHaFd+k=",
+			"checksumSHA1": "VoX0UHJfkB5EOdj/P/3sclyO1rc=",
 			"path": "github.com/cayleygraph/cayley/graph/mongo",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "jnn+0OSW4PRcSSeGDkGaCa2esSw=",
 			"path": "github.com/cayleygraph/cayley/graph/path",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "py8ajkdfrgMPgMzdIHh23mAo9h8=",
 			"path": "github.com/cayleygraph/cayley/graph/proto",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "nkyWUwui2gYe8GyUZEHxWPDLBKY=",
 			"path": "github.com/cayleygraph/cayley/internal/dock",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "rz2m64GQQ7dSwNcR2AFV0gmjuy4=",
 			"path": "github.com/cayleygraph/cayley/internal/lru",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "sE8lEED/w+x+QULydZY6oPTBN5E=",
 			"path": "github.com/cayleygraph/cayley/quad",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "/tWNS4rF+W1hflTOY5E098Z22xA=",
 			"path": "github.com/cayleygraph/cayley/quad/cquads",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "aM5YAgWyIm+kgH3whZzP6VvHOVE=",
 			"path": "github.com/cayleygraph/cayley/writer",
-			"revision": "bc98b4ba916356331936034e35ef04033818c2f3",
-			"revisionTime": "2016-08-17T20:15:25Z"
+			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
+			"revisionTime": "2016-08-19T17:31:27Z"
 		},
 		{
 			"checksumSHA1": "jqSVRDK7dGg6E/NikVq1Kw6gdbA=",
