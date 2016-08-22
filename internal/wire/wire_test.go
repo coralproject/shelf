@@ -1,6 +1,8 @@
 package wire_test
 
 import (
+	"fmt"
+	"os"
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
@@ -43,181 +45,29 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
-//==============================================================================
+// TestMain helps to clean up the test data.
+func TestMain(m *testing.M) {
+	os.Exit(runTest(m))
+}
 
-// TestGenerateView tests the generation of a view, opting not to persist the view.
-func TestGenerateView(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
+// runTest initializes the environment for the tests and allows for
+// the proper return code if the test fails or succeeds.
+func runTest(m *testing.M) int {
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		fmt.Println("MongoDB is not configured")
+		return 1
 	}
 	defer db.CloseMGO(tests.Context)
 
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
+	if err := loadTestData(tests.Context, db); err != nil {
+		fmt.Println("test data is not loaded")
+		return 1
 	}
+	defer unloadTestData(tests.Context, db)
 
-	// -----------------------------------------------------------
-	// Load/unload the test data.
-
-	t.Log("Given the need to load the test data.")
-	{
-		if err = loadTestData(tests.Context, db); err != nil {
-			t.Fatalf("\t%s\tShould be able to load the test data : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to load the test data.", tests.Success)
-	}
-
-	defer func() {
-		t.Log("Given the need to unload the test data.")
-		{
-			if err = unloadTestData(tests.Context, db); err != nil {
-				t.Fatalf("\t%s\tShould be able to unload the test data : %v", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to unload the test data.", tests.Success)
-		}
-	}()
-
-	// -----------------------------------------------------------
-	// Generate the view.
-
-	t.Log("Given the need to generate a view.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "user comments",
-				ItemKeys: []string{"ITEST_80aa936a-f618-4234-a7be-df59a14cf8de"},
-			}
-
-			// Generate the view.
-			result, err := wire.Generate(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the resulting items.
-			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 2 {
-				t.Fatalf("\t%s\tShould be able to get 2 items in the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
-		}
-	}
+	return m.Run()
 }
-
-// TestPersistView tests the generation of a view, opting to persist the view.
-func TestPersistView(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Load/unload the test data.
-
-	t.Log("Given the need to load the test data.")
-	{
-		if err = loadTestData(tests.Context, db); err != nil {
-			t.Fatalf("\t%s\tShould be able to load the test data : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to load the test data.", tests.Success)
-	}
-
-	defer func() {
-		t.Log("Given the need to unload the test data.")
-		{
-			if err = unloadTestData(tests.Context, db); err != nil {
-				t.Fatalf("\t%s\tShould be able to unload the test data : %v", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to unload the test data.", tests.Success)
-		}
-	}()
-
-	// -----------------------------------------------------------
-	// Generate the view.
-
-	t.Log("Given the need to generate a view.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName:          viewPrefix + "thread",
-				ItemKeys:          []string{"ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"},
-				ResultsCollection: "testcollection",
-			}
-
-			// Generate the view.
-			result, err := wire.Generate(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the result message.
-			msg, ok := result.Results.(bson.M)
-			if !ok || msg["number_of_results"] != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
-
-			// Verify that the output collection exists.
-			var viewItems []bson.M
-			f := func(c *mgo.Collection) error {
-				return c.Find(nil).All(&viewItems)
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
-
-			if len(viewItems) != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
-
-			// Delete the persisted collection to clean up.
-			f = func(c *mgo.Collection) error {
-				return c.DropCollection()
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
-
-		}
-	}
-}
-
-//==============================================================================
 
 // loadTestData adds all the test data into the database.
 func loadTestData(context interface{}, db *db.DB) error {
@@ -336,4 +186,135 @@ func unloadTestData(context interface{}, db *db.DB) error {
 
 	return nil
 
+}
+
+//==============================================================================
+
+// TestGenerateView tests the generation of a view, opting not to persist the view.
+func TestGenerateView(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	opts := make(map[string]interface{})
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
+	}
+
+	// -----------------------------------------------------------
+	// Generate the view.
+
+	t.Log("Given the need to generate a view.")
+	{
+		t.Log("\tWhen using the view, relationship, and item fixtures.")
+		{
+
+			// Form the view parameters.
+			viewParams := wire.ViewParams{
+				ViewName: viewPrefix + "user comments",
+				ItemKeys: []string{"ITEST_80aa936a-f618-4234-a7be-df59a14cf8de"},
+			}
+
+			// Generate the view.
+			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the resulting items.
+			items, ok := result.Results.([]bson.M)
+			if !ok || len(items) != 2 {
+				t.Fatalf("\t%s\tShould be able to get 2 items in the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
+		}
+	}
+}
+
+// TestPersistView tests the generation of a view, opting to persist the view.
+func TestPersistView(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	opts := make(map[string]interface{})
+	opts["database_name"] = cfg.MustString("MONGO_DB")
+	opts["username"] = cfg.MustString("MONGO_USER")
+	opts["password"] = cfg.MustString("MONGO_PASS")
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
+	}
+
+	// -----------------------------------------------------------
+	// Generate the view.
+
+	t.Log("Given the need to generate a view.")
+	{
+		t.Log("\tWhen using the view, relationship, and item fixtures.")
+		{
+
+			// Form the view parameters.
+			viewParams := wire.ViewParams{
+				ViewName:          viewPrefix + "thread",
+				ItemKeys:          []string{"ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"},
+				ResultsCollection: "testcollection",
+			}
+
+			// Generate the view.
+			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the result message.
+			msg, ok := result.Results.(bson.M)
+			if !ok || msg["number_of_results"] != 5 {
+				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
+
+			// Verify that the output collection exists.
+			var viewItems []bson.M
+			f := func(c *mgo.Collection) error {
+				return c.Find(nil).All(&viewItems)
+			}
+
+			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
+				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
+
+			if len(viewItems) != 5 {
+				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
+
+			// Delete the persisted collection to clean up.
+			f = func(c *mgo.Collection) error {
+				return c.DropCollection()
+			}
+
+			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
+				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
+		}
+	}
 }
