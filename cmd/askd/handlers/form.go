@@ -43,7 +43,6 @@ func (formHandle) UpdateStatus(c *app.Context) error {
 	id := c.Params["id"]
 	status := c.Params["status"]
 
-	// actually update the form status
 	f, err := form.UpdateStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
 	if err != nil {
 		return err
@@ -81,7 +80,6 @@ func (formHandle) List(c *app.Context) error {
 func (formHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
-	// fetch the document from the store
 	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
@@ -96,7 +94,6 @@ func (formHandle) Retrieve(c *app.Context) error {
 func (formHandle) Delete(c *app.Context) error {
 	id := c.Params["id"]
 
-	// perform the delete operation
 	err := form.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err

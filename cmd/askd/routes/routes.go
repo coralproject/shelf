@@ -77,7 +77,7 @@ func API() http.Handler {
 	a := app.New(midware.Mongo, midware.Auth)
 	a.Ctx["anvil"] = anv
 
-	// load in the recaptcha secret
+	// Load in the recaptcha secret from the config.
 	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
 		a.Ctx["recaptcha"] = recaptcha
 		log.Dev("startup", "Init", "Recaptcha Enabled")

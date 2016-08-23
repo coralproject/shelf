@@ -69,7 +69,6 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 		return nil, ErrInvalidID
 	}
 
-	// validate that the answers are not invalid
 	for _, answer := range answers {
 		if err := answer.Validate(); err != nil {
 			log.Error(context, "CreateSubmission", err, "Completed")
@@ -83,7 +82,6 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 		return nil, err
 	}
 
-	// create the new form submission
 	sub := submission.Submission{
 		ID:          bson.NewObjectId(),
 		FormID:      bson.ObjectIdHex(formID),
@@ -94,17 +92,16 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 		DateUpdated: time.Now(),
 	}
 
-	// for each answer
+	// For each answer, merge in the widget details from the Form.
 	for _, answer := range answers {
 		var found bool
 
-		// we must check each step of the form
 		for _, step := range f.Steps {
-			// and each widget
+
 			for _, widget := range step.Widgets {
-				// to see if we can find the matching widget for this answer
+
 				if answer.WidgetID == widget.ID {
-					// and push that answer into the form submission
+
 					sub.Answers = append(sub.Answers, submission.Answer{
 						WidgetID: widget.ID,
 						Answer:   answer,
@@ -113,16 +110,16 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 						Props:    widget.Props,
 					})
 
-					// mark the answer as found
 					found = true
 
 					break
 				}
 			}
 
-			// so that if the answer was already found...
 			if found {
-				// we can break out of this step loop
+
+				// The answer was already found above, so we don't need to keep looping!
+
 				break
 			}
 		}
@@ -144,7 +141,7 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 
 // DeleteSubmission deletes a submission as well as updating a form's stats.
 func DeleteSubmission(context interface{}, db *db.DB, id, formID string) error {
-	log.Dev(context, "DeleteSubmission", "Started")
+	log.Dev(context, "DeleteSubmission", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "DeleteSubmission", ErrInvalidID, "Completed")

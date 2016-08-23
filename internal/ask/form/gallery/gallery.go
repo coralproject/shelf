@@ -97,7 +97,7 @@ func Create(context interface{}, db *db.DB, formID string) (*Gallery, error) {
 // Retrieve retrieves a form gallery from the MongoDB database
 // collection as well as hydrating the form gallery with form submissions.
 func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error) {
-	log.Dev(context, "Retrieve", "Started")
+	log.Dev(context, "Retrieve", "Started : Gallery[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Retrieve", ErrInvalidID, "Completed")
@@ -129,88 +129,75 @@ func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error) {
 // hydrate loads a Gallery with form submissions from the MongoDB
 // database collection.
 func hydrate(context interface{}, db *db.DB, gallery *Gallery) error {
-	log.Dev(context, "hydrate", "Started")
 
-	if err := gallery.Validate(); err != nil {
-		log.Error(context, "hydrate", err, "Completed")
-		return err
-	}
-
-	// load all the submission id's from the answers inside the gallery
+	// Load all the submission id's from the answers inside the gallery into
+	// an array so that we can query by them all.
 	var submissionIDs = make([]string, len(gallery.Answers))
 	for i, answer := range gallery.Answers {
-		// and set their hex
 		submissionIDs[i] = answer.SubmissionID.Hex()
 	}
 
-	// so we can fetch all the form submissions in one request
 	submissions, err := submission.List(context, db, submissionIDs)
 	if err != nil {
-		log.Error(context, "hydrate", err, "Completed")
 		return err
 	}
 
-	// merge the submissions into the given gallery
 	mergeSubmissionsIntoGalleryAnswers(gallery, submissions)
 
-	log.Dev(context, "hydrate", "Completed")
 	return nil
 }
 
 // mergeSubmissionsIntoGalleryAnswers associates the array of submissions onto
 // matching gallery answers.
 func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submission.Submission) {
-	// walk through all their answers
+	// We should walk through all their answers from the Gallery.
 	for j, answer := range gallery.Answers {
 
-		// and for each submission
 		for k, sub := range submissions {
-			// if we are looking at a different submission that doesn't match the
+			// If we are looking at a different submission that doesn't match the
 			// answer's submission ID or the submission was to a different form that
 			// the current gallery is on, then we need to skip this submission.
 			if sub.ID != answer.SubmissionID || sub.FormID.Hex() != gallery.FormID.Hex() {
 				continue
 			}
 
-			// we have verified that the current submission is indeed for the
-			// current gallery form and matches the submission id
+			// We have verified that the current submission is indeed for the
+			// current gallery form and matches the submission id.
 
-			// so lets walk over the current submission's answers to match to the
-			// particular question/widget/answer that we want to look at
+			// Walk over the current submission's answers to match to the particular
+			// question/widget/answer that we want to look at.
 			for _, submissionAnswer := range sub.Answers {
-				// and if it doesn't match
 				if submissionAnswer.WidgetID != answer.AnswerID {
-					// then just continue
+
+					// Continue if the widgetID and the answerID do not match.
+
 					continue
 				}
 
-				// but as it does
-
-				// set the answer to the current submission answer
+				// Set the answer to the current submission answer.
 				gallery.Answers[j].Answer = sub.Answers[k]
 
-				// and create an empty array for the identity answers that we will
-				// walk over
+				// Create an empty array for the identity answers that we will walk
+				// over.
 				gallery.Answers[j].IdentityAnswers = make([]submission.Answer, 0)
 
-				// specifically, walk over the the current submission's answers again
+				// Specifically, walk over the the current submission's answers again to
+				// find any identity answers related to this specific answer.
 				for m, submissionAnswer := range sub.Answers {
-					// to find any identity answers related to this specific answer
+
 					if submissionAnswer.Identity {
-						// and append it to the list
 						gallery.Answers[j].IdentityAnswers = append(gallery.Answers[j].IdentityAnswers, sub.Answers[m])
 					}
 				}
 
-				// because we found a match for the specific answer/widget, we can't
-				// possibly have another duplicate, so stop looping over the the
-				// current submissions answers
+				// We found a match for the specific answer/widget so we can't possibly
+				// have another duplicate, so stop looping over the the current
+				// submissions answers
 				break
 			}
 
-			// and because we found a match for the submission id and the form id
-			// there can't possibly be another match, so stop looping over the
-			// submissions
+			// We found a match for the submission id and the form id so there can't
+			// possibly be another match, so stop looping over the submissions.
 			break
 		}
 	}
@@ -219,46 +206,31 @@ func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submissi
 // hydrateMany loads an array of form galleries with form submissions
 // from the MongoDB database collection.
 func hydrateMany(context interface{}, db *db.DB, galleries []Gallery) error {
-	log.Dev(context, "hydrateMany", "Started")
-
-	for _, gallery := range galleries {
-		if err := gallery.Validate(); err != nil {
-			log.Error(context, "hydrateMany", err, "Completed")
-			return err
-		}
-	}
-
-	// load all the submission id's from the answers inside the gallery
+	// Load all the submission id's from the answers inside the gallery.
 	var submissionIDs []string
 
 	for _, gallery := range galleries {
 		for i, answer := range gallery.Answers {
-			// and set their hex
 			submissionIDs[i] = answer.SubmissionID.Hex()
 		}
 	}
 
-	// so we can fetch all the form submissions in one request
 	submissions, err := submission.List(context, db, submissionIDs)
 	if err != nil {
-		log.Error(context, "hydrateMany", err, "Completed")
 		return err
 	}
 
-	// for each of the galleries that we're hydrating
 	for i := range galleries {
-		// merge the submissions into the given gallery
 		mergeSubmissionsIntoGalleryAnswers(&galleries[i], submissions)
 	}
 
-	log.Dev(context, "hydrateMany", "Completed")
 	return nil
 }
 
 // AddAnswer adds an answer to a form gallery. Duplicated answers
 // are de-duplicated automatically and will not return an error.
 func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error) {
-	log.Dev(context, "AddAnswer", "Started")
+	log.Dev(context, "AddAnswer", "Started : Gallery[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "AddAnswer", ErrInvalidID, "Completed")
@@ -310,7 +282,7 @@ func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string
 // RemoveAnswer adds an answer to a form gallery. Duplicated answers
 // are de-duplicated automatically and will not return an error.
 func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error) {
-	log.Dev(context, "RemoveAnswer", "Started")
+	log.Dev(context, "RemoveAnswer", "Started : Gallery[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "RemoveAnswer", ErrInvalidID, "Completed")
@@ -397,7 +369,7 @@ func List(context interface{}, db *db.DB, formID string) ([]Gallery, error) {
 // Update updates the form gallery in the MongoDB database
 // collection.
 func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error {
-	log.Dev(context, "Update", "Started")
+	log.Dev(context, "Update", "Started : Gallery[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Update", ErrInvalidID, "Completed")
@@ -411,7 +383,6 @@ func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error {
 
 	objectID := bson.ObjectIdHex(id)
 
-	// update the DateUpdated timestamp.
 	gallery.DateUpdated = time.Now()
 
 	f := func(c *mgo.Collection) error {

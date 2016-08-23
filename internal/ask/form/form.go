@@ -96,7 +96,9 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 
 	var isNewForm bool
 
-	// if there was no ID provided, we should set one
+	// If there is no ID probided, we should set one as this is an Upsert
+	// operation. It is also important to remember if this was a new form or not
+	// because we need to update the stats if this wasn't a new form.
 	if form.ID == "" {
 		form.ID = bson.NewObjectId()
 		isNewForm = true
@@ -119,6 +121,7 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 		return err
 	}
 
+	// New forms don't have any stats so don't bother updating it.
 	if !isNewForm {
 		if _, err := UpdateStats(context, db, form.ID.Hex()); err != nil {
 			log.Error(context, "Upsert", err, "Completed")
@@ -132,7 +135,7 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 
 // UpdateStats updates the Stats on a given Form.
 func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
-	log.Dev(context, "UpdateStats", "Started")
+	log.Dev(context, "UpdateStats", "Started : Form[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "UpdateStats", ErrInvalidID, "Completed")
@@ -173,7 +176,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 // UpdateStatus updates the forms status and returns the updated form from
 // the MongodB database collection.
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Form, error) {
-	log.Dev(context, "UpdateStatus", "Started")
+	log.Dev(context, "UpdateStatus", "Started : Form[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "UpdateStatus", ErrInvalidID, "Completed")
@@ -210,7 +213,7 @@ func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Form, err
 
 // Retrieve retrieves the form from the MongodB database collection.
 func Retrieve(context interface{}, db *db.DB, id string) (*Form, error) {
-	log.Dev(context, "Retrieve", "Started")
+	log.Dev(context, "Retrieve", "Started : Form[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Retrieve", ErrInvalidID, "Completed")
@@ -256,7 +259,7 @@ func List(context interface{}, db *db.DB, limit, skip int) ([]Form, error) {
 // Delete removes the document matching the id provided from the MongoDB
 // database collection.
 func Delete(context interface{}, db *db.DB, id string) error {
-	log.Dev(context, "Delete", "Started")
+	log.Dev(context, "Delete", "Started : Form[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Delete", ErrInvalidID, "Completed")

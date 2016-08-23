@@ -40,20 +40,19 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 	formID := c.Params["form_id"]
 
 	{
-		// we should check to see if the form has a recaptcha property
+		// We should check to see if the form has a recaptcha property.
 		f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 		if err != nil {
 			return err
 		}
 
-		// if the recaptcha is enabled on the form
+		// If the recaptcha is enabled on the form, then we should check that the
+		// response contains the data we need and if it's valid.
 		if f.Settings["recaptcha"].(bool) {
-			// and if we have a recaptcha value
 			if len(payload.Recaptcha) <= 0 {
 				return ErrInvalidCaptcha
 			}
 
-			// we should validate the recaptcha with google
 			body := url.Values{
 				"secret":   []string{c.Ctx["recaptcha"].(string)},
 				"response": []string{payload.Recaptcha},
@@ -190,10 +189,16 @@ func (formSubmissionHandle) Delete(c *app.Context) error {
 	// FIXME: pull out ", ok" check once old API has been deprecated.
 	formID, ok := c.Params["form_id"]
 	if !ok {
-		// currently will fall back on no form ID in the event that there is a
-		// deleted form submission, but it should not once the old API route has
-		// been deprecated.
-		formID = ""
+
+		// If in the event that the url does not contain the form id, we should get
+		// it from the database by looking up the requested submission.
+
+		sub, err := submission.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+		if err != nil {
+			return err
+		}
+
+		formID = sub.FormID.Hex()
 	}
 
 	err := ask.DeleteSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, formID)

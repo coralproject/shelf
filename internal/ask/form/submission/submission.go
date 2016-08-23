@@ -138,7 +138,7 @@ func (s *Submission) Validate() error {
 // Create adds a new Submission based on a given Form into
 // the MongoDB database collection.
 func Create(context interface{}, db *db.DB, formID string, submission *Submission) error {
-	log.Dev(context, "Create", "Started")
+	log.Dev(context, "Create", "Started : Form[%s]", formID)
 
 	if !bson.IsObjectIdHex(formID) {
 		log.Error(context, "Create", ErrInvalidID, "Completed")
@@ -175,7 +175,7 @@ func Create(context interface{}, db *db.DB, formID string, submission *Submissio
 // Retrieve retrieves a Submission from the MongoDB database
 // collection.
 func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error) {
-	log.Dev(context, "Retrieve", "Started")
+	log.Dev(context, "Retrieve", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Retrieve", ErrInvalidID, "Completed")
@@ -237,7 +237,7 @@ func List(context interface{}, db *db.DB, ids []string) ([]Submission, error) {
 // UpdateStatus updates a form submissions status inside the MongoDB database
 // collection.
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submission, error) {
-	log.Dev(context, "UpdateStatus", "Started")
+	log.Dev(context, "UpdateStatus", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "UpdateStatus", ErrInvalidID, "Completed")
@@ -275,7 +275,7 @@ func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submissio
 // UpdateAnswer updates the edited answer if it could find it
 // inside the MongoDB database collection atomically.
 func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAnswer interface{}) (*Submission, error) {
-	log.Dev(context, "UpdateAnswer", "Started")
+	log.Dev(context, "UpdateAnswer", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "UpdateAnswer", ErrInvalidID, "Completed")
@@ -295,7 +295,7 @@ func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAns
 			"replies.widget_id": answerID,
 		}
 
-		// update the nested subdocument using the $ projection operator:
+		// Update the nested subdocument using the $ projection operator:
 		// https://docs.mongodb.com/manual/reference/operator/update/positional/
 		u := bson.M{
 			"$set": bson.M{
@@ -325,7 +325,7 @@ func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAns
 // Count returns the count of current submissions for a given
 // form id in the Form Submissions MongoDB database collection.
 func Count(context interface{}, db *db.DB, formID string) (int, error) {
-	log.Dev(context, "Count", "Completed")
+	log.Dev(context, "Count", "Completed : Form[%s]", formID)
 
 	if !bson.IsObjectIdHex(formID) {
 		log.Error(context, "Count", ErrInvalidID, "Completed")
@@ -392,12 +392,13 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 
 		if opts.Query != "" || opts.FilterBy != "" {
 			if opts.Query != "" {
-				// search query including the optional text query
+				// Search query includes the optional text query.
 				q["$text"] = bson.M{
 					"$search": opts.Query,
 				}
 			} else {
-				// a flag based filter
+				// This must be a tag based filter, so determine if the flag is a
+				// negation or not and add the proper filter.
 				if strings.HasPrefix(opts.FilterBy, "-") {
 					notflag := strings.TrimLeft(opts.FilterBy, "-")
 					q["flags"] = bson.M{"$nin": []string{notflag}}
@@ -412,7 +413,7 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 				return err
 			}
 		} else {
-			// as there's no extra filtering criterion, we don't need to re-count the
+			// As there's no extra filtering criterion, we don't need to re-count the
 			// total results as a result of the filtering because there wasn't any!
 			results.Counts.TotalSearch = results.Counts.TotalSubmissions
 		}
@@ -423,7 +424,8 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 			return err
 		}
 
-		// instead of pulling all the form submissions ourself, we're
+		// Instead of pulling all the form submissions ourself, we can just use
+		// the MongoDB Query Aggregation.
 		pipeline := []bson.M{
 			bson.M{"$match": q},
 			bson.M{"$unwind": "$flags"},
@@ -445,7 +447,7 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 			return err
 		}
 
-		// load the buckets into the flag aggregation
+		// Load the buckets into the flag aggregation.
 		for _, bucket := range flagBuckets {
 			results.Counts.SearchByFlag[bucket.Name] = bucket.Count
 		}
@@ -465,7 +467,7 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 // AddFlag adds, and de-duplicates a flag to a given
 // Submission in the MongoDB database collection.
 func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error) {
-	log.Dev(context, "AddFlag", "Started")
+	log.Dev(context, "AddFlag", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "AddFlag", ErrInvalidID, "Completed")
@@ -502,7 +504,7 @@ func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, erro
 // RemoveFlag removes a flag from a given Submission in
 // the MongoDB database collection.
 func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error) {
-	log.Dev(context, "RemoveFlag", "Started")
+	log.Dev(context, "RemoveFlag", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "RemoveFlag", ErrInvalidID, "Completed")
@@ -539,7 +541,7 @@ func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, e
 // Delete removes a given Form Submission from the MongoDB
 // database collection.
 func Delete(context interface{}, db *db.DB, id string) error {
-	log.Dev(context, "Delete", "Started")
+	log.Dev(context, "Delete", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "Delete", ErrInvalidID, "Completed")
