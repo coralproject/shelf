@@ -29,9 +29,9 @@ var ErrInvalidID = errors.New("ID is not in it's proper form")
 
 //==============================================================================
 
-// GalleryCollection is the mongo collection where Gallery documents are
+// Collection is the mongo collection where Gallery documents are
 // saved.
-const GalleryCollection = "form_galleries"
+const Collection = "form_galleries"
 
 // Answer describes an answer from a form which has been added to a
 // Gallery.
@@ -85,7 +85,7 @@ func Create(context interface{}, db *db.DB, formID string) (*Gallery, error) {
 		return c.Insert(gallery)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
 		return nil, err
 	}
@@ -112,7 +112,7 @@ func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error) {
 		return c.FindId(objectID).One(&gallery)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Retrieve", err, "Completed")
 		return nil, err
 	}
@@ -264,7 +264,7 @@ func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "AddAnswer", err, "Completed")
 		return nil, err
 	}
@@ -316,7 +316,7 @@ func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID str
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "RemoveAnswer", err, "Completed")
 		return nil, err
 	}
@@ -352,7 +352,7 @@ func List(context interface{}, db *db.DB, formID string) ([]Gallery, error) {
 		return c.Find(q).All(&galleries)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "List", err, "Completed")
 		return nil, err
 	}
@@ -390,7 +390,7 @@ func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error {
 		return c.UpdateId(objectID, gallery)
 	}
 
-	if err := db.ExecuteMGO(context, GalleryCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Update", err, "Completed")
 		return err
 	}

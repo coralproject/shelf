@@ -30,9 +30,9 @@ var ErrInvalidID = errors.New("ID is not in it's proper form")
 
 //==============================================================================
 
-// SubmissionCollection is the mongo collection where Submission
+// Collection is the mongo collection where Submission
 // documents are saved.
-const SubmissionCollection = "form_submissions"
+const Collection = "form_submissions"
 
 // EnsureIndexes perform index create commands against Mongo for the indexes
 // needed for the ask package to run.
@@ -52,7 +52,7 @@ func EnsureIndexes(context interface{}, db *db.DB) error {
 		return c.EnsureIndex(index)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "EnsureIndexes", err, "Completed")
 		return err
 	}
@@ -163,7 +163,7 @@ func Create(context interface{}, db *db.DB, formID string, submission *Submissio
 		return c.Insert(submission)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
 		return err
 	}
@@ -190,7 +190,7 @@ func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error) {
 		return c.FindId(objectID).One(&submission)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Retrieve", err, "Completed")
 		return nil, err
 	}
@@ -225,7 +225,7 @@ func List(context interface{}, db *db.DB, ids []string) ([]Submission, error) {
 		return c.Find(q).All(&submissions)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "List", err, "Completed")
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submissio
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateStatus", err, "Completed")
 		return nil, err
 	}
@@ -307,7 +307,7 @@ func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAns
 		return c.Update(q, u)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateAnswer", err, "Completed")
 		return nil, err
 	}
@@ -346,7 +346,7 @@ func Count(context interface{}, db *db.DB, formID string) (int, error) {
 		return err
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Count", err, "Completed")
 		return 0, err
 	}
@@ -455,7 +455,7 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 		return nil
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Search", err, "Completed")
 		return nil, err
 	}
@@ -486,7 +486,7 @@ func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, erro
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "AddFlag", err, "Completed")
 		return nil, err
 	}
@@ -523,7 +523,7 @@ func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, e
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "RemoveFlag", err, "Completed")
 		return nil, err
 	}
@@ -555,7 +555,7 @@ func Delete(context interface{}, db *db.DB, id string) error {
 		return c.RemoveId(objectID)
 	}
 
-	if err := db.ExecuteMGO(context, SubmissionCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Delete", err, "Completed")
 		return err
 	}

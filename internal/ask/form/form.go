@@ -29,8 +29,8 @@ var ErrInvalidID = errors.New("ID is not in it's proper form")
 
 //==============================================================================
 
-// FormCollection is the mongo collection where Form documents are saved.
-const FormCollection = "forms"
+// Collection is the mongo collection where Form documents are saved.
+const Collection = "forms"
 
 // Widget describes a specific question being asked by the Form which is
 // contained within a Step.
@@ -99,7 +99,7 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 	// If there is no ID probided, we should set one as this is an Upsert
 	// operation. It is also important to remember if this was a new form or not
 	// because we need to update the stats if this wasn't a new form.
-	if form.ID == "" {
+	if form.ID.Hex() == "" {
 		form.ID = bson.NewObjectId()
 		isNewForm = true
 	}
@@ -110,13 +110,12 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 	}
 
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"id": form.ID}
-		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(q), mongo.Query(form))
-		_, err := c.Upsert(q, form)
+		log.Dev(context, "Upsert", "MGO : db.%s.upsert(%s, %s)", c.Name, mongo.Query(form.ID.Hex()), mongo.Query(form))
+		_, err := c.UpsertId(form.ID, form)
 		return err
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
@@ -164,7 +163,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateStats", err, "Completed")
 		return nil, err
 	}
@@ -196,7 +195,7 @@ func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Form, err
 		return c.UpdateId(objectID, u)
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "UpdateStatus", err, "Completed")
 		return nil, err
 	}
@@ -228,7 +227,7 @@ func Retrieve(context interface{}, db *db.DB, id string) (*Form, error) {
 		return c.FindId(objectID).One(&form)
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Retrieve", err, "Completed")
 		return nil, err
 	}
@@ -247,7 +246,7 @@ func List(context interface{}, db *db.DB, limit, skip int) ([]Form, error) {
 		return c.Find(nil).Limit(limit).Skip(skip).All(&forms)
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "List", err, "Completed")
 		return nil, err
 	}
@@ -273,7 +272,7 @@ func Delete(context interface{}, db *db.DB, id string) error {
 		return c.RemoveId(objectID)
 	}
 
-	if err := db.ExecuteMGO(context, FormCollection, f); err != nil {
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Delete", err, "Completed")
 		return err
 	}
