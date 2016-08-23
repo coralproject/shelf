@@ -6,10 +6,12 @@ import (
 	"sort"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/graph"
 	"github.com/cayleygraph/cayley/graph/path"
 	"github.com/cayleygraph/cayley/quad"
+	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/wire/view"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -17,6 +19,9 @@ import (
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 var ErrNotFound = errors.New("View items Not found")
+
+// bufferLimit controlled the size of the batches used when upserting saved views.
+const bufferLimit = 100
 
 // viewPathToGraphPath translates the path in a view into a "path"
 // utilized in graph queries.
@@ -127,44 +132,72 @@ func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, e
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
-func viewSave(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
-	if viewParams.ResultsCollection != "" {
+func viewSave(context interface{}, mgoCfg mongo.Config, v *view.View, viewParams *ViewParams, ids []string) error {
 
-		// Form the query.
-		var results []bson.M
-		f := func(c *mgo.Collection) error {
-			return c.Pipe([]bson.M{{"$match": bson.M{"item_id": bson.M{"$in": ids}}}, {"$out": viewParams.ResultsCollection}}).All(&results)
-		}
+	// Create a new mongo session.
+	session, err := mongo.New(mgoCfg)
+	if err != nil {
+		return err
+	}
+	defer session.Close()
 
-		// Execute the query.
-		if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
-			if err == mgo.ErrNotFound {
-				err = ErrNotFound
+	// Form the query.
+	q := bson.M{"item_id": bson.M{"$in": ids}}
+	c := session.DB(mgoCfg.DB).C(v.Collection)
+	results := c.Find(q).Iter()
+
+	// Set up a Bulk upsert.
+	outCollection := session.DB(mgoCfg.DB).C(viewParams.ResultsCollection)
+	tx := outCollection.Bulk()
+	tx.Unordered()
+
+	// Iterate over the view items.
+	var queuedDocs int
+	var result item.Item
+	for results.Next(&result) {
+
+		// Queue the upsert of the result.
+		tx.Upsert(bson.M{"item_id": result.ID}, result)
+		queuedDocs++
+
+		// If the queued documents for upsert have reached the buffer limit,
+		// run the bulk upsert and re-initialize the bulk operation.
+		if queuedDocs >= bufferLimit {
+			if _, err := tx.Run(); err != nil {
+				return err
 			}
-			return err
+			tx = outCollection.Bulk()
+			tx.Unordered()
+			queuedDocs = 0
 		}
+	}
+	if err := results.Close(); err != nil {
+		return err
+	}
+
+	// Run the bulk operation for any remaining queued documents.
+	if _, err := tx.Run(); err != nil {
+		return err
 	}
 
 	return nil
 }
 
 // viewItems retrieves the items corresponding to the provided list of item IDs.
-func viewItems(context interface{}, db *db.DB, v *view.View, viewParams *ViewParams, ids []string) ([]bson.M, error) {
+func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bson.M, error) {
+
+	// Form the query.
 	var results []bson.M
-	if viewParams.ResultsCollection == "" {
+	f := func(c *mgo.Collection) error {
+		return c.Find(bson.M{"item_id": bson.M{"$in": ids}}).All(&results)
+	}
 
-		// Form the query.
-		f := func(c *mgo.Collection) error {
-			return c.Find(bson.M{"item_id": bson.M{"$in": ids}}).All(&results)
+	// Execute the query.
+	if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
 		}
-
-		// Execute the query.
-		if err := db.ExecuteMGO(context, v.Collection, f); err != nil {
-			if err == mgo.ErrNotFound {
-				err = ErrNotFound
-			}
-			return nil, err
-		}
+		return nil, err
 	}
 
 	return results, nil

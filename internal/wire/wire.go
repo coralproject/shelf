@@ -5,6 +5,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/wire/view"
@@ -27,74 +28,65 @@ func errResult(err error) *Result {
 // ViewParams represents how the View will be generated and persisted.
 type ViewParams struct {
 	ViewName          string
-	ItemKeys          []string
+	ItemKey           string
 	ResultsCollection string
 }
 
 //==============================================================================
 
-// Generate generates the specified view.
-func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error) {
-	log.Dev(context, "Generate", "Started : Name[%s]", viewParams.ViewName)
+// Execute executes a graph query to generate the specified view.
+func Execute(context interface{}, mgoDB *db.DB, mgoCfg mongo.Config, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error) {
+	log.Dev(context, "Execute", "Started : Name[%s]", viewParams.ViewName)
 
 	// Get the view.
 	v, err := view.GetByName(context, mgoDB, viewParams.ViewName)
 	if err != nil {
-		log.Error(context, "Generate", err, "Completed")
+		log.Error(context, "Execute", err, "Completed")
 		return errResult(err), err
 	}
 
 	// Validate the start type.
 	if err := validateStartType(context, mgoDB, v); err != nil {
-		log.Error(context, "Generate", err, "Completed")
+		log.Error(context, "Execute", err, "Completed")
 		return errResult(err), err
 	}
 
-	// Loop over item keys persisting or gathering items.
-	var count int
-	var items []bson.M
-	for _, key := range viewParams.ItemKeys {
-
-		// Translate the view path into a graph query path.
-		graphPath, err := viewPathToGraphPath(v, key, graphDB)
-		if err != nil {
-			log.Error(context, "Generate", err, "Completed")
-			return errResult(err), err
-		}
-
-		// Retrieve the item IDs for the view.
-		ids, err := viewIDs(v, graphPath, graphDB)
-		if err != nil {
-			log.Error(context, "Generate", err, "Completed")
-			return errResult(err), err
-		}
-
-		// Persist the items in the view.
-		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
-			log.Error(context, "Generate", err, "Completed")
-			return errResult(err), err
-		}
-		count += len(ids)
-
-		// Gather the items in the view.
-		itemsOut, err := viewItems(context, mgoDB, v, viewParams, ids)
-		if err != nil {
-			log.Error(context, "Generate", err, "Completed")
-			return errResult(err), err
-		}
-		items = append(items, itemsOut...)
+	// Translate the view path into a graph query path.
+	graphPath, err := viewPathToGraphPath(v, viewParams.ItemKey, graphDB)
+	if err != nil {
+		log.Error(context, "Execute", err, "Completed")
+		return errResult(err), err
 	}
 
-	// Form the result.
+	// Retrieve the item IDs for the view.
+	ids, err := viewIDs(v, graphPath, graphDB)
+	if err != nil {
+		log.Error(context, "Execute", err, "Completed")
+		return errResult(err), err
+	}
+
+	// Persist the items in the view, if an output Collection is provided.
+	if viewParams.ResultsCollection != "" {
+		if err := viewSave(context, mgoCfg, v, viewParams, ids); err != nil {
+			log.Error(context, "Execute", err, "Completed")
+			return errResult(err), err
+		}
+		result := Result{
+			Results: bson.M{"number_of_results": len(ids)},
+		}
+		return &result, nil
+	}
+
+	// Otherwise, gather the items in the view.
+	items, err := viewItems(context, mgoDB, v, ids)
+	if err != nil {
+		log.Error(context, "Execute", err, "Completed")
+		return errResult(err), err
+	}
 	result := Result{
 		Results: items,
 	}
-	if viewParams.ResultsCollection != "" {
-		result = Result{
-			Results: bson.M{"number_of_results": count},
-		}
-	}
 
-	log.Dev(context, "Generate", "Completed")
+	log.Dev(context, "Execute", "Completed")
 	return &result, nil
 }

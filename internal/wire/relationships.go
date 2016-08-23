@@ -27,26 +27,22 @@ func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 		return err
 	}
 
-	// Verify the starting type.
-	verify := false
+	// Get the relevant item types based on the direction of the
+	// first relationship in the path.
+	var itemTypes []string
 	switch firstDir {
 	case "out":
-		for _, itemType := range rel.SubjectTypes {
-			if itemType == v.StartType {
-				verify = true
-			}
-		}
+		itemTypes = rel.SubjectTypes
 	case "in":
-		for _, itemType := range rel.ObjectTypes {
-			if itemType == v.StartType {
-				verify = true
-			}
+		itemTypes = rel.ObjectTypes
+	}
+
+	// Validate the starting type provided in the view.
+	for _, itemType := range itemTypes {
+		if itemType == v.StartType {
+			return nil
 		}
 	}
 
-	if !verify {
-		return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, rel.SubjectTypes)
-	}
-
-	return nil
+	return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, itemTypes)
 }

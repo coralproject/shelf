@@ -22,6 +22,8 @@ import (
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 )
 
+var mgoCfg mongo.Config
+
 const (
 	relPrefix  = "RTEST_"
 	itemPrefix = "ITEST_"
@@ -35,14 +37,14 @@ func init() {
 
 	// Initialize MongoDB using the `tests.TestSession` as the name of the
 	// master session.
-	cfg := mongo.Config{
+	mgoCfg = mongo.Config{
 		Host:     cfg.MustString("MONGO_HOST"),
 		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
 		DB:       cfg.MustString("MONGO_DB"),
 		User:     cfg.MustString("MONGO_USER"),
 		Password: cfg.MustString("MONGO_PASS"),
 	}
-	tests.InitMongo(cfg)
+	tests.InitMongo(mgoCfg)
 }
 
 // TestMain helps to clean up the test data.
@@ -221,11 +223,11 @@ func TestGenerateView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: viewPrefix + "user comments",
-				ItemKeys: []string{"ITEST_80aa936a-f618-4234-a7be-df59a14cf8de"},
+				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
-			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			result, err := wire.Execute(tests.Context, db, mgoCfg, store, &viewParams)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
 			}
@@ -272,12 +274,12 @@ func TestPersistView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName:          viewPrefix + "thread",
-				ItemKeys:          []string{"ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"},
+				ItemKey:           "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 				ResultsCollection: "testcollection",
 			}
 
 			// Generate the view.
-			result, err := wire.Generate(tests.Context, db, store, &viewParams)
+			result, err := wire.Execute(tests.Context, db, mgoCfg, store, &viewParams)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
 			}

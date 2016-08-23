@@ -16,7 +16,7 @@ Package wire provides support for generating views.
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
 * [type Result](#Result)
-  * [func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Generate)
+  * [func Execute(context interface{}, mgoDB *db.DB, mgoCfg mongo.Config, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Execute)
 * [type ViewParams](#ViewParams)
 
 
@@ -34,7 +34,7 @@ ErrNotFound is an error variable thrown when no results are returned from a Mong
 
 
 
-## <a name="Result">type</a> [Result](/src/target/wire.go?s=325:385#L4)
+## <a name="Result">type</a> [Result](/src/target/wire.go?s=362:422#L5)
 ``` go
 type Result struct {
     Results interface{} `json:"results"`
@@ -48,21 +48,21 @@ Result represents what a user will receive after generating a view.
 
 
 
-### <a name="Generate">func</a> [Generate](/src/target/wire.go?s=868:981#L27)
+### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=927:1060#L28)
 ``` go
-func Generate(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
+func Execute(context interface{}, mgoDB *db.DB, mgoCfg mongo.Config, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
-Generate generates the specified view.
+Execute executes a graph query to generate the specified view.
 
 
 
 
 
-## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=636:742#L18)
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=673:777#L19)
 ``` go
 type ViewParams struct {
     ViewName          string
-    ItemKeys          []string
+    ItemKey           string
     ResultsCollection string
 }
 ```
