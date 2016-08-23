@@ -6,7 +6,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/shelf/internal/ask"
+	"github.com/coralproject/shelf/internal/ask/form/gallery"
 )
 
 // formGalleryHandle maintains the set of handlers for the form gallery api.
@@ -22,7 +22,7 @@ func (formGalleryHandle) AddAnswer(c *app.Context) error {
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
 
-	gallery, err := ask.AddFormGalleryAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
+	gallery, err := gallery.AddAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
 	if err != nil {
 		return err
 	}
@@ -38,7 +38,7 @@ func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
 
-	gallery, err := ask.RemoveFormGalleryAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
+	gallery, err := gallery.RemoveAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissionID, answerID)
 	if err != nil {
 		return err
 	}
@@ -53,7 +53,7 @@ func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
 func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
 	formID := c.Params["form_id"]
 
-	galleries, err := ask.RetrieveFormGalleriesForForm(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
+	galleries, err := gallery.List(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 	if err != nil {
 		return err
 	}
@@ -67,7 +67,7 @@ func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
 func (formGalleryHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
-	gallery, err := ask.RetrieveFormGallery(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	gallery, err := gallery.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
@@ -79,18 +79,18 @@ func (formGalleryHandle) Retrieve(c *app.Context) error {
 // Update updates a FormGallery based on it's id and it's provided payload.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formGalleryHandle) Update(c *app.Context) error {
-	var gallery ask.FormGallery
-	if err := json.NewDecoder(c.Request.Body).Decode(&gallery); err != nil {
+	var g gallery.Gallery
+	if err := json.NewDecoder(c.Request.Body).Decode(&g); err != nil {
 		return err
 	}
 
 	id := c.Params["id"]
 
-	err := ask.UpdateFormGallery(c.SessionID, c.Ctx["DB"].(*db.DB), id, &gallery)
+	err := gallery.Update(c.SessionID, c.Ctx["DB"].(*db.DB), id, &g)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(gallery, http.StatusOK)
+	c.Respond(g, http.StatusOK)
 	return nil
 }

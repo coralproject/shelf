@@ -13,7 +13,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/askd/handlers"
 	"github.com/coralproject/shelf/cmd/askd/midware"
-	"github.com/coralproject/shelf/internal/ask"
+	"github.com/coralproject/shelf/internal/ask/form/submission"
 )
 
 // Environmental variables.
@@ -171,5 +171,5 @@ func ensureDBIndexes() error {
 	}
 	defer mgoDB.CloseMGO("startup")
 
-	return ask.EnsureIndexes("startup", mgoDB)
+	return submission.EnsureIndexes("startup", mgoDB)
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
+	"github.com/coralproject/shelf/internal/ask/form"
 )
 
 // formHandle maintains the set of handlers for the form api.
@@ -21,13 +22,13 @@ var Form formHandle
 // Upsert upserts a form into the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formHandle) Upsert(c *app.Context) error {
-	var form ask.Form
+	var form form.Form
 	if err := json.NewDecoder(c.Request.Body).Decode(&form); err != nil {
 		return err
 	}
 
 	// perform the upsert operation
-	err := ask.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &form)
+	err := ask.UpsertForm(c.SessionID, c.Ctx["DB"].(*db.DB), &form)
 	if err != nil {
 		return err
 	}
@@ -43,12 +44,12 @@ func (formHandle) UpdateStatus(c *app.Context) error {
 	status := c.Params["status"]
 
 	// actually update the form status
-	form, err := ask.UpdateFormStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
+	f, err := form.UpdateStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(form, http.StatusOK)
+	c.Respond(f, http.StatusOK)
 	return nil
 }
 
@@ -66,7 +67,7 @@ func (formHandle) List(c *app.Context) error {
 		skip = 0
 	}
 
-	forms, err := ask.RetrieveManyForms(c.SessionID, c.Ctx["DB"].(*db.DB), limit, skip)
+	forms, err := form.List(c.SessionID, c.Ctx["DB"].(*db.DB), limit, skip)
 	if err != nil {
 		return err
 	}
@@ -81,12 +82,12 @@ func (formHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
 	// fetch the document from the store
-	form, err := ask.RetrieveForm(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(form, http.StatusOK)
+	c.Respond(f, http.StatusOK)
 	return nil
 }
 
@@ -96,7 +97,7 @@ func (formHandle) Delete(c *app.Context) error {
 	id := c.Params["id"]
 
 	// perform the delete operation
-	err := ask.DeleteForm(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	err := form.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}

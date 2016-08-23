@@ -11,6 +11,8 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
+	"github.com/coralproject/shelf/internal/ask/form"
+	"github.com/coralproject/shelf/internal/ask/form/submission"
 )
 
 // ErrInvalidCaptcha is returned when a captcha is required for a form but it
@@ -29,7 +31,7 @@ var FormSubmission formSubmissionHandle
 func (formSubmissionHandle) Create(c *app.Context) error {
 	var payload struct {
 		Recaptcha string
-		Answers   []ask.FormSubmissionAnswerInput `json:"replies"`
+		Answers   []submission.AnswerInput `json:"replies"`
 	}
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
 		return err
@@ -39,13 +41,13 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 
 	{
 		// we should check to see if the form has a recaptcha property
-		form, err := ask.RetrieveForm(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
+		f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 		if err != nil {
 			return err
 		}
 
 		// if the recaptcha is enabled on the form
-		if form.Settings["recaptcha"].(bool) {
+		if f.Settings["recaptcha"].(bool) {
 			// and if we have a recaptcha value
 			if len(payload.Recaptcha) <= 0 {
 				return ErrInvalidCaptcha
@@ -81,12 +83,12 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		}
 	}
 
-	submission, err := ask.CreateFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
+	s, err := ask.CreateSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
@@ -98,12 +100,12 @@ func (formSubmissionHandle) UpdateStatus(c *app.Context) error {
 	id := c.Params["id"]
 	status := c.Params["status"]
 
-	submission, err := ask.UpdateFormStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
+	s, err := submission.UpdateStatus(c.SessionID, c.Ctx["DB"].(*db.DB), id, status)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
@@ -120,12 +122,12 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 	id := c.Params["id"]
 	answerID := c.Params["answer_id"]
 
-	submission, err := ask.UpdateFormSubmissionAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, answerID, editedAnswer)
+	s, err := submission.UpdateAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, answerID, editedAnswer)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
@@ -146,7 +148,7 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		skip = 0
 	}
 
-	opts := ask.FormSubmissionSearchOpts{
+	opts := submission.SearchOpts{
 		Query:    c.Request.URL.Query().Get("search"),
 		FilterBy: c.Request.URL.Query().Get("filterby"),
 	}
@@ -155,7 +157,7 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		opts.DscOrder = true
 	}
 
-	results, err := ask.SearchFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
+	results, err := submission.Search(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
 	if err != nil {
 		return err
 	}
@@ -170,12 +172,12 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 func (formSubmissionHandle) Retrieve(c *app.Context) error {
 	id := c.Params["id"]
 
-	submission, err := ask.RetrieveFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	s, err := submission.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
@@ -194,7 +196,7 @@ func (formSubmissionHandle) Delete(c *app.Context) error {
 		formID = ""
 	}
 
-	err := ask.DeleteFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, formID)
+	err := ask.DeleteSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, formID)
 	if err != nil {
 		return err
 	}
@@ -211,12 +213,12 @@ func (formSubmissionHandle) AddFlag(c *app.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 
-	submission, err := ask.AddFlagToFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
+	s, err := submission.AddFlag(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
@@ -228,12 +230,12 @@ func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 
-	submission, err := ask.RemoveFlagFromFormSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
+	s, err := submission.RemoveFlag(c.SessionID, c.Ctx["DB"].(*db.DB), id, flag)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(submission, http.StatusOK)
+	c.Respond(s, http.StatusOK)
 
 	return nil
 }
