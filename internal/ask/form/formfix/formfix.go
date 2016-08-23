@@ -47,7 +47,7 @@ func Add(context interface{}, db *db.DB, fms []form.Form) error {
 // Remove removes forms in Mongo that match a given pattern.
 func Remove(context interface{}, db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"header.title": bson.RegEx{Pattern: pattern}}
+		q := bson.M{"header.title": bson.RegEx{Pattern: "^" + pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
