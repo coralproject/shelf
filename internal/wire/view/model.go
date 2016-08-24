@@ -26,6 +26,9 @@ type PathSegment struct {
 	Tag       string `bson:"tag,omitempty" json:"tag,omitempty"`
 }
 
+// Path is a slice of PathSegment.
+type Path []PathSegment
+
 // Validate checks the PathSegment value for consistency.
 func (ps *PathSegment) Validate() error {
 	if err := validate.Struct(ps); err != nil {
@@ -34,11 +37,27 @@ func (ps *PathSegment) Validate() error {
 	return nil
 }
 
+// Len is required to sort a slice of PathSegment.
+func (slice Path) Len() int {
+	return len(slice)
+}
+
+// Less is required to sort a slice of PathSegment.
+func (slice Path) Less(i, j int) bool {
+	return slice[i].Level < slice[j].Level
+}
+
+// Swap is required to sort a slice of PathSegment.
+func (slice Path) Swap(i, j int) {
+	slice[i], slice[j] = slice[j], slice[i]
+}
+
 // View contains metadata about a view.
 type View struct {
-	Name      string        `bson:"name" json:"name" validate:"required,min=3"`
-	StartType string        `bson:"start_type" json:"start_type" validate:"required,min=3"`
-	Path      []PathSegment `bson:"path" json:"path" validate:"required,min=1"`
+	Name       string `bson:"name" json:"name" validate:"required,min=3"`
+	Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
+	StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
+	Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 
 // Validate checks the View value for consistency.

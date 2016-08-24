@@ -17,6 +17,10 @@
 * [func Delete(context interface{}, db *db.DB, name string) error](#Delete)
 * [func GetAll(context interface{}, db *db.DB) ([]View, error)](#GetAll)
 * [func Upsert(context interface{}, db *db.DB, view *View) error](#Upsert)
+* [type Path](#Path)
+  * [func (slice Path) Len() int](#Path.Len)
+  * [func (slice Path) Less(i, j int) bool](#Path.Less)
+  * [func (slice Path) Swap(i, j int)](#Path.Swap)
 * [type PathSegment](#PathSegment)
   * [func (ps *PathSegment) Validate() error](#PathSegment.Validate)
 * [type View](#View)
@@ -68,6 +72,48 @@ Upsert upserts a view to the collection of currently utilized views.
 
 
 
+## <a name="Path">type</a> [Path](/src/target/model.go?s=875:898#L20)
+``` go
+type Path []PathSegment
+```
+Path is a slice of PathSegment.
+
+
+
+
+
+
+
+
+
+
+### <a name="Path.Len">func</a> (Path) [Len](/src/target/model.go?s=1127:1154#L31)
+``` go
+func (slice Path) Len() int
+```
+Len is required to sort a slice of PathSegment.
+
+
+
+
+### <a name="Path.Less">func</a> (Path) [Less](/src/target/model.go?s=1231:1268#L36)
+``` go
+func (slice Path) Less(i, j int) bool
+```
+Less is required to sort a slice of PathSegment.
+
+
+
+
+### <a name="Path.Swap">func</a> (Path) [Swap](/src/target/model.go?s=1366:1398#L41)
+``` go
+func (slice Path) Swap(i, j int)
+```
+Swap is required to sort a slice of PathSegment.
+
+
+
+
 ## <a name="PathSegment">type</a> [PathSegment](/src/target/model.go?s=517:838#L12)
 ``` go
 type PathSegment struct {
@@ -89,7 +135,7 @@ which path partially defines a View.
 
 
 
-### <a name="PathSegment.Validate">func</a> (\*PathSegment) [Validate](/src/target/model.go?s=898:937#L20)
+### <a name="PathSegment.Validate">func</a> (\*PathSegment) [Validate](/src/target/model.go?s=958:997#L23)
 ``` go
 func (ps *PathSegment) Validate() error
 ```
@@ -98,12 +144,13 @@ Validate checks the PathSegment value for consistency.
 
 
 
-## <a name="View">type</a> [View](/src/target/model.go?s=1056:1319#L28)
+## <a name="View">type</a> [View](/src/target/model.go?s=1485:1813#L46)
 ``` go
 type View struct {
-    Name      string        `bson:"name" json:"name" validate:"required,min=3"`
-    StartType string        `bson:"start_type" json:"start_type" validate:"required,min=3"`
-    Path      []PathSegment `bson:"path" json:"path" validate:"required,min=1"`
+    Name       string `bson:"name" json:"name" validate:"required,min=3"`
+    Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
+    StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
+    Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 ```
 View contains metadata about a view.
@@ -124,7 +171,7 @@ GetByName retrieves a view by name from Mongo.
 
 
 
-### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1372:1403#L35)
+### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1866:1897#L54)
 ``` go
 func (v *View) Validate() error
 ```

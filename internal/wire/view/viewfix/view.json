@@ -1,18 +1,19 @@
  [
 	{
 		"name": "VTEST_thread",
+		"collection": "items",
 		"start_type": "coral_asset",
 		"path": [
 			{
 				"level": 1,
 				"direction": "in",
-				"predicate": "on",
+				"predicate": "RTEST_on",
 				"tag": "comment"
 			},
 			{
 				"level": 2,
 				"direction": "in",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "author"
 			}
 		]
@@ -20,11 +21,12 @@
 	{
 		"name": "VTEST_user comments",
 		"start_type": "coral_user",
+		"collection": "items",
 		"path": [
 			{
 				"level": 1,
 				"direction": "out",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "comment"
 			}
 		]
@@ -32,22 +34,23 @@
 	{
 		"name": "VTEST_comments from authors flagged by a user",
 		"start_type": "coral_user",
+		"collection": "items",
 		"path": [
 			{
 				"level": 1,
 				"direction": "out",
-				"predicate": "flagged"
+				"predicate": "RTEST_flagged"
 			},
 			{
 				"level": 2,
 				"direction": "in",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "author"
 			},
 			{
 				"level": 3,
 				"direction": "out",
-				"predicate": "authored",
+				"predicate": "RTEST_authored",
 				"tag": "comment"
 			}
 		]
