@@ -21,16 +21,16 @@
 			"revisionTime": "2016-04-27T16:48:56Z"
 		},
 		{
-			"checksumSHA1": "FnNh+WrRznfgrmwn0r4ZjXd8mbk=",
+			"checksumSHA1": "YKGTOpWlJ4uo9orPjJ6WSLyezxA=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
-			"revisionTime": "2016-07-16T01:09:33Z"
+			"revision": "a65a8dc1d74287aeb2a56e0471350c56192ebad7",
+			"revisionTime": "2016-06-29T17:19:49Z"
 		},
 		{
 			"checksumSHA1": "LtvZGFkHom2jtvFxc+rdJ+u++es=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
-			"revisionTime": "2016-07-16T01:09:33Z"
+			"revision": "a65a8dc1d74287aeb2a56e0471350c56192ebad7",
+			"revisionTime": "2016-06-29T17:19:49Z"
 		},
 		{
 			"checksumSHA1": "By/iy3mbtLH0tZbDxSqAhqm/r0E=",

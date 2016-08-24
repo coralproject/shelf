@@ -227,7 +227,7 @@ func TestGenerateView(t *testing.T) {
 			}
 
 			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, mgoCfg, store, &viewParams)
+			result, err := wire.Execute(tests.Context, db, store, &viewParams)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
 			}
@@ -279,7 +279,7 @@ func TestPersistView(t *testing.T) {
 			}
 
 			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, mgoCfg, store, &viewParams)
+			result, err := wire.Execute(tests.Context, db, store, &viewParams)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
 			}

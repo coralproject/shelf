@@ -6,7 +6,6 @@ import (
 	"sort"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/graph"
 	"github.com/cayleygraph/cayley/graph/path"
@@ -132,24 +131,20 @@ func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, e
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
-func viewSave(context interface{}, mgoCfg mongo.Config, v *view.View, viewParams *ViewParams, ids []string) error {
-
-	// Create a new mongo session.
-	session, err := mongo.New(mgoCfg)
-	if err != nil {
-		return err
-	}
-	defer session.Close()
+func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
 
 	// Form the query.
 	q := bson.M{"item_id": bson.M{"$in": ids}}
-	c := session.DB(mgoCfg.DB).C(v.Collection)
-	results := c.Find(q).Iter()
+	results, err := mgoDB.BatchedQueryMGO(context, v.Collection, q)
+	if err != nil {
+		return err
+	}
 
 	// Set up a Bulk upsert.
-	outCollection := session.DB(mgoCfg.DB).C(viewParams.ResultsCollection)
-	tx := outCollection.Bulk()
-	tx.Unordered()
+	tx, err := mgoDB.BulkOperationMGO(context, viewParams.ResultsCollection)
+	if err != nil {
+		return err
+	}
 
 	// Iterate over the view items.
 	var queuedDocs int
@@ -166,8 +161,10 @@ func viewSave(context interface{}, mgoCfg mongo.Config, v *view.View, viewParams
 			if _, err := tx.Run(); err != nil {
 				return err
 			}
-			tx = outCollection.Bulk()
-			tx.Unordered()
+			tx, err = mgoDB.BulkOperationMGO(context, viewParams.ResultsCollection)
+			if err != nil {
+				return err
+			}
 			queuedDocs = 0
 		}
 	}

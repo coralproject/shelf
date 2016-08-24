@@ -5,7 +5,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/wire/view"
@@ -35,7 +34,7 @@ type ViewParams struct {
 //==============================================================================
 
 // Execute executes a graph query to generate the specified view.
-func Execute(context interface{}, mgoDB *db.DB, mgoCfg mongo.Config, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error) {
+func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error) {
 	log.Dev(context, "Execute", "Started : Name[%s]", viewParams.ViewName)
 
 	// Get the view.
@@ -67,7 +66,7 @@ func Execute(context interface{}, mgoDB *db.DB, mgoCfg mongo.Config, graphDB *ca
 
 	// Persist the items in the view, if an output Collection is provided.
 	if viewParams.ResultsCollection != "" {
-		if err := viewSave(context, mgoCfg, v, viewParams, ids); err != nil {
+		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
 			log.Error(context, "Execute", err, "Completed")
 			return errResult(err), err
 		}
