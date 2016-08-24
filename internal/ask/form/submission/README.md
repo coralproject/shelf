@@ -7,9 +7,9 @@
 
 ## Constants
 ``` go
-const SubmissionCollection = "form_submissions"
+const Collection = "form_submissions"
 ```
-SubmissionCollection is the mongo collection where Submission
+Collection is the mongo collection where Submission
 documents are saved.
 
 

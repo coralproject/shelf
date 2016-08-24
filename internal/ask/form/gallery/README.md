@@ -7,9 +7,9 @@
 
 ## Constants
 ``` go
-const GalleryCollection = "form_galleries"
+const Collection = "form_galleries"
 ```
-GalleryCollection is the mongo collection where Gallery documents are
+Collection is the mongo collection where Gallery documents are
 saved.
 
 

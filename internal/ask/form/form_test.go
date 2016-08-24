@@ -111,6 +111,58 @@ func Test_UpsertDelete(t *testing.T) {
 				t.Fatalf("\t%s\tShould generate an error when getting a form with the deleted id : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould generate an error when getting a form with the deleted id.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Create a new fresh form.
+
+			fms[0].ID = ""
+
+			if err := form.Upsert(tests.Context, dbSession, &fms[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to upsert a form : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to upsert a form.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Ensure that an ID was set.
+
+			if fms[0].ID == "" {
+				t.Fatalf("\t%s\tShould be able to add an ID when upserting a new form : ID was not assigned", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to add an ID when upserting a new form.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the form.
+
+			fm, err = form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to get the form by id : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get the form by id.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check that we got the form we expected.
+
+			if fms[0].ID.Hex() != fm.ID.Hex() {
+				t.Fatalf("\t%s\tShould be able to get back the same form.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get back the same form.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Delete the form.
+
+			if err := form.Delete(tests.Context, dbSession, fms[0].ID.Hex()); err != nil {
+				t.Fatalf("\t%s\tShould be able to delete the form : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to delete the form.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Get the form.
+
+			_, err = form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			if err == nil {
+				t.Fatalf("\t%s\tShould generate an error when getting a form with the deleted id : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould generate an error when getting a form with the deleted id.", tests.Success)
 		}
 	}
 }

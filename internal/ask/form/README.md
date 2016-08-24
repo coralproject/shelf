@@ -7,9 +7,9 @@
 
 ## Constants
 ``` go
-const FormCollection = "forms"
+const Collection = "forms"
 ```
-FormCollection is the mongo collection where Form documents are saved.
+Collection is the mongo collection where Form documents are saved.
 
 
 ## Variables
