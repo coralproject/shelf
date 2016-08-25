@@ -36,6 +36,7 @@ func TestMain(m *testing.M) {
 // runTest initializes the environment for the tests and allows for
 // the proper return code if the test fails or succeeds.
 func runTest(m *testing.M) int {
+
 	// In order to get a Mongo session we need the name of the database we
 	// are using. The web framework middleware is using this by convention.
 	dbName, err := cfg.String("MONGO_DB")
