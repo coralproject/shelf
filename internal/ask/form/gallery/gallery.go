@@ -137,7 +137,7 @@ func hydrate(context interface{}, db *db.DB, gallery *Gallery) error {
 		submissionIDs[i] = answer.SubmissionID.Hex()
 	}
 
-	submissions, err := submission.List(context, db, submissionIDs)
+	submissions, err := submission.RetrieveMany(context, db, submissionIDs)
 	if err != nil {
 		return err
 	}
@@ -215,7 +215,7 @@ func hydrateMany(context interface{}, db *db.DB, galleries []Gallery) error {
 		}
 	}
 
-	submissions, err := submission.List(context, db, submissionIDs)
+	submissions, err := submission.RetrieveMany(context, db, submissionIDs)
 	if err != nil {
 		return err
 	}

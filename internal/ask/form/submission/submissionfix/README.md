@@ -7,6 +7,27 @@
 
 
 
+## func Add
+``` go
+func Add(context interface{}, db *db.DB, subs []submission.Submission) error
+```
+Add inserts forms for testing.
+
+
+## func Get
+``` go
+func Get() ([]submission.Submission, error)
+```
+Get loads form data based on forms.json.
+
+
+## func Remove
+``` go
+func Remove(context interface{}, db *db.DB, pattern string) error
+```
+Remove removes forms in Mongo that match a given pattern.
+
+
 
 
 

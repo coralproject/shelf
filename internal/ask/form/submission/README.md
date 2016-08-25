@@ -133,14 +133,30 @@ given forms submissions.
 
 
 
+## type SearchResultCounts
+``` go
+type SearchResultCounts struct {
+    SearchByFlag     map[string]int `json:"search_by_flag"`
+    TotalSearch      int            `json:"total_search"`
+    TotalSubmissions int            `json:"total_submissions"`
+}
+```
+SearchResultCounts is a structured type containing the counts of results.
+
+
+
+
+
+
+
+
+
+
+
 ## type SearchResults
 ``` go
 type SearchResults struct {
-    Counts struct {
-        SearchByFlag     map[string]int `json:"search_by_flag"`
-        TotalSearch      int            `json:"total_search"`
-        TotalSubmissions int            `json:"total_submissions"`
-    } `json:"counts"`
+    Counts      SearchResultCounts `json:"counts"`
     Submissions []Submission
 }
 ```

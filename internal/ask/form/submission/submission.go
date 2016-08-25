@@ -61,14 +61,17 @@ func EnsureIndexes(context interface{}, db *db.DB) error {
 	return nil
 }
 
+// SearchResultCounts is a structured type containing the counts of results.
+type SearchResultCounts struct {
+	SearchByFlag     map[string]int `json:"search_by_flag"`
+	TotalSearch      int            `json:"total_search"`
+	TotalSubmissions int            `json:"total_submissions"`
+}
+
 // SearchResults is a structured type returning the results
 // expected from searching for submissions based on a form id.
 type SearchResults struct {
-	Counts struct {
-		SearchByFlag     map[string]int `json:"search_by_flag"`
-		TotalSearch      int            `json:"total_search"`
-		TotalSubmissions int            `json:"total_submissions"`
-	} `json:"counts"`
+	Counts      SearchResultCounts `json:"counts"`
 	Submissions []Submission
 }
 
@@ -83,7 +86,7 @@ type SearchOpts struct {
 // AnswerInput describes the input accepted for a new submission
 // answer.
 type AnswerInput struct {
-	WidgetID string      `json:"widget_id" validate:"required,len=24"`
+	WidgetID string      `json:"widget_id" validate:"required,uuid"`
 	Answer   interface{} `json:"answer" validate:"exists"`
 }
 
@@ -199,15 +202,15 @@ func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error) {
 	return &submission, nil
 }
 
-// List retrieves a list of Submission's from the MongoDB database collection.
-func List(context interface{}, db *db.DB, ids []string) ([]Submission, error) {
-	log.Dev(context, "List", "Started")
+// RetrieveMany retrieves a list of Submission's from the MongoDB database collection.
+func RetrieveMany(context interface{}, db *db.DB, ids []string) ([]Submission, error) {
+	log.Dev(context, "RetrieveMany", "Started")
 
 	var objectIDs = make([]bson.ObjectId, len(ids))
 
 	for i, id := range ids {
 		if !bson.IsObjectIdHex(id) {
-			log.Error(context, "List", ErrInvalidID, "Completed")
+			log.Error(context, "RetrieveMany", ErrInvalidID, "Completed")
 			return nil, ErrInvalidID
 		}
 
@@ -221,16 +224,16 @@ func List(context interface{}, db *db.DB, ids []string) ([]Submission, error) {
 				"$in": objectIDs,
 			},
 		}
-		log.Dev(context, "List", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
+		log.Dev(context, "RetrieveMany", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).All(&submissions)
 	}
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
-		log.Error(context, "List", err, "Completed")
+		log.Error(context, "RetrieveMany", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "List", "Started")
+	log.Dev(context, "RetrieveMany", "Started")
 	return submissions, nil
 }
 
@@ -274,7 +277,7 @@ func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submissio
 
 // UpdateAnswer updates the edited answer if it could find it
 // inside the MongoDB database collection atomically.
-func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAnswer interface{}) (*Submission, error) {
+func UpdateAnswer(context interface{}, db *db.DB, id string, answer AnswerInput) (*Submission, error) {
 	log.Dev(context, "UpdateAnswer", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
@@ -282,7 +285,7 @@ func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAns
 		return nil, ErrInvalidID
 	}
 
-	if !bson.IsObjectIdHex(answerID) {
+	if err := answer.Validate(); err != nil {
 		log.Error(context, "UpdateAnswer", ErrInvalidID, "Completed")
 		return nil, ErrInvalidID
 	}
@@ -292,14 +295,14 @@ func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAns
 	f := func(c *mgo.Collection) error {
 		q := bson.M{
 			"_id":               objectID,
-			"replies.widget_id": answerID,
+			"replies.widget_id": answer.WidgetID,
 		}
 
 		// Update the nested subdocument using the $ projection operator:
 		// https://docs.mongodb.com/manual/reference/operator/update/positional/
 		u := bson.M{
 			"$set": bson.M{
-				"replies.$.edited": editedAnswer,
+				"replies.$.edited": answer.Answer,
 			},
 		}
 
@@ -376,6 +379,9 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 
 	var results = SearchResults{
 		Submissions: make([]Submission, 0),
+		Counts: SearchResultCounts{
+			SearchByFlag: make(map[string]int),
+		},
 	}
 	f := func(c *mgo.Collection) error {
 		var err error
@@ -390,13 +396,18 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 			return err
 		}
 
+		// If the query or the filter is specificed, we do need to mutate the query
+		// to include these terms. If that's the case, we also need to perform a
+		// count based on the new search terms.
 		if opts.Query != "" || opts.FilterBy != "" {
 			if opts.Query != "" {
 				// Search query includes the optional text query.
 				q["$text"] = bson.M{
 					"$search": opts.Query,
 				}
-			} else {
+			}
+
+			if opts.FilterBy != "" {
 				// This must be a tag based filter, so determine if the flag is a
 				// negation or not and add the proper filter.
 				if strings.HasPrefix(opts.FilterBy, "-") {

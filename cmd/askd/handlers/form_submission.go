@@ -121,7 +121,10 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 	id := c.Params["id"]
 	answerID := c.Params["answer_id"]
 
-	s, err := submission.UpdateAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, answerID, editedAnswer)
+	s, err := submission.UpdateAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submission.AnswerInput{
+		WidgetID: answerID,
+		Answer:   editedAnswer,
+	})
 	if err != nil {
 		return err
 	}
