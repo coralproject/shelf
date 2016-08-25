@@ -52,11 +52,11 @@ EnsureIndexes perform index create commands against Mongo for the indexes
 needed for the ask package to run.
 
 
-## func List
+## func RetrieveMany
 ``` go
-func List(context interface{}, db *db.DB, ids []string) ([]Submission, error)
+func RetrieveMany(context interface{}, db *db.DB, ids []string) ([]Submission, error)
 ```
-List retrieves a list of Submission's from the MongoDB database collection.
+RetrieveMany retrieves a list of Submission's from the MongoDB database collection.
 
 
 
@@ -87,7 +87,7 @@ with the specific question asked included as well.
 ## type AnswerInput
 ``` go
 type AnswerInput struct {
-    WidgetID string      `json:"widget_id" validate:"required,len=24"`
+    WidgetID string      `json:"widget_id" validate:"required,uuid"`
     Answer   interface{} `json:"answer" validate:"exists"`
 }
 ```
@@ -237,7 +237,7 @@ collection.
 
 ### func UpdateAnswer
 ``` go
-func UpdateAnswer(context interface{}, db *db.DB, id, answerID string, editedAnswer interface{}) (*Submission, error)
+func UpdateAnswer(context interface{}, db *db.DB, id string, answer AnswerInput) (*Submission, error)
 ```
 UpdateAnswer updates the edited answer if it could find it
 inside the MongoDB database collection atomically.
