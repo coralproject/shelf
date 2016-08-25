@@ -35,30 +35,43 @@ func init() {
 
 //==============================================================================
 
-// TestUpsertCreateMask tests if we can create a query mask record in the db.
-func TestUpsertCreateMask(t *testing.T) {
+// setup initializes for each indivdual test.
+func setup(t *testing.T, fixture string) ([]mask.Mask, *db.DB) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
-	const fixture = "basic.json"
 	masks, err := mfix.Get(fixture)
 	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould load query mask record from file : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
+	t.Logf("%s\tShould load query mask record from file.", tests.Success)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
-	defer db.CloseMGO(tests.Context)
 
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	return masks, db
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	if err := mfix.Remove(db, collection); err != nil {
+		t.Fatalf("%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the query mask.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
+// TestUpsertCreateMask tests if we can create a query mask record in the db.
+func TestUpsertCreateMask(t *testing.T) {
+	const fixture = "basic.json"
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to save a query mask into the database.")
 	{
@@ -69,7 +82,7 @@ func TestUpsertCreateMask(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query mask.", tests.Success)
 
-			if _, err = mask.GetLastHistoryByName(tests.Context, db, masks[0].Collection, masks[0].Field); err != nil {
+			if _, err := mask.GetLastHistoryByName(tests.Context, db, masks[0].Collection, masks[0].Field); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query mask from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query mask from history.", tests.Success)
@@ -93,28 +106,9 @@ func TestUpsertCreateMask(t *testing.T) {
 
 // TestGetMasks validates retrieval of all query mask records.
 func TestGetMasks(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of query masks.")
 	{
@@ -150,28 +144,9 @@ func TestGetMasks(t *testing.T) {
 
 // TestGetMaskByCollection validates retrieval of all query mask records by collection.
 func TestGetMaskByCollection(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of query masks by collection.")
 	{
@@ -208,28 +183,9 @@ func TestGetMaskByCollection(t *testing.T) {
 // TestGetLastMaskHistoryByName validates retrieval of Mask from the history
 // collection.
 func TestGetLastMaskHistoryByName(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a mask from history.")
 	{
@@ -264,28 +220,9 @@ func TestGetLastMaskHistoryByName(t *testing.T) {
 
 // TestUpsertUpdateMask validates update operation of a given mask.
 func TestUpsertUpdateMask(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to update a mask into the database.")
 	{
@@ -327,28 +264,9 @@ func TestUpsertUpdateMask(t *testing.T) {
 
 // TestDeleteMask validates the removal of a mask from the database.
 func TestDeleteMask(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := mfix.Remove(db, collection); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
-	}()
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to delete a mask in the database.")
 	{
@@ -379,15 +297,9 @@ func TestDeleteMask(t *testing.T) {
 
 // TestAPIFailureMasks validates the failure of the api using a nil session.
 func TestAPIFailureMasks(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	masks, err := mfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
+	masks, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{

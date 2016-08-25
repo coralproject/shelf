@@ -36,30 +36,43 @@ func init() {
 
 //==============================================================================
 
-// TestUpsertCreateScript tests if we can create a script record in the db.
-func TestUpsertCreateScript(t *testing.T) {
+// setup initializes for each indivdual test.
+func setup(t *testing.T, fixture string) (script.Script, *db.DB) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
-	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
+	scr, err := sfix.Get(fixture)
 	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould load query mask record from file : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
+	t.Logf("%s\tShould load query mask record from file.", tests.Success)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
-	defer db.CloseMGO(tests.Context)
 
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
+	return scr, db
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	if err := sfix.Remove(db, prefix); err != nil {
+		t.Fatalf("%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the query mask.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
+// TestUpsertCreateScript tests if we can create a script record in the db.
+func TestUpsertCreateScript(t *testing.T) {
+	const fixture = "basic.json"
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to save a script into the database.")
 	{
@@ -94,30 +107,11 @@ func TestUpsertCreateScript(t *testing.T) {
 
 // TestGetScriptNames validates retrieval of Script record names.
 func TestGetScriptNames(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	scrName := prefix + "_basic"
-
-	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
 
 	t.Log("Given the need to retrieve a list of scripts.")
 	{
@@ -175,28 +169,9 @@ func TestGetScriptNames(t *testing.T) {
 
 // TestGetScripts validates retrieval of all Script records.
 func TestGetScripts(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of scripts.")
 	{
@@ -253,28 +228,9 @@ func TestGetScripts(t *testing.T) {
 
 // TestGetScriptByNames validates retrieval of Script records by a set of names.
 func TestGetScriptByNames(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of script values.")
 	{
@@ -332,30 +288,11 @@ func TestGetScriptByNames(t *testing.T) {
 // TestGetLastScriptHistoryByName validates retrieval of Script from the history
 // collection.
 func TestGetLastScriptHistoryByName(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	scrName := prefix + "_basic"
-
-	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
 
 	t.Log("Given the need to retrieve a script from history.")
 	{
@@ -392,28 +329,9 @@ func TestGetLastScriptHistoryByName(t *testing.T) {
 
 // TestUpsertUpdateScript validates update operation of a given Script.
 func TestUpsertUpdateScript(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to update a script into the database.")
 	{
@@ -468,31 +386,12 @@ func TestUpsertUpdateScript(t *testing.T) {
 
 // TestDeleteScript validates the removal of a script from the database.
 func TestDeleteScript(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	scrName := prefix + "_basic"
 	scrBadName := prefix + "_basic_advice"
-
-	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := sfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the scripts : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the scripts.", tests.Success)
-	}()
 
 	t.Log("Given the need to delete a script in the database.")
 	{
@@ -523,17 +422,11 @@ func TestDeleteScript(t *testing.T) {
 
 // TestAPIFailureScripts validates the failure of the api using a nil session.
 func TestAPIFailureScripts(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	scr1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	scrName := prefix + "_unknown"
-
-	const fixture = "basic.json"
-	scr1, err := sfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load script record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load script record from file.", tests.Success)
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{

@@ -37,6 +37,38 @@ func init() {
 
 //==============================================================================
 
+// setup initializes for each indivdual test.
+func setup(t *testing.T, fixture string) (regex.Regex, *db.DB) {
+	tests.ResetLog()
+
+	rgx, err := rfix.Get(fixture)
+	if err != nil {
+		t.Fatalf("%s\tShould load query mask record from file : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould load query mask record from file.", tests.Success)
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+
+	return rgx, db
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	if err := rfix.Remove(db, prefix); err != nil {
+		t.Fatalf("%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the query mask.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
 // TestInvalidRegex tests that bad regex expressions cause errors.
 func TestInvalidRegex(t *testing.T) {
 	tests.ResetLog()
@@ -83,28 +115,9 @@ func TestInvalidRegex(t *testing.T) {
 
 // TestUpsertCreateRegex tests if we can create a regex record in the db.
 func TestUpsertCreateRegex(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regex : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regex.", tests.Success)
-	}()
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to save a regex into the database.")
 	{
@@ -115,7 +128,7 @@ func TestUpsertCreateRegex(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a regex.", tests.Success)
 
-			if _, err = regex.GetLastHistoryByName(tests.Context, db, rgx1.Name); err != nil {
+			if _, err := regex.GetLastHistoryByName(tests.Context, db, rgx1.Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the regex from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the regex from history.", tests.Success)
@@ -144,30 +157,11 @@ func TestUpsertCreateRegex(t *testing.T) {
 
 // TestGetRegexNames validates retrieval of Regex record names.
 func TestGetRegexNames(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	rgxName := prefix + "_basic"
-
-	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
 
 	t.Log("Given the need to retrieve a list of regexs.")
 	{
@@ -214,28 +208,9 @@ func TestGetRegexNames(t *testing.T) {
 
 // TestGetRegexs validates retrieval of all Regex records.
 func TestGetRegexs(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of regexs.")
 	{
@@ -275,28 +250,9 @@ func TestGetRegexs(t *testing.T) {
 
 // TestGetRegexByNames validates retrieval of Regex records by a set of names.
 func TestGetRegexByNames(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of regex values.")
 	{
@@ -344,30 +300,11 @@ func TestGetRegexByNames(t *testing.T) {
 // TestGetLastRegexHistoryByName validates retrieval of Regex from the history
 // collection.
 func TestGetLastRegexHistoryByName(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	rgxName := prefix + "_basic"
-
-	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
 
 	t.Log("Given the need to retrieve a regex from history.")
 	{
@@ -404,28 +341,9 @@ func TestGetLastRegexHistoryByName(t *testing.T) {
 
 // TestUpsertUpdateRegex validates update operation of a given Regex.
 func TestUpsertUpdateRegex(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to update a regex into the database.")
 	{
@@ -474,31 +392,12 @@ func TestUpsertUpdateRegex(t *testing.T) {
 
 // TestDeleteRegex validates the removal of a regex from the database.
 func TestDeleteRegex(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	rgxName := prefix + "_basic"
 	rgxBadName := prefix + "_basic_advice"
-
-	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := rfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the regexs : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the regexs.", tests.Success)
-	}()
 
 	t.Log("Given the need to delete a regex in the database.")
 	{
@@ -529,17 +428,11 @@ func TestDeleteRegex(t *testing.T) {
 
 // TestAPIFailureRegexs validates the failure of the api using a nil session.
 func TestAPIFailureRegexs(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	rgx1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	rgxName := prefix + "_unknown"
-
-	const fixture = "basic.json"
-	rgx1, err := rfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load regex record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load regex record from file.", tests.Success)
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{

@@ -35,30 +35,43 @@ func init() {
 
 //==============================================================================
 
-// TestUpsertCreateSet tests if we can create a Set record in the db.
-func TestUpsertCreateSet(t *testing.T) {
+// setup initializes for each indivdual test.
+func setup(t *testing.T, fixture string) (*query.Set, *db.DB) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
-	const fixture = "basic_fldsub.json"
-	set1, err := qfix.Get(fixture)
+	set, err := qfix.Get(fixture)
 	if err != nil {
-		t.Fatalf("\t%s\tShould load query set record from file : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould load query mask record from file : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould load query set record from file.", tests.Success)
+	t.Logf("%s\tShould load query mask record from file.", tests.Success)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
-	defer db.CloseMGO(tests.Context)
 
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
+	return set, db
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	if err := qfix.Remove(db, prefix); err != nil {
+		t.Fatalf("%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the query mask.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
+// TestUpsertCreateSet tests if we can create a Set record in the db.
+func TestUpsertCreateSet(t *testing.T) {
+	const fixture = "basic_fldsub.json"
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to save a query set into the database.")
 	{
@@ -69,7 +82,7 @@ func TestUpsertCreateSet(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to create a query set.", tests.Success)
 
-			if _, err = query.GetLastHistoryByName(tests.Context, db, set1.Name); err != nil {
+			if _, err := query.GetLastHistoryByName(tests.Context, db, set1.Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
@@ -93,28 +106,9 @@ func TestUpsertCreateSet(t *testing.T) {
 
 // TestGetSetNames validates retrieval of query Set record names.
 func TestGetSetNames(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of query sets.")
 	{
@@ -155,28 +149,9 @@ func TestGetSetNames(t *testing.T) {
 
 // TestGetSets validates retrieval of all Set records.
 func TestGetSets(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to retrieve a list of query sets.")
 	{
@@ -217,30 +192,11 @@ func TestGetSets(t *testing.T) {
 // TestGetLastSetHistoryByName validates retrieval of query Set from the history
 // collection.
 func TestGetLastSetHistoryByName(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	qsName := prefix + "_basic"
-
-	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
 
 	t.Log("Given the need to retrieve a query set from history.")
 	{
@@ -277,28 +233,9 @@ func TestGetLastSetHistoryByName(t *testing.T) {
 
 // TestUpsertUpdateQuery validates update operation of a given query Set.
 func TestUpsertUpdateQuery(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to update a query set into the database.")
 	{
@@ -321,7 +258,7 @@ func TestUpsertUpdateQuery(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to update a query set record.", tests.Success)
 
-			if _, err = query.GetLastHistoryByName(tests.Context, db, set1.Name); err != nil {
+			if _, err := query.GetLastHistoryByName(tests.Context, db, set1.Name); err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve the query set from history: %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query set from history.", tests.Success)
@@ -357,31 +294,12 @@ func TestUpsertUpdateQuery(t *testing.T) {
 
 // TestDeleteSet validates the removal of a query from the database.
 func TestDeleteSet(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	qsName := prefix + "_basic"
 	qsBadName := prefix + "_basic_advice"
-
-	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
 
 	t.Log("Given the need to delete a query set in the database.")
 	{
@@ -413,30 +331,11 @@ func TestDeleteSet(t *testing.T) {
 // TestUnknownName validates the behaviour of the query API when using a invalid/
 // unknown query name.
 func TestUnknownName(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	qsName := prefix + "_unknown"
-
-	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
 
 	t.Log("Given the need to validate bad query name response.")
 	{
@@ -462,28 +361,9 @@ func TestUnknownName(t *testing.T) {
 
 // TestEnsureIndex validates indexes can be ensured.
 func TestEnsureIndex(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
 	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := qfix.Remove(db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the query set : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the query set.", tests.Success)
-	}()
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	t.Log("Given the need to validate ensureing indexes.")
 	{
@@ -499,17 +379,11 @@ func TestEnsureIndex(t *testing.T) {
 
 // TestAPIFailureSet validates the failure of the api using a nil session.
 func TestAPIFailureSet(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	const fixture = "basic.json"
+	set1, db := setup(t, fixture)
+	defer teardown(t, db)
 
 	qsName := prefix + "_unknown"
-
-	const fixture = "basic.json"
-	set1, err := qfix.Get(fixture)
-	if err != nil {
-		t.Fatalf("\t%s\tShould load query record from file : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould load query record from file.", tests.Success)
 
 	t.Log("Given the need to validate failure of API with bad session.")
 	{
