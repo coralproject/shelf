@@ -32,7 +32,7 @@ func (q *QuadParams) Validate() error {
 
 // AddToGraph adds relationships as quads into the cayley graph.
 func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
-	log.Dev(context, "Add", "Started : %d Relationships", len(quadParams))
+	log.Dev(context, "AddToGraph", "Started : %d Relationships", len(quadParams))
 
 	// Convert the given parameters into cayley quads.
 	tx := cayley.NewTransaction()
@@ -40,7 +40,7 @@ func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadPara
 
 		// Validate the parameters.
 		if err := params.Validate(); err != nil {
-			log.Error(context, "Add", err, "Completed")
+			log.Error(context, "AddToGraph", err, "Completed")
 			return err
 		}
 
@@ -51,17 +51,17 @@ func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadPara
 
 	// Apply the transaction.
 	if err := store.ApplyTransaction(tx); err != nil {
-		log.Error(context, "Add", err, "Completed")
+		log.Error(context, "AddToGraph", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "Add", "Completed")
+	log.Dev(context, "AddToGraph", "Completed")
 	return nil
 }
 
 // RemoveFromGraph removes relationship quads from the cayley graph.
 func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
-	log.Dev(context, "Remove", "Started : %d Relationships", len(quadParams))
+	log.Dev(context, "RemoveFromGraph", "Started : %d Relationships", len(quadParams))
 
 	// Convert the given parameters into cayley quads.
 	tx := cayley.NewTransaction()
@@ -69,7 +69,7 @@ func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []Qua
 
 		// Validate the parameters.
 		if err := params.Validate(); err != nil {
-			log.Error(context, "Remove", err, "Completed")
+			log.Error(context, "RemoveFromGraph", err, "Completed")
 			return err
 		}
 
@@ -80,10 +80,10 @@ func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []Qua
 
 	// Apply the transaction.
 	if err := store.ApplyTransaction(tx); err != nil {
-		log.Error(context, "Remove", err, "Completed")
+		log.Error(context, "RemoveFromGraph", err, "Completed")
 		return err
 	}
 
-	log.Dev(context, "Remove", "Completed")
+	log.Dev(context, "RemoveFromGraph", "Completed")
 	return nil
 }
