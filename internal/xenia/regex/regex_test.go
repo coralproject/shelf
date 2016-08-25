@@ -43,13 +43,13 @@ func setup(t *testing.T, fixture string) (regex.Regex, *db.DB) {
 
 	rgx, err := rfix.Get(fixture)
 	if err != nil {
-		t.Fatalf("\t%s\tShould load query mask record from file : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould load query mask record from file : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould load query mask record from file.", tests.Success)
+	t.Logf("%s\tShould load query mask record from file.", tests.Success)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
 	return rgx, db
@@ -58,9 +58,9 @@ func setup(t *testing.T, fixture string) (regex.Regex, *db.DB) {
 // teardown deinitializes for each indivdual test.
 func teardown(t *testing.T, db *db.DB) {
 	if err := rfix.Remove(db, prefix); err != nil {
-		t.Fatalf("\t%s\tShould be able to remove the query mask : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to remove the query mask : %v", tests.Failed, err)
 	}
-	t.Logf("\t%s\tShould be able to remove the query mask.", tests.Success)
+	t.Logf("%s\tShould be able to remove the query mask.", tests.Success)
 
 	db.CloseMGO(tests.Context)
 
