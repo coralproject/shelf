@@ -148,23 +148,19 @@ func DeleteSubmission(context interface{}, db *db.DB, id, formID string) error {
 		return ErrInvalidID
 	}
 
-	// FIXME: uncomment once old API has been deprecated.
-	// if !bson.IsObjectIdHex(formID) {
-	// 	log.Error(context, "Delete", ErrInvalidID, "Completed")
-	// 	return ErrInvalidID
-	// }
+	if !bson.IsObjectIdHex(formID) {
+		log.Error(context, "Delete", ErrInvalidID, "Completed")
+		return ErrInvalidID
+	}
 
 	if err := submission.Delete(context, db, id); err != nil {
 		log.Error(context, "DeleteSubmission", err, "Completed")
 		return err
 	}
 
-	// FIXME: remove once old API has been deprecated.
-	if formID != "" {
-		if _, err := form.UpdateStats(context, db, formID); err != nil {
-			log.Error(context, "DeleteSubmission", err, "Completed")
-			return err
-		}
+	if _, err := form.UpdateStats(context, db, formID); err != nil {
+		log.Error(context, "DeleteSubmission", err, "Completed")
+		return err
 	}
 
 	log.Dev(context, "DeleteSubmission", "Started")
