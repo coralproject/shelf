@@ -1,7 +1,6 @@
 package form_test
 
 import (
-	"log"
 	"os"
 	"testing"
 	"time"
@@ -13,8 +12,6 @@ import (
 	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/formfix"
 )
-
-var dbSession *db.DB
 
 // prefix is what we are looking to delete after the test.
 const prefix = "FTEST"
@@ -35,45 +32,48 @@ func TestMain(m *testing.M) {
 	}
 	tests.InitMongo(cfg)
 
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		log.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	// set the package database handle
-	dbSession = db
-
 	os.Exit(m.Run())
 }
 
-func Test_UpsertDelete(t *testing.T) {
+func setup(t *testing.T, fixture string) ([]form.Form, *db.DB) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
-	defer func() {
-		if err := formfix.Remove(tests.Context, dbSession, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the forms : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the forms.", tests.Success)
-	}()
+	fms, err := formfix.Get()
+	if err != nil {
+		t.Fatalf("%s\tShould be able retrieve form fixture : %s", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able retrieve form fixture.", tests.Success)
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("Should be able to get a Mongo session : %v", tests.Failed, err)
+	}
+
+	return fms, db
+}
+
+func teardown(t *testing.T, db *db.DB) {
+	if err := formfix.Remove(tests.Context, db, prefix); err != nil {
+		t.Fatalf("%s\tShould be able to remove the forms : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the forms.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+	tests.DisplayLog()
+}
+
+func Test_UpsertDelete(t *testing.T) {
+	fms, db := setup(t, "form")
+	defer teardown(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{
 		t.Log("\tWhen starting from an empty forms collection")
 		{
 			//----------------------------------------------------------------------
-			// Get the fixture.
-
-			fms, err := formfix.Get()
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve form fixture : %s", tests.Failed, err)
-			}
-
-			//----------------------------------------------------------------------
 			// Upsert the form.
 
-			if err := form.Upsert(tests.Context, dbSession, &fms[0]); err != nil {
+			if err := form.Upsert(tests.Context, db, &fms[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a form : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a form.", tests.Success)
@@ -81,7 +81,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the form.
 
-			fm, err := form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			fm, err := form.Retrieve(tests.Context, db, fms[0].ID.Hex())
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get the form by id : %s", tests.Failed, err)
 			}
@@ -98,7 +98,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Delete the form.
 
-			if err := form.Delete(tests.Context, dbSession, fms[0].ID.Hex()); err != nil {
+			if err := form.Delete(tests.Context, db, fms[0].ID.Hex()); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete the form : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to delete the form.", tests.Success)
@@ -106,7 +106,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the form.
 
-			_, err = form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			_, err = form.Retrieve(tests.Context, db, fms[0].ID.Hex())
 			if err == nil {
 				t.Fatalf("\t%s\tShould generate an error when getting a form with the deleted id : %s", tests.Failed, err)
 			}
@@ -117,7 +117,7 @@ func Test_UpsertDelete(t *testing.T) {
 
 			fms[0].ID = ""
 
-			if err := form.Upsert(tests.Context, dbSession, &fms[0]); err != nil {
+			if err := form.Upsert(tests.Context, db, &fms[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a form : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a form.", tests.Success)
@@ -133,7 +133,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the form.
 
-			fm, err = form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			fm, err = form.Retrieve(tests.Context, db, fms[0].ID.Hex())
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get the form by id : %s", tests.Failed, err)
 			}
@@ -150,7 +150,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Delete the form.
 
-			if err := form.Delete(tests.Context, dbSession, fms[0].ID.Hex()); err != nil {
+			if err := form.Delete(tests.Context, db, fms[0].ID.Hex()); err != nil {
 				t.Fatalf("\t%s\tShould be able to delete the form : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to delete the form.", tests.Success)
@@ -158,7 +158,7 @@ func Test_UpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the form.
 
-			_, err = form.Retrieve(tests.Context, dbSession, fms[0].ID.Hex())
+			_, err = form.Retrieve(tests.Context, db, fms[0].ID.Hex())
 			if err == nil {
 				t.Fatalf("\t%s\tShould generate an error when getting a form with the deleted id : %s", tests.Failed, err)
 			}
@@ -168,39 +168,25 @@ func Test_UpsertDelete(t *testing.T) {
 }
 
 func Test_List(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	defer func() {
-		if err := formfix.Remove(tests.Context, dbSession, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the forms : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the forms.", tests.Success)
-	}()
+	fms, db := setup(t, "form")
+	defer teardown(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{
 		t.Log("\tWhen starting from an empty forms collection")
 		{
-			//----------------------------------------------------------------------
-			// Get the fixtures.
-
-			fms, err := formfix.Get()
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve form fixtures : %s", tests.Failed, err)
-			}
 
 			//----------------------------------------------------------------------
 			// Upsert the forms.
 
 			for _, fm := range fms {
-				if err := form.Upsert(tests.Context, dbSession, &fm); err != nil {
+				if err := form.Upsert(tests.Context, db, &fm); err != nil {
 					t.Fatalf("\t%s\tShould be able to upsert a form : %s", tests.Failed, err)
 				}
 			}
 			t.Logf("\t%s\tShould be able to upsert forms.", tests.Success)
 
-			lfms, err := form.List(tests.Context, dbSession, len(fms), 0)
+			lfms, err := form.List(tests.Context, db, len(fms), 0)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to list forms : %s", tests.Failed, err)
 			}
@@ -231,32 +217,18 @@ func Test_List(t *testing.T) {
 }
 
 func Test_UpdateStatus(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	defer func() {
-		if err := formfix.Remove(tests.Context, dbSession, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the forms : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the forms.", tests.Success)
-	}()
+	fms, db := setup(t, "form")
+	defer teardown(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{
 		t.Log("\tWhen starting from an empty forms collection")
 		{
-			//----------------------------------------------------------------------
-			// Get the fixtures.
-
-			fms, err := formfix.Get()
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve form fixtures : %s", tests.Failed, err)
-			}
 
 			//----------------------------------------------------------------------
 			// Upsert the form.
 
-			if err := form.Upsert(tests.Context, dbSession, &fms[0]); err != nil {
+			if err := form.Upsert(tests.Context, db, &fms[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a form : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a form.", tests.Success)
@@ -266,7 +238,7 @@ func Test_UpdateStatus(t *testing.T) {
 
 			newStatus := "updated_" + time.Now().String()
 
-			fm, err := form.UpdateStatus(tests.Context, dbSession, fms[0].ID.Hex(), newStatus)
+			fm, err := form.UpdateStatus(tests.Context, db, fms[0].ID.Hex(), newStatus)
 			if err != nil {
 				t.Logf("\t%s\tShould be able to update a forms status without error : %s", tests.Success, err.Error())
 			}
@@ -291,7 +263,7 @@ func Test_UpdateStatus(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get a copy from the DB.
 
-			rfm, err := form.Retrieve(tests.Context, dbSession, fm.ID.Hex())
+			rfm, err := form.Retrieve(tests.Context, db, fm.ID.Hex())
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to retrieve a form given it's id : %s", tests.Success, err.Error())
 			}
