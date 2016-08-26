@@ -28,6 +28,11 @@ var (
 	bufferLimit = 100
 )
 
+const (
+	inString  = "in"
+	outString = "out"
+)
+
 // Result represents what a user will receive after generating a view.
 type Result struct {
 	Results interface{} `json:"results"`
@@ -174,9 +179,9 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 
 			// Add the first level relationship.
 			switch segment.Direction {
-			case "in":
+			case inString:
 				graphPath = cayley.StartPath(graphDB, quad.String(key)).In(quad.String(segment.Predicate))
-			case "out":
+			case outString:
 				graphPath = cayley.StartPath(graphDB, quad.String(key)).Out(quad.String(segment.Predicate))
 			}
 
