@@ -35,7 +35,7 @@ func TestMain(m *testing.M) {
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		log.Fatalf("Should be able to get a Mongo session : %v", tests.Failed, err)
+		log.Fatalf("Should be able to get a Mongo session : %v", err)
 	}
 	defer db.CloseMGO(tests.Context)
 
@@ -43,7 +43,7 @@ func TestMain(m *testing.M) {
 	// first. This is fairly important, so we want to fail the entire test suite
 	// if we can't setup the indexes.
 	if err := submission.EnsureIndexes(tests.Context, db); err != nil {
-		log.Fatalf("Can't ensure the database indexes")
+		log.Fatal("Can't ensure the database indexes")
 	}
 
 	os.Exit(m.Run())
@@ -60,7 +60,7 @@ func setup(t *testing.T, fixture string) ([]submission.Submission, *db.DB) {
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("Should be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("Should be able to get a Mongo session : %v", err)
 	}
 
 	return subs, db

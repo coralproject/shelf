@@ -46,7 +46,7 @@ func setup(t *testing.T, fixture string) ([]form.Form, *db.DB) {
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("Should be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("Should be able to get a Mongo session : %v", err)
 	}
 
 	return fms, db
@@ -59,7 +59,7 @@ func teardown(t *testing.T, db *db.DB) {
 	t.Logf("%s\tShould be able to remove the forms.", tests.Success)
 
 	db.CloseMGO(tests.Context)
-	// tests.DisplayLog()
+	tests.DisplayLog()
 }
 
 func Test_UpsertDelete(t *testing.T) {
