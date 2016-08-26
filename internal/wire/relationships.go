@@ -1,48 +1,89 @@
 package wire
 
 import (
-	"fmt"
-
-	"github.com/ardanlabs/kit/db"
-	"github.com/coralproject/shelf/internal/wire/relationship"
-	"github.com/coralproject/shelf/internal/wire/view"
+	"github.com/ardanlabs/kit/log"
+	"github.com/cayleygraph/cayley"
+	"github.com/cayleygraph/cayley/quad"
+	validator "gopkg.in/bluesuncorp/validator.v8"
 )
 
-// validateStartType verifies the start type of a view path.
-func validateStartType(context interface{}, db *db.DB, v *view.View) error {
+// validate is used to perform field validation.
+var validate *validator.Validate
 
-	// Extract the first level relationship predicate.
-	var firstRel string
-	var firstDir string
-	for _, segment := range v.Path {
-		if segment.Level == 1 {
-			firstRel = segment.Predicate
-			firstDir = segment.Direction
+func init() {
+	validate = validator.New(&validator.Config{TagName: "validate"})
+}
+
+// QuadParams contains information needed to add/remove relationships
+// to/from the cayley graph.
+type QuadParams struct {
+	Subject   string `validate:"required,min=2"`
+	Predicate string `validate:"required,min=2"`
+	Object    string `validate:"required,min=2"`
+}
+
+// Validate checks the QuadParams value for consistency.
+func (q *QuadParams) Validate() error {
+	if err := validate.Struct(q); err != nil {
+		return err
+	}
+	return nil
+}
+
+// AddToGraph adds relationships as quads into the cayley graph.
+func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
+	log.Dev(context, "AddToGraph", "Started : %d Relationships", len(quadParams))
+
+	// Convert the given parameters into cayley quads.
+	tx := cayley.NewTransaction()
+	for _, params := range quadParams {
+
+		// Validate the parameters.
+		if err := params.Validate(); err != nil {
+			log.Error(context, "AddToGraph", err, "Completed")
+			return err
 		}
+
+		// Form the cayley quad.
+		quad := quad.Make(params.Subject, params.Predicate, params.Object, "")
+		tx.AddQuad(quad)
 	}
 
-	// Get the relationship metadata.
-	rel, err := relationship.GetByPredicate(context, db, firstRel)
-	if err != nil {
+	// Apply the transaction.
+	if err := store.ApplyTransaction(tx); err != nil {
+		log.Error(context, "AddToGraph", err, "Completed")
 		return err
 	}
 
-	// Get the relevant item types based on the direction of the
-	// first relationship in the path.
-	var itemTypes []string
-	switch firstDir {
-	case "out":
-		itemTypes = rel.SubjectTypes
-	case "in":
-		itemTypes = rel.ObjectTypes
-	}
+	log.Dev(context, "AddToGraph", "Completed")
+	return nil
+}
 
-	// Validate the starting type provided in the view.
-	for _, itemType := range itemTypes {
-		if itemType == v.StartType {
-			return nil
+// RemoveFromGraph removes relationship quads from the cayley graph.
+func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
+	log.Dev(context, "RemoveFromGraph", "Started : %d Relationships", len(quadParams))
+
+	// Convert the given parameters into cayley quads.
+	tx := cayley.NewTransaction()
+	for _, params := range quadParams {
+
+		// Validate the parameters.
+		if err := params.Validate(); err != nil {
+			log.Error(context, "RemoveFromGraph", err, "Completed")
+			return err
 		}
+
+		// Form the cayley quad.
+		quad := quad.Make(params.Subject, params.Predicate, params.Object, "")
+		tx.RemoveQuad(quad)
 	}
 
-	return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, itemTypes)
+	// Apply the transaction.
+	if err := store.ApplyTransaction(tx); err != nil {
+		log.Error(context, "RemoveFromGraph", err, "Completed")
+		return err
+	}
+
+	log.Dev(context, "RemoveFromGraph", "Completed")
+	return nil
 }

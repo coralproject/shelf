@@ -33,7 +33,7 @@
 	},
 	{
 		"name": "VTEST_comments from authors flagged by a user",
-		"start_type": "coral_user",
+		"start_type": "coral_invalid_type",
 		"collection": "items",
 		"path": [
 			{
@@ -52,6 +52,43 @@
 				"direction": "out",
 				"predicate": "RTEST_authored",
 				"tag": "comment"
+			}
+		]
+	},
+	{
+		"name": "VTEST_has invalid starting relationship",
+		"start_type": "coral_user",
+		"collection": "items",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "RTEST_invalid"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "RTEST_authored",
+				"tag": "author"
+			}
+		]
+	},
+	{
+		"name": "VTEST_thread_backwards",
+		"collection": "items",
+		"start_type": "coral_user",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "RTEST_authored",
+				"tag": "comment"
+			},
+			{
+				"level": 2,
+				"direction": "out",
+				"predicate": "RTEST_on",
+				"tag": "asset"
 			}
 		]
 	}
