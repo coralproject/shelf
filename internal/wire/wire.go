@@ -139,9 +139,9 @@ func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 	// first relationship in the path.
 	var itemTypes []string
 	switch firstDir {
-	case "out":
+	case outString:
 		itemTypes = rel.SubjectTypes
-	case "in":
+	case inString:
 		itemTypes = rel.ObjectTypes
 	}
 
@@ -196,9 +196,9 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 
 		// Add the relationship.
 		switch segment.Direction {
-		case "in":
+		case inString:
 			graphPath = graphPath.Clone().In(quad.String(segment.Predicate))
-		case "out":
+		case outString:
 			graphPath = graphPath.Clone().Out(quad.String(segment.Predicate))
 		}
 
