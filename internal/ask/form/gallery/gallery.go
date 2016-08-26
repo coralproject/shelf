@@ -37,9 +37,18 @@ const Collection = "form_galleries"
 // Gallery.
 type Answer struct {
 	SubmissionID    bson.ObjectId       `json:"submission_id" bson:"submission_id" validate:"required"`
-	AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required,len=24"`
-	Answer          submission.Answer   `json:"answer,omitempty" bson:"-"`
+	AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required,uuid"`
+	Answer          submission.Answer   `json:"answer,omitempty" bson:"-" validate:"-"`
 	IdentityAnswers []submission.Answer `json:"identity_answers,omitempty" bson:"-"`
+}
+
+// Validate checks the Anser value for consistency.
+func (a *Answer) Validate() error {
+	if err := validate.Struct(a); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Gallery is a Form that has been moved to a shared space.
@@ -154,6 +163,7 @@ func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submissi
 	for j, answer := range gallery.Answers {
 
 		for k, sub := range submissions {
+
 			// If we are looking at a different submission that doesn't match the
 			// answer's submission ID or the submission was to a different form that
 			// the current gallery is on, then we need to skip this submission.
@@ -242,16 +252,16 @@ func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string
 		return nil, ErrInvalidID
 	}
 
-	if !bson.IsObjectIdHex(answerID) {
-		log.Error(context, "AddAnswer", ErrInvalidID, "Completed")
-		return nil, ErrInvalidID
-	}
-
 	objectID := bson.ObjectIdHex(id)
 
 	answer := Answer{
 		SubmissionID: bson.ObjectIdHex(submissionID),
 		AnswerID:     answerID,
+	}
+
+	if err := answer.Validate(); err != nil {
+		log.Error(context, "AddAnswer", err, "Completed")
+		return nil, err
 	}
 
 	f := func(c *mgo.Collection) error {
@@ -294,16 +304,16 @@ func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID str
 		return nil, ErrInvalidID
 	}
 
-	if !bson.IsObjectIdHex(answerID) {
-		log.Error(context, "RemoveAnswer", ErrInvalidID, "Completed")
-		return nil, ErrInvalidID
-	}
-
 	objectID := bson.ObjectIdHex(id)
 
 	answer := Answer{
 		SubmissionID: bson.ObjectIdHex(submissionID),
 		AnswerID:     answerID,
+	}
+
+	if err := answer.Validate(); err != nil {
+		log.Error(context, "RemoveAnswer", err, "Completed")
+		return nil, err
 	}
 
 	f := func(c *mgo.Collection) error {

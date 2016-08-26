@@ -10,6 +10,8 @@ import (
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/internal/ask/form/gallery"
 	"github.com/coralproject/shelf/internal/ask/form/gallery/galleryfix"
+	"github.com/coralproject/shelf/internal/ask/form/submission"
+	"github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
 )
 
 // prefix is what we are looking to delete after the test.
@@ -113,4 +115,99 @@ func Test_CreateDelete(t *testing.T) {
 			t.Logf("\t%s\tShould generate an error when getting a gallery with the deleted id.", tests.Success)
 		}
 	}
+}
+
+func Test_Answers(t *testing.T) {
+	gs, db := setup(t, "gallery")
+	defer teardown(t, db)
+
+	// we need to get/fill in real form submissions
+	subs, err := submissionfix.Get()
+	if err != nil {
+		t.Fatalf("Should be able to fetch submission fixtures : %v", err)
+	}
+
+	// set the form id to the first form.
+	for i := range subs {
+		subs[i].FormID = gs[0].FormID
+	}
+
+	if err := submissionfix.Add(tests.Context, db, subs); err != nil {
+		t.Fatalf("Should be able to add submission fixtures : %v", err)
+	}
+
+	defer func() {
+		for _, sub := range subs {
+			if err := submission.Delete(tests.Context, db, sub.ID.Hex()); err != nil {
+				t.Fatalf("%s\tShould be able to remove submission fixtures : %v", tests.Failed, err)
+			}
+		}
+		t.Logf("%s\tShould be able to remove submission fixtures.", tests.Success)
+	}()
+
+	t.Log("Given the need to upsert and delete galleries.")
+	{
+		t.Log("\tWhen starting from an empty galleries collection but saturated submissions collection")
+		{
+
+			if err := galleryfix.Add(tests.Context, db, gs); err != nil {
+				t.Fatalf("\t%s\tShould be able to add the galleries : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add the galleries.", tests.Success)
+
+			crg, err := gallery.AddAnswer(tests.Context, db, gs[0].ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to add an answer to a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add an answer to a gallery.", tests.Success)
+
+			if len(crg.Answers) != 1 {
+				t.Fatalf("\t%s\tShould have at least one answer on the returned gallery : Expected 1, got %d", tests.Failed, len(crg.Answers))
+			}
+			t.Logf("\t%s\tShould have at least one answer on the returned gallery.", tests.Success)
+
+			matchAnswers(t, crg.Answers[0], subs[0], subs[0].Answers[0])
+
+			rg, err := gallery.Retrieve(tests.Context, db, gs[0].ID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to add an answer to a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add an answer to a gallery.", tests.Success)
+
+			if len(rg.Answers) != 1 {
+				t.Fatalf("\t%s\tShould have at least one answer on the returned gallery : Expected 1, got %d", tests.Failed, len(rg.Answers))
+			}
+			t.Logf("\t%s\tShould have at least one answer on the returned gallery.", tests.Success)
+
+			matchAnswers(t, rg.Answers[0], subs[0], subs[0].Answers[0])
+
+			drg, err := gallery.RemoveAnswer(tests.Context, db, gs[0].ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to remove an answer from a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to remove an answer from a gallery.", tests.Success)
+
+			if len(drg.Answers) != 0 {
+				t.Fatalf("\t%s\tShould have at no answers on the returned gallery : Expected 0, got %d", tests.Failed, len(drg.Answers))
+			}
+			t.Logf("\t%s\tShould have at no answers on the returned gallery.", tests.Success)
+		}
+	}
+}
+
+func matchAnswers(t *testing.T, ga gallery.Answer, sub submission.Submission, sa submission.Answer) {
+	if ga.SubmissionID.Hex() != sub.ID.Hex() {
+		t.Fatalf("\t%s\tShould match the submission ID : Expected %s, got %s", tests.Failed, sub.ID.Hex(), ga.SubmissionID.Hex())
+	}
+	t.Logf("\t%s\tShould match the submission ID", tests.Success)
+
+	if ga.AnswerID != sa.WidgetID {
+		t.Fatalf("\t%s\tShould match the widget ID : Expected %s, got %s", tests.Failed, sa.WidgetID, ga.AnswerID)
+	}
+	t.Logf("\t%s\tShould match the widget ID", tests.Success)
+
+	if mongo.Query(ga.Answer.Answer) != mongo.Query(sa.Answer) {
+		t.Fatalf("\t%s\tShould match the answer : Expected %s, got %s", tests.Failed, mongo.Query(sa.Answer), mongo.Query(ga.Answer.Answer))
+	}
+	t.Logf("\t%s\tShould match the answer.", tests.Success)
 }

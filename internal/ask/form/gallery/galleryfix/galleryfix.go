@@ -35,10 +35,14 @@ func Get() ([]gallery.Gallery, error) {
 
 // Add inserts gallerys for testing.
 func Add(context interface{}, db *db.DB, gs []gallery.Gallery) error {
-	for _, g := range gs {
-		if _, err := gallery.Create(context, db, g.FormID.Hex()); err != nil {
+	for i, g := range gs {
+		cg, err := gallery.Create(context, db, g.FormID.Hex())
+		if err != nil {
 			return err
 		}
+
+		// copy the id across
+		gs[i].ID = cg.ID
 	}
 
 	return nil
