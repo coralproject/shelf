@@ -91,7 +91,7 @@ func Create(context interface{}, db *db.DB, formID string) (*Gallery, error) {
 	}
 
 	log.Dev(context, "Create", "Completed")
-	return nil, nil
+	return &gallery, nil
 }
 
 // Retrieve retrieves a form gallery from the MongoDB database
@@ -396,5 +396,30 @@ func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error {
 	}
 
 	log.Dev(context, "Update", "Completed")
+	return nil
+}
+
+// Delete removes the given Gallery with the ID provided.
+func Delete(context interface{}, db *db.DB, id string) error {
+	log.Dev(context, "Delete", "Started")
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "Delete", ErrInvalidID, "Completed")
+		return ErrInvalidID
+	}
+
+	objectID := bson.ObjectIdHex(id)
+
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "Delete", "MGO : db.%s.remove(%s)", c.Name, mongo.Query(objectID))
+		return c.RemoveId(objectID)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		log.Error(context, "Delete", err, "Completed")
+		return err
+	}
+
+	log.Dev(context, "Delete", "Completed")
 	return nil
 }
