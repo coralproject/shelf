@@ -37,7 +37,13 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		return err
 	}
 
-	formID := c.Params["form_id"]
+	// FIXME: remove "comma ok" check after API migration. This is requried
+	// because there is a wildcard collision inbetween the form_id and the id
+	// for the specific endpoints old/new.
+	formID, ok := c.Params["form_id"]
+	if !ok {
+		formID = c.Params["id"]
+	}
 
 	{
 		// We should check to see if the form has a recaptcha property.

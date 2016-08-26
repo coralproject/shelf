@@ -104,57 +104,60 @@ func oldRoutes(a *app.App) {
 	// forms
 	a.Handle("POST", "/api/form", handlers.Form.Upsert)
 	a.Handle("PUT", "/api/form", handlers.Form.Upsert)
-	a.Handle("PUT", "/api/form/{id}/status/{status}", handlers.Form.UpdateStatus)
+	a.Handle("PUT", "/api/form/:id/status/:status", handlers.Form.UpdateStatus)
 	a.Handle("GET", "/api/forms", handlers.Form.List)
-	a.Handle("GET", "/api/form/{id}", handlers.Form.Retrieve)
-	a.Handle("DELETE", "/api/form/{id}", handlers.Form.Delete)
+	a.Handle("GET", "/api/form/:id", handlers.Form.Retrieve)
+	a.Handle("DELETE", "/api/form/:id", handlers.Form.Delete)
 
 	// form submissions
-	a.Handle("POST", "/api/form_submission/{form_id}", handlers.FormSubmission.Create)
-	a.Handle("PUT", "/api/form_submission/{id}/status/{status}", handlers.FormSubmission.UpdateStatus)
-	a.Handle("GET", "/api/form_submissions/{form_id}", handlers.FormSubmission.Search)
-	a.Handle("GET", "/api/form_submission/{id}", handlers.FormSubmission.Retrieve)
-	a.Handle("PUT", "/api/form_submission/{id}/{answer_id}", handlers.FormSubmission.UpdateAnswer)
-	a.Handle("PUT", "/api/form_submission/{id}/flag/{flag}", handlers.FormSubmission.AddFlag)
-	a.Handle("DELETE", "/api/form_submission/{id}/flag/{flag}", handlers.FormSubmission.RemoveFlag)
-	a.Handle("DELETE", "/api/form_submission/{id}", handlers.FormSubmission.Delete)
+	a.Handle("POST", "/api/form_submission/:id", handlers.FormSubmission.Create)
+	a.Handle("PUT", "/api/form_submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
+	a.Handle("GET", "/api/form_submissions/:form_id", handlers.FormSubmission.Search)
+	a.Handle("GET", "/api/form_submission/:id", handlers.FormSubmission.Retrieve)
+	a.Handle("PUT", "/api/form_submission/:id/:answer_id", handlers.FormSubmission.UpdateAnswer)
+	a.Handle("PUT", "/api/form_submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
+	a.Handle("DELETE", "/api/form_submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
+	a.Handle("DELETE", "/api/form_submission/:id", handlers.FormSubmission.Delete)
 
 	// form galleries
-	a.Handle("GET", "/api/form_gallery/{id}", handlers.FormGallery.Retrieve)
-	a.Handle("GET", "/api/form_galleries/{form_id}", handlers.FormGallery.RetrieveForForm)
-	a.Handle("GET", "/api/form_galleries/form/{form_id}", handlers.FormGallery.RetrieveForForm)
-	a.Handle("PUT", "/api/form_gallery/{id}/add/{submission_id}/{answer_id}", handlers.FormGallery.AddAnswer)
-	a.Handle("PUT", "/api/form_gallery/{id}", handlers.FormGallery.Update)
-	a.Handle("DELETE", "/api/form_gallery/{id}/remove/{submission_id}/{answer_id}", handlers.FormGallery.RemoveAnswer)
+	a.Handle("GET", "/api/form_gallery/:id", handlers.FormGallery.Retrieve)
+	a.Handle("GET", "/api/form_galleries/:form_id", handlers.FormGallery.RetrieveForForm)
+	a.Handle("GET", "/api/form_galleries/form/:form_id", handlers.FormGallery.RetrieveForForm)
+	a.Handle("PUT", "/api/form_gallery/:id/add/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
+	a.Handle("PUT", "/api/form_gallery/:id", handlers.FormGallery.Update)
+	a.Handle("DELETE", "/api/form_gallery/:id/remove/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
 }
 
 func routes(a *app.App) {
+	// global
+	a.Handle("GET", "/1.0/version", handlers.Version.List)
+
 	// forms
 	a.Handle("POST", "/1.0/form", handlers.Form.Upsert)
 	a.Handle("GET", "/1.0/form", handlers.Form.List)
-	a.Handle("PUT", "/1.0/form/{id}", handlers.Form.Upsert)
-	a.Handle("PUT", "/1.0/form/{id}/status/{status}", handlers.Form.UpdateStatus)
-	a.Handle("GET", "/1.0/form/{id}", handlers.Form.Retrieve)
-	a.Handle("DELETE", "/1.0/form/{id}", handlers.Form.Delete)
+	a.Handle("PUT", "/1.0/form/:id", handlers.Form.Upsert)
+	a.Handle("PUT", "/1.0/form/:id/status/:status", handlers.Form.UpdateStatus)
+	a.Handle("GET", "/1.0/form/:id", handlers.Form.Retrieve)
+	a.Handle("DELETE", "/1.0/form/:id", handlers.Form.Delete)
 
 	// form form submissions
-	a.Handle("POST", "/1.0/form/{form_id}/submission", handlers.FormSubmission.Create)
-	a.Handle("GET", "/1.0/form/{form_id}/submission", handlers.FormSubmission.Search)
-	a.Handle("GET", "/1.0/form/{form_id}/submission/{id}", handlers.FormSubmission.Retrieve)
-	a.Handle("PUT", "/1.0/form/{form_id}/submission/{id}/status/{status}", handlers.FormSubmission.UpdateStatus)
-	a.Handle("POST", "/1.0/form/{form_id}/submission/{id}/flag/{flag}", handlers.FormSubmission.AddFlag)
-	a.Handle("DELETE", "/1.0/form/{form_id}/submission/{id}/flag/{flag}", handlers.FormSubmission.RemoveFlag)
-	a.Handle("PUT", "/1.0/form/{form_id}/submission/{id}/answer/{answer_id}", handlers.FormSubmission.UpdateAnswer)
-	a.Handle("DELETE", "/1.0/form/{form_id}/submission/{id}", handlers.FormSubmission.Delete)
+	a.Handle("POST", "/1.0/form/:form_id/submission", handlers.FormSubmission.Create)
+	a.Handle("GET", "/1.0/form/:form_id/submission", handlers.FormSubmission.Search)
+	a.Handle("GET", "/1.0/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)
+	a.Handle("PUT", "/1.0/form/:form_id/submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
+	a.Handle("POST", "/1.0/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
+	a.Handle("DELETE", "/1.0/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
+	a.Handle("PUT", "/1.0/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
+	a.Handle("DELETE", "/1.0/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
 
 	// form form galleries
-	a.Handle("GET", "/1.0/form/{form_id}/gallery", handlers.FormGallery.RetrieveForForm)
+	a.Handle("GET", "/1.0/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
 
 	// form galleries
-	a.Handle("GET", "/1.0/form_gallery/{id}", handlers.FormGallery.Retrieve)
-	a.Handle("PUT", "/1.0/form_gallery/{id}", handlers.FormGallery.Update)
-	a.Handle("POST", "/1.0/form_gallery/{id}/submission/{submission_id}/{answer_id}", handlers.FormGallery.AddAnswer)
-	a.Handle("DELETE", "/1.0/form_gallery/{id}/submission/{submission_id}/{answer_id}", handlers.FormGallery.RemoveAnswer)
+	a.Handle("GET", "/1.0/form_gallery/:id", handlers.FormGallery.Retrieve)
+	a.Handle("PUT", "/1.0/form_gallery/:id", handlers.FormGallery.Update)
+	a.Handle("POST", "/1.0/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
+	a.Handle("DELETE", "/1.0/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
 }
 
 func ensureDBIndexes() error {
