@@ -9,16 +9,23 @@ import (
 	"github.com/coralproject/shelf/internal/wire"
 )
 
-// TestAddRemoveGraph tests if we can add/remove relationship quads to/from cayley.
-func TestAddRemoveGraph(t *testing.T) {
+// setupGraph initializes an in-memory Cayley graph and logging for an individual test.
+func setupGraph(t *testing.T) *cayley.Handle {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
 	store, err := cayley.NewMemoryGraph()
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to create a new Cayley graph : %v", tests.Failed, err)
 	}
 	t.Logf("\t%s\tShould be able to create a new Cayley graph.", tests.Success)
+
+	return store
+}
+
+// TestAddRemoveGraph tests if we can add/remove relationship quads to/from cayley.
+func TestAddRemoveGraph(t *testing.T) {
+	store := setupGraph(t)
+	defer tests.DisplayLog()
 
 	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
 	{
@@ -57,7 +64,7 @@ func TestAddRemoveGraph(t *testing.T) {
 				token := it.Result()
 				value := store.NameOf(token)
 				if quad.NativeOf(value) != "the ring" {
-					t.Fatalf("\t%s\tShould be able to get the relationships from the graph : %s", tests.Failed, err)
+					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
 			if err := it.Err(); err != nil {
@@ -72,7 +79,7 @@ func TestAddRemoveGraph(t *testing.T) {
 				token := it.Result()
 				value := store.NameOf(token)
 				if quad.NativeOf(value) != "frodo" {
-					t.Fatalf("\t%s\tShould be able to get the relationships from the graph : %s", tests.Failed, err)
+					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
 			if err := it.Err(); err != nil {
@@ -121,14 +128,8 @@ func TestAddRemoveGraph(t *testing.T) {
 
 // TestGraphParamFail tests if we can handle invalid quad parameters.
 func TestGraphParamFail(t *testing.T) {
-	tests.ResetLog()
+	store := setupGraph(t)
 	defer tests.DisplayLog()
-
-	store, err := cayley.NewMemoryGraph()
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to create a new Cayley graph : %v", tests.Failed, err)
-	}
-	t.Logf("\t%s\tShould be able to create a new Cayley graph.", tests.Success)
 
 	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
 	{
