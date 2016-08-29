@@ -49,10 +49,10 @@ func errResult(err error) *Result {
 
 // ViewParams represents how the View will be generated and persisted.
 type ViewParams struct {
-	ViewName          string
-	ItemKey           string
-	ResultsCollection string
-	BufferLimit       int
+	ViewName          string `json:"view_name"`
+	ItemKey           string `json:"item_key"`
+	ResultsCollection string `json:"results_collection"`
+	BufferLimit       int    `json:"buffer_limit"`
 }
 
 //==============================================================================
