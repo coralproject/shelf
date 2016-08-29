@@ -67,7 +67,6 @@ func init() {
 	}
 
 	// Unmarshal the payload.
-	var payload Payload
 	if err := json.Unmarshal([]byte(payloadString), &payload); err != nil {
 		fmt.Println("Unable to unmarshal the payload, exiting.")
 		os.Exit(1)
