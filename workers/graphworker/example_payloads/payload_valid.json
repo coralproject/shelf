@@ -1,0 +1,21 @@
+{
+	"context": "626e853e-ccc8-4f5d-b06b-8902d64eda51",
+	"cayley_host": "localhost:27017",
+	"cayley_db": "cayley_test",
+	"cayley_user": "",
+	"cayley_password": "",
+	"logging_level": 1,
+	"add_quad_data": [
+		{
+			"subject": "frodo",
+			"predicate": "carries",
+			"object": "the ring"
+		},
+		{
+			"subject": "orcs",
+			"predicate": "chase",
+			"object": "frodo"
+		}
+	],
+	"remove_quad_data": []
+}
