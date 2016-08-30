@@ -69,7 +69,7 @@ func Test_CreateDelete(t *testing.T) {
 	gs, db := setup(t, "gallery")
 	defer teardown(t, db)
 
-	t.Log("Given the need to upsert and delete galleries.")
+	t.Log("Given the need to create and delete galleries.")
 	{
 		t.Log("\tWhen starting from an empty galleries collection")
 		{
@@ -126,7 +126,7 @@ func Test_Answers(t *testing.T) {
 	gs, db := setup(t, "gallery")
 	defer teardown(t, db)
 
-	t.Log("Given the need to upsert and delete galleries.")
+	t.Log("Given the need to add and remove answers from galleries.")
 	{
 		t.Log("\tWhen starting from an empty galleries collection but saturated submissions collection")
 		{
@@ -264,9 +264,9 @@ func Test_List(t *testing.T) {
 	gs, db := setup(t, "gallery_list")
 	defer teardown(t, db)
 
-	t.Log("Given the need to upsert and delete galleries.")
+	t.Log("Given the need to list galleries.")
 	{
-		t.Log("\tWhen starting from an empty galleries collection but saturated submissions collection")
+		t.Log("\tWhen starting from an empty galleries collection.")
 		{
 			lgs, err := gallery.List(tests.Context, db, gs[0].FormID.Hex())
 			if err != nil {
@@ -315,6 +315,57 @@ func Test_List(t *testing.T) {
 				t.Fatalf("\t%s\tShould contain all the fixtures in the listed contents : Not all fixtures found", tests.Failed)
 			}
 			t.Logf("\t%s\tShould contain all the fixtures in the listed contents.", tests.Success)
+		}
+	}
+}
+
+func Test_Update(t *testing.T) {
+	gs, db := setup(t, "gallery")
+	defer teardown(t, db)
+
+	t.Log("Given the need to list galleries.")
+	{
+		t.Log("\tWhen starting from an empty galleries collection.")
+		{
+			//----------------------------------------------------------------------
+			// Starting with a single gallery.
+			g := gs[0]
+
+			//----------------------------------------------------------------------
+			// Create the gallery.
+
+			if err := gallery.Create(tests.Context, db, &g); err != nil {
+				t.Fatalf("\t%s\tShould be able to upsert a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to upsert a gallery.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Update the gallery.
+
+			newHeadline := "my new headline"
+
+			g.Headline = newHeadline
+
+			if err := gallery.Update(tests.Context, db, g.ID.Hex(), &g); err != nil {
+				t.Fatalf("\t%s\tShould be able to update the gallery : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to update the gallery.", tests.Success)
+
+			if g.Headline != newHeadline {
+				t.Fatalf("\t%s\tShould update the headline on the returned gallery : Expected \"%s\", got \"%s\"", tests.Failed, newHeadline, g.Headline)
+			}
+			t.Logf("\t%s\tShould update the headline on the returned gallery.", tests.Success)
+
+			rg, err := gallery.Retrieve(tests.Context, db, g.ID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve the gallery : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve the gallery.", tests.Success)
+
+			if rg.Headline != newHeadline {
+				t.Fatalf("\t%s\tShould update the headline on the retrieved gallery : Expected \"%s\", got \"%s\"", tests.Failed, newHeadline, rg.Headline)
+			}
+			t.Logf("\t%s\tShould update the headline on the retrieved gallery.", tests.Success)
 		}
 	}
 }
