@@ -12,6 +12,9 @@ import (
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 )
 
+// prefix is what we are looking to delete after the test.
+const prefix = "RTEST_"
+
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
@@ -29,38 +32,49 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
-// prefix is what we are looking to delete after the test.
-const prefix = "RTEST_"
+//==============================================================================
 
-// TestUpsertDelete tests if we can add/remove a relationship to/from the db.
-func TestUpsertDelete(t *testing.T) {
+// setup initializes for each indivdual test.
+func setup(t *testing.T) ([]relationship.Relationship, *db.DB) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
+
+	rels, err := relationshipfix.Get()
+	if err != nil {
+		t.Fatalf("%s\tShould load relationship records from file : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould load relationship records from file.", tests.Success)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
-	defer db.CloseMGO(tests.Context)
 
-	defer func() {
-		if err := relationshipfix.Remove(tests.Context, db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the relationships : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the relationships.", tests.Success)
-	}()
+	return rels, db
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	if err := relationshipfix.Remove(tests.Context, db, prefix); err != nil {
+		t.Fatalf("%s\tShould be able to remove the relationship records : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould be able to remove the relationship records.", tests.Success)
+
+	db.CloseMGO(tests.Context)
+
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
+// TestUpsertDelete tests if we can add/remove a relationship to/from the db.
+func TestUpsertDelete(t *testing.T) {
+	rels, db := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to upsert and delete relationships.")
 	{
 		t.Log("\tWhen starting from an empty relationships collection")
 		{
-			//----------------------------------------------------------------------
-			// Get the fixture.
-
-			rels, err := relationshipfix.Get()
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
-			}
 
 			//----------------------------------------------------------------------
 			// Upsert the relationship.
@@ -111,32 +125,15 @@ func TestUpsertDelete(t *testing.T) {
 
 // TestGetAll tests if we can get all relationships from the db.
 func TestGetAll(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	defer func() {
-		if err := relationshipfix.Remove(tests.Context, db, prefix); err != nil {
-			t.Fatalf("\t%s\tShould be able to remove the relationships : %v", tests.Failed, err)
-		}
-		t.Logf("\t%s\tShould be able to remove the relationships.", tests.Success)
-	}()
+	rels, db := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to get all the relationships in the database.")
 	{
 		t.Log("\tWhen starting from an empty relationships collection")
 		{
-			rels1, err := relationshipfix.Get()
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able retrieve relationship fixture : %s", tests.Failed, err)
-			}
 
-			for _, rel := range rels1 {
+			for _, rel := range rels {
 				if err := relationship.Upsert(tests.Context, db, &rel); err != nil {
 					t.Fatalf("\t%s\tShould be able to upsert a relationships : %s", tests.Failed, err)
 				}
@@ -149,8 +146,8 @@ func TestGetAll(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to get all relationships.", tests.Success)
 
-			if !reflect.DeepEqual(rels1, rels2) {
-				t.Logf("\t%+v", rels1)
+			if !reflect.DeepEqual(rels, rels2) {
+				t.Logf("\t%+v", rels)
 				t.Logf("\t%+v", rels2)
 				t.Fatalf("\t%s\tShould be able to get back the same relationships.", tests.Failed)
 			}

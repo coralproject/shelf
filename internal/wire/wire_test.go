@@ -190,18 +190,14 @@ func unloadTestData(context interface{}, db *db.DB) error {
 
 }
 
-//==============================================================================
-
-// TestExecuteView tests the generation of a view, opting not to persist the view.
-func TestExecuteView(t *testing.T) {
+// setup initializes for each indivdual test.
+func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 	tests.ResetLog()
-	defer tests.DisplayLog()
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
-	defer db.CloseMGO(tests.Context)
 
 	opts := make(map[string]interface{})
 	opts["database_name"] = cfg.MustString("MONGO_DB")
@@ -212,8 +208,21 @@ func TestExecuteView(t *testing.T) {
 		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
 	}
 
-	// -----------------------------------------------------------
-	// Generate the view.
+	return db, store
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	db.CloseMGO(tests.Context)
+	tests.DisplayLog()
+}
+
+//==============================================================================
+
+// TestExecuteView tests the generation of a view, opting not to persist the view.
+func TestExecuteView(t *testing.T) {
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to generate a view.")
 	{
@@ -246,26 +255,8 @@ func TestExecuteView(t *testing.T) {
 // TestExecuteBackwardsView tests the generation of a view with multiple
 // out direction relationships, opting not to persist the view.
 func TestExecuteBackwardsView(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to generate a view with multiple backwards direction relationships.")
 	{
@@ -297,28 +288,10 @@ func TestExecuteBackwardsView(t *testing.T) {
 
 // TestPersistView tests the generation of a view, opting to persist the view.
 func TestPersistView(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	db, store := setup(t)
+	defer teardown(t, db)
 
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
-
-	t.Log("Given the need to generate a view.")
+	t.Log("Given the need to generate and persist a view.")
 	{
 		t.Log("\tWhen using the view, relationship, and item fixtures.")
 		{
@@ -375,26 +348,8 @@ func TestPersistView(t *testing.T) {
 
 // TestPersistViewWithBuffer tests the buffered saving of a view.
 func TestPersistViewWithBuffer(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to perform a buffered save of a view.")
 	{
@@ -455,26 +410,8 @@ func TestPersistViewWithBuffer(t *testing.T) {
 // TestExecuteNameFail tests that the correct result is returned when
 // an invalid view name is provided.
 func TestExecuteNameFail(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to catch an invalid view name.")
 	{
@@ -507,26 +444,8 @@ func TestExecuteNameFail(t *testing.T) {
 // TestExecuteTypeFail tests that the correct result is returned when
 // an invalid start type is defined in view metadata.
 func TestExecuteTypeFail(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to catch an invalid start type.")
 	{
@@ -559,26 +478,8 @@ func TestExecuteTypeFail(t *testing.T) {
 // TestExecuteRelationshipFail tests that the correct result is returned when
 // an invalid relationship is defined in view metadata.
 func TestExecuteRelationshipFail(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
-	}
-
-	// -----------------------------------------------------------
-	// Generate the view.
+	db, store := setup(t)
+	defer teardown(t, db)
 
 	t.Log("Given the need to catch an invalid relationship.")
 	{
