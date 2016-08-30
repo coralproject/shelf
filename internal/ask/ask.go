@@ -49,7 +49,14 @@ func UpsertForm(context interface{}, db *db.DB, f *form.Form) error {
 	}
 
 	if isNewForm {
-		if _, err := gallery.Create(context, db, f.ID.Hex()); err != nil {
+
+		// Create the new gallery that we will create that is based on the current
+		// form ID.
+		g := gallery.Gallery{
+			FormID: f.ID,
+		}
+
+		if err := gallery.Create(context, db, &g); err != nil {
 			log.Error(context, "UpsertForm", err, "Completed")
 			return err
 		}

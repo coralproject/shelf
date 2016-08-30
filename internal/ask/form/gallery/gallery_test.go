@@ -4,6 +4,8 @@ import (
 	"os"
 	"testing"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -72,10 +74,13 @@ func Test_CreateDelete(t *testing.T) {
 		t.Log("\tWhen starting from an empty galleries collection")
 		{
 			//----------------------------------------------------------------------
-			// Upsert the gallery.
+			// Starting with a single gallery.
+			g := gs[0]
 
-			g, err := gallery.Create(tests.Context, db, gs[0].FormID.Hex())
-			if err != nil {
+			//----------------------------------------------------------------------
+			// Create the gallery.
+
+			if err := gallery.Create(tests.Context, db, &g); err != nil {
 				t.Fatalf("\t%s\tShould be able to upsert a gallery : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to upsert a gallery.", tests.Success)
@@ -121,45 +126,65 @@ func Test_Answers(t *testing.T) {
 	gs, db := setup(t, "gallery")
 	defer teardown(t, db)
 
-	// we need to get/fill in real form submissions
-	subs, err := submissionfix.Get()
-	if err != nil {
-		t.Fatalf("Should be able to fetch submission fixtures : %v", err)
-	}
-
-	// set the form id to the first form.
-	for i := range subs {
-		subs[i].FormID = gs[0].FormID
-	}
-
-	if err := submissionfix.Add(tests.Context, db, subs); err != nil {
-		t.Fatalf("Should be able to add submission fixtures : %v", err)
-	}
-
-	defer func() {
-		for _, sub := range subs {
-			if err := submission.Delete(tests.Context, db, sub.ID.Hex()); err != nil {
-				t.Fatalf("%s\tShould be able to remove submission fixtures : %v", tests.Failed, err)
-			}
-		}
-		t.Logf("%s\tShould be able to remove submission fixtures.", tests.Success)
-	}()
-
 	t.Log("Given the need to upsert and delete galleries.")
 	{
 		t.Log("\tWhen starting from an empty galleries collection but saturated submissions collection")
 		{
 
-			if err := galleryfix.Add(tests.Context, db, gs); err != nil {
-				t.Fatalf("\t%s\tShould be able to add the galleries : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to add the galleries.", tests.Success)
+			//----------------------------------------------------------------------
+			// Starting with a single gallery.
+			g := gs[0]
 
-			crg, err := gallery.AddAnswer(tests.Context, db, gs[0].ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
+			//----------------------------------------------------------------------
+			// Create the gallery.
+
+			if err := gallery.Create(tests.Context, db, &g); err != nil {
+				t.Fatalf("\t%s\tShould be able to upsert a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to upsert a gallery.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// We need to get/fill in real form submissions.
+
+			subs, err := submissionfix.Get()
+			if err != nil {
+				t.Fatalf("Should be able to fetch submission fixtures : %v", err)
+			}
+
+			// Set the form ID on these new submissions.
+			for i := range subs {
+				// We need to assign a new submission ID to ensure that we don't collide
+				// with existing submissions.
+				subs[i].ID = bson.NewObjectId()
+				subs[i].FormID = g.FormID
+			}
+
+			// Add all the submission fixtures.
+			if err := submissionfix.Add(tests.Context, db, subs); err != nil {
+				t.Fatalf("Should be able to add submission fixtures : %v", err)
+			}
+
+			// Remove the new fixtures after the tests are completed.
+			defer func() {
+				for _, sub := range subs {
+					if err := submission.Delete(tests.Context, db, sub.ID.Hex()); err != nil {
+						t.Fatalf("%s\tShould be able to remove submission fixtures : %v", tests.Failed, err)
+					}
+				}
+				t.Logf("%s\tShould be able to remove submission fixtures.", tests.Success)
+			}()
+
+			//----------------------------------------------------------------------
+			// Add an answer to the gallery.
+
+			crg, err := gallery.AddAnswer(tests.Context, db, g.ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to add an answer to a gallery : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to add an answer to a gallery.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check that the returned gallery has the correct answers.
 
 			if len(crg.Answers) != 1 {
 				t.Fatalf("\t%s\tShould have at least one answer on the returned gallery : Expected 1, got %d", tests.Failed, len(crg.Answers))
@@ -168,11 +193,14 @@ func Test_Answers(t *testing.T) {
 
 			matchAnswers(t, crg.Answers[0], subs[0], subs[0].Answers[0])
 
-			rg, err := gallery.Retrieve(tests.Context, db, gs[0].ID.Hex())
+			//----------------------------------------------------------------------
+			// Check that the retrieved gallery has the correct answers.
+
+			rg, err := gallery.Retrieve(tests.Context, db, g.ID.Hex())
 			if err != nil {
-				t.Fatalf("\t%s\tShould be able to add an answer to a gallery : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to retrieve a gallery : %s", tests.Failed, err)
 			}
-			t.Logf("\t%s\tShould be able to add an answer to a gallery.", tests.Success)
+			t.Logf("\t%s\tShould be able to retrieve a gallery.", tests.Success)
 
 			if len(rg.Answers) != 1 {
 				t.Fatalf("\t%s\tShould have at least one answer on the returned gallery : Expected 1, got %d", tests.Failed, len(rg.Answers))
@@ -181,13 +209,33 @@ func Test_Answers(t *testing.T) {
 
 			matchAnswers(t, rg.Answers[0], subs[0], subs[0].Answers[0])
 
-			drg, err := gallery.RemoveAnswer(tests.Context, db, gs[0].ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
+			//----------------------------------------------------------------------
+			// Remove the answer.
+
+			drg, err := gallery.RemoveAnswer(tests.Context, db, g.ID.Hex(), subs[0].ID.Hex(), subs[0].Answers[0].WidgetID)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to remove an answer from a gallery : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to remove an answer from a gallery.", tests.Success)
 
+			//----------------------------------------------------------------------
+			// Check that the returned gallery has the correct answers.
+
 			if len(drg.Answers) != 0 {
+				t.Fatalf("\t%s\tShould have at no answers on the returned gallery : Expected 0, got %d", tests.Failed, len(drg.Answers))
+			}
+			t.Logf("\t%s\tShould have at no answers on the returned gallery.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check that the retrieved gallery has the correct answers.
+
+			rg, err = gallery.Retrieve(tests.Context, db, g.ID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to retrieve a gallery : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to retrieve a gallery.", tests.Success)
+
+			if len(rg.Answers) != 0 {
 				t.Fatalf("\t%s\tShould have at no answers on the returned gallery : Expected 0, got %d", tests.Failed, len(drg.Answers))
 			}
 			t.Logf("\t%s\tShould have at no answers on the returned gallery.", tests.Success)

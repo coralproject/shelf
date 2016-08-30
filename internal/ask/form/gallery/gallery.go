@@ -74,20 +74,14 @@ func (fg *Gallery) Validate() error {
 
 // Create adds a form gallery based on the form id provided into the
 // MongoDB database collection.
-func Create(context interface{}, db *db.DB, formID string) (*Gallery, error) {
+func Create(context interface{}, db *db.DB, gallery *Gallery) error {
 	log.Dev(context, "Create", "Started")
 
-	if !bson.IsObjectIdHex(formID) {
-		log.Error(context, "Create", ErrInvalidID, "Completed")
-		return nil, ErrInvalidID
-	}
-
-	gallery := Gallery{
-		ID:          bson.NewObjectId(),
-		FormID:      bson.ObjectIdHex(formID),
-		DateCreated: time.Now(),
-		DateUpdated: time.Now(),
-	}
+	// Set some new properties on the gallery struct before we actually save the
+	// gallery into Mongo.
+	gallery.ID = bson.NewObjectId()
+	gallery.DateCreated = time.Now()
+	gallery.DateUpdated = time.Now()
 
 	f := func(c *mgo.Collection) error {
 		log.Dev(context, "Create", "MGO : db.%s.insert(%s)", c.Name, mongo.Query(gallery))
@@ -96,11 +90,11 @@ func Create(context interface{}, db *db.DB, formID string) (*Gallery, error) {
 
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
 		log.Error(context, "Create", err, "Completed")
-		return nil, err
+		return err
 	}
 
 	log.Dev(context, "Create", "Completed")
-	return &gallery, nil
+	return nil
 }
 
 // Retrieve retrieves a form gallery from the MongoDB database

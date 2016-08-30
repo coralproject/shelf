@@ -35,14 +35,12 @@ func Get() ([]gallery.Gallery, error) {
 
 // Add inserts gallerys for testing.
 func Add(context interface{}, db *db.DB, gs []gallery.Gallery) error {
-	for i, g := range gs {
-		cg, err := gallery.Create(context, db, g.FormID.Hex())
-		if err != nil {
+	for i := range gs {
+		// The gallery.Create function will add/update fields so we need to pass
+		// the correct reference.
+		if err := gallery.Create(context, db, &gs[i]); err != nil {
 			return err
 		}
-
-		// copy the id across
-		gs[i].ID = cg.ID
 	}
 
 	return nil
@@ -51,7 +49,7 @@ func Add(context interface{}, db *db.DB, gs []gallery.Gallery) error {
 // Remove removes gallerys in Mongo that match a given pattern.
 func Remove(context interface{}, db *db.DB, pattern string) error {
 	f := func(c *mgo.Collection) error {
-		q := bson.M{"header.title": bson.RegEx{Pattern: "^" + pattern}}
+		q := bson.M{"description": bson.RegEx{Pattern: "^" + pattern}}
 		_, err := c.RemoveAll(q)
 		return err
 	}
