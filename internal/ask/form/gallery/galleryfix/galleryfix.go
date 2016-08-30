@@ -17,8 +17,8 @@ func init() {
 }
 
 // Get loads gallery data based on gallerys.json.
-func Get() ([]gallery.Gallery, error) {
-	file, err := os.Open(path + "gallery.json")
+func Get(fixture string) ([]gallery.Gallery, error) {
+	file, err := os.Open(path + fixture + ".json")
 	if err != nil {
 		return nil, err
 	}

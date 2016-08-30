@@ -41,7 +41,7 @@ func TestMain(m *testing.M) {
 func setup(t *testing.T, fixture string) ([]gallery.Gallery, *db.DB) {
 	tests.ResetLog()
 
-	gs, err := galleryfix.Get()
+	gs, err := galleryfix.Get(fixture)
 	if err != nil {
 		t.Fatalf("%s\tShould be able retrieve gallery fixture : %s", tests.Failed, err)
 	}
@@ -258,4 +258,63 @@ func matchAnswers(t *testing.T, ga gallery.Answer, sub submission.Submission, sa
 		t.Fatalf("\t%s\tShould match the answer : Expected %s, got %s", tests.Failed, mongo.Query(sa.Answer), mongo.Query(ga.Answer.Answer))
 	}
 	t.Logf("\t%s\tShould match the answer.", tests.Success)
+}
+
+func Test_List(t *testing.T) {
+	gs, db := setup(t, "gallery_list")
+	defer teardown(t, db)
+
+	t.Log("Given the need to upsert and delete galleries.")
+	{
+		t.Log("\tWhen starting from an empty galleries collection but saturated submissions collection")
+		{
+			lgs, err := gallery.List(tests.Context, db, gs[0].FormID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to list no galleries : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to list no galleries.", tests.Success)
+
+			if len(lgs) != 0 {
+				t.Fatalf("\t%s\tShould be able to list the correct amount of galleries: Expected 0, found %d", tests.Failed, len(lgs))
+			}
+			t.Logf("\t%s\tShould be able to list the correct amount of galleries.", tests.Success)
+
+			if err := galleryfix.Add(tests.Context, db, gs); err != nil {
+				t.Fatalf("\t%s\tShould be able to load gallery fixtures : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to load gallery fixtures.", tests.Success)
+
+			lgs, err = gallery.List(tests.Context, db, gs[0].FormID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to load gallery fixtures : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to load gallery fixtures.", tests.Success)
+
+			if len(lgs) != len(gs) {
+				t.Fatalf("\t%s\tShould be able to list the correct amount of galleries: Expected %d, found %d", tests.Failed, len(gs), len(lgs))
+			}
+			t.Logf("\t%s\tShould be able to list the correct amount of galleries.", tests.Success)
+
+			for _, g := range lgs {
+				if g.FormID.Hex() != gs[0].FormID.Hex() {
+					t.Fatalf("\t%s\tShould have the correct form id : Expected %s, got %s", tests.Failed, gs[0].FormID.Hex(), g.FormID.Hex())
+				}
+			}
+			t.Logf("\t%s\tShould have the correct form id.", tests.Success)
+
+			matches := 0
+			for _, fg := range gs {
+				for _, lg := range lgs {
+					if lg.ID.Hex() == fg.ID.Hex() {
+						matches++
+					}
+				}
+			}
+
+			if matches != len(lgs) {
+				t.Fatalf("\t%s\tShould contain all the fixtures in the listed contents : Not all fixtures found", tests.Failed)
+			}
+			t.Logf("\t%s\tShould contain all the fixtures in the listed contents.", tests.Success)
+		}
+	}
 }
