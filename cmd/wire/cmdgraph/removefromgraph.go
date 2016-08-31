@@ -46,20 +46,24 @@ func runRemoveFromGraph(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	// Get the working directory.
 	pwd, err := os.Getwd()
 	if err != nil {
 		cmd.Println("Removing relationships : ", err)
 		return
 	}
 
+	// Join the provided path with the working directory.
 	file := filepath.Join(pwd, remove.path)
 
+	// Get the description of the file.
 	stat, err := os.Stat(file)
 	if err != nil {
 		cmd.Println("Removing relationships : ", err)
 		return
 	}
 
+	// If a file is provided (i.e., not a directory), remove the relationships.
 	if !stat.IsDir() {
 		scr, err := disk.LoadQuadParams("", file)
 		if err != nil {
@@ -76,6 +80,7 @@ func runRemoveFromGraph(cmd *cobra.Command, args []string) {
 		return
 	}
 
+	// If a directory is provided, remove relationships for all the included files.
 	f := func(path string) error {
 		scr, err := disk.LoadQuadParams("", path)
 		if err != nil {

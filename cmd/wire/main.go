@@ -25,17 +25,21 @@ const (
 	cfgMongoPassword = "MONGO_PASS"
 )
 
+// wire includes information about the wire cobra command.
 var wire = &cobra.Command{
 	Use:   "wire",
 	Short: "Wire provides the central cli housing of various cli tools that interface with the internal wire API",
 }
 
 func main() {
-	if err := cfg.Init(cfg.EnvProvider{Namespace: "XENIA"}); err != nil {
+
+	// Initialize the configuration
+	if err := cfg.Init(cfg.EnvProvider{Namespace: "WIRE"}); err != nil {
 		wire.Println("Unable to initialize configuration")
 		os.Exit(1)
 	}
 
+	// Initialize the logging
 	logLevel := func() int {
 		ll, err := cfg.Int(cfgLoggingLevel)
 		if err != nil {
@@ -43,8 +47,8 @@ func main() {
 		}
 		return ll
 	}
-	log.Init(os.Stderr, logLevel, log.Ldefault)
 
+	log.Init(os.Stderr, logLevel, log.Ldefault)
 	wire.Println("Using log level", logLevel())
 
 	// Pull options from the config.
@@ -88,9 +92,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Add the graph and view commands to the CLI tool.
 	wire.AddCommand(
 		cmdview.GetCommands(mgoDB, graphDB),
 		cmdgraph.GetCommands(graphDB),
 	)
+
+	// Execute the command.
 	wire.Execute()
 }
