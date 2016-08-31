@@ -98,11 +98,7 @@ Result represents what a user will receive after generating a view.
 
 
 
-<<<<<<< HEAD
-### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1499:1611#L51)
-=======
 ### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1589:1701#L51)
->>>>>>> e7f13c391f23210b5b00bb4c2032ac6d3e436d0d
 ``` go
 func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
