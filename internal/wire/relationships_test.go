@@ -123,7 +123,7 @@ func TestAddRemoveGraph(t *testing.T) {
 			it.Close()
 
 			if count != 0 {
-				t.Fatalf("\t%s\tShould be able to verify the empty graph : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to verify the empty graph", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to verify the empty graph.", tests.Success)
 		}
