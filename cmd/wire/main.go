@@ -55,7 +55,7 @@ func main() {
 	var mgoDB *db.DB
 	var graphDB *cayley.Handle
 
-	// Configure MongoDB
+	// Configure MongoDB.
 	wire.Println("Configuring MongoDB")
 
 	mongoCfg := mongo.Config{
@@ -79,13 +79,14 @@ func main() {
 	}
 	defer mgoDB.CloseMGO("")
 
-	// Configure Cayley
+	// Configure Cayley.
 	wire.Println("Configuring Cayley")
 
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString(cfgMongoDB)
-	opts["username"] = cfg.MustString(cfgMongoUser)
-	opts["password"] = cfg.MustString(cfgMongoPassword)
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString(cfgMongoDB),
+		"username":      cfg.MustString(cfgMongoUser),
+		"password":      cfg.MustString(cfgMongoPassword),
+	}
 	graphDB, err = cayley.NewGraph("mongo", cfg.MustString(cfgMongoHost), opts)
 	if err != nil {
 		wire.Println("Unable to get Cayley handle")
