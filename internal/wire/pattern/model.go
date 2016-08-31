@@ -18,12 +18,13 @@ func init() {
 type Inference struct {
 	RelIDField string `bson:"related_ID_field" json:"related_ID_field" validate:"required,min=2"`
 	Predicate  string `bson:"predicate" json:"predicate" validate:"required,min=2"`
+	Direction  string `bson:"direction" json:"direction" validate:"required,min=2"`
 	Required   bool   `bson:"required" json:"required"`
 }
 
 // Validate checks the Inference value for consistency.
-func (infer *Inference) Validate() error {
-	if err := validate.Struct(infer); err != nil {
+func (inf *Inference) Validate() error {
+	if err := validate.Struct(inf); err != nil {
 		return err
 	}
 	return nil
