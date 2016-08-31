@@ -98,7 +98,11 @@ Result represents what a user will receive after generating a view.
 
 
 
+<<<<<<< HEAD
 ### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1499:1611#L51)
+=======
+### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1589:1701#L51)
+>>>>>>> e7f13c391f23210b5b00bb4c2032ac6d3e436d0d
 ``` go
 func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
@@ -108,13 +112,13 @@ Execute executes a graph query to generate the specified view.
 
 
 
-## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1222:1349#L41)
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1222:1439#L41)
 ``` go
 type ViewParams struct {
-    ViewName          string
-    ItemKey           string
-    ResultsCollection string
-    BufferLimit       int
+    ViewName          string `json:"view_name"`
+    ItemKey           string `json:"item_key"`
+    ResultsCollection string `json:"results_collection"`
+    BufferLimit       int    `json:"buffer_limit"`
 }
 ```
 ViewParams represents how the View will be generated and persisted.

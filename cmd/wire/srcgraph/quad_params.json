@@ -1,0 +1,17 @@
+[
+	{
+		"subject": "frodo",
+		"predicate": "carries",
+		"object": "the ring"
+	},
+	{
+		"subject": "orcs",
+		"predicate": "chase",
+		"object": "frodo"
+	},
+	{
+		"subject": "sam",
+		"predicate": "helps",
+		"object": "frodo"
+	}
+]
