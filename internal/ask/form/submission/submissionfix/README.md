@@ -16,14 +16,14 @@ Add inserts forms for testing.
 
 ## func Get
 ``` go
-func Get() ([]submission.Submission, error)
+func Get(fixture string) ([]submission.Submission, error)
 ```
 Get loads form data based on forms.json.
 
 
 ## func Remove
 ``` go
-func Remove(context interface{}, db *db.DB, pattern string) error
+func Remove(context interface{}, db *db.DB, prefix string) error
 ```
 Remove removes forms in Mongo that match a given pattern.
 

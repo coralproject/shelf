@@ -1,0 +1,72 @@
+[
+  {
+    "id": "57c70213c772bb5ac7000001",
+    "form_id": "57c6fd46c7870a50cc000001",
+    "replies": [
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332831",
+        "identity": true,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Option 1"
+            },
+            {
+              "index": 2,
+              "title": "Option 3"
+            },
+            {
+              "index": 1,
+              "title": "Option 2"
+            },
+            {
+              "index": 3,
+              "title": "Otheeeer"
+            }
+          ]
+        },
+        "question": "My question"
+      }
+    ],
+    "flags": [],
+    "header": {
+      "title": "FGTEST Multiple choice with other - Thursday test"
+    }
+  },
+  {
+    "id": "57c7021855168a0864000001",
+    "form_id": "57c6fd46c7870a50cc000001",
+    "replies": [
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332831",
+        "identity": true,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Option 1"
+            },
+            {
+              "index": 2,
+              "title": "Option 3"
+            },
+            {
+              "index": 1,
+              "title": "Option 2"
+            },
+            {
+              "index": 3,
+              "title": "Otheeeer"
+            }
+          ]
+        },
+        "question": "My question"
+      }
+    ],
+    "flags": [],
+    "header": {
+      "title": "FGTEST Multiple choice with other - Thursday test"
+    }
+  }
+]

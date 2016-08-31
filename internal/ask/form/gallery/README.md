@@ -20,6 +20,21 @@ var ErrInvalidID = errors.New("ID is not in it's proper form")
 ErrInvalidID occurs when an ID is not in a valid form.
 
 
+## func Create
+``` go
+func Create(context interface{}, db *db.DB, gallery *Gallery) error
+```
+Create adds a form gallery based on the form id provided into the
+MongoDB database collection.
+
+
+## func Delete
+``` go
+func Delete(context interface{}, db *db.DB, id string) error
+```
+Delete removes the given Gallery with the ID provided.
+
+
 ## func List
 ``` go
 func List(context interface{}, db *db.DB, formID string) ([]Gallery, error)
@@ -41,8 +56,8 @@ collection.
 ``` go
 type Answer struct {
     SubmissionID    bson.ObjectId       `json:"submission_id" bson:"submission_id" validate:"required"`
-    AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required,len=24"`
-    Answer          submission.Answer   `json:"answer,omitempty" bson:"-"`
+    AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required,uuid"`
+    Answer          submission.Answer   `json:"answer,omitempty" bson:"-" validate:"-"`
     IdentityAnswers []submission.Answer `json:"identity_answers,omitempty" bson:"-"`
 }
 ```
@@ -56,6 +71,14 @@ Gallery.
 
 
 
+
+
+
+### func (\*Answer) Validate
+``` go
+func (a *Answer) Validate() error
+```
+Validate checks the Anser value for consistency.
 
 
 
@@ -88,14 +111,6 @@ func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string
 ```
 AddAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
-
-
-### func Create
-``` go
-func Create(context interface{}, db *db.DB, formID string) (*Gallery, error)
-```
-Create adds a form gallery based on the form id provided into the
-MongoDB database collection.
 
 
 ### func RemoveAnswer

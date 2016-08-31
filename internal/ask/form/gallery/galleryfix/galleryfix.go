@@ -16,7 +16,7 @@ func init() {
 	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/ask/form/gallery/galleryfix/"
 }
 
-// Get loads gallery data based on gallerys.json.
+// Get loads gallery data.
 func Get(fixture string) ([]gallery.Gallery, error) {
 	file, err := os.Open(path + fixture + ".json")
 	if err != nil {
