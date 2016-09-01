@@ -55,7 +55,7 @@ func runInferAddRelationships(cmd *cobra.Command, args []string) {
 	}
 
 	// Join the provided path with the working directory.
-	file := filepath.Join(pwd, infer.path)
+	file := filepath.Join(pwd, inferAdd.path)
 
 	// Get the description of the file.
 	stat, err := os.Stat(file)
