@@ -37,7 +37,7 @@ const Collection = "form_galleries"
 // Gallery.
 type Answer struct {
 	SubmissionID    bson.ObjectId       `json:"submission_id" bson:"submission_id" validate:"required"`
-	AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required,uuid"`
+	AnswerID        string              `json:"answer_id" bson:"answer_id" validate:"required"`
 	Answer          submission.Answer   `json:"answer,omitempty" bson:"-" validate:"-"`
 	IdentityAnswers []submission.Answer `json:"identity_answers,omitempty" bson:"-"`
 }

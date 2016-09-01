@@ -87,7 +87,7 @@ with the specific question asked included as well.
 ## type AnswerInput
 ``` go
 type AnswerInput struct {
-    WidgetID string      `json:"widget_id" validate:"required,uuid"`
+    WidgetID string      `json:"widget_id" validate:"required"`
     Answer   interface{} `json:"answer" validate:"exists"`
 }
 ```

@@ -111,7 +111,7 @@ func CreateSubmission(context interface{}, db *db.DB, formID string, answers []s
 
 					sub.Answers = append(sub.Answers, submission.Answer{
 						WidgetID: widget.ID,
-						Answer:   answer,
+						Answer:   answer.Answer,
 						Identity: widget.Identity,
 						Question: widget.Title,
 						Props:    widget.Props,

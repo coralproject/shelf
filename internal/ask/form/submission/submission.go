@@ -86,7 +86,7 @@ type SearchOpts struct {
 // AnswerInput describes the input accepted for a new submission
 // answer.
 type AnswerInput struct {
-	WidgetID string      `json:"widget_id" validate:"required,uuid"`
+	WidgetID string      `json:"widget_id" validate:"required"`
 	Answer   interface{} `json:"answer" validate:"exists"`
 }
 

@@ -38,7 +38,7 @@ func TestMain(m *testing.M) {
 func setup(t *testing.T, fixture string) ([]form.Form, *db.DB) {
 	tests.ResetLog()
 
-	fms, err := formfix.Get()
+	fms, err := formfix.Get("form")
 	if err != nil {
 		t.Fatalf("%s\tShould be able retrieve form fixture : %s", tests.Failed, err)
 	}

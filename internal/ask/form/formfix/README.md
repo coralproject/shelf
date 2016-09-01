@@ -16,7 +16,7 @@ Add inserts forms for testing.
 
 ## func Get
 ``` go
-func Get() ([]form.Form, error)
+func Get(fixture string) ([]form.Form, error)
 ```
 Get loads form data based on forms.json.
 

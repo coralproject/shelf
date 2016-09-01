@@ -17,8 +17,8 @@ func init() {
 }
 
 // Get loads form data based on forms.json.
-func Get() ([]form.Form, error) {
-	file, err := os.Open(path + "form.json")
+func Get(fixture string) ([]form.Form, error) {
+	file, err := os.Open(path + fixture + ".json")
 	if err != nil {
 		return nil, err
 	}
