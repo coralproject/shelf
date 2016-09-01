@@ -12,6 +12,7 @@
 
 ## <a name="pkg-index">Index</a>
 * [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
+* [func LoadItems(context interface{}, path string) ([]bson.M, error)](#LoadItems)
 * [func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)](#LoadQuadParams)
 
 
@@ -22,7 +23,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=926:983#L26)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1550:1607#L48)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -31,7 +32,16 @@ json file found.
 
 
 
-## <a name="LoadQuadParams">func</a> [LoadQuadParams](/src/target/disk.go?s=303:383#L5)
+## <a name="LoadItems">func</a> [LoadItems](/src/target/disk.go?s=985:1051#L27)
+``` go
+func LoadItems(context interface{}, path string) ([]bson.M, error)
+```
+LoadItems serializes the content of a set of items from a file using the
+given file path. Returns the serialized item values.
+
+
+
+## <a name="LoadQuadParams">func</a> [LoadQuadParams](/src/target/disk.go?s=327:407#L6)
 ``` go
 func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 ```

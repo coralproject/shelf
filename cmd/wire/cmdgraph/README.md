@@ -11,19 +11,19 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func GetCommands(store *cayley.Handle) *cobra.Command](#GetCommands)
+* [func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command](#GetCommands)
 
 
 #### <a name="pkg-files">Package files</a>
-[addtograph.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/addtograph.go) [commands.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/commands.go) [removefromgraph.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/removefromgraph.go) 
+[addtograph.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/addtograph.go) [commands.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/commands.go) [infer.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/infer.go) [inferandadd.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/inferandadd.go) [removefromgraph.go](/src/github.com/coralproject/shelf/cmd/wire/cmdgraph/removefromgraph.go) 
 
 
 
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=405:458#L8)
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=504:570#L14)
 ``` go
-func GetCommands(store *cayley.Handle) *cobra.Command
+func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command
 ```
 GetCommands returns the graph commands.
 

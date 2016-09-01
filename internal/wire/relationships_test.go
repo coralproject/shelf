@@ -1,17 +1,32 @@
 package wire_test
 
 import (
+	"reflect"
 	"testing"
 
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/wire"
+	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // setupGraph initializes an in-memory Cayley graph and logging for an individual test.
-func setupGraph(t *testing.T) *cayley.Handle {
+func setupGraph(t *testing.T) (*db.DB, *cayley.Handle, []bson.M) {
 	tests.ResetLog()
+
+	_, items, err := patternfix.Get()
+	if err != nil {
+		t.Fatalf("%s\tShould load item records from the fixture file : %v", tests.Failed, err)
+	}
+	t.Logf("%s\tShould load item records from the fixture file.", tests.Success)
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
 
 	store, err := cayley.NewMemoryGraph()
 	if err != nil {
@@ -19,12 +34,12 @@ func setupGraph(t *testing.T) *cayley.Handle {
 	}
 	t.Logf("\t%s\tShould be able to create a new Cayley graph.", tests.Success)
 
-	return store
+	return db, store, items
 }
 
 // TestAddRemoveGraph tests if we can add/remove relationship quads to/from cayley.
 func TestAddRemoveGraph(t *testing.T) {
-	store := setupGraph(t)
+	_, store, _ := setupGraph(t)
 	defer tests.DisplayLog()
 
 	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
@@ -132,7 +147,7 @@ func TestAddRemoveGraph(t *testing.T) {
 
 // TestGraphParamFail tests if we can handle invalid quad parameters.
 func TestGraphParamFail(t *testing.T) {
-	store := setupGraph(t)
+	_, store, _ := setupGraph(t)
 	defer tests.DisplayLog()
 
 	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
@@ -169,6 +184,53 @@ func TestGraphParamFail(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to catch invalid quad parameters on remove : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to catch invalid quad parameters on remove.", tests.Success)
+		}
+	}
+}
+
+// TestInferRelationships tests if we can infer relationships based on patterns.
+func TestInferRelationships(t *testing.T) {
+	db, _, items := setupGraph(t)
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to infer relationships from items.")
+	{
+		t.Log("\tWhen starting from a slice of input item documents.")
+		{
+			//----------------------------------------------------------------------
+			// Infer Relationships.
+
+			quadParams, err := wire.InferRelationships(tests.Context, db, items)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to infer relationships : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to infer relationships.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check the inferred relationships.
+
+			if len(quadParams) != 10 {
+				t.Fatalf("\t%s\tShould infer 10 relationships", tests.Failed)
+			}
+			t.Logf("\t%s\tShould infer 10 relationships.", tests.Success)
+
+			relCounts := make(map[string]int)
+			for _, params := range quadParams {
+				relCounts[params.Predicate]++
+			}
+
+			expectedCounts := map[string]int{
+				"authored":    3,
+				"on":          3,
+				"parented_by": 1,
+				"has_role":    2,
+				"part_of":     1,
+			}
+
+			if eq := reflect.DeepEqual(relCounts, expectedCounts); !eq {
+				t.Fatalf("\t%s\tShould have expected numbers of relationship predicates", tests.Failed)
+			}
+			t.Logf("\t%s\tShould have expected numbers of relationship predicates.", tests.Success)
 		}
 	}
 }

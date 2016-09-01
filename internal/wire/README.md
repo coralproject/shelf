@@ -16,6 +16,7 @@ Package wire provides support for generating views.
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
 * [func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error](#AddToGraph)
+* [func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error)](#InferRelationships)
 * [func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error](#RemoveFromGraph)
 * [type QuadParams](#QuadParams)
   * [func (q *QuadParams) Validate() error](#QuadParams.Validate)
@@ -38,7 +39,7 @@ var (
 ```
 
 
-## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=844:933#L24)
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=962:1051#L29)
 ``` go
 func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error
 ```
@@ -46,7 +47,16 @@ AddToGraph adds relationships as quads into the cayley graph.
 
 
 
-## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=1685:1779#L53)
+## <a name="InferRelationships">func</a> [InferRelationships](/src/target/relationships.go?s=2700:2796#L88)
+``` go
+func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error)
+```
+InferRelationships infers realtionships based on patterns corresponding to
+types of items.
+
+
+
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=1803:1897#L58)
 ``` go
 func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error
 ```
@@ -55,7 +65,7 @@ RemoveFromGraph removes relationship quads from the cayley graph.
 
 
 
-## <a name="QuadParams">type</a> [QuadParams](/src/target/relationships.go?s=441:605#L9)
+## <a name="QuadParams">type</a> [QuadParams](/src/target/relationships.go?s=559:723#L14)
 ``` go
 type QuadParams struct {
     Subject   string `validate:"required,min=2"`
@@ -75,7 +85,7 @@ to/from the cayley graph.
 
 
 
-### <a name="QuadParams.Validate">func</a> (\*QuadParams) [Validate](/src/target/relationships.go?s=664:701#L16)
+### <a name="QuadParams.Validate">func</a> (\*QuadParams) [Validate](/src/target/relationships.go?s=782:819#L21)
 ``` go
 func (q *QuadParams) Validate() error
 ```

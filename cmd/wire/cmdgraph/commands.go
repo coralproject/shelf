@@ -1,6 +1,7 @@
 package cmdgraph
 
 import (
+	"github.com/ardanlabs/kit/db"
 	"github.com/cayleygraph/cayley"
 	"github.com/spf13/cobra"
 )
@@ -11,14 +12,22 @@ var graphCmd = &cobra.Command{
 	Short: "graph provides a CLI for add/removing relationships to/from a graph.",
 }
 
-// graphDB holds the graph handle for graph access.
-var graphDB *cayley.Handle
+var (
+	// mgoDB holds the session for the DB access.
+	mgoDB *db.DB
+
+	// graphDB holds the graph handle for graph access.
+	graphDB *cayley.Handle
+)
 
 // GetCommands returns the graph commands.
-func GetCommands(store *cayley.Handle) *cobra.Command {
+func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command {
+	mgoDB = conn
 	graphDB = store
 
 	addAddToGraph()
 	addRemoveFromGraph()
+	addInferRelationships()
+	addInferAddRelationships()
 	return graphCmd
 }

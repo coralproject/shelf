@@ -8,6 +8,7 @@ import (
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/wire"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // LoadQuadParams serializes the content of a set of QuadParams from a file using the
@@ -29,6 +30,27 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 
 	log.Dev(context, "LoadQuadParams", "Completed")
 	return quadParams, nil
+}
+
+// LoadItems serializes the content of a set of items from a file using the
+// given file path. Returns the serialized item values.
+func LoadItems(context interface{}, path string) ([]bson.M, error) {
+	log.Dev(context, "LoadItems", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadItems", err, "Completed")
+		return nil, err
+	}
+
+	var items []bson.M
+	if err = json.NewDecoder(file).Decode(&items); err != nil {
+		log.Error(context, "LoadItems", err, "Completed")
+		return nil, err
+	}
+
+	log.Dev(context, "LoadItems", "Completed")
+	return items, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

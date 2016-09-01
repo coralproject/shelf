@@ -1,10 +1,15 @@
 package wire
 
 import (
+	"fmt"
+
+	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/quad"
+	"github.com/coralproject/shelf/internal/wire/pattern"
 	validator "gopkg.in/bluesuncorp/validator.v8"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // validate is used to perform field validation.
@@ -86,4 +91,58 @@ func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []Qua
 
 	log.Dev(context, "RemoveFromGraph", "Completed")
 	return nil
+}
+
+// InferRelationships infers realtionships based on patterns corresponding to
+// types of items.
+func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error) {
+	log.Dev(context, "InferRelationships", "Started : %d Items", len(items))
+
+	// Infer relationships for each provided item.
+	var quadParams []QuadParams
+	for _, item := range items {
+
+		// Get the relevant pattern.
+		itemType := item["type"]
+		p, err := pattern.GetByType(context, mgoDB, itemType.(string))
+		if err != nil {
+			continue
+		}
+
+		// Loop over inferences in the pattern.
+		data := item["data"]
+		dataMap, ok := data.(map[string]interface{})
+		if !ok {
+			err = fmt.Errorf("Could not parse item data")
+			log.Error(context, "InferRelationships", err, "Completed")
+			return nil, err
+		}
+		for _, inference := range p.Relationships {
+
+			// Check for the relevant field in the item.
+			if val, ok := dataMap[inference.RelIDField].(string); ok {
+
+				// Add the relationship parameters.
+				switch inference.Direction {
+				case inString:
+					quad := QuadParams{
+						Subject:   val,
+						Predicate: inference.Predicate,
+						Object:    item["item_id"].(string),
+					}
+					quadParams = append(quadParams, quad)
+				case outString:
+					quad := QuadParams{
+						Subject:   item["item_id"].(string),
+						Predicate: inference.Predicate,
+						Object:    val,
+					}
+					quadParams = append(quadParams, quad)
+				}
+			}
+		}
+	}
+
+	log.Dev(context, "InferRelationships", "Completed")
+	return quadParams, nil
 }
