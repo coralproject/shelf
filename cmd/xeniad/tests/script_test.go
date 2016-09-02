@@ -146,8 +146,8 @@ func TestScriptUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -198,8 +198,8 @@ func TestScriptUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3},{"command":4}]}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3},{"command":4}]}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -266,8 +266,8 @@ func TestScriptDelete(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the script.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + sPrefix + `_upsert","commands":[{"command.one":1},{"command":2},{"command":3}]}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"commands":[{"command.one":1},{"command":2},{"command":3}], "name":"` + sPrefix + `_upsert"}`)
 
 			if resp != recv {
 				t.Log(resp)
