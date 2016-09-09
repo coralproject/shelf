@@ -72,7 +72,7 @@ type SearchResultCounts struct {
 // expected from searching for submissions based on a form id.
 type SearchResults struct {
 	Counts      SearchResultCounts `json:"counts"`
-	Submissions []Submission
+	Submissions []Submission       `json:"submissions"`
 }
 
 // SearchOpts is the options used to perform a search accross a
@@ -438,9 +438,9 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 		// Instead of pulling all the form submissions ourself, we can just use
 		// the MongoDB Query Aggregation.
 		pipeline := []bson.M{
-			bson.M{"$match": q},
-			bson.M{"$unwind": "$flags"},
-			bson.M{"$group": bson.M{
+			{"$match": q},
+			{"$unwind": "$flags"},
+			{"$group": bson.M{
 				"_id": "$flags",
 				"count": bson.M{
 					"$sum": 1,
