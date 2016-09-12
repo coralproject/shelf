@@ -62,19 +62,24 @@ func API() http.Handler {
 	}
 
 	// If authentication is on then configure Anvil.
-	var anv *anvil.Anvil
-	if url, err := cfg.String(cfgAnvilHost); err == nil {
+	/*
 
-		log.Dev("startup", "Init", "Initalizing Anvil")
-		anv, err = anvil.New(url)
-		if err != nil {
-			log.Error("startup", "Init", err, "Initializing Anvil: %s", url)
-			os.Exit(1)
+		// Anvil is temporarily disabled pending auth strategy
+
+		var anv *anvil.Anvil
+		if url, err := cfg.String(cfgAnvilHost); err == nil {
+
+			log.Dev("startup", "Init", "Initalizing Anvil")
+			anv, err = anvil.New(url)
+			if err != nil {
+				log.Error("startup", "Init", err, "Initializing Anvil: %s", url)
+				os.Exit(1)
+			}
 		}
-	}
+	*/
 
 	a := app.New(midware.Mongo, midware.Auth)
-	a.Ctx["anvil"] = anv
+	//		a.Ctx["anvil"] = anv
 
 	// Load in the recaptcha secret from the config.
 	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
@@ -86,7 +91,7 @@ func API() http.Handler {
 
 	log.Dev("startup", "Init", "Initalizing routes")
 
-	oldRoutes(a) // FIXME: remove on next API release
+	//oldRoutes(a) // FIXME: remove on next API release
 	routes(a)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
