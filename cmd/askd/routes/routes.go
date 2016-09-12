@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/anvilresearch/go-anvil"
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -130,34 +129,34 @@ func oldRoutes(a *app.App) {
 
 func routes(a *app.App) {
 	// global
-	a.Handle("GET", "/1.0/version", handlers.Version.List)
+	a.Handle("GET", "/v1/version", handlers.Version.List)
 
 	// forms
-	a.Handle("POST", "/1.0/form", handlers.Form.Upsert)
-	a.Handle("GET", "/1.0/form", handlers.Form.List)
-	a.Handle("PUT", "/1.0/form/:id", handlers.Form.Upsert)
-	a.Handle("PUT", "/1.0/form/:id/status/:status", handlers.Form.UpdateStatus)
-	a.Handle("GET", "/1.0/form/:id", handlers.Form.Retrieve)
-	a.Handle("DELETE", "/1.0/form/:id", handlers.Form.Delete)
+	a.Handle("POST", "/v1/form", handlers.Form.Upsert)
+	a.Handle("GET", "/v1/form", handlers.Form.List)
+	a.Handle("PUT", "/v1/form/:id", handlers.Form.Upsert)
+	a.Handle("PUT", "/v1/form/:id/status/:status", handlers.Form.UpdateStatus)
+	a.Handle("GET", "/v1/form/:id", handlers.Form.Retrieve)
+	a.Handle("DELETE", "/v1/form/:id", handlers.Form.Delete)
 
 	// form form submissions
-	a.Handle("POST", "/1.0/form/:form_id/submission", handlers.FormSubmission.Create)
-	a.Handle("GET", "/1.0/form/:form_id/submission", handlers.FormSubmission.Search)
-	a.Handle("GET", "/1.0/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)
-	a.Handle("PUT", "/1.0/form/:form_id/submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
-	a.Handle("POST", "/1.0/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
-	a.Handle("DELETE", "/1.0/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
-	a.Handle("PUT", "/1.0/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
-	a.Handle("DELETE", "/1.0/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
+	a.Handle("POST", "/v1/form/:form_id/submission", handlers.FormSubmission.Create)
+	a.Handle("GET", "/v1/form/:form_id/submission", handlers.FormSubmission.Search)
+	a.Handle("GET", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)
+	a.Handle("PUT", "/v1/form/:form_id/submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
+	a.Handle("POST", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
+	a.Handle("DELETE", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
+	a.Handle("PUT", "/v1/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
+	a.Handle("DELETE", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
 
 	// form form galleries
-	a.Handle("GET", "/1.0/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
+	a.Handle("GET", "/v1/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
 
 	// form galleries
-	a.Handle("GET", "/1.0/form_gallery/:id", handlers.FormGallery.Retrieve)
-	a.Handle("PUT", "/1.0/form_gallery/:id", handlers.FormGallery.Update)
-	a.Handle("POST", "/1.0/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
-	a.Handle("DELETE", "/1.0/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
+	a.Handle("GET", "/v1/form_gallery/:id", handlers.FormGallery.Retrieve)
+	a.Handle("PUT", "/v1/form_gallery/:id", handlers.FormGallery.Update)
+	a.Handle("POST", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
+	a.Handle("DELETE", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
 }
 
 func ensureDBIndexes() error {
