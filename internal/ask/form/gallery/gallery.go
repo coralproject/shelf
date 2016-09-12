@@ -214,8 +214,8 @@ func hydrateMany(context interface{}, db *db.DB, galleries []Gallery) error {
 	var submissionIDs []string
 
 	for _, gallery := range galleries {
-		for i, answer := range gallery.Answers {
-			submissionIDs[i] = answer.SubmissionID.Hex()
+		for _, answer := range gallery.Answers {
+			submissionIDs = append(submissionIDs, answer.SubmissionID.Hex())
 		}
 	}
 
