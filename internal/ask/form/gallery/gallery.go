@@ -154,9 +154,9 @@ func hydrate(context interface{}, db *db.DB, gallery *Gallery) error {
 // matching gallery answers.
 func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submission.Submission) {
 	// We should walk through all their answers from the Gallery.
-	for j, answer := range gallery.Answers {
+	for answerIndex, answer := range gallery.Answers {
 
-		for k, sub := range submissions {
+		for _, sub := range submissions {
 
 			// If we are looking at a different submission that doesn't match the
 			// answer's submission ID or the submission was to a different form that
@@ -170,7 +170,7 @@ func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submissi
 
 			// Walk over the current submission's answers to match to the particular
 			// question/widget/answer that we want to look at.
-			for _, submissionAnswer := range sub.Answers {
+			for submissionAnswerIndex, submissionAnswer := range sub.Answers {
 				if submissionAnswer.WidgetID != answer.AnswerID {
 
 					// Continue if the widgetID and the answerID do not match.
@@ -179,18 +179,18 @@ func mergeSubmissionsIntoGalleryAnswers(gallery *Gallery, submissions []submissi
 				}
 
 				// Set the answer to the current submission answer.
-				gallery.Answers[j].Answer = sub.Answers[k]
+				gallery.Answers[answerIndex].Answer = sub.Answers[submissionAnswerIndex]
 
 				// Create an empty array for the identity answers that we will walk
 				// over.
-				gallery.Answers[j].IdentityAnswers = make([]submission.Answer, 0)
+				gallery.Answers[answerIndex].IdentityAnswers = make([]submission.Answer, 0)
 
 				// Specifically, walk over the the current submission's answers again to
 				// find any identity answers related to this specific answer.
-				for m, submissionAnswer := range sub.Answers {
+				for submissionAnswerIndex, submissionAnswer := range sub.Answers {
 
 					if submissionAnswer.Identity {
-						gallery.Answers[j].IdentityAnswers = append(gallery.Answers[j].IdentityAnswers, sub.Answers[m])
+						gallery.Answers[answerIndex].IdentityAnswers = append(gallery.Answers[answerIndex].IdentityAnswers, sub.Answers[submissionAnswerIndex])
 					}
 				}
 
