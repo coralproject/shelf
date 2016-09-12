@@ -15,34 +15,34 @@
 			"revisionTime": "2016-05-03T02:00:42Z"
 		},
 		{
-			"checksumSHA1": "PjHe3NkUqsMhbthk9qpv56U/TG0=",
+			"checksumSHA1": "WWElstbt65X/2hn9bYATJuoLgPw=",
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
-			"checksumSHA1": "YKGTOpWlJ4uo9orPjJ6WSLyezxA=",
+			"checksumSHA1": "5U36HUtCWHXh3+QgQivEcMCAPFU=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "a65a8dc1d74287aeb2a56e0471350c56192ebad7",
-			"revisionTime": "2016-06-29T17:19:49Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
 			"checksumSHA1": "LtvZGFkHom2jtvFxc+rdJ+u++es=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "a65a8dc1d74287aeb2a56e0471350c56192ebad7",
-			"revisionTime": "2016-06-29T17:19:49Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
 			"checksumSHA1": "By/iy3mbtLH0tZbDxSqAhqm/r0E=",
 			"path": "github.com/ardanlabs/kit/log",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
-			"checksumSHA1": "urtHLPYkazMKm0uGj7ag8QAGbuQ=",
+			"checksumSHA1": "TfieH23my6GTKr6POJatpoe0j/M=",
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "fd0aefcf7805b145f4e65b121ee528c1a60f6a2f",
-			"revisionTime": "2016-04-27T16:48:56Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
@@ -50,10 +50,10 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "uJviBFfoynCvM0piSX38we1F6yE=",
+			"checksumSHA1": "SCx4A7CRxn/eEbrU4kQn1mwb1j0=",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "15608e1fed420f84a8c8709a49e0ceba841514c7",
-			"revisionTime": "2016-07-16T01:09:33Z"
+			"revision": "02737deee7a35a646ed2f2c2fd48dfb4906f34a3",
+			"revisionTime": "2016-09-02T15:09:54Z"
 		},
 		{
 			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",

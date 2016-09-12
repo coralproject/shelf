@@ -75,55 +75,61 @@ func TestExecuteSet(t *testing.T) {
 		t.Logf("Given the need to execute %s mongo tests.", execSet.typ)
 		{
 			for _, es := range execSet.set {
-				t.Logf("\tWhen using Execute Set %s", es.set.Name)
-				{
-					result := xenia.Exec(tests.Context, db, es.set, es.vars)
 
-					data, err := json.Marshal(result)
-					if err != nil {
-						t.Errorf("\t%s\tShould be able to marshal the result : %s", tests.Failed, err)
-						continue
-					}
-					t.Logf("\t%s\tShould be able to marshal the result.", tests.Success)
+				// Setup a sub-test for each item.
+				tf := func(t *testing.T) {
+					t.Logf("\tWhen using Execute Set %s", es.set.Name)
+					{
+						result := xenia.Exec(tests.Context, db, es.set, es.vars)
 
-					var res query.Result
-					if err := json.Unmarshal(data, &res); err != nil {
-						t.Errorf("\t%s\tShould be able to unmarshal the result : %s", tests.Failed, err)
-						continue
-					}
-					t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
+						data, err := json.Marshal(result)
+						if err != nil {
+							t.Errorf("\t%s\tShould be able to marshal the result : %s", tests.Failed, err)
+							return
+						}
+						t.Logf("\t%s\tShould be able to marshal the result.", tests.Success)
 
-					// This support allowing the test to provide multiple documents
-					// to check when data value order can be underterminstic.
-					var found bool
-					for _, rslt := range es.results {
+						var res query.Result
+						if err := json.Unmarshal(data, &res); err != nil {
+							t.Errorf("\t%s\tShould be able to unmarshal the result : %s", tests.Failed, err)
+							return
+						}
+						t.Logf("\t%s\tShould be able to unmarshal the result.", tests.Success)
 
-						// We just need to find the string inside the result.
-						if strings.HasPrefix(rslt, "#find:") {
-							if strings.Contains(string(data), rslt[6:]) {
+						// This support allowing the test to provide multiple documents
+						// to check when data value order can be underterminstic.
+						var found bool
+						for _, rslt := range es.results {
+
+							// We just need to find the string inside the result.
+							if strings.HasPrefix(rslt, "#find:") {
+								if strings.Contains(string(data), rslt[6:]) {
+									found = true
+									break
+								}
+								continue
+							}
+
+							// Compare the entire result.
+							if string(data) == rslt {
 								found = true
 								break
 							}
-							continue
 						}
 
-						// Compare the entire result.
-						if string(data) == rslt {
-							found = true
-							break
+						if !found {
+							t.Log("Exp:", string(data))
+							for _, rslt := range es.results {
+								t.Log("Rsl:", rslt)
+							}
+							t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
+							return
 						}
+						t.Logf("\t%s\tShould have the correct result", tests.Success)
 					}
-
-					if !found {
-						t.Log("Exp:", string(data))
-						for _, rslt := range es.results {
-							t.Log("Rsl:", rslt)
-						}
-						t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
-						continue
-					}
-					t.Logf("\t%s\tShould have the correct result", tests.Success)
 				}
+
+				t.Run(es.set.Name, tf)
 			}
 		}
 	}

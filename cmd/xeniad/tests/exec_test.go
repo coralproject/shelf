@@ -32,8 +32,8 @@ func TestExec(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -77,8 +77,8 @@ func TestExecCustom(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -111,7 +111,22 @@ func TestExecJSONP(t *testing.T) {
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
 			recv := w.Body.String()
-			resp := `handle_data({"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]})`
+
+			if !strings.HasPrefix(recv, "handle_data(") {
+				t.Fatalf("\t%s\tShould get the expected prefix.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected prefix.", tests.Success)
+
+			recv = strings.TrimPrefix(recv, "handle_data(")
+
+			if !strings.HasSuffix(recv, ")") {
+				t.Fatalf("\t%s\tShould get the expected suffix.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould get the expected suffix.", tests.Success)
+
+			recv = tests.IndentJSON(strings.TrimSuffix(recv, ")"))
+
+			resp := tests.IndentJSON(`{"results":[{"Name":"Basic","Docs":[{"name":"C14 - Pasco County Buoy, FL"}]}]}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -157,7 +172,7 @@ func TestExecExplain(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
 
-			recv := w.Body.String()
+			recv := tests.IndentJSON(w.Body.String())
 			resp := `queryPlanner`
 
 			if !strings.Contains(recv, resp) {
