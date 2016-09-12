@@ -8,12 +8,11 @@ import (
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/wire"
-	"gopkg.in/mgo.v2/bson"
 )
 
 // LoadQuadParams serializes the content of a set of QuadParams from a file using the
 // given file path. Returns the serialized QuadParams value.
-func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error) {
+func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error) {
 	log.Dev(context, "LoadQuadParams", "Started : File %s", path)
 
 	file, err := os.Open(path)
@@ -22,7 +21,7 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 		return nil, err
 	}
 
-	var quadParams []wire.QuadParams
+	var quadParams []wire.QuadParam
 	if err = json.NewDecoder(file).Decode(&quadParams); err != nil {
 		log.Error(context, "LoadQuadParams", err, "Completed")
 		return nil, err
@@ -32,25 +31,26 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 	return quadParams, nil
 }
 
-// LoadItems serializes the content of a set of items from a file using the
+// LoadItem serializes the content of an item from a file using the
 // given file path. Returns the serialized item values.
-func LoadItems(context interface{}, path string) ([]bson.M, error) {
-	log.Dev(context, "LoadItems", "Started : File %s", path)
+func LoadItem(context interface{}, path string) (map[string]interface{}, error) {
+	log.Dev(context, "LoadItem", "Started : File %s", path)
+
+	var item map[string]interface{}
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error(context, "LoadItems", err, "Completed")
-		return nil, err
+		log.Error(context, "LoadItem", err, "Completed")
+		return item, err
 	}
 
-	var items []bson.M
-	if err = json.NewDecoder(file).Decode(&items); err != nil {
-		log.Error(context, "LoadItems", err, "Completed")
-		return nil, err
+	if err = json.NewDecoder(file).Decode(&item); err != nil {
+		log.Error(context, "LoadItem", err, "Completed")
+		return item, err
 	}
 
-	log.Dev(context, "LoadItems", "Completed")
-	return items, nil
+	log.Dev(context, "LoadItem", "Completed")
+	return item, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

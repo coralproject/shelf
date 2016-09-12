@@ -12,7 +12,7 @@
 
 ## <a name="pkg-index">Index</a>
 * [func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error](#Add)
-* [func Get() ([]pattern.Pattern, []bson.M, error)](#Get)
+* [func Get() ([]pattern.Pattern, []map[string]interface{}, error)](#Get)
 * [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
 
 
@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/pattern_fix.go?s=1024:1098#L42)
+## <a name="Add">func</a> [Add](/src/target/pattern_fix.go?s=1056:1130#L42)
 ``` go
 func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error
 ```
@@ -31,15 +31,15 @@ Add inserts patterns for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/pattern_fix.go?s=374:421#L10)
+## <a name="Get">func</a> [Get](/src/target/pattern_fix.go?s=374:437#L10)
 ``` go
-func Get() ([]pattern.Pattern, []bson.M, error)
+func Get() ([]pattern.Pattern, []map[string]interface{}, error)
 ```
 Get loads pattern data based on patterns.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/pattern_fix.go?s=1293:1357#L53)
+## <a name="Remove">func</a> [Remove](/src/target/pattern_fix.go?s=1325:1389#L53)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```

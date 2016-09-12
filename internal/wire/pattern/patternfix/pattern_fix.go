@@ -17,7 +17,7 @@ func init() {
 }
 
 // Get loads pattern data based on patterns.json.
-func Get() ([]pattern.Pattern, []bson.M, error) {
+func Get() ([]pattern.Pattern, []map[string]interface{}, error) {
 
 	// Get the patterns.
 	patternFile, err := os.Open(path + "patterns.json")
@@ -39,7 +39,7 @@ func Get() ([]pattern.Pattern, []bson.M, error) {
 	}
 	defer itemFile.Close()
 
-	var items []bson.M
+	var items []map[string]interface{}
 	err = json.NewDecoder(itemFile).Decode(&items)
 	if err != nil {
 		return nil, nil, err

@@ -27,7 +27,5 @@ func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command {
 
 	addAddToGraph()
 	addRemoveFromGraph()
-	addInferRelationships()
-	addInferAddRelationships()
 	return graphCmd
 }

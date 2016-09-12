@@ -1,7 +1,7 @@
 package wire
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
@@ -9,26 +9,36 @@ import (
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/wire/pattern"
 	validator "gopkg.in/bluesuncorp/validator.v8"
-	"gopkg.in/mgo.v2/bson"
 )
 
-// validate is used to perform field validation.
-var validate *validator.Validate
+var (
+	// validate is used to perform field validation.
+	validate *validator.Validate
+
+	// ErrItemType is used in item parsing.
+	ErrItemType = errors.New("Could not parse item type")
+
+	// ErrItemData is used in item parsing.
+	ErrItemData = errors.New("Could not parse item data")
+
+	// ErrItemID is used in item parsing.
+	ErrItemID = errors.New("Could not parse item ID")
+)
 
 func init() {
 	validate = validator.New(&validator.Config{TagName: "validate"})
 }
 
-// QuadParams contains information needed to add/remove relationships
+// QuadParam contains information needed to add/remove relationships
 // to/from the cayley graph.
-type QuadParams struct {
+type QuadParam struct {
 	Subject   string `validate:"required,min=2"`
 	Predicate string `validate:"required,min=2"`
 	Object    string `validate:"required,min=2"`
 }
 
 // Validate checks the QuadParams value for consistency.
-func (q *QuadParams) Validate() error {
+func (q *QuadParam) Validate() error {
 	if err := validate.Struct(q); err != nil {
 		return err
 	}
@@ -36,8 +46,15 @@ func (q *QuadParams) Validate() error {
 }
 
 // AddToGraph adds relationships as quads into the cayley graph.
-func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
-	log.Dev(context, "AddToGraph", "Started : %d Relationships", len(quadParams))
+func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error {
+	log.Dev(context, "AddToGraph", "Started : %v", item)
+
+	// Infer the relationships in the item.
+	quadParams, err := inferRelationships(context, db, item)
+	if err != nil {
+		log.Error(context, "AddToGraph", err, "Completed")
+		return err
+	}
 
 	// Convert the given parameters into cayley quads.
 	tx := cayley.NewTransaction()
@@ -65,7 +82,7 @@ func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadPara
 }
 
 // RemoveFromGraph removes relationship quads from the cayley graph.
-func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error {
+func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error {
 	log.Dev(context, "RemoveFromGraph", "Started : %d Relationships", len(quadParams))
 
 	// Convert the given parameters into cayley quads.
@@ -93,56 +110,123 @@ func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []Qua
 	return nil
 }
 
-// InferRelationships infers realtionships based on patterns corresponding to
-// types of items.
-func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error) {
-	log.Dev(context, "InferRelationships", "Started : %d Items", len(items))
+// inferRelationships infers realtionships based on patterns corresponding to
+// a type of item.
+func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interface{}) ([]QuadParam, error) {
 
-	// Infer relationships for each provided item.
-	var quadParams []QuadParams
-	for _, item := range items {
+	// Parse the item.
+	item, err := itemParse(itemIn)
+	if err != nil {
+		return nil, err
+	}
 
-		// Get the relevant pattern.
-		itemType := item["type"]
-		p, err := pattern.GetByType(context, mgoDB, itemType.(string))
-		if err != nil {
-			continue
-		}
+	// Get the relevant pattern.
+	p, err := pattern.GetByType(context, db, item.Type)
+	if err != nil {
+		return nil, nil
+	}
 
-		// Loop over inferences in the pattern.
-		data := item["data"]
-		dataMap, ok := data.(map[string]interface{})
-		if !ok {
-			err = fmt.Errorf("Could not parse item data")
-			log.Error(context, "InferRelationships", err, "Completed")
-			return nil, err
-		}
-		for _, inference := range p.Relationships {
+	// Loop over inferences in the pattern.
+	var quadParams []QuadParam
+	for _, inference := range p.Relationships {
 
-			// Check for the relevant field in the item.
-			if val, ok := dataMap[inference.RelIDField].(string); ok {
+		// Check for the relevant field in the item.
+		if relatedItemID, ok := item.Data[inference.RelIDField]; ok {
 
-				// Add the relationship parameters.
-				switch inference.Direction {
-				case inString:
-					quad := QuadParams{
-						Subject:   val,
-						Predicate: inference.Predicate,
-						Object:    item["item_id"].(string),
-					}
-					quadParams = append(quadParams, quad)
-				case outString:
-					quad := QuadParams{
-						Subject:   item["item_id"].(string),
-						Predicate: inference.Predicate,
-						Object:    val,
-					}
-					quadParams = append(quadParams, quad)
+			// Add the relationship parameters.
+			switch inference.Direction {
+			case inString:
+				quad := QuadParam{
+					Subject:   relatedItemID,
+					Predicate: inference.Predicate,
+					Object:    item.ID,
 				}
+				quadParams = append(quadParams, quad)
+			case outString:
+				quad := QuadParam{
+					Subject:   item.ID,
+					Predicate: inference.Predicate,
+					Object:    relatedItemID,
+				}
+				quadParams = append(quadParams, quad)
 			}
 		}
 	}
 
-	log.Dev(context, "InferRelationships", "Completed")
 	return quadParams, nil
+}
+
+// parsedItem contains the structure of the item.
+type parsedItem struct {
+	ID   string
+	Type string
+	Data map[string]string
+}
+
+// itemParse parses a general map[string]interface{} into a parsedItem value,
+// validating the fields required for relationship inference.
+func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
+
+	// Validate and extract the item type.
+	val, ok := itemIn["type"]
+	if !ok {
+		return parsedItem{}, ErrItemType
+	}
+
+	itemType, ok := val.(string)
+	if !ok {
+		return parsedItem{}, ErrItemType
+	}
+
+	if itemType == "" {
+		return parsedItem{}, ErrItemType
+	}
+
+	// Validate and extract the item ID.
+	val, ok = itemIn["item_id"]
+	if !ok {
+		return parsedItem{}, ErrItemID
+	}
+
+	itemID, ok := val.(string)
+	if !ok {
+		return parsedItem{}, ErrItemType
+	}
+
+	if itemID == "" {
+		return parsedItem{}, ErrItemType
+	}
+
+	// Validate and extract the item data.
+	val, ok = itemIn["data"]
+	if !ok {
+		return parsedItem{}, ErrItemData
+	}
+
+	dataMap, ok := val.(map[string]interface{})
+	if !ok {
+		return parsedItem{}, ErrItemData
+	}
+
+	itemData := make(map[string]string)
+	for k, v := range dataMap {
+
+		vString, ok := v.(string)
+		if !ok {
+			continue
+		}
+		itemData[k] = vString
+	}
+
+	if len(itemData) == 0 {
+		return parsedItem{}, ErrItemData
+	}
+
+	// Create and return the parsed item value.
+	itemOut := parsedItem{
+		ID:   itemID,
+		Type: itemType,
+		Data: itemData,
+	}
+	return itemOut, nil
 }

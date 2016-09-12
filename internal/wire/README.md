@@ -15,11 +15,10 @@ Package wire provides support for generating views.
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error](#AddToGraph)
-* [func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error)](#InferRelationships)
-* [func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error](#RemoveFromGraph)
-* [type QuadParams](#QuadParams)
-  * [func (q *QuadParams) Validate() error](#QuadParams.Validate)
+* [func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#AddToGraph)
+* [func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error](#RemoveFromGraph)
+* [type QuadParam](#QuadParam)
+  * [func (q *QuadParam) Validate() error](#QuadParam.Validate)
 * [type Result](#Result)
   * [func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Execute)
 * [type ViewParams](#ViewParams)
@@ -33,47 +32,51 @@ Package wire provides support for generating views.
 ## <a name="pkg-variables">Variables</a>
 ``` go
 var (
+
+    // ErrItemType is used in item parsing.
+    ErrItemType = errors.New("Could not parse item type")
+
+    // ErrItemData is used in item parsing.
+    ErrItemData = errors.New("Could not parse item data")
+
+    // ErrItemID is used in item parsing.
+    ErrItemID = errors.New("Could not parse item ID")
+)
+```
+``` go
+var (
     // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
     ErrNotFound = errors.New("View items Not found")
 )
 ```
 
 
-## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=962:1051#L29)
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1229:1333#L39)
 ``` go
-func AddToGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error
+func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
 AddToGraph adds relationships as quads into the cayley graph.
 
 
 
-## <a name="InferRelationships">func</a> [InferRelationships](/src/target/relationships.go?s=2700:2796#L88)
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2246:2339#L75)
 ``` go
-func InferRelationships(context interface{}, mgoDB *db.DB, items []bson.M) ([]QuadParams, error)
-```
-InferRelationships infers realtionships based on patterns corresponding to
-types of items.
-
-
-
-## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=1803:1897#L58)
-``` go
-func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParams) error
+func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error
 ```
 RemoveFromGraph removes relationship quads from the cayley graph.
 
 
 
 
-## <a name="QuadParams">type</a> [QuadParams](/src/target/relationships.go?s=559:723#L14)
+## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=828:991#L24)
 ``` go
-type QuadParams struct {
+type QuadParam struct {
     Subject   string `validate:"required,min=2"`
     Predicate string `validate:"required,min=2"`
     Object    string `validate:"required,min=2"`
 }
 ```
-QuadParams contains information needed to add/remove relationships
+QuadParam contains information needed to add/remove relationships
 to/from the cayley graph.
 
 
@@ -85,9 +88,9 @@ to/from the cayley graph.
 
 
 
-### <a name="QuadParams.Validate">func</a> (\*QuadParams) [Validate](/src/target/relationships.go?s=782:819#L21)
+### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1050:1086#L31)
 ``` go
-func (q *QuadParams) Validate() error
+func (q *QuadParam) Validate() error
 ```
 Validate checks the QuadParams value for consistency.
 
