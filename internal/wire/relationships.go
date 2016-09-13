@@ -121,46 +121,46 @@ func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interf
 	}
 
 	// Get the relevant pattern.
-	p, err := pattern.GetByType(context, db, item.Type)
+	p, err := pattern.GetByType(context, db, item.itemType)
 	if err != nil {
-		return nil, nil
+		return nil, err
 	}
 
 	// Loop over inferences in the pattern.
-	var quadParams []QuadParam
-	for _, inference := range p.Relationships {
+	var qps []QuadParam
+	for _, inf := range p.Inferences {
 
 		// Check for the relevant field in the item.
-		if relatedItemID, ok := item.Data[inference.RelIDField]; ok {
+		if relID, ok := item.itemData[inf.RelIDField]; ok {
 
 			// Add the relationship parameters.
-			switch inference.Direction {
+			switch inf.Direction {
 			case inString:
-				quad := QuadParam{
-					Subject:   relatedItemID,
-					Predicate: inference.Predicate,
-					Object:    item.ID,
+				qp := QuadParam{
+					Subject:   relID,
+					Predicate: inf.Predicate,
+					Object:    item.itemID,
 				}
-				quadParams = append(quadParams, quad)
+				qps = append(qps, qp)
 			case outString:
-				quad := QuadParam{
-					Subject:   item.ID,
-					Predicate: inference.Predicate,
-					Object:    relatedItemID,
+				qp := QuadParam{
+					Subject:   item.itemID,
+					Predicate: inf.Predicate,
+					Object:    relID,
 				}
-				quadParams = append(quadParams, quad)
+				qps = append(qps, qp)
 			}
 		}
 	}
 
-	return quadParams, nil
+	return qps, nil
 }
 
 // parsedItem contains the structure of the item.
 type parsedItem struct {
-	ID   string
-	Type string
-	Data map[string]string
+	itemID   string
+	itemType string
+	itemData map[string]string
 }
 
 // itemParse parses a general map[string]interface{} into a parsedItem value,
@@ -224,9 +224,9 @@ func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
 
 	// Create and return the parsed item value.
 	itemOut := parsedItem{
-		ID:   itemID,
-		Type: itemType,
-		Data: itemData,
+		itemID:   itemID,
+		itemType: itemType,
+		itemData: itemData,
 	}
 	return itemOut, nil
 }

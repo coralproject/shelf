@@ -98,11 +98,11 @@ Validate checks the Inference value for consistency.
 
 
 
-## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1108:1307#L25)
+## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1108:1295#L25)
 ``` go
 type Pattern struct {
-    Type          string      `bson:"type" json:"type" validate:"required,min=2"`
-    Relationships []Inference `bson:"relationships" json:"relationships" validate:"required,min=1"`
+    Type       string      `bson:"type" json:"type" validate:"required,min=2"`
+    Inferences []Inference `bson:"inferences" json:"inferences" validate:"required,min=1"`
 }
 ```
 Pattern includes information used to infer relationships given an
@@ -124,7 +124,7 @@ GetByType retrieves a pattern by type from Mongo.
 
 
 
-### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1363:1397#L31)
+### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1351:1385#L31)
 ``` go
 func (p *Pattern) Validate() error
 ```
