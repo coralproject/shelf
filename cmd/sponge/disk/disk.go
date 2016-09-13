@@ -20,6 +20,7 @@ func LoadItems(context interface{}, path string) ([]item.Item, error) {
 		log.Error(context, "LoadItems", err, "Completed")
 		return nil, err
 	}
+	defer file.Close()
 
 	var items []item.Item
 	if err = json.NewDecoder(file).Decode(&items); err != nil {

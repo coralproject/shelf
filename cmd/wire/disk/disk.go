@@ -20,6 +20,7 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error) 
 		log.Error(context, "LoadQuadParams", err, "Completed")
 		return nil, err
 	}
+	defer file.Close()
 
 	var quadParams []wire.QuadParam
 	if err = json.NewDecoder(file).Decode(&quadParams); err != nil {
@@ -43,6 +44,7 @@ func LoadItem(context interface{}, path string) (map[string]interface{}, error) 
 		log.Error(context, "LoadItem", err, "Completed")
 		return item, err
 	}
+	defer file.Close()
 
 	if err = json.NewDecoder(file).Decode(&item); err != nil {
 		log.Error(context, "LoadItem", err, "Completed")
