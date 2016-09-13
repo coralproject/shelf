@@ -1,12 +1,16 @@
 package handlers
 
 import (
+	"bytes"
+	"encoding/csv"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net"
 	"net/http"
 	"net/url"
 	"strconv"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
@@ -170,7 +174,57 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		return err
 	}
 
+	if csv := c.Request.URL.Query().Get("csv"); csv != "" {
+		results.CSVURL = fmt.Sprintf("%v%v/csv", c.Request.Host, c.Request.URL.Path)
+	}
+
 	c.Respond(results, http.StatusOK)
+
+	return nil
+}
+
+// SearchCSV retrieves a set of FormSubmission's based on the search params
+// provided in the query string.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (formSubmissionHandle) SearchCSV(c *app.Context) error {
+	formID := c.Params["form_id"]
+
+	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 0
+	}
+
+	skip, err := strconv.Atoi(c.Request.URL.Query().Get("skip"))
+	if err != nil {
+		skip = 0
+	}
+
+	opts := submission.SearchOpts{
+		Query:    c.Request.URL.Query().Get("search"),
+		FilterBy: c.Request.URL.Query().Get("filterby"),
+	}
+
+	if c.Request.URL.Query().Get("orderby") == "dsc" {
+		opts.DscOrder = true
+	}
+
+	results, err := submission.Search(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
+	if err != nil {
+		return err
+	}
+
+	// Marshal the data into a CSV string.
+	csvData, err := encodeCSV(results.Submissions)
+	if err != nil {
+		return err
+	}
+
+	// Set the content type.
+	c.Header().Set("Content-Type", "text/csv")
+	c.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"ask_%s_%s.csv\"", formID, time.Now().String()))
+
+	c.WriteHeader(http.StatusOK)
+	c.Write(csvData)
 
 	return nil
 }
@@ -252,4 +306,26 @@ func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
 	c.Respond(s, http.StatusOK)
 
 	return nil
+}
+
+// encodeCSV gets all the submissions and encode them into a CSV
+func encodeCSV(s []submission.Submission) ([]byte, error) {
+
+	var buf bytes.Buffer
+	w := csv.NewWriter(&buf)
+	if err := w.Write(s[0].GetQuestions()); err != nil {
+		return nil, err
+	}
+	for _, row := range s {
+		if err := w.Write(row.GetAnswers()); err != nil {
+			return nil, err
+		}
+	}
+
+	w.Flush()
+
+	if err := w.Error(); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
