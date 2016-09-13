@@ -38,7 +38,7 @@ func init() {
 func setup(t *testing.T) ([]pattern.Pattern, *db.DB) {
 	tests.ResetLog()
 
-	patterns, err := patternfix.Get()
+	patterns, _, err := patternfix.Get()
 	if err != nil {
 		t.Fatalf("%s\tShould load pattern records from the fixture file : %v", tests.Failed, err)
 	}

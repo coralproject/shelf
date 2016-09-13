@@ -33,8 +33,8 @@ func (inf *Inference) Validate() error {
 // Pattern includes information used to infer relationships given an
 // item of an certain type.
 type Pattern struct {
-	Type          string      `bson:"type" json:"type" validate:"required,min=2"`
-	Relationships []Inference `bson:"relationships" json:"relationships" validate:"required,min=1"`
+	Type       string      `bson:"type" json:"type" validate:"required,min=2"`
+	Inferences []Inference `bson:"inferences" json:"inferences" validate:"required,min=1"`
 }
 
 // Validate checks the Pattern value for consistency.
@@ -43,7 +43,7 @@ func (p *Pattern) Validate() error {
 		return err
 	}
 
-	for _, infer := range p.Relationships {
+	for _, infer := range p.Inferences {
 		if err := validate.Struct(infer); err != nil {
 			return err
 		}

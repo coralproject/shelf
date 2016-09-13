@@ -11,7 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func GetCommands(store *cayley.Handle) *cobra.Command](#GetCommands)
+* [func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command](#GetCommands)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -21,9 +21,9 @@
 
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=405:458#L8)
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=504:570#L14)
 ``` go
-func GetCommands(store *cayley.Handle) *cobra.Command
+func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command
 ```
 GetCommands returns the graph commands.
 

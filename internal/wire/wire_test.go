@@ -18,6 +18,7 @@ import (
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire"
+	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 )
@@ -25,9 +26,10 @@ import (
 var mgoCfg mongo.Config
 
 const (
-	relPrefix  = "RTEST_"
-	itemPrefix = "ITEST_"
-	viewPrefix = "VTEST_"
+	relPrefix     = "RTEST_"
+	itemPrefix    = "ITEST_"
+	viewPrefix    = "VTEST_"
+	patternPrefix = "PTEST_"
 )
 
 func init() {
@@ -83,6 +85,18 @@ func loadTestData(context interface{}, db *db.DB) error {
 	}
 
 	if err := itemfix.Add(context, db, items); err != nil {
+		return err
+	}
+
+	// -----------------------------------------------------------
+	// Load example patterns.
+
+	patterns, _, err := patternfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := patternfix.Add(context, db, patterns); err != nil {
 		return err
 	}
 
@@ -155,6 +169,7 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	itemfix.Remove("context", db, itemPrefix)
 	relationshipfix.Remove("context", db, relPrefix)
 	viewfix.Remove("context", db, viewPrefix)
+	patternfix.Remove("context", db, patternPrefix)
 
 	// ------------------------------------------------------------
 	// Clear cayley graph.

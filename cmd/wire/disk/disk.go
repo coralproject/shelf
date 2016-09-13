@@ -12,7 +12,7 @@ import (
 
 // LoadQuadParams serializes the content of a set of QuadParams from a file using the
 // given file path. Returns the serialized QuadParams value.
-func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error) {
+func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error) {
 	log.Dev(context, "LoadQuadParams", "Started : File %s", path)
 
 	file, err := os.Open(path)
@@ -21,7 +21,7 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 		return nil, err
 	}
 
-	var quadParams []wire.QuadParams
+	var quadParams []wire.QuadParam
 	if err = json.NewDecoder(file).Decode(&quadParams); err != nil {
 		log.Error(context, "LoadQuadParams", err, "Completed")
 		return nil, err
@@ -29,6 +29,28 @@ func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
 
 	log.Dev(context, "LoadQuadParams", "Completed")
 	return quadParams, nil
+}
+
+// LoadItem serializes the content of an item from a file using the
+// given file path. Returns the serialized item values.
+func LoadItem(context interface{}, path string) (map[string]interface{}, error) {
+	log.Dev(context, "LoadItem", "Started : File %s", path)
+
+	var item map[string]interface{}
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadItem", err, "Completed")
+		return item, err
+	}
+
+	if err = json.NewDecoder(file).Decode(&item); err != nil {
+		log.Error(context, "LoadItem", err, "Completed")
+		return item, err
+	}
+
+	log.Dev(context, "LoadItem", "Completed")
+	return item, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid
