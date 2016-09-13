@@ -150,6 +150,9 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/1.0/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
 	a.Handle("DELETE", "/1.0/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
 
+	// temporal route to get CSV file
+	a.Handle("GET", "/1.0/form/:form_id/submission/csv", handlers.FormSubmission.SearchCSV)
+
 	// form form galleries
 	a.Handle("GET", "/1.0/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
 
