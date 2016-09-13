@@ -128,6 +128,12 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/1.0/view", handlers.View.Upsert)
 	a.Handle("GET", "/1.0/view/:name", handlers.View.Retrieve)
 	a.Handle("DELETE", "/1.0/view/:name", handlers.View.Delete)
+
+	a.Handle("GET", "/1.0/pattern", handlers.Pattern.List)
+	a.Handle("PUT", "/1.0/pattern", handlers.Pattern.Upsert)
+	a.Handle("GET", "/1.0/pattern/:type", handlers.Pattern.Retrieve)
+	a.Handle("DELETE", "/1.0/pattern/:type", handlers.Pattern.Delete)
+
 }
 
 // website manages the serving of web files for the project.
