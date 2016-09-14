@@ -73,6 +73,7 @@ type SearchResultCounts struct {
 type SearchResults struct {
 	Counts      SearchResultCounts `json:"counts"`
 	Submissions []Submission       `json:"submissions"`
+	CSVURL      string             `json:"csv_url"`
 }
 
 // SearchOpts is the options used to perform a search accross a
