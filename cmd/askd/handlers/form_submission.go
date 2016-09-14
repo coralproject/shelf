@@ -16,6 +16,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
 	"github.com/coralproject/shelf/internal/ask/form"
@@ -63,6 +64,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		// response contains the data we need and if it's valid.
 		if f.Settings["recaptcha"].(bool) {
 			if len(payload.Recaptcha) <= 0 {
+				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Payload empty")
 				return ErrInvalidCaptcha
 			}
 
@@ -78,6 +80,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 
 			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
 			if err != nil {
+				log.Error(c.SessionID, "FormSubmission : Create", err, "Error posting to the google service")
 				return err
 			}
 			defer resp.Body.Close()
@@ -86,10 +89,12 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 				Success bool `json:"success"`
 			}
 			if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
+				log.Error(c.SessionID, "FormSubmission : Create", err, "Error decoding the google service response")
 				return err
 			}
 
 			if !rr.Success {
+				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Recaptcha is invalid as per the google service")
 				return ErrInvalidCaptcha
 			}
 		}
