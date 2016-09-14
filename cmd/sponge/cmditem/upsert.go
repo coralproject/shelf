@@ -69,7 +69,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if err := runUpsertWeb(cmd, item); err != nil {
+		if err := runUpsertWeb(cmd, *item); err != nil {
 			cmd.Println("Upserting Items : ", err)
 			return
 		}
@@ -84,7 +84,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return err
 		}
 
-		if err := runUpsertWeb(cmd, item); err != nil {
+		if err := runUpsertWeb(cmd, *item); err != nil {
 			return err
 		}
 
