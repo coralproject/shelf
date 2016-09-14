@@ -329,8 +329,8 @@ func encodeCSV(records [][]string) ([]byte, error) {
 // convert a bson.M into string.
 func convertToString(m bson.M) string {
 	var s string
-	for k, v := range m {
-		s = s + fmt.Sprintf("%v: %v ", k, v)
+	for _, v := range m {
+		s = s + fmt.Sprintf("%v ", v)
 	}
 	return s
 }
