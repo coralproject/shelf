@@ -102,6 +102,8 @@ func Upsert(context interface{}, db *db.DB, form *Form) error {
 	if form.ID.Hex() == "" {
 		form.ID = bson.NewObjectId()
 		isNewForm = true
+		form.DateCreated = time.Now()
+		form.DateUpdated = time.Now()
 	}
 
 	if err := form.Validate(); err != nil {
