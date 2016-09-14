@@ -184,8 +184,6 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		results.CSVURL = fmt.Sprintf("http://%v%v/csv", c.Request.Host, c.Request.URL.Path)
 	}
 
-	fmt.Println("DEBUG ", c.Request.Form)
-
 	c.Respond(results, http.StatusOK)
 
 	return nil
@@ -340,7 +338,7 @@ func convertToString(m bson.M) string {
 // get the keys of a map.
 func keys(m map[string]bool) []string {
 
-	k := make([]string, len(m))
+	k := make([]string, 0)
 	for i := range m {
 		k = append(k, i)
 	}
@@ -391,7 +389,7 @@ func getReplies(submissions []submission.Submission) [][]string {
 	result = append(result, questions)
 
 	for _, s := range submissions {
-		row := make([]string, len(questions))
+		row := make([]string, 0)
 		for _, q := range questions {
 			row = append(row, findAnswer(s, q))
 		}
