@@ -225,6 +225,8 @@ func (formSubmissionHandle) SearchCSV(c *app.Context) error {
 	c.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"ask_%s_%s.csv\"", formID, time.Now().String()))
 
 	c.WriteHeader(http.StatusOK)
+	c.Status = http.StatusOK
+
 	c.Write(csvData)
 
 	return nil
