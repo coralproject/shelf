@@ -63,17 +63,15 @@ func runUpsert(cmd *cobra.Command, args []string) {
 	}
 
 	if !stat.IsDir() {
-		items, err := disk.LoadItems("", file)
+		item, err := disk.LoadItem("", file)
 		if err != nil {
 			cmd.Println("Upserting Items : ", err)
 			return
 		}
 
-		for _, item := range items {
-			if err := runUpsertWeb(cmd, item); err != nil {
-				cmd.Println("Upserting Items : ", err)
-				return
-			}
+		if err := runUpsertWeb(cmd, item); err != nil {
+			cmd.Println("Upserting Items : ", err)
+			return
 		}
 
 		cmd.Println("\n", "Upserting Items : Upserted")
@@ -81,15 +79,13 @@ func runUpsert(cmd *cobra.Command, args []string) {
 	}
 
 	f := func(path string) error {
-		items, err := disk.LoadItems("", path)
+		item, err := disk.LoadItem("", path)
 		if err != nil {
 			return err
 		}
 
-		for _, item := range items {
-			if err := runUpsertWeb(cmd, item); err != nil {
-				return err
-			}
+		if err := runUpsertWeb(cmd, item); err != nil {
+			return err
 		}
 
 		return nil

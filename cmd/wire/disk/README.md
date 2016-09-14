@@ -23,7 +23,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1539:1596#L48)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1579:1636#L50)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -32,7 +32,7 @@ json file found.
 
 
 
-## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=951:1030#L26)
+## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=971:1050#L27)
 ``` go
 func LoadItem(context interface{}, path string) (map[string]interface{}, error)
 ```
