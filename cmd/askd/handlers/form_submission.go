@@ -12,6 +12,8 @@ import (
 	"strconv"
 	"time"
 
+	"gopkg.in/mgo.v2/bson"
+
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
@@ -187,20 +189,13 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 }
 
 // SearchCSV retrieves a set of FormSubmission's based on the search params
-// provided in the query string.
+// provided in the query string. It also generates a CSV with the replies.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) SearchCSV(c *app.Context) error {
 	formID := c.Params["form_id"]
 
-	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
-	if err != nil {
-		limit = 0
-	}
-
-	skip, err := strconv.Atoi(c.Request.URL.Query().Get("skip"))
-	if err != nil {
-		skip = 0
-	}
+	limit := 0
+	skip := 0
 
 	opts := submission.SearchOpts{
 		Query:    c.Request.URL.Query().Get("search"),
@@ -216,8 +211,11 @@ func (formSubmissionHandle) SearchCSV(c *app.Context) error {
 		return err
 	}
 
+	// Convert into [][]string to encode the CSV.
+	records := getReplies(results.Submissions)
+
 	// Marshal the data into a CSV string.
-	csvData, err := encodeCSV(results.Submissions)
+	csvData, err := encodeCSV(records)
 	if err != nil {
 		return err
 	}
@@ -311,24 +309,53 @@ func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
 	return nil
 }
 
-// encodeCSV gets all the submissions and encode them into a CSV
-func encodeCSV(s []submission.Submission) ([]byte, error) {
+// encodeCSV gets all the submissions and encode them into a CSV.
+func encodeCSV(records [][]string) ([]byte, error) {
 
 	var buf bytes.Buffer
 	w := csv.NewWriter(&buf)
-	if err := w.Write(s[0].GetQuestions()); err != nil {
-		return nil, err
-	}
-	for _, row := range s {
-		if err := w.Write(row.GetAnswers()); err != nil {
-			return nil, err
-		}
-	}
 
-	w.Flush()
+	w.WriteAll(records)
 
 	if err := w.Error(); err != nil {
 		return nil, err
 	}
 	return buf.Bytes(), nil
+}
+
+// getReplies retrieves the questions and answers on a specific submission.
+func getReplies(submissions []submission.Submission) [][]string {
+
+	var result [][]string
+
+	convertToString := func(m bson.M) string {
+		var s string
+		for k, v := range m {
+			s = s + fmt.Sprintf("%v: %v ", k, v)
+		}
+		return s
+	}
+
+	header := make([]string, 0)
+	addHeader := true
+
+	for _, s := range submissions {
+		row := make([]string, 0)
+		for _, r := range s.Answers {
+			header = append(header, r.Question.(string))
+			switch t := r.Answer.(type) {
+			case bson.M:
+				row = append(row, convertToString(t))
+			default:
+				row = append(row, fmt.Sprintf("%v", t))
+			}
+		}
+		if addHeader {
+			result = append(result, header)
+			addHeader = false
+		}
+		result = append(result, row)
+	}
+
+	return result
 }
