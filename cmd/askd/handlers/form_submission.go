@@ -9,6 +9,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"sort"
 	"strconv"
 	"time"
 
@@ -180,8 +181,10 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 	}
 
 	if csv := c.Request.URL.Query().Get("csv"); csv != "" {
-		results.CSVURL = fmt.Sprintf("%v%v/csv", c.Request.Host, c.Request.URL.Path)
+		results.CSVURL = fmt.Sprintf("http://%v%v/csv", c.Request.Host, c.Request.URL.Path)
 	}
+
+	fmt.Println("DEBUG ", c.Request.Form)
 
 	c.Respond(results, http.StatusOK)
 
@@ -325,37 +328,74 @@ func encodeCSV(records [][]string) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// convert a bson.M into string.
+func convertToString(m bson.M) string {
+	var s string
+	for k, v := range m {
+		s = s + fmt.Sprintf("%v: %v ", k, v)
+	}
+	return s
+}
+
+// get the keys of a map.
+func keys(m map[string]bool) []string {
+
+	k := make([]string, len(m))
+	for i := range m {
+		k = append(k, i)
+	}
+
+	sort.Strings(k)
+
+	return k
+}
+
+// get all the questions for the submissions to the form.
+func getAllQuestions(submissions []submission.Submission) []string {
+
+	q := make(map[string]bool, 0)
+
+	for _, s := range submissions {
+		for _, r := range s.Answers {
+			question := r.Question.(string)
+			if question != "" && !q[question] {
+				q[question] = true
+			}
+		}
+	}
+	return keys(q)
+}
+
+// find the Answer for the specific question in the submission. It returns an empty string if it does not find it.
+func findAnswer(s submission.Submission, q string) string {
+	for _, r := range s.Answers {
+		if r.Question.(string) == q {
+			switch t := r.Answer.(type) {
+			case bson.M:
+				return convertToString(t)
+			default:
+				return fmt.Sprintf("%v", t)
+			}
+		}
+	}
+	return ""
+}
+
 // getReplies retrieves the questions and answers on a specific submission.
 func getReplies(submissions []submission.Submission) [][]string {
 
+	questions := getAllQuestions(submissions)
+
 	var result [][]string
 
-	convertToString := func(m bson.M) string {
-		var s string
-		for k, v := range m {
-			s = s + fmt.Sprintf("%v: %v ", k, v)
-		}
-		return s
-	}
-
-	header := make([]string, 0)
-	addHeader := true
+	result = append(result, questions)
 
 	for _, s := range submissions {
-		row := make([]string, 0)
-		for _, r := range s.Answers {
-			header = append(header, r.Question.(string))
-			switch t := r.Answer.(type) {
-			case bson.M:
-				row = append(row, convertToString(t))
-			default:
-				row = append(row, fmt.Sprintf("%v", t))
-			}
+		row := make([]string, len(questions))
+		for _, q := range questions {
+			row = append(row, findAnswer(s, q))
 		}
-		if addHeader {
-			result = append(result, header)
-			addHeader = false
-		}
+
 		result = append(result, row)
 	}
 
