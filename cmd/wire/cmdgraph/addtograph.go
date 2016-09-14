@@ -9,12 +9,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var addLong = `Use execute to add relationships to a graph.
+var addLong = `Use execute to add relationships, inferred from an item, to a graph.
 
 Example:
-	graph add -p relationships.json
+	graph add -p item.json
 
-	graph add -p ./relationships
+	graph add -p ./items
 `
 
 // add contains the state for this command.
@@ -26,12 +26,12 @@ var add struct {
 func addAddToGraph() {
 	cmd := &cobra.Command{
 		Use:   "add",
-		Short: "add adds relationship quads to a graph.",
+		Short: "add adds relationships to a graph.",
 		Long:  addLong,
 		Run:   runAddToGraph,
 	}
 
-	cmd.Flags().StringVarP(&add.path, "path", "p", "", "Path to the JSON containing relationships")
+	cmd.Flags().StringVarP(&add.path, "path", "p", "", "Path to the JSON containing an item")
 
 	graphCmd.AddCommand(cmd)
 }
@@ -65,13 +65,13 @@ func runAddToGraph(cmd *cobra.Command, args []string) {
 
 	// If a file is provided (i.e., not a directory), add the relationships.
 	if !stat.IsDir() {
-		scr, err := disk.LoadQuadParams("", file)
+		scr, err := disk.LoadItem("", file)
 		if err != nil {
 			cmd.Println("Adding relationships : ", err)
 			return
 		}
 
-		if err := wire.AddToGraph("", graphDB, scr); err != nil {
+		if err := wire.AddToGraph("", mgoDB, graphDB, scr); err != nil {
 			cmd.Println("Adding relationships : ", err)
 			return
 		}
@@ -82,12 +82,12 @@ func runAddToGraph(cmd *cobra.Command, args []string) {
 
 	// If a directory is provided, add relationships for all the included files.
 	f := func(path string) error {
-		scr, err := disk.LoadQuadParams("", path)
+		scr, err := disk.LoadItem("", path)
 		if err != nil {
 			return err
 		}
 
-		return wire.AddToGraph("", graphDB, scr)
+		return wire.AddToGraph("", mgoDB, graphDB, scr)
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {

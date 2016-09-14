@@ -12,7 +12,8 @@
 
 ## <a name="pkg-index">Index</a>
 * [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
-* [func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)](#LoadQuadParams)
+* [func LoadItem(context interface{}, path string) (map[string]interface{}, error)](#LoadItem)
+* [func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error)](#LoadQuadParams)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -22,7 +23,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=926:983#L26)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1539:1596#L48)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -31,9 +32,18 @@ json file found.
 
 
 
-## <a name="LoadQuadParams">func</a> [LoadQuadParams](/src/target/disk.go?s=303:383#L5)
+## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=951:1030#L26)
 ``` go
-func LoadQuadParams(context interface{}, path string) ([]wire.QuadParams, error)
+func LoadItem(context interface{}, path string) (map[string]interface{}, error)
+```
+LoadItem serializes the content of an item from a file using the
+given file path. Returns the serialized item values.
+
+
+
+## <a name="LoadQuadParams">func</a> [LoadQuadParams](/src/target/disk.go?s=303:382#L5)
+``` go
+func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error)
 ```
 LoadQuadParams serializes the content of a set of QuadParams from a file using the
 given file path. Returns the serialized QuadParams value.

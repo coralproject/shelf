@@ -17,20 +17,35 @@ func init() {
 }
 
 // Get loads pattern data based on patterns.json.
-func Get() ([]pattern.Pattern, error) {
-	file, err := os.Open(path + "patterns.json")
+func Get() ([]pattern.Pattern, []map[string]interface{}, error) {
+
+	// Get the patterns.
+	patternFile, err := os.Open(path + "patterns.json")
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	defer file.Close()
+	defer patternFile.Close()
 
 	var patterns []pattern.Pattern
-	err = json.NewDecoder(file).Decode(&patterns)
+	err = json.NewDecoder(patternFile).Decode(&patterns)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return patterns, nil
+	// Get the example items.
+	itemFile, err := os.Open(path + "items.json")
+	if err != nil {
+		return nil, nil, err
+	}
+	defer itemFile.Close()
+
+	var items []map[string]interface{}
+	err = json.NewDecoder(itemFile).Decode(&items)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	return patterns, items, nil
 }
 
 // Add inserts patterns for testing.

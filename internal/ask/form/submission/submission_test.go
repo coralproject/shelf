@@ -76,66 +76,6 @@ func teardown(t *testing.T, db *db.DB) {
 	tests.DisplayLog()
 }
 
-func Test_GetQuestions(t *testing.T) {
-	subs, db := setup(t, "submission")
-	defer teardown(t, db)
-
-	t.Log("Given the need to get the questions associated with a submission.")
-	{
-		t.Log("\tWhen starting from a specific submission")
-		{
-			//----------------------------------------------------------------------
-			// Get the submission's questions.
-
-			q := subs[0].GetQuestions()
-
-			//----------------------------------------------------------------------
-			// Check that we got the questions we expected.
-
-			expectedLen := 1
-
-			if len(q) != expectedLen {
-				t.Fatalf("\t%s\tShould be able to get all the questions for the submission. ", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get all the questions for the submission.", tests.Success)
-
-			if q[0] != "My question" {
-				t.Fatalf("\t%s\tShould be able to get the right question for the submission. ", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get the right question for the submission.", tests.Success)
-
-		}
-	}
-
-}
-
-func Test_GetAnswers(t *testing.T) {
-	subs, db := setup(t, "submission")
-	defer teardown(t, db)
-
-	t.Log("Given the need to get the questions associated with a submission.")
-	{
-		t.Log("\tWhen starting from a specific submission")
-		{
-			//----------------------------------------------------------------------
-			// Get the submission's questions.
-
-			a := subs[0].GetAnswers()
-
-			//----------------------------------------------------------------------
-			// Check that we got the questions we expected.
-
-			expectedLen := 1
-
-			if len(a) != expectedLen {
-				t.Fatalf("\t%s\tShould be able to get all the questions for the submission. ", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get all the questions for the submission.", tests.Success)
-
-		}
-	}
-}
-
 func Test_CreateDelete(t *testing.T) {
 	subs, db := setup(t, "submission")
 	defer teardown(t, db)

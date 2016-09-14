@@ -1,7 +1,7 @@
 [
 	{
 		"type": "PTEST_comment",
-		"relationships": [
+		"inferences": [
 			{
 				"related_ID_field": "author",
 				"predicate": "authored",
@@ -24,7 +24,7 @@
 	},
 	{
 		"type": "PTEST_user",
-		"relationships": [
+		"inferences": [
 			{
 				"related_ID_field": "role",
 				"predicate": "has_role",
@@ -35,7 +35,7 @@
 	},
 	{
 		"type": "PTEST_asset",
-		"relationships": [
+		"inferences": [
 			{
 				"related_ID_field": "section",
 				"predicate": "part_of",

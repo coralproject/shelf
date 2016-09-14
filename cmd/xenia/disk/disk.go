@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/wire/pattern"
 	"github.com/coralproject/shelf/internal/wire/relationship"
 	"github.com/coralproject/shelf/internal/wire/view"
 	"github.com/coralproject/shelf/internal/xenia/mask"
@@ -25,6 +26,7 @@ func LoadSet(context interface{}, path string) (*query.Set, error) {
 		log.Error(context, "LoadSet", err, "Completed")
 		return nil, err
 	}
+	defer file.Close()
 
 	var set query.Set
 	if err = json.NewDecoder(file).Decode(&set); err != nil {
@@ -46,6 +48,7 @@ func LoadScript(context interface{}, path string) (script.Script, error) {
 		log.Error(context, "LoadScript", err, "Completed")
 		return script.Script{}, err
 	}
+	defer file.Close()
 
 	var scr script.Script
 	if err = json.NewDecoder(file).Decode(&scr); err != nil {
@@ -67,6 +70,7 @@ func LoadRegex(context interface{}, path string) (regex.Regex, error) {
 		log.Error(context, "LoadRegex", err, "Completed")
 		return regex.Regex{}, err
 	}
+	defer file.Close()
 
 	var rgx regex.Regex
 	if err = json.NewDecoder(file).Decode(&rgx); err != nil {
@@ -88,6 +92,7 @@ func LoadMask(context interface{}, path string) (mask.Mask, error) {
 		log.Error(context, "LoadMask", err, "Completed")
 		return mask.Mask{}, err
 	}
+	defer file.Close()
 
 	var msk mask.Mask
 	if err = json.NewDecoder(file).Decode(&msk); err != nil {
@@ -109,6 +114,7 @@ func LoadRelationship(context interface{}, path string) (relationship.Relationsh
 		log.Error(context, "LoadRelationship", err, "Completed")
 		return relationship.Relationship{}, err
 	}
+	defer file.Close()
 
 	var rel relationship.Relationship
 	if err = json.NewDecoder(file).Decode(&rel); err != nil {
@@ -118,6 +124,28 @@ func LoadRelationship(context interface{}, path string) (relationship.Relationsh
 
 	log.Dev(context, "LoadRelationship", "Completed")
 	return rel, nil
+}
+
+// LoadPattern serializes the content of a Pattern from a file using the
+// given file path. Returns the serialized Pattern value.
+func LoadPattern(context interface{}, path string) (pattern.Pattern, error) {
+	log.Dev(context, "LoadPattern", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadPattern", err, "Completed")
+		return pattern.Pattern{}, err
+	}
+	defer file.Close()
+
+	var p pattern.Pattern
+	if err = json.NewDecoder(file).Decode(&p); err != nil {
+		log.Error(context, "LoadPattern", err, "Completed")
+		return pattern.Pattern{}, err
+	}
+
+	log.Dev(context, "LoadPattern", "Completed")
+	return p, nil
 }
 
 // LoadView serializes the content of a View from a file using the
@@ -130,6 +158,7 @@ func LoadView(context interface{}, path string) (view.View, error) {
 		log.Error(context, "LoadView", err, "Completed")
 		return view.View{}, err
 	}
+	defer file.Close()
 
 	var v view.View
 	if err = json.NewDecoder(file).Decode(&v); err != nil {

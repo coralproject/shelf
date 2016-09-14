@@ -123,7 +123,10 @@ func (formSubmissionHandle) UpdateStatus(c *app.Context) error {
 // endpoint.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
-	var editedAnswer interface{}
+	var editedAnswer struct {
+		Edited string
+	}
+
 	if err := json.NewDecoder(c.Request.Body).Decode(&editedAnswer); err != nil {
 		return err
 	}
@@ -133,7 +136,7 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 
 	s, err := submission.UpdateAnswer(c.SessionID, c.Ctx["DB"].(*db.DB), id, submission.AnswerInput{
 		WidgetID: answerID,
-		Answer:   editedAnswer,
+		Answer:   editedAnswer.Edited,
 	})
 	if err != nil {
 		return err

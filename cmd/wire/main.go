@@ -96,7 +96,7 @@ func main() {
 	// Add the graph and view commands to the CLI tool.
 	wire.AddCommand(
 		cmdview.GetCommands(mgoDB, graphDB),
-		cmdgraph.GetCommands(graphDB),
+		cmdgraph.GetCommands(mgoDB, graphDB),
 	)
 
 	// Execute the command.

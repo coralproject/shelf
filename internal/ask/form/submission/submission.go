@@ -2,7 +2,6 @@ package submission
 
 import (
 	"errors"
-	"fmt"
 	"strings"
 	"time"
 
@@ -73,8 +72,8 @@ type SearchResultCounts struct {
 // expected from searching for submissions based on a form id.
 type SearchResults struct {
 	Counts      SearchResultCounts `json:"counts"`
-	Submissions []Submission
-	CSVURL      string
+	Submissions []Submission       `json:"submissions"`
+	CSVURL      string             `json:"csv_url"`
 }
 
 // SearchOpts is the options used to perform a search accross a
@@ -138,41 +137,6 @@ func (s *Submission) Validate() error {
 	}
 
 	return nil
-}
-
-// GetQuestions retrieves the questions
-func (s *Submission) GetQuestions() []string {
-	var h []string
-
-	for _, r := range s.Answers {
-		h = append(h, r.Question.(string))
-	}
-
-	return h
-}
-
-// GetAnswers get the answers on the submission and returns a slice of them
-func (s *Submission) GetAnswers() []string {
-	var v []string
-	convertToString := func(m bson.M) string {
-		var s string
-		for k, v := range m {
-			s = s + fmt.Sprintf("%v: %v ", k, v)
-		}
-		return s
-	}
-
-	// Go through the answers and convert them into a slice of strings
-	for _, r := range s.Answers {
-		switch t := r.Answer.(type) {
-		case bson.M:
-			v = append(v, convertToString(t))
-		default:
-			v = append(v, fmt.Sprintf("%v", t))
-		}
-	}
-
-	return v
 }
 
 // Create adds a new Submission based on a given Form into
@@ -475,9 +439,9 @@ func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts
 		// Instead of pulling all the form submissions ourself, we can just use
 		// the MongoDB Query Aggregation.
 		pipeline := []bson.M{
-			bson.M{"$match": q},
-			bson.M{"$unwind": "$flags"},
-			bson.M{"$group": bson.M{
+			{"$match": q},
+			{"$unwind": "$flags"},
+			{"$group": bson.M{
 				"_id": "$flags",
 				"count": bson.M{
 					"$sum": 1,

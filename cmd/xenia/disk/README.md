@@ -13,6 +13,7 @@
 ## <a name="pkg-index">Index</a>
 * [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
 * [func LoadMask(context interface{}, path string) (mask.Mask, error)](#LoadMask)
+* [func LoadPattern(context interface{}, path string) (pattern.Pattern, error)](#LoadPattern)
 * [func LoadRegex(context interface{}, path string) (regex.Regex, error)](#LoadRegex)
 * [func LoadRelationship(context interface{}, path string) (relationship.Relationship, error)](#LoadRelationship)
 * [func LoadScript(context interface{}, path string) (script.Script, error)](#LoadScript)
@@ -27,7 +28,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=4264:4321#L136)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=4958:5015#L158)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -36,7 +37,7 @@ json file found.
 
 
 
-## <a name="LoadMask">func</a> [LoadMask](/src/target/disk.go?s=2376:2442#L73)
+## <a name="LoadMask">func</a> [LoadMask](/src/target/disk.go?s=2431:2497#L74)
 ``` go
 func LoadMask(context interface{}, path string) (mask.Mask, error)
 ```
@@ -45,7 +46,16 @@ given file path. Returns the serialized Mask value.
 
 
 
-## <a name="LoadRegex">func</a> [LoadRegex](/src/target/disk.go?s=1766:1835#L52)
+## <a name="LoadPattern">func</a> [LoadPattern](/src/target/disk.go?s=3762:3837#L116)
+``` go
+func LoadPattern(context interface{}, path string) (pattern.Pattern, error)
+```
+LoadPattern serializes the content of a Pattern from a file using the
+given file path. Returns the serialized Pattern value.
+
+
+
+## <a name="LoadRegex">func</a> [LoadRegex](/src/target/disk.go?s=1821:1890#L53)
 ``` go
 func LoadRegex(context interface{}, path string) (regex.Regex, error)
 ```
@@ -54,7 +64,7 @@ given file path. Returns the serialized regex value.
 
 
 
-## <a name="LoadRelationship">func</a> [LoadRelationship](/src/target/disk.go?s=2997:3087#L94)
+## <a name="LoadRelationship">func</a> [LoadRelationship](/src/target/disk.go?s=3052:3142#L95)
 ``` go
 func LoadRelationship(context interface{}, path string) (relationship.Relationship, error)
 ```
@@ -63,7 +73,7 @@ given file path. Returns the serialized Relationship value.
 
 
 
-## <a name="LoadScript">func</a> [LoadScript](/src/target/disk.go?s=1140:1212#L31)
+## <a name="LoadScript">func</a> [LoadScript](/src/target/disk.go?s=1195:1267#L32)
 ``` go
 func LoadScript(context interface{}, path string) (script.Script, error)
 ```
@@ -72,7 +82,7 @@ given file path. Returns the serialized Script value.
 
 
 
-## <a name="LoadSet">func</a> [LoadSet](/src/target/disk.go?s=556:622#L10)
+## <a name="LoadSet">func</a> [LoadSet](/src/target/disk.go?s=611:677#L11)
 ``` go
 func LoadSet(context interface{}, path string) (*query.Set, error)
 ```
@@ -81,7 +91,7 @@ given file path. Returns the serialized Set value.
 
 
 
-## <a name="LoadView">func</a> [LoadView](/src/target/disk.go?s=3698:3764#L115)
+## <a name="LoadView">func</a> [LoadView](/src/target/disk.go?s=4392:4458#L137)
 ``` go
 func LoadView(context interface{}, path string) (view.View, error)
 ```
