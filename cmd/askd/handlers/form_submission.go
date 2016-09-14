@@ -38,7 +38,7 @@ var FormSubmission formSubmissionHandle
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) Create(c *app.Context) error {
 	var payload struct {
-		Recaptcha string
+		Recaptcha string                   `json:"recaptcha"`
 		Answers   []submission.AnswerInput `json:"replies"`
 	}
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
@@ -73,10 +73,18 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 				"response": []string{payload.Recaptcha},
 			}
 
-			ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
-			if err == nil {
+			// FIXME: ensure that we can trust the proxy?
+
+			// If there is a header on the incoming request of X-Real-IP then we know
+			// that there is a proxy in place providing the real ip. Otherwise, just
+			// grab the up address from the request payload.
+			if ip := c.Request.Header.Get("X-Real-IP"); ip != "" {
+				body["remoteip"] = []string{ip}
+			} else if ip, _, err := net.SplitHostPort(c.Request.RemoteAddr); err == nil {
 				body["remoteip"] = []string{ip}
 			}
+
+			log.Dev(c.SessionID, "FormSubmission : Create", "Checking Recaptcha : %s", body.Encode())
 
 			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
 			if err != nil {
@@ -86,12 +94,16 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 			defer resp.Body.Close()
 
 			var rr struct {
-				Success bool `json:"success"`
+				Success    bool          `json:"success"`
+				Hostname   string        `json:"hostname"`
+				ErrorCodes []interface{} `json:"error-codes"`
 			}
 			if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
 				log.Error(c.SessionID, "FormSubmission : Create", err, "Error decoding the google service response")
 				return err
 			}
+
+			log.Dev(c.SessionID, "FormSubmission : Create", "Recaptcha Response : %#v", rr)
 
 			if !rr.Success {
 				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Recaptcha is invalid as per the google service")
