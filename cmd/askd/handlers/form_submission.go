@@ -380,13 +380,14 @@ func findAnswer(s submission.Submission, q string) string {
 }
 
 // getReplies retrieves the questions and answers on a specific submission.
+// we are returning a [][]string to use the resolut in returing the data in CSV.
 func getReplies(submissions []submission.Submission) [][]string {
 
 	questions := getAllQuestions(submissions)
 
-	var result [][]string
+	var rows [][]string
 
-	result = append(result, questions)
+	rows = append(rows, questions)
 
 	for _, s := range submissions {
 		row := make([]string, 0)
@@ -394,8 +395,8 @@ func getReplies(submissions []submission.Submission) [][]string {
 			row = append(row, findAnswer(s, q))
 		}
 
-		result = append(result, row)
+		rows = append(rows, row)
 	}
 
-	return result
+	return rows
 }
