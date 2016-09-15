@@ -33,7 +33,7 @@ func Cayley(h app.Handler) app.Handler {
 		}
 
 		log.Dev(c.SessionID, "Cayley", "******> Capture Cayley Session")
-		c.Ctx["Cayley"] = store
+		c.Ctx["Graph"] = store
 		defer func() {
 			log.Dev(c.SessionID, "Cayley", "******> Release Cayley Session")
 			store.Close()
