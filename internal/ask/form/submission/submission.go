@@ -107,7 +107,7 @@ type Answer struct {
 	Identity     bool        `json:"identity" bson:"identity"`
 	Answer       interface{} `json:"answer" bson:"answer"`
 	EditedAnswer interface{} `json:"edited" bson:"edited"`
-	Question     interface{} `json:"question" bson:"question"`
+	Question     string      `json:"question" bson:"question"`
 	Props        interface{} `json:"props" bson:"props"`
 }
 
