@@ -2,6 +2,7 @@
 package main
 
 import (
+	"os"
 	"runtime"
 	"time"
 
@@ -45,5 +46,10 @@ func main() {
 	// to the end of the response write.
 	writeTimeout := 30 * time.Second
 
-	app.Run(":4000", routes.API(), readTimeout, writeTimeout)
+	if err := app.Run(":4000", routes.API(), readTimeout, writeTimeout); err != nil {
+		log.Error("shutdown", "Init", err, "App Shutdown")
+		os.Exit(1)
+	}
+
+	log.User("shutdown", "Init", "App Shutdown")
 }

@@ -33,3 +33,6 @@ cmd/askd/askd
 
 # Local development Config files
 config/gaba.cfg
+
+# Generated Go files
+cmd/corald/handlers/fixtures/*.go
