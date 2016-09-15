@@ -3,12 +3,13 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/wire"
 )
@@ -55,14 +56,19 @@ func (itemHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	// Prepare generic item data.
-	itMap, ok := item.(map[string]interface{})
-	if !ok {
-		return fmt.Errorf("Could not convert item data to a map.")
+	// Prepare the generic item data map.
+	itMap := make(map[string]interface{})
+	val := reflect.ValueOf(it)
+	typ := val.Type()
+	for i := 0; i < val.NumField(); i++ {
+		fi := typ.Field(i)
+		if tagv := fi.Tag.Get("json"); tagv != "" {
+			itMap[tagv] = val.Field(i).Interface()
+		}
 	}
 
 	// Infer relationships and add them to the graph.
-	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"], c.Ctx["Graph"], itMap); err != nil {
+	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
 		return err
 	}
 
