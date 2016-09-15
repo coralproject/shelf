@@ -10,8 +10,11 @@ import (
 	_ "github.com/cayleygraph/cayley/graph/mongo"
 )
 
-// cfgMongoDB config environmental variables.
-const cfgMongoHost = "MONGO_HOST"
+const (
+	cfgMongoHost     = "MONGO_HOST"
+	cfgMongoUser     = "MONGO_USER"
+	cfgMongoPassword = "MONGO_PASS"
+)
 
 // Cayley handles session management.
 func Cayley(h app.Handler) app.Handler {
@@ -27,7 +30,12 @@ func Cayley(h app.Handler) app.Handler {
 
 	// Wrap the handlers inside a session copy/close.
 	return func(c *app.Context) error {
-		store, err := cayley.NewGraph("mongo", mongoHost, nil)
+		opts := map[string]interface{}{
+			"database_name": cfg.MustString(cfgMongoDB),
+			"username":      cfg.MustString(cfgMongoUser),
+			"password":      cfg.MustString(cfgMongoPassword),
+		}
+		store, err := cayley.NewGraph("mongo", mongoHost, opts)
 		if err != nil {
 			return app.ErrDBNotConfigured
 		}
