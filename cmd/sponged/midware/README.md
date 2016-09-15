@@ -12,11 +12,12 @@
 
 ## <a name="pkg-index">Index</a>
 * [func Auth(h app.Handler) app.Handler](#Auth)
+* [func Cayley(h app.Handler) app.Handler](#Cayley)
 * [func Mongo(h app.Handler) app.Handler](#Mongo)
 
 
 #### <a name="pkg-files">Package files</a>
-[auth.go](/src/github.com/coralproject/shelf/cmd/sponged/midware/auth.go) [mongo.go](/src/github.com/coralproject/shelf/cmd/sponged/midware/mongo.go) 
+[auth.go](/src/github.com/coralproject/shelf/cmd/sponged/midware/auth.go) [cayley.go](/src/github.com/coralproject/shelf/cmd/sponged/midware/cayley.go) [mongo.go](/src/github.com/coralproject/shelf/cmd/sponged/midware/mongo.go) 
 
 
 
@@ -27,6 +28,14 @@
 func Auth(h app.Handler) app.Handler
 ```
 Auth handles token authentication.
+
+
+
+## <a name="Cayley">func</a> [Cayley](/src/target/cayley.go?s=430:468#L10)
+``` go
+func Cayley(h app.Handler) app.Handler
+```
+Cayley handles session management.
 
 
 
