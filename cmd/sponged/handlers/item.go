@@ -3,12 +3,14 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/wire"
 )
 
 // itemHandle maintains the set of handlers for theitem api.
@@ -41,12 +43,26 @@ func (itemHandle) Retrieve(c *app.Context) error {
 // Upsert inserts or updates the posted Item document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (itemHandle) Upsert(c *app.Context) error {
+
+	// Decode the item.
 	var it item.Item
 	if err := json.NewDecoder(c.Request.Body).Decode(&it); err != nil {
 		return err
 	}
 
+	// Add the item to the items collection.
 	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &it); err != nil {
+		return err
+	}
+
+	// Prepare generic item data.
+	itMap, ok := item.(map[string]interface{})
+	if !ok {
+		return fmt.Errorf("Could not convert item data to a map.")
+	}
+
+	// Infer relationships and add them to the graph.
+	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"], c.Ctx["Graph"], itMap); err != nil {
 		return err
 	}
 
