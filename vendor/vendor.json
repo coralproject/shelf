@@ -50,10 +50,11 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "PP6ptcsN19VCkGXRBA8KmUMafQU=",
+			"checksumSHA1": "m8QiHXKTQrHjCBfAQMqbPWKcMXk=",
+			"origin": "github.com/coralproject/shelf/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "616cf009cc457ee07d9e48380853a0c0500c3719",
+			"revisionTime": "2016-09-16T14:58:49Z"
 		},
 		{
 			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",

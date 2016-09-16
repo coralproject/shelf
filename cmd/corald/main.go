@@ -1,4 +1,4 @@
-// Askd is a web service for handling form related calls.
+// Xenia is a web service for handling query related calls.
 package main
 
 import (
@@ -6,7 +6,6 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
@@ -23,10 +22,6 @@ var (
 )
 
 func main() {
-	// Initialize the configuration and logging systems. Plus anything
-	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
-
 	log.User("startup", "Init", "Revision     : %q", GitRevision)
 	log.User("startup", "Init", "Version      : %q", GitVersion)
 	log.User("startup", "Init", "Build Date   : %q", BuildDate)
@@ -43,15 +38,13 @@ func main() {
 
 	// These are the absolute read and write timeouts.
 
-	const (
-		// ReadTimeout covers the time from when the connection is accepted to when the
-		// request body is fully read.
-		readTimeout = 10 * time.Second
+	// ReadTimeout covers the time from when the connection is accepted to when the
+	// request body is fully read.
+	readTimeout := 10 * time.Second
 
-		// WriteTimeout normally covers the time from the end of the request header read
-		// to the end of the response write.
-		writeTimeout = 30 * time.Second
-	)
+	// WriteTimeout normally covers the time from the end of the request header read
+	// to the end of the response write.
+	writeTimeout := 30 * time.Second
 
 	if err := app.Run(":4001", routes.API(), readTimeout, writeTimeout); err != nil {
 		log.Error("shutdown", "Init", err, "App Shutdown")

@@ -3,44 +3,43 @@ package routes
 import (
 	"net/http"
 
+	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/coralproject/shelf/cmd/corald/fixtures"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
 )
 
+func init() {
+	// Initialize the configuration and logging systems. Plus anything
+	// else the web app layer needs.
+	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
+}
+
 // API returns a handler for a set of routes.
-func API() http.Handler {
-	// Create a new App.
+func API(testing ...bool) http.Handler {
+
+	// TODO: If authentication is on then configure
+	// it and provide proper middleware.
+
 	a := app.New()
 
 	log.Dev("startup", "Init", "Initalizing routes")
-
-	// Add the routes to the API.
-	setupRoutes(a)
+	routes(a)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
-
-	// Enable CORS on the endpoints.
 	a.CORS()
 
 	return a
 }
 
-// setupRoutes adds all the routes that the corald command will serve.
-func setupRoutes(a *app.App) {
+// routes manages the handling of the API endpoints.
+func routes(a *app.App) {
+	a.Handle("GET", "/1.0/version", handlers.Version.List)
 
-	//----------------------------------------------------------------------
-	// Implemented handlers.
-	//
-
-	a.Handle("GET", "/version", handlers.Version.List)
-
-	//----------------------------------------------------------------------
-	// Fixture handlers.
-	//
-
-	a.Handle("GET", "/1.0/form", handlers.Fixture("forms", http.StatusOK))
-	a.Handle("POST", "/1.0/form", handlers.Fixture("form", http.StatusCreated))
-	a.Handle("GET", "/1.0/form/:form_id", handlers.Fixture("form", http.StatusOK))
-	a.Handle("PUT", "/1.0/form/:form_id", handlers.NoContent)
+	// TODO: For now these are sample routes.
+	a.Handle("GET", "/1.0/form", handlers.Form.List)
+	a.Handle("POST", "/1.0/form", fixtures.Handler("form", http.StatusCreated))
+	a.Handle("GET", "/1.0/form/:form_id", fixtures.Handler("form", http.StatusOK))
+	a.Handle("PUT", "/1.0/form/:form_id", fixtures.NoContent)
 }
