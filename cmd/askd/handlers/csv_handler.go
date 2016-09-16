@@ -65,7 +65,6 @@ func buildHeader(questions map[string]string) []map[string]string {
 	header := []map[string]string{
 		{"title": "ID"},
 		{"title": "FormID"},
-		{"title": "Number"},
 		{"title": "Status"},
 		{"title": "Flags"},
 		{"title": "CreatedBy"},
