@@ -1,4 +1,4 @@
-// Askd is a web service for handling form related calls.
+// Xenia is a web service for handling query related calls.
 package main
 
 import (
@@ -8,8 +8,8 @@ import (
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/shelf/cmd/askd/handlers"
-	"github.com/coralproject/shelf/cmd/askd/routes"
+	"github.com/coralproject/shelf/cmd/corald/handlers"
+	"github.com/coralproject/shelf/cmd/corald/routes"
 )
 
 // These are set by the makefile with:

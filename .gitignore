@@ -30,6 +30,7 @@ _testmain.go
 cmd/xenia/xenia
 cmd/xeniad/xeniad
 cmd/askd/askd
+cmd/corald/corald
 
 # Local development Config files
-config/gaba.cfg
+config
