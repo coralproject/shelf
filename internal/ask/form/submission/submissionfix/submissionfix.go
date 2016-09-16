@@ -16,12 +16,13 @@ func init() {
 	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/ask/form/submission/submissionfix/"
 }
 
-// Get loads form data based on forms.json.
-func Get(fixture string) ([]submission.Submission, error) {
-	file, err := os.Open(path + fixture + ".json")
+// Get retrieves a submission document from the filesystem for testing.
+func GetMany(fileName string) ([]submission.Submission, error) {
+	file, err := os.Open(path + fileName)
 	if err != nil {
 		return nil, err
 	}
+
 	defer file.Close()
 
 	var subs []submission.Submission
@@ -33,7 +34,7 @@ func Get(fixture string) ([]submission.Submission, error) {
 	return subs, nil
 }
 
-// Add inserts forms for testing.
+// Add inserts submissions to the DB for testing.
 func Add(context interface{}, db *db.DB, subs []submission.Submission) error {
 	for _, sub := range subs {
 		if err := submission.Create(context, db, sub.FormID.Hex(), &sub); err != nil {

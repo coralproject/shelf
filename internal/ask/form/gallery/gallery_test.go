@@ -146,7 +146,7 @@ func Test_Answers(t *testing.T) {
 			//----------------------------------------------------------------------
 			// We need to get/fill in real form submissions.
 
-			subs, err := submissionfix.Get("gallery_submissions")
+			subs, err := submissionfix.GetMany("gallery_submissions.json")
 			if err != nil {
 				t.Fatalf("Should be able to fetch submission fixtures : %v", err)
 			}

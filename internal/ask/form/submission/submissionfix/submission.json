@@ -103,6 +103,15 @@
           ],
           "otherAllowed": true
         }
+      },
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332832",
+        "identity": true,
+        "answer": {
+          "text": "my answer"
+        },
+        "edited": null,
+        "question": "My second question"
       }
     ],
     "flags": [
