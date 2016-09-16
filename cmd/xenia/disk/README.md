@@ -28,7 +28,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=4958:5015#L158)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=5098:5155#L165)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -37,7 +37,7 @@ json file found.
 
 
 
-## <a name="LoadMask">func</a> [LoadMask](/src/target/disk.go?s=2431:2497#L74)
+## <a name="LoadMask">func</a> [LoadMask](/src/target/disk.go?s=2491:2557#L77)
 ``` go
 func LoadMask(context interface{}, path string) (mask.Mask, error)
 ```
@@ -46,7 +46,7 @@ given file path. Returns the serialized Mask value.
 
 
 
-## <a name="LoadPattern">func</a> [LoadPattern](/src/target/disk.go?s=3762:3837#L116)
+## <a name="LoadPattern">func</a> [LoadPattern](/src/target/disk.go?s=3862:3937#L121)
 ``` go
 func LoadPattern(context interface{}, path string) (pattern.Pattern, error)
 ```
@@ -55,7 +55,7 @@ given file path. Returns the serialized Pattern value.
 
 
 
-## <a name="LoadRegex">func</a> [LoadRegex](/src/target/disk.go?s=1821:1890#L53)
+## <a name="LoadRegex">func</a> [LoadRegex](/src/target/disk.go?s=1861:1930#L55)
 ``` go
 func LoadRegex(context interface{}, path string) (regex.Regex, error)
 ```
@@ -64,7 +64,7 @@ given file path. Returns the serialized regex value.
 
 
 
-## <a name="LoadRelationship">func</a> [LoadRelationship](/src/target/disk.go?s=3052:3142#L95)
+## <a name="LoadRelationship">func</a> [LoadRelationship](/src/target/disk.go?s=3132:3222#L99)
 ``` go
 func LoadRelationship(context interface{}, path string) (relationship.Relationship, error)
 ```
@@ -73,7 +73,7 @@ given file path. Returns the serialized Relationship value.
 
 
 
-## <a name="LoadScript">func</a> [LoadScript](/src/target/disk.go?s=1195:1267#L32)
+## <a name="LoadScript">func</a> [LoadScript](/src/target/disk.go?s=1215:1287#L33)
 ``` go
 func LoadScript(context interface{}, path string) (script.Script, error)
 ```
@@ -91,7 +91,7 @@ given file path. Returns the serialized Set value.
 
 
 
-## <a name="LoadView">func</a> [LoadView](/src/target/disk.go?s=4392:4458#L137)
+## <a name="LoadView">func</a> [LoadView](/src/target/disk.go?s=4512:4578#L143)
 ``` go
 func LoadView(context interface{}, path string) (view.View, error)
 ```

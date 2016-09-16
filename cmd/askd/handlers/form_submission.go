@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/internal/ask"
 	"github.com/coralproject/shelf/internal/ask/form"
@@ -32,7 +33,7 @@ var FormSubmission formSubmissionHandle
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) Create(c *app.Context) error {
 	var payload struct {
-		Recaptcha string
+		Recaptcha string                   `json:"recaptcha"`
 		Answers   []submission.AnswerInput `json:"replies"`
 	}
 	if err := json.NewDecoder(c.Request.Body).Decode(&payload); err != nil {
@@ -58,33 +59,49 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		// response contains the data we need and if it's valid.
 		if f.Settings["recaptcha"].(bool) {
 			if len(payload.Recaptcha) <= 0 {
+				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Payload empty")
 				return ErrInvalidCaptcha
 			}
 
 			body := url.Values{
-				"secret":   []string{c.Ctx["recaptcha"].(string)},
+				"secret":   []string{c.App.Ctx["recaptcha"].(string)},
 				"response": []string{payload.Recaptcha},
 			}
 
-			ip, _, err := net.SplitHostPort(c.Request.RemoteAddr)
-			if err == nil {
+			// FIXME: ensure that we can trust the proxy?
+
+			// If there is a header on the incoming request of X-Real-IP then we know
+			// that there is a proxy in place providing the real ip. Otherwise, just
+			// grab the up address from the request payload.
+			if ip := c.Request.Header.Get("X-Real-IP"); ip != "" {
+				body["remoteip"] = []string{ip}
+			} else if ip, _, err := net.SplitHostPort(c.Request.RemoteAddr); err == nil {
 				body["remoteip"] = []string{ip}
 			}
 
+			log.Dev(c.SessionID, "FormSubmission : Create", "Checking Recaptcha : %s", body.Encode())
+
 			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
 			if err != nil {
+				log.Error(c.SessionID, "FormSubmission : Create", err, "Error posting to the google service")
 				return err
 			}
 			defer resp.Body.Close()
 
 			var rr struct {
-				Success bool `json:"success"`
+				Success    bool          `json:"success"`
+				Hostname   string        `json:"hostname"`
+				ErrorCodes []interface{} `json:"error-codes"`
 			}
 			if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
+				log.Error(c.SessionID, "FormSubmission : Create", err, "Error decoding the google service response")
 				return err
 			}
 
+			log.Dev(c.SessionID, "FormSubmission : Create", "Recaptcha Response : %#v", rr)
+
 			if !rr.Success {
+				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Recaptcha is invalid as per the google service")
 				return ErrInvalidCaptcha
 			}
 		}

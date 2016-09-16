@@ -10,26 +10,26 @@ import (
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
-// LoadItems serializes the content of Items from a file using the
+// LoadItem serializes the content of Items from a file using the
 // given file path. Returns the serialized Item value.
-func LoadItems(context interface{}, path string) ([]item.Item, error) {
-	log.Dev(context, "LoadItems", "Started : File %s", path)
+func LoadItem(context interface{}, path string) (*item.Item, error) {
+	log.Dev(context, "LoadItem", "Started : File %s", path)
 
 	file, err := os.Open(path)
 	if err != nil {
-		log.Error(context, "LoadItems", err, "Completed")
+		log.Error(context, "LoadItem", err, "Completed")
 		return nil, err
 	}
 	defer file.Close()
 
-	var items []item.Item
-	if err = json.NewDecoder(file).Decode(&items); err != nil {
-		log.Error(context, "LoadItems", err, "Completed")
+	var it item.Item
+	if err = json.NewDecoder(file).Decode(&it); err != nil {
+		log.Error(context, "LoadItem", err, "Completed")
 		return nil, err
 	}
 
-	log.Dev(context, "LoadItems", "Completed")
-	return items, nil
+	log.Dev(context, "LoadItem", "Completed")
+	return &it, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid
