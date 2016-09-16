@@ -154,16 +154,40 @@ func buildRow(header []map[string]string, submission submission.Submission) ([]s
 }
 
 // convert a bson.M into string to display in the CSV.
+// This is quite complicated code to be able to deal
+// and convert any type of data that comes up in the fields. For example, multiple option/multiple choice.
 func convertToString(m bson.M) string {
-
 	var s string
 	for _, val := range m {
-		if s == "" {
-			if v, ok := val.(string); ok {
-				s = v
+		switch t := val.(type) {
+		case string:
+			if s == "" {
+				s = t
+			} else {
+				s = fmt.Sprintf("%s, %s ", s, val)
 			}
-		} else {
-			s = fmt.Sprintf("%s, %s ", s, val)
+		case bson.M:
+			s = fmt.Sprintf("%s, %s ", s, convertToString(t))
+		case []interface{}: //map[  options: [map[index:2 title:Clarinet]] ]
+			for _, option := range val.([]interface{}) {
+				switch o := option.(type) {
+				case bson.M:
+					if _, ok := o["title"]; !ok {
+						s = fmt.Sprintf("%s, %v", s, o)
+					} else {
+						if s == "" {
+							s = o["title"].(string)
+						} else {
+							s = fmt.Sprintf("%s, %s", s, o["title"])
+						}
+					}
+				default:
+					s = fmt.Sprintf("%v", option)
+				}
+
+			}
+		default:
+			s = fmt.Sprintf("%v", val)
 		}
 	}
 
