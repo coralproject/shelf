@@ -202,49 +202,54 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) Download(c *app.Context) error {
 
-	if c.Request.URL.Query().Get("download") == "true" { // Generates and returns the CSV file.
-
-		formID := c.Params["form_id"]
-
-		limit := 0
-		skip := 0
-
-		opts := submission.SearchOpts{
-			Query:    c.Request.URL.Query().Get("search"),
-			FilterBy: c.Request.URL.Query().Get("filterby"),
-		}
-
-		if c.Request.URL.Query().Get("orderby") == "dsc" {
-			opts.DscOrder = true
-		}
-
-		results, err := submission.Search(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
-		if err != nil {
-			return err
-		}
-
-		// Convert into [][]string to encode the CSV.
-		csvData, err := encodeSubmissionsToCSV(results.Submissions)
-		if err != nil {
-			return err
-		}
-
-		// Set the content type.
-		c.Header().Set("Content-Type", "text/csv")
-		c.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"ask_%s_%s.csv\"", formID, time.Now().String()))
-
-		c.WriteHeader(http.StatusOK)
-		c.Status = http.StatusOK
-
-		c.Write(csvData)
-
-	} else { // Returns a URL To the CSV file.
+	if c.Request.URL.Query().Get("download") != "true" { // Returns a URL To the CSV file.
 
 		results := submission.SearchResults{}
 		results.CSVURL = fmt.Sprintf("http://%v%v?download=true", c.Request.Host, c.Request.URL.Path)
 
 		c.Respond(results, http.StatusOK)
+
+		return nil
 	}
+
+	// Generates and returns the CSV file.
+
+	// It will only arrive to this handler if the formID exists.
+	formID := c.Params["form_id"]
+
+	var (
+		limit int
+		skip  int
+	)
+
+	opts := submission.SearchOpts{
+		Query:    c.Request.URL.Query().Get("search"),
+		FilterBy: c.Request.URL.Query().Get("filterby"),
+	}
+
+	if c.Request.URL.Query().Get("orderby") == "dsc" {
+		opts.DscOrder = true
+	}
+
+	results, err := submission.Search(c.SessionID, c.Ctx["DB"].(*db.DB), formID, limit, skip, opts)
+	if err != nil {
+		return err
+	}
+
+	// Convert into [][]string to encode the CSV.
+	csvData, err := encodeSubmissionsToCSV(results.Submissions)
+	if err != nil {
+		return err
+	}
+
+	// Set the content type.
+	c.Header().Set("Content-Type", "text/csv")
+	c.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"ask_%s_%s.csv\"", formID, time.Now().String()))
+
+	c.WriteHeader(http.StatusOK)
+	c.Status = http.StatusOK
+
+	c.Write(csvData)
 
 	return nil
 }

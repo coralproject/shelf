@@ -59,49 +59,22 @@ func encodeSubmissionsToCSV(submissions []submission.Submission) ([]byte, error)
 	return buf.Bytes(), nil
 }
 
-// build the header for the CSV.
-// it is returning a slice to get the columns in order when building the CSV
+// buildHeader builds the header for the CSV.
+// It is returning a slice to get the columns in order when building the CSV.
 func buildHeader(questions map[string]string) []map[string]string {
-
 	header := []map[string]string{
-		{
-			"title":    "ID",
-			"widgetID": "",
-		},
-		{
-			"title":    "FormID",
-			"widgetID": "",
-		},
-		{
-			"title":    "Number",
-			"widgetID": "",
-		},
-		{
-			"title":    "Status",
-			"widgetID": "",
-		},
-		{
-			"title":    "Flags",
-			"widgetID": "",
-		},
-		{
-			"title":    "CreatedBy",
-			"widgetID": "",
-		},
-		{
-			"title":    "UpdatedBy",
-			"widgetID": "",
-		},
-		{
-			"title":    "DateCreated",
-			"widgetID": "",
-		},
-		{
-			"title":    "DateUpdated",
-			"widgetID": "",
-		},
+		{"title": "ID"},
+		{"title": "FormID"},
+		{"title": "Number"},
+		{"title": "Status"},
+		{"title": "Flags"},
+		{"title": "CreatedBy"},
+		{"title": "UpdatedBy"},
+		{"title": "DateCreated"},
+		{"title": "DateUpdated"},
 	}
 
+	// Adds the questions to the map header.
 	for k, v := range questions {
 		header = append(header, map[string]string{"title": k, "widgetID": v})
 	}
@@ -109,78 +82,79 @@ func buildHeader(questions map[string]string) []map[string]string {
 	return header
 }
 
-// gets the data associated to the header from the submission and build the row
+// buildRow gets the data associated to the header from the submission and build the row of the CSV.
+// It returns the row to add tot he CSV.
 func buildRow(header []map[string]string, submission submission.Submission) ([]string, error) {
-
 	var row []string
 	var err error
 
 	for i := 0; i < len(header); i++ {
-
 		widgetID := header[i]["widgetID"]
 		title := header[i]["title"]
 
-		if widgetID != "" { // if the column is one of the questions.
-
+		if widgetID != "" { // If the column is one of the questions.
 			row = append(row, findAnswerToQuestion(submission, widgetID))
-
-		} else { // if the column is other information (not a question) about the submission.
-
-			var value string
-			v := reflect.ValueOf(submission)
-			switch t := reflect.Indirect(v).FieldByName(title).Interface().(type) {
-			case string:
-				value = t
-			case int:
-				value = strconv.Itoa(t)
-			case []string:
-				value = strings.Join(t, ", ")
-			case time.Time:
-				value = t.String()
-			case bson.ObjectId:
-				value = t.Hex()
-			case nil:
-				value = ""
-			default:
-				err = fmt.Errorf("Type not found for field %v. Value: %v", title, t)
-				return nil, err
-			}
-
-			row = append(row, value)
+			continue
 		}
+
+		// If the column is other information (not a question) about the submission.
+		var value string
+		v := reflect.ValueOf(submission)
+		switch t := reflect.Indirect(v).FieldByName(title).Interface().(type) {
+		case string:
+			value = t
+		case int:
+			value = strconv.Itoa(t)
+		case []string:
+			value = strings.Join(t, ", ")
+		case time.Time:
+			value = t.String()
+		case bson.ObjectId:
+			value = t.Hex()
+		case nil:
+			value = ""
+		default:
+			err = fmt.Errorf("Type not found for field %v. Value: %v", title, t)
+			return nil, err
+		}
+		row = append(row, value)
 	}
 
 	return row, nil
 }
 
-// convert a bson.M into string to display in the CSV.
+// convertToString convert a bson.M into string to display in the CSV.
 // This is quite complicated code to be able to deal
 // and convert any type of data that comes up in the fields. For example, multiple option/multiple choice.
 func convertToString(m bson.M) string {
 	var s string
 	for _, val := range m {
 		switch t := val.(type) {
+
 		case string:
 			if s == "" {
 				s = t
-			} else {
-				s = fmt.Sprintf("%s, %s ", s, val)
+				continue
 			}
+			s = fmt.Sprintf("%s, %s ", s, val)
+
 		case bson.M:
 			s = fmt.Sprintf("%s, %s ", s, convertToString(t))
+
 		case []interface{}: //map[  options: [map[index:2 title:Clarinet]] ]
 			for _, option := range val.([]interface{}) {
 				switch o := option.(type) {
 				case bson.M:
 					if _, ok := o["title"]; !ok {
 						s = fmt.Sprintf("%s, %v", s, o)
-					} else {
-						if s == "" {
-							s = o["title"].(string)
-						} else {
-							s = fmt.Sprintf("%s, %s", s, o["title"])
-						}
+						continue
 					}
+					if s == "" {
+						s = o["title"].(string)
+						continue
+					}
+					s = fmt.Sprintf("%s, %s", s, o["title"])
+
 				default:
 					s = fmt.Sprintf("%v", option)
 				}
@@ -194,7 +168,8 @@ func convertToString(m bson.M) string {
 	return s
 }
 
-// find the Answer for the specific question in the submission. It returns an empty string if it does not find it.
+// findAnswerToQuestion finds the answer for the specific question in the submission.
+// It returns an empty string if it does not find it.
 func findAnswerToQuestion(s submission.Submission, widgetID string) string {
 	for _, r := range s.Answers {
 		if r.WidgetID == widgetID {
@@ -208,14 +183,13 @@ func findAnswerToQuestion(s submission.Submission, widgetID string) string {
 			}
 		}
 	}
+
 	return ""
 }
 
-// get the titles of the header
+// getTitles get the titles of the header
 func getTitles(header []map[string]string) []string {
-
 	var titles []string
-
 	for v := range header {
 		titles = append(titles, header[v]["title"])
 	}
