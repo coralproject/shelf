@@ -31,8 +31,8 @@ func encodeSubmissionsToCSV(submissions []submission.Submission) ([]byte, error)
 
 	var rows [][]string
 
-	// Add the values of the header to the CSV.
-	rows = append(rows, getValues(header))
+	// Add the titles of the header to the CSV.
+	rows = append(rows, getTitles(header))
 
 	// Build the rows.
 	for _, s := range submissions {
@@ -60,33 +60,65 @@ func encodeSubmissionsToCSV(submissions []submission.Submission) ([]byte, error)
 }
 
 // build the header for the CSV.
-func buildHeader(questions map[string]string) map[string]string {
+// it is returning a slice to get the columns in order when building the CSV
+func buildHeader(questions map[string]string) []map[string]string {
 
-	header := map[string]string{
-		"ID":          "",
-		"FormID":      "",
-		"Number":      "",
-		"Status":      "",
-		"Flags":       "",
-		"CreatedBy":   "",
-		"UpdatedBy":   "",
-		"DateCreated": "",
-		"DateUpdated": "",
+	header := []map[string]string{
+		{
+			"title":    "ID",
+			"widgetID": "",
+		},
+		{
+			"title":    "FormID",
+			"widgetID": "",
+		},
+		{
+			"title":    "Number",
+			"widgetID": "",
+		},
+		{
+			"title":    "Status",
+			"widgetID": "",
+		},
+		{
+			"title":    "Flags",
+			"widgetID": "",
+		},
+		{
+			"title":    "CreatedBy",
+			"widgetID": "",
+		},
+		{
+			"title":    "UpdatedBy",
+			"widgetID": "",
+		},
+		{
+			"title":    "DateCreated",
+			"widgetID": "",
+		},
+		{
+			"title":    "DateUpdated",
+			"widgetID": "",
+		},
 	}
+
 	for k, v := range questions {
-		header[k] = v
+		header = append(header, map[string]string{"title": k, "widgetID": v})
 	}
 
 	return header
 }
 
 // gets the data associated to the header from the submission and build the row
-func buildRow(header map[string]string, submission submission.Submission) ([]string, error) {
+func buildRow(header []map[string]string, submission submission.Submission) ([]string, error) {
 
 	var row []string
 	var err error
 
-	for head, widgetID := range header {
+	for i := 0; i < len(header); i++ {
+
+		widgetID := header[i]["widgetID"]
+		title := header[i]["title"]
 
 		if widgetID != "" { // if the column is one of the questions.
 
@@ -96,7 +128,7 @@ func buildRow(header map[string]string, submission submission.Submission) ([]str
 
 			var value string
 			v := reflect.ValueOf(submission)
-			switch t := reflect.Indirect(v).FieldByName(head).Interface().(type) {
+			switch t := reflect.Indirect(v).FieldByName(title).Interface().(type) {
 			case string:
 				value = t
 			case int:
@@ -110,7 +142,7 @@ func buildRow(header map[string]string, submission submission.Submission) ([]str
 			case nil:
 				value = ""
 			default:
-				err = fmt.Errorf("Type not found for field %v. Value: %v", head, t)
+				err = fmt.Errorf("Type not found for field %v. Value: %v", title, t)
 				return nil, err
 			}
 
@@ -126,7 +158,13 @@ func convertToString(m bson.M) string {
 
 	var s string
 	for _, val := range m {
-		s = s + fmt.Sprintf("%v ", val)
+		if s == "" {
+			if v, ok := val.(string); ok {
+				s = v
+			}
+		} else {
+			s = fmt.Sprintf("%s, %s ", s, val)
+		}
 	}
 
 	return s
@@ -149,14 +187,14 @@ func findAnswerToQuestion(s submission.Submission, widgetID string) string {
 	return ""
 }
 
-// get values of a map.
-func getValues(m map[string]string) []string {
+// get the titles of the header
+func getTitles(header []map[string]string) []string {
 
-	var values []string
+	var titles []string
 
-	for v := range m {
-		values = append(values, v)
+	for v := range header {
+		titles = append(titles, header[v]["title"])
 	}
 
-	return values
+	return titles
 }
