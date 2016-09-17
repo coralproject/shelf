@@ -1,19 +1,14 @@
 package handlers
 
 import (
-	"bytes"
-	"encoding/csv"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net"
 	"net/http"
 	"net/url"
-	"sort"
 	"strconv"
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
@@ -197,23 +192,36 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 		return err
 	}
 
-	if csv := c.Request.URL.Query().Get("csv"); csv != "" {
-		results.CSVURL = fmt.Sprintf("http://%v%v/csv", c.Request.Host, c.Request.URL.Path)
-	}
-
 	c.Respond(results, http.StatusOK)
 
 	return nil
 }
 
-// SearchCSV retrieves a set of FormSubmission's based on the search params
-// provided in the query string. It also generates a CSV with the replies.
+// Download retrieves a set of FormSubmission's based on the search params
+// provided in the query string and generates a CSV with the replies.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) SearchCSV(c *app.Context) error {
+func (formSubmissionHandle) Download(c *app.Context) error {
+
+	if c.Request.URL.Query().Get("download") != "true" {
+
+		// Returns a URL To the CSV file.
+		results := submission.SearchResults{}
+		results.CSVURL = fmt.Sprintf("http://%v%v?download=true", c.Request.Host, c.Request.URL.Path)
+
+		c.Respond(results, http.StatusOK)
+
+		return nil
+	}
+
+	// Generates and returns the CSV file.
+
+	// It will only arrive to this handler if the formID exists.
 	formID := c.Params["form_id"]
 
-	limit := 0
-	skip := 0
+	var (
+		limit int
+		skip  int
+	)
 
 	opts := submission.SearchOpts{
 		Query:    c.Request.URL.Query().Get("search"),
@@ -230,10 +238,7 @@ func (formSubmissionHandle) SearchCSV(c *app.Context) error {
 	}
 
 	// Convert into [][]string to encode the CSV.
-	records := getReplies(results.Submissions)
-
-	// Marshal the data into a CSV string.
-	csvData, err := encodeCSV(records)
+	csvData, err := encodeSubmissionsToCSV(results.Submissions)
 	if err != nil {
 		return err
 	}
@@ -327,93 +332,4 @@ func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
 	c.Respond(s, http.StatusOK)
 
 	return nil
-}
-
-// encodeCSV gets all the submissions and encode them into a CSV.
-func encodeCSV(records [][]string) ([]byte, error) {
-
-	var buf bytes.Buffer
-	w := csv.NewWriter(&buf)
-
-	w.WriteAll(records)
-
-	if err := w.Error(); err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-// convert a bson.M into string.
-func convertToString(m bson.M) string {
-	var s string
-	for _, v := range m {
-		s = s + fmt.Sprintf("%v ", v)
-	}
-	return s
-}
-
-// get the keys of a map.
-func keys(m map[string]bool) []string {
-
-	k := make([]string, 0)
-	for i := range m {
-		k = append(k, i)
-	}
-
-	sort.Strings(k)
-
-	return k
-}
-
-// get all the questions for the submissions to the form.
-func getAllQuestions(submissions []submission.Submission) []string {
-
-	q := make(map[string]bool, 0)
-
-	for _, s := range submissions {
-		for _, r := range s.Answers {
-			question := r.Question.(string)
-			if question != "" && !q[question] {
-				q[question] = true
-			}
-		}
-	}
-	return keys(q)
-}
-
-// find the Answer for the specific question in the submission. It returns an empty string if it does not find it.
-func findAnswer(s submission.Submission, q string) string {
-	for _, r := range s.Answers {
-		if r.Question.(string) == q {
-			switch t := r.Answer.(type) {
-			case bson.M:
-				return convertToString(t)
-			default:
-				return fmt.Sprintf("%v", t)
-			}
-		}
-	}
-	return ""
-}
-
-// getReplies retrieves the questions and answers on a specific submission.
-// we are returning a [][]string to use the resolut in returing the data in CSV.
-func getReplies(submissions []submission.Submission) [][]string {
-
-	questions := getAllQuestions(submissions)
-
-	var rows [][]string
-
-	rows = append(rows, questions)
-
-	for _, s := range submissions {
-		row := make([]string, 0)
-		for _, q := range questions {
-			row = append(row, findAnswer(s, q))
-		}
-
-		rows = append(rows, row)
-	}
-
-	return rows
 }

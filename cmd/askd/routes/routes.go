@@ -155,7 +155,7 @@ func routes(a *app.App) {
 	a.Handle("DELETE", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
 
 	// temporal route to get CSV file - TO DO : move into a different service
-	a.Handle("GET", "/v1/form/:form_id/submission/csv", handlers.FormSubmission.SearchCSV)
+	a.Handle("GET", "/v1/form/:form_id/submission/export", handlers.FormSubmission.Download)
 
 	// form form galleries
 	a.Handle("GET", "/v1/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
