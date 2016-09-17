@@ -55,8 +55,7 @@ func runTest(m *testing.M) int {
 	tstdata.Generate(db)
 	defer tstdata.Drop(db)
 
-	err = loadSubmissions(db, "submission.json")
-	if err != nil {
+	if err = loadSubmissions(db, "submission.json"); err != nil {
 		fmt.Println("Unable to load submissions: ", err)
 	}
 	defer submissionfix.Remove(tests.Context, db, "FTEST_")
@@ -64,9 +63,8 @@ func runTest(m *testing.M) int {
 	return m.Run()
 }
 
-// loadSubmissions adds submissions to run tests.
+//loadSubmissions adds submissions to run tests.
 func loadSubmissions(db *db.DB, file string) error {
-
 	submissions, err := submissionfix.GetMany(file)
 	if err != nil {
 		return err

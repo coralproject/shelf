@@ -2,15 +2,16 @@
 package tests
 
 import (
-	"bytes"
+	"encoding/csv"
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
 
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/tests"
-	"github.com/gocarina/gocsv"
 )
 
 // relPrefix is the base name for everything.
@@ -32,7 +33,7 @@ func TextExport(t *testing.T) {
 		t.Logf("\tWhen calling url : %s", url)
 		{
 			t.Log("\tWhen we user version 1.0 of the export endpoint.")
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to get the URL of the file to download : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to get the URL of the file to download.", tests.Success)
@@ -87,27 +88,15 @@ func TestDownloadCSV(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to get a CSV content-type file.", tests.Success)
 
-			buf := bytes.NewBufferString(string(w.Body.Bytes()))
-			type Record struct {
-				ID               string `csv:"id"`
-				FormID           string `csv:"form_id"`
-				Status           string `csv:"status"`
-				Flags            string `csv:"flags"`
-				CreatedBy        string `csv:"created_by"`
-				UpdatedBy        string `csv:"updated_by"`
-				DateCreated      string `csv:"date_created"`
-				DateUpdated      string `csv:"date_updated"`
-				Myquestion       string `csv:"my_question"`
-				Mysecondquestion string `csv:"my_second_question"`
-			}
-			var result []Record
-			if err := gocsv.Unmarshal(buf, &result); err != nil {
+			r := csv.NewReader(strings.NewReader(string(w.Body.Bytes())))
+			records, err := r.ReadAll()
+			if err != nil {
 				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			expectedCount := 2
-			if len(result) != expectedCount {
+			expectedCount := 3
+			if len(records) != expectedCount {
 				t.Fatalf("\t%s\tShould have exactly %d rows.", tests.Failed, expectedCount)
 			}
 			t.Logf("\t%s\tShould have exactly %d rows.", tests.Success, expectedCount)
