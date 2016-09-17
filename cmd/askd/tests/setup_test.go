@@ -63,7 +63,7 @@ func runTest(m *testing.M) int {
 	return m.Run()
 }
 
-//loadSubmissions adds submissions to run tests.
+// loadSubmissions adds submissions to run tests.
 func loadSubmissions(db *db.DB, file string) error {
 	submissions, err := submissionfix.GetMany(file)
 	if err != nil {
