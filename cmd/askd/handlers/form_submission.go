@@ -202,8 +202,9 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formSubmissionHandle) Download(c *app.Context) error {
 
-	if c.Request.URL.Query().Get("download") != "true" { // Returns a URL To the CSV file.
+	if c.Request.URL.Query().Get("download") != "true" {
 
+		// Returns a URL To the CSV file.
 		results := submission.SearchResults{}
 		results.CSVURL = fmt.Sprintf("http://%v%v?download=true", c.Request.Host, c.Request.URL.Path)
 
