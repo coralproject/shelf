@@ -124,47 +124,59 @@ func buildRow(header []map[string]string, submission submission.Submission) ([]s
 
 // convertToString convert a bson.M into string to display in the CSV.
 // This is quite complicated code to be able to deal
-// and convert any type of data that comes up in the fields. For example, multiple option/multiple choice.
-func convertToString(m bson.M) string {
-	var s string
-	for _, val := range m {
-		switch t := val.(type) {
+// and convert any type of data that comes up in the fields. For example,
+// multiple option/multiple choice.
+func convertToString(doc bson.M) string {
 
+	// Construct an array of strings to collect our bson properties
+	var strs []string
+
+	// Loop over the document.
+	for _, val := range doc {
+
+		switch docValue := val.(type) {
+
+		// If the value is a string, just append it.
 		case string:
-			if s == "" {
-				s = t
-				continue
-			}
-			s = fmt.Sprintf("%s, %s ", s, val)
+			strs = append(strs, docValue)
 
+		// If the value is another bson.M document, then recurse.
 		case bson.M:
-			s = fmt.Sprintf("%s, %s ", s, convertToString(t))
+			strs = append(strs, convertToString(docValue))
 
-		case []interface{}: //map[  options: [map[index:2 title:Clarinet]] ]
-			for _, option := range val.([]interface{}) {
-				switch o := option.(type) {
+		// If the value is an array of documents, then range of that one.
+		case []interface{}:
+			// Loop over the
+			for _, subDoc := range docValue {
+
+				switch subDocValue := subDoc.(type) {
+
+				// If this is another doc, then walk into it.
 				case bson.M:
-					if _, ok := o["title"]; !ok {
-						s = fmt.Sprintf("%s, %v", s, o)
-						continue
+
+					// If the doc has a property called title, we need to select that one
+					// instead of another field.
+					if title, ok := subDocValue["title"]; ok {
+						if titleString, ok := title.(string); ok {
+							strs = append(strs, titleString)
+							continue
+						}
 					}
-					if s == "" {
-						s = o["title"].(string)
-						continue
-					}
-					s = fmt.Sprintf("%s, %s", s, o["title"])
+
+					// The inner object is a bson.M object, we should keep extracting it.
+					strs = append(strs, convertToString(subDocValue))
 
 				default:
-					s = fmt.Sprintf("%v", option)
+					strs = append(strs, fmt.Sprintf("%v", subDocValue))
 				}
-
 			}
+
 		default:
-			s = fmt.Sprintf("%v", val)
+			strs = append(strs, fmt.Sprintf("%v", val))
 		}
 	}
 
-	return s
+	return strings.Join(strs, ", ")
 }
 
 // findAnswerToQuestion finds the answer for the specific question in the submission.
