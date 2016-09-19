@@ -15,7 +15,7 @@ import (
 )
 
 // prefix is what we are looking to delete after the test.
-const prefix = "FTEST"
+const prefix = "FSTEST"
 
 func TestMain(m *testing.M) {
 	// Initialize the configuration and logging systems. Plus anything
