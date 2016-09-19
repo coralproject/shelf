@@ -11,7 +11,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/askd/routes"
 	"github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
-	"github.com/gabelula/kit/tests"
+	"github.com/ardanlabs/kit/tests"
 
 	"github.com/coralproject/shelf/tstdata"
 )
