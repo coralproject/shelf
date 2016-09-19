@@ -84,7 +84,7 @@ func jsonFormJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/form.json", size: 1923, mode: os.FileMode(420), modTime: time.Unix(1474034219, 0)}
+	info := bindataFileInfo{name: "json/form.json", size: 1923, mode: os.FileMode(420), modTime: time.Unix(1474044889, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -104,7 +104,7 @@ func jsonFormsJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/forms.json", size: 391693, mode: os.FileMode(420), modTime: time.Unix(1474034219, 0)}
+	info := bindataFileInfo{name: "json/forms.json", size: 391693, mode: os.FileMode(420), modTime: time.Unix(1474044889, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
