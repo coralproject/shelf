@@ -14,8 +14,8 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
-// relPrefix is the base name for everything.
-const relPrefix = "FTEST_"
+// subPrefix is the base name for everything.
+const subPrefix = "FTEST_"
 
 // TestExport tests the retrieval of a URL for a CSV file to download with the submissions.
 func TextExport(t *testing.T) {
