@@ -52,7 +52,7 @@ func TestMain(m *testing.M) {
 func setup(t *testing.T, fixture string) ([]submission.Submission, *db.DB) {
 	tests.ResetLog()
 
-	subs, err := submissionfix.Get("submission")
+	subs, err := submissionfix.GetMany("submission.json")
 	if err != nil {
 		t.Fatalf("%s\tShould be able retrieve submission fixture : %s", tests.Failed, err)
 	}

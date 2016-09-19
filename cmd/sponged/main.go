@@ -2,6 +2,7 @@
 package main
 
 import (
+	"os"
 	"runtime"
 	"time"
 
@@ -36,14 +37,21 @@ func main() {
 	handlers.Version.IntVersion = IntVersion
 
 	// These are the absolute read and write timeouts.
+	const (
 
-	// ReadTimeout covers the time from when the connection is accepted to when the
-	// request body is fully read.
-	readTimeout := 10 * time.Second
+		// ReadTimeout covers the time from when the connection is accepted to when the
+		// request body is fully read.
+		readTimeout = 10 * time.Second
 
-	// WriteTimeout normally covers the time from the end of the request header read
-	// to the end of the response write.
-	writeTimeout := 30 * time.Second
+		// WriteTimeout normally covers the time from the end of the request header read
+		// to the end of the response write.
+		writeTimeout = 30 * time.Second
+	)
 
-	app.Run(":4001", routes.API(), readTimeout, writeTimeout)
+	if err := app.Run(":4001", routes.API(), readTimeout, writeTimeout); err != nil {
+		log.Error("shutdown", "Init", err, "App Shutdown")
+		os.Exit(1)
+	}
+
+	log.User("shutdown", "Init", "App Shutdown")
 }
