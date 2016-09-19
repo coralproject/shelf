@@ -15,7 +15,7 @@ import (
 )
 
 // subPrefix is the base name for everything.
-const subPrefix = "FTEST_"
+const subPrefix = "FTEST"
 
 // TestExport tests the retrieval of a URL for a CSV file to download with the submissions.
 func TextExport(t *testing.T) {
@@ -97,9 +97,10 @@ func TestDownloadCSV(t *testing.T) {
 
 			expectedCount := 3
 			if len(records) != expectedCount {
-				t.Fatalf("\t%s\tShould have exactly %d rows.", tests.Failed, expectedCount)
+				t.Fatalf("\t%s\tShould have exactly %d rows but it has %d.", tests.Failed, expectedCount, len(records))
 			}
 			t.Logf("\t%s\tShould have exactly %d rows.", tests.Success, expectedCount)
+
 		}
 	}
 }
