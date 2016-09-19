@@ -28,7 +28,6 @@ func init() {
 
 // TestMain helps to clean up the test data.
 func TestMain(m *testing.M) {
-	fmt.Println("DEBUG WTF 1")
 	os.Exit(runTest(m))
 }
 
