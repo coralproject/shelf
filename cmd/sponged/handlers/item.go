@@ -61,8 +61,8 @@ func (itemHandle) Upsert(c *app.Context) error {
 	val := reflect.ValueOf(it)
 	typ := val.Type()
 	for i := 0; i < val.NumField(); i++ {
-		fi := typ.Field(i)
-		if tagv := fi.Tag.Get("json"); tagv != "" {
+		field := typ.Field(i)
+		if tagv := field.Tag.Get("json"); tagv != "" {
 			itMap[tagv] = val.Field(i).Interface()
 		}
 	}
