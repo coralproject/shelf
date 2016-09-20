@@ -6,6 +6,7 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
+	"github.com/cayleygraph/cayley/graph"
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/wire/pattern"
 	validator "gopkg.in/bluesuncorp/validator.v8"
@@ -73,8 +74,10 @@ func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[s
 
 	// Apply the transaction.
 	if err := store.ApplyTransaction(tx); err != nil {
-		log.Error(context, "AddToGraph", err, "Completed")
-		return err
+		if !graph.IsQuadExist(err) {
+			log.Error(context, "AddToGraph", err, "Completed")
+			return err
+		}
 	}
 
 	log.Dev(context, "AddToGraph", "Completed")

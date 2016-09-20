@@ -7,13 +7,21 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/cayleygraph/cayley"
+	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
-// itemPrefix is the base name for everything.
-const itemPrefix = "ITEST_"
+const (
+	// itemPrefix is the base name for items.
+	itemPrefix = "ITEST_"
+
+	// patternPrefix is the base name for patterns.
+	patternPrefix = "PTEST_"
+)
 
 // TestRetrieveItems tests the retrieval of items.
 func TestRetrieveItems(t *testing.T) {
@@ -57,8 +65,8 @@ func TestRetrieveItems(t *testing.T) {
 	}
 }
 
-// TestUpsertView tests the insert and update of an item.
-func TestUpsertView(t *testing.T) {
+// TestUpsertItem tests the insert and update of an item.
+func TestUpsertItem(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -95,6 +103,36 @@ func TestUpsertView(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to insert the item.", tests.Success)
 		}
+
+		//----------------------------------------------------------------------
+		// Check the inferred relationship.
+
+		opts := map[string]interface{}{
+			"database_name": cfg.MustString("MONGO_DB"),
+			"username":      cfg.MustString("MONGO_USER"),
+			"password":      cfg.MustString("MONGO_PASS"),
+		}
+
+		store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
+		}
+
+		p := cayley.StartPath(store, quad.String("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+		it, _ := p.BuildIterator().Optimize()
+		defer it.Close()
+		for it.Next() {
+			token := it.Result()
+			value := store.NameOf(token)
+			if quad.NativeOf(value) != "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82" {
+				t.Fatalf("\t%s\tShould be able to get the inferred relationships from the graph", tests.Failed)
+			}
+		}
+		if err := it.Err(); err != nil {
+			t.Fatalf("\t%s\tShould be able to get the inferred relationships from the graph : %s", tests.Failed, err)
+		}
+		it.Close()
+		t.Logf("\t%s\tShould be able to get the inferred relationships from the graph.", tests.Success)
 
 		//----------------------------------------------------------------------
 		// Retrieve the item.
