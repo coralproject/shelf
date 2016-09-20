@@ -4,7 +4,6 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
-	"reflect"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"
@@ -57,14 +56,11 @@ func (itemHandle) Upsert(c *app.Context) error {
 	}
 
 	// Prepare the generic item data map.
-	itMap := make(map[string]interface{})
-	val := reflect.ValueOf(it)
-	typ := val.Type()
-	for i := 0; i < val.NumField(); i++ {
-		field := typ.Field(i)
-		if tagv := field.Tag.Get("json"); tagv != "" {
-			itMap[tagv] = val.Field(i).Interface()
-		}
+	itMap := map[string]interface{}{
+		"item_id": it.ID,
+		"type":    it.Type,
+		"version": it.Version,
+		"data":    it.Data,
 	}
 
 	// Infer relationships and add them to the graph.
