@@ -6,6 +6,7 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/pborman/uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -19,6 +20,11 @@ var ErrNotFound = errors.New("Set Not found")
 // Upsert upserts an item to the items collections.
 func Upsert(context interface{}, db *db.DB, item *Item) error {
 	log.Dev(context, "Upsert", "Started : ID[%s]", item.ID)
+
+	// if there is no ID, create one
+	if item.ID == "" {
+		item.ID = uuid.New()
+	}
 
 	// Validate the item.
 	if err := item.Validate(); err != nil {
@@ -82,4 +88,33 @@ func Delete(context interface{}, db *db.DB, id string) error {
 
 	log.Dev(context, "Delete", "Completed")
 	return nil
+}
+
+// GetOneByQuery accepts a bson.M query and runs it against the item collection
+//  returning the first record found.
+func GetOneByQuery(context interface{}, db *db.DB, q bson.M) (*Item, error) {
+	log.Dev(context, "GetByQuery", "Started : Looking for %#v", q)
+
+	var item Item
+
+	// Query the database for the item.
+	f := func(c *mgo.Collection) error {
+		log.Dev(context, "GetByQuery", "MGO : %#v", q)
+		return c.Find(q).One(&item)
+	}
+
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		// It's ok to return an empty query, all other errors are thrown.
+		if err != mgo.ErrNotFound {
+			return nil, err
+		}
+
+		// Return nil nil for no results found.
+		log.Dev(context, "GetByQuery", "Completed : No Items found")
+		return nil, nil
+	}
+
+	log.Dev(context, "GetByQuery", "Completed : Found %+v", item.ID)
+	return &item, nil
+
 }
