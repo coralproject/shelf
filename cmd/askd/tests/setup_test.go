@@ -8,10 +8,10 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
+	"github.com/ardanlabs/kit/tests"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/askd/routes"
 	"github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
-	"github.com/gabelula/kit/tests"
 
 	"github.com/coralproject/shelf/tstdata"
 )
@@ -57,7 +57,7 @@ func runTest(m *testing.M) int {
 	if err = loadSubmissions(db, "submission.json"); err != nil {
 		fmt.Println("Unable to load submissions: ", err)
 	}
-	defer submissionfix.Remove(tests.Context, db, "FTEST_")
+	defer submissionfix.Remove(tests.Context, db, subPrefix)
 
 	return m.Run()
 }

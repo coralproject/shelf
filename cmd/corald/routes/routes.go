@@ -13,7 +13,7 @@ import (
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
+	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
 }
 
 // API returns a handler for a set of routes.
