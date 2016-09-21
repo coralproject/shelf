@@ -61,7 +61,7 @@ func TestItemizeData(t *testing.T) {
 		t.Fatalf("\t%s\tCould not upsert (insert) item: %v", tests.Failed, err)
 	}
 
-	t.Logf("\t%s\tShould get the same id item when itemizing again", tests.Success)
+	t.Logf("\t%s\tShould get the same item_id when itemizing again", tests.Success)
 	i, err = sponge.Itemize(tests.Context, db, "test_comment", 1, d)
 	if err != nil {
 		t.Fatalf("\t%s\tCould not create item from data when item is present in store: %v", tests.Failed, err)
