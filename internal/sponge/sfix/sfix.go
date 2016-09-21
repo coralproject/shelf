@@ -1,12 +1,12 @@
-package dfix
+package sfix
 
 import (
 	"encoding/json"
 	"os"
 
 	"github.com/ardanlabs/kit/db"
-	"github.com/coralproject/shelf/internal/sponge/data"
-	"github.com/coralproject/sponge/pkg/item"
+	"github.com/coralproject/shelf/internal/sponge"
+	"github.com/coralproject/shelf/internal/sponge/item"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -14,41 +14,18 @@ import (
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/sponge/data/dfix/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/sponge/sfix/"
 }
 
-func RegisterTypes(filename string) error {
-
-	file, err := os.Open(path + filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	// grab the item type fixture file
-	var types []data.Type
-	err = json.NewDecoder(file).Decode(&types)
-	if err != nil {
-		return err
-	}
-
-	// retister the item types
-	for _, t := range types {
-		data.RegisterType(t)
-	}
-
-	return nil
-}
-
-// Get loads item data based on item.json.
-func Get(filename string) (data.Data, error) {
+// Get loads data based from data.json.
+func Get(filename string) (sponge.Data, error) {
 	file, err := os.Open(path + filename)
 	if err != nil {
 		return nil, err
 	}
 	defer file.Close()
 
-	var d data.Data
+	var d sponge.Data
 	err = json.NewDecoder(file).Decode(&d)
 	if err != nil {
 		return nil, err

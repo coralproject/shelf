@@ -18,7 +18,7 @@ func init() {
 // are formatted with an ID, Type, and Version, and asssociated data (which
 // may differ greatly between items) is encoded into the Data interface.
 type Item struct {
-	ID      string      `bson:"item_id" json:"item_id" validate:"required,min=36"`
+	ID      string      `bson:"item_id" json:"item_id" validate:"required,min=1"`
 	Type    string      `bson:"type" json:"type" validate:"required,min=2"`
 	Version int         `bson:"version" json:"version" validate:"required,min=1"`
 	Data    interface{} `bson:"data" json:"data"`
