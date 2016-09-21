@@ -12,7 +12,7 @@
 
 ## <a name="pkg-index">Index</a>
 * [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
-* [func LoadItem(context interface{}, path string) (item.Item, error)](#LoadItem)
+* [func LoadItem(context interface{}, path string) (*item.Item, error)](#LoadItem)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -22,7 +22,7 @@
 
 
 
-## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=873:930#L27)
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=859:916#L27)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -31,9 +31,9 @@ json file found.
 
 
 
-## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=284:350#L5)
+## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=284:351#L5)
 ``` go
-func LoadItem(context interface{}, path string) (item.Item, error)
+func LoadItem(context interface{}, path string) (*item.Item, error)
 ```
 LoadItem serializes the content of Items from a file using the
 given file path. Returns the serialized Item value.

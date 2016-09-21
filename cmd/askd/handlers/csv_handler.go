@@ -63,8 +63,8 @@ func encodeSubmissionsToCSV(submissions []submission.Submission) ([]byte, error)
 // It is returning a slice to get the columns in order when building the CSV.
 func buildHeader(questions map[string]string) []map[string]string {
 	header := []map[string]string{
-		{"title": "ID"},
 		{"title": "FormID"},
+		{"title": "ID"},
 		{"title": "Status"},
 		{"title": "Flags"},
 		{"title": "CreatedBy"},

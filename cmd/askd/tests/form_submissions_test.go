@@ -14,8 +14,8 @@ import (
 	"github.com/ardanlabs/kit/tests"
 )
 
-// relPrefix is the base name for everything.
-const relPrefix = "FTEST_"
+// subPrefix is the base name for everything.
+const subPrefix = "FSTEST"
 
 // TestExport tests the retrieval of a URL for a CSV file to download with the submissions.
 func TextExport(t *testing.T) {
@@ -24,7 +24,7 @@ func TextExport(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000001/submission/export"
+		url := "/v1/form/57be0437e65ada0851000002/submission/export"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -44,7 +44,7 @@ func TextExport(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			expectedURL := "http:///v1/form/57be0437e65ada0851000001/submission/export?download=true"
+			expectedURL := "http:///v1/form/57be0437e65ada0851000002/submission/export?download=true"
 			csvURL := result["csv_url"]
 
 			if csvURL != expectedURL {
@@ -62,7 +62,7 @@ func TestDownloadCSV(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000001/submission/export?download=true"
+		url := "/v1/form/57be0437e65ada0851000002/submission/export?download=true"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -97,9 +97,10 @@ func TestDownloadCSV(t *testing.T) {
 
 			expectedCount := 3
 			if len(records) != expectedCount {
-				t.Fatalf("\t%s\tShould have exactly %d rows.", tests.Failed, expectedCount)
+				t.Fatalf("\t%s\tShould have exactly %d rows but it has %d.", tests.Failed, expectedCount, len(records))
 			}
 			t.Logf("\t%s\tShould have exactly %d rows.", tests.Success, expectedCount)
+
 		}
 	}
 }
