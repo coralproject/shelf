@@ -1,54 +1,64 @@
 [
 	{
 		"item_id": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
-		"type": "coral_comment",
+		"type": "PTEST_comment",
 		"version": 1,
 		"data": {
-			"body": "Computer, belay that order."
+			"body": "Computer, belay that order.",
+			"author": "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+			"asset": "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"
 		}
 	},
 	{
 		"item_id": "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4",
-		"type": "coral_comment",
+		"type": "PTEST_comment",
 		"version": 1,
 		"data": {
-			"body": "Wouldn't that bring about chaos? My oath is between Captain Kargan and myself. Your only concern is with how you obey my orders. Or do you prefer the rank of prisoner to that of lieutenant?"
+			"body": "Wouldn't that bring about chaos? My oath is between Captain Kargan and myself. Your only concern is with how you obey my orders. Or do you prefer the rank of prisoner to that of lieutenant?",
+			"author": "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+			"asset": "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+			"parent": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
 		}
 	},
 	{
 		"item_id": "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660",
-		"type": "coral_comment",
+		"type": "PTEST_comment",
 		"version": 1,
 		"data": {
-			"body": "And blowing into maximum warp speed, you appeared for an instant to be in two places at once. A lot of things can change in twelve years, Admiral."
+			"body": "And blowing into maximum warp speed, you appeared for an instant to be in two places at once. A lot of things can change in twelve years, Admiral.",
+			"author": "ITEST_a63af637-58af-472b-98c7-f5c00743bac6",
+			"asset": "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"
 		}
 	},
 	{
 		"item_id": "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
-		"type": "coral_user",
+		"type": "PTEST_user",
 		"version": 1,
 		"data": {
 			"first_name": "Bilbo",
 			"last_name": "Baggins",
-			"email": "ringbearer@bagend.com"
+			"email": "ringbearer@bagend.com",
+			"role": "hobbit"
 		}
 	},
 	{
 		"item_id": "ITEST_a63af637-58af-472b-98c7-f5c00743bac6",
-		"type": "coral_user",
+		"type": "PTEST_user",
 		"version": 1,
 		"data": {
 			"name": "Gandalf",
-			"facebook_user": "whitewizard"
+			"facebook_user": "whitewizard",
+			"role": "wizard"
 		}
 	},
 	{
 		"item_id": "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-		"type": "coral_asset",
+		"type": "PTEST_asset",
 		"version": 1,
 		"data": {
 			"title": "Avoiding the pitfalls of the dark side of the force.",
-			"published": "2016-01-22 15:22:01"
+			"published": "2016-01-22 15:22:01",
+			"section": "tutorials"
 		}
 	}
 ] 	

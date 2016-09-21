@@ -11,6 +11,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/sponged/routes"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 )
 
 var a *app.App
@@ -50,6 +51,9 @@ func runTest(m *testing.M) int {
 	loadItems("context", db)
 	defer itemfix.Remove("context", db, itemPrefix)
 
+	loadPatterns("context", db)
+	defer patternfix.Remove("context", db, patternPrefix)
+
 	return m.Run()
 }
 
@@ -61,6 +65,20 @@ func loadItems(context interface{}, db *db.DB) error {
 	}
 
 	if err := itemfix.Add(context, db, items[1:]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadPatterns adds patterns to run tests.
+func loadPatterns(context interface{}, db *db.DB) error {
+	ps, _, err := patternfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := patternfix.Add(context, db, ps[0:2]); err != nil {
 		return err
 	}
 

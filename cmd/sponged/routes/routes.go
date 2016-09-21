@@ -68,7 +68,7 @@ func API() http.Handler {
 		}
 	}
 
-	a := app.New(midware.Mongo, midware.Auth)
+	a := app.New(midware.Mongo, midware.Cayley, midware.Auth)
 	a.Ctx["anvil"] = anv
 
 	log.Dev("startup", "Init", "Initalizing routes")
