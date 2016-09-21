@@ -1,6 +1,7 @@
 [
 	{
 		"name": "test_comment",
-		"source_id": "id"
+		"source_id": "id",
+		"version": 1
 	}
 ]

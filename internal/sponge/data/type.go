@@ -12,6 +12,7 @@ import (
 type Type struct {
 	Name    string `bson:"name" json:"name"`
 	IDField string `bson:"source_id" json:"source_id"` // field containing primary key
+	Version string `bson:"version" json:"version"`     // current version
 }
 
 //==============================================================================

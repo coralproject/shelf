@@ -24,25 +24,29 @@ var ErrTypeNotFound = errors.New("Type Not found")
 // have the existing item's _ids consistent with an update operation.
 func Itemize(context interface{}, db *db.DB, t string, v int, d Data) (item.Item, error) {
 	i := item.Item{}
-
-	// validate and set type
-	if isRegistered(t) == false {
-		// TODO, how can we use
-		return i, errors.New("Type not found: " + t)
-	}
+	i.Version = v
+	i.Data = d
 	i.Type = t
+
+	// default the source id field to _id_ by convention
+	idField := "id"
+
+	// If the type is registered, use the field from the config
+	if isRegistered(t) == true {
+		idField = Types[t].IDField
+	}
 
 	// This data may correspond to an item already present. Check the _source id_ to see
 	// if there's a source key to look for in the item store.
 
 	// Get this data's IdField value for this type.
-	idValue := d[Types[t].IDField]
+	idValue := d[idField]
 
 	// If a source id value is found, look to see if this item already exists.
 	if idValue != nil {
 
 		// Create a query referencing the source_id in data and type.
-		dbIDField := "data." + Types[t].IDField
+		dbIDField := "data." + idField
 		q := bson.M{"type": t, dbIDField: idValue}
 
 		// Look up items with the souce id and type
@@ -56,9 +60,6 @@ func Itemize(context interface{}, db *db.DB, t string, v int, d Data) (item.Item
 			i.ID = dbItem.ID
 		}
 	}
-
-	i.Version = v
-	i.Data = d
 
 	return i, nil
 
