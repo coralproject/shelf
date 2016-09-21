@@ -7,9 +7,10 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
+
+const defaultVersion = 1
 
 // dataHandle maintains the set of handlers for the data api.
 type dataHandle struct{}
@@ -23,18 +24,19 @@ var Data dataHandle
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (dataHandle) Upsert(c *app.Context) error {
 
-	var da sponge.Data
+	var da map[string]interface{}
 	if err := json.NewDecoder(c.Request.Body).Decode(&da); err != nil {
 		return err
 	}
 
-	ty := c.Params["type"]
+	// Create a new item.
+	it := item.Item{
+		Type:    c.Params["type"],
+		Version: defaultVersion,
+		Data:    da,
+	}
 
-	// Pass the version from the type config for now. TODO: Possibly add version
-	// option in a separate endpoint in the future.
-	var it item.Item
-	it, err := sponge.Itemize(c.SessionID, c.Ctx["DB"].(*db.DB), ty, 1, da)
-	if err != nil {
+	if err := it.InferIDFromData(); err != nil {
 		return err
 	}
 
@@ -42,6 +44,6 @@ func (dataHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	c.Respond(it, http.StatusNoContent)
+	c.Respond(nil, http.StatusNoContent)
 	return nil
 }

@@ -1,6 +1,7 @@
 package item_test
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -158,4 +159,42 @@ func TestGetAll(t *testing.T) {
 			t.Logf("\t%s\tShould be able to get back the same items.", tests.Success)
 		}
 	}
+}
+
+// TestInferId tests the inference of an item_id from type and source id.
+func TestItemizeData(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	// Test the inference of item_id where source_id is present.
+	d, err := itemfix.GetData("data.json")
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to load item data.json fixture: %v", tests.Failed, err)
+	}
+	it := item.Item{
+		Type:    "test_type",
+		Version: 1,
+		Data:    d,
+	}
+	if err := it.InferIDFromData(); err != nil {
+		t.Fatalf("\t%s\tShould be able to InferID from data containing field id: %v", tests.Failed, err)
+	}
+	if it.ID != it.Type+"_"+fmt.Sprintf("%v", d["id"]) {
+		t.Fatalf("\t%s\tShould infer item_id of form type + \"_\" + source_id: %v", tests.Failed, err)
+	}
+
+	// Test the inference of item_id where source_id is not present.
+	d, err = itemfix.GetData("data_without_id.json")
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to load item data_without_id.json fixture: %v", tests.Failed, err)
+	}
+	it = item.Item{
+		Type:    "test_type",
+		Version: 1,
+		Data:    d,
+	}
+	if err := it.InferIDFromData(); err == nil {
+		t.Fatalf("\t%s\tShould not be able to InferID from data not containing field id: %v", tests.Failed, err)
+	}
+
 }
