@@ -5,7 +5,6 @@ import (
 	"os"
 	"time"
 
-	"github.com/anvilresearch/go-anvil"
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -56,20 +55,7 @@ func init() {
 // API returns a handler for a set of routes.
 func API() http.Handler {
 
-	// If authentication is on then configure Anvil.
-	var anv *anvil.Anvil
-	if url, err := cfg.String(cfgAnvilHost); err == nil {
-
-		log.Dev("startup", "Init", "Initalizing Anvil")
-		anv, err = anvil.New(url)
-		if err != nil {
-			log.Error("startup", "Init", err, "Initializing Anvil: %s", url)
-			os.Exit(1)
-		}
-	}
-
 	a := app.New(midware.Mongo, midware.Auth)
-	a.Ctx["anvil"] = anv
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)
@@ -83,6 +69,8 @@ func API() http.Handler {
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
 	a.Handle("GET", "/1.0/version", handlers.Version.List)
+
+	a.Handle("POST", "/1.0/data/type/:type", handlers.Data.Upsert)
 
 	a.Handle("GET", "/1.0/item/:id", handlers.Item.Retrieve)
 	a.Handle("PUT", "/1.0/item", handlers.Item.Upsert)
