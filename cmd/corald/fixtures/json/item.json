@@ -1,7 +1,7 @@
 {
   "item_id": "1",
   "type": "comment",
-  "version": "1",
+  "version": 1,
   "data":
     {
       "body": "Something body like.",

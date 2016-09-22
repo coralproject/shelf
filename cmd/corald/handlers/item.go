@@ -2,13 +2,13 @@ package handlers
 
 import (
 	"net/http"
-	"net/url"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/coralproject/shelf/internal/xenia"
-	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/coral"
 )
+
+// SpongeHost holds temporarily the sponge API url
+const SpongeHost = "http://127.0.0.1:3001"
 
 // itemHandle maintains the set of handlers for the form api.
 type itemHandle struct{}
@@ -18,40 +18,36 @@ var Item itemHandle
 
 //==============================================================================
 
-// List returns all the existing items in the system.
+// Retrieve returns the item by item_id in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (itemHandle) List(c *app.Context) error {
+func (itemHandle) Retrieve(c *app.Context) error {
 
-	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
+	URL := SpongeHost + "/1.0/item/" + c.Params["item_id"]
+
+	result, err := coral.DoRequest(c, "POST", URL, c.Request.Body)
 	if err != nil {
-		if err == query.ErrNotFound {
-			err = app.ErrNotFound
-		}
 		return err
 	}
 
-	var vars map[string]string
-	if c.Request.URL.RawQuery != "" {
-		if m, err := url.ParseQuery(c.Request.URL.RawQuery); err == nil {
-			vars = make(map[string]string)
-			for k, v := range m {
-				vars[k] = v[0]
-			}
-		}
-	}
-
-	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
-
 	c.Respond(result, http.StatusOK)
-	return nil
 
-	//  {type:’comment’, content: ‘Stuff and things’, author:’userid123’}
+	return nil
 }
 
-// FilterByType returns all the existing items in the system.
-// 200 Success, 404 Not Found, 500 Internal
-func (itemHandle) FilterByType(c *app.Context) error {
+//==============================================================================
 
-	//  {type:’comment’, content: ‘Stuff and things’, author:’userid123’}
+// Upsert insert or update an item in the system.
+// 200 Success, 404 Not Found, 500 Internal
+func (itemHandle) Upsert(c *app.Context) error {
+
+	URL := SpongeHost + "/1.0/item"
+
+	result, err := coral.DoRequest(c, "PUT", URL, c.Request.Body)
+	if err != nil {
+		return err
+	}
+
+	c.Respond(result, http.StatusOK)
+
 	return nil
 }

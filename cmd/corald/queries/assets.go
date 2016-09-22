@@ -83,7 +83,7 @@ func setsCommentsJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "sets/comments.json", size: 486, mode: os.FileMode(420), modTime: time.Unix(1474325955, 0)}
+	info := bindataFileInfo{name: "sets/comments.json", size: 486, mode: os.FileMode(420), modTime: time.Unix(1474475440, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
