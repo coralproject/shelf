@@ -51,7 +51,7 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
 
 	// Items
-	a.Handle("GET", "/v1/item/:view_name/:item_key/:query_set", fixtures.Handler("items", http.StatusOK))
+	a.Handle("GET", "/v1/item/:view_name/:item_key/:query_set", handlers.Item.Retrieve)
 	a.Handle("POST", "/v1/item", fixtures.Handler("itemid", http.StatusCreated))
 	a.Handle("PUT", "/v1/item/:item_id", fixtures.NoContent)
 }
