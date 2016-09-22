@@ -22,19 +22,6 @@ var (
 
 const cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 
-// authError is used when there is an error setting up Auth but we still need to
-// setup the middleware.
-func authError(err error) app.Handler {
-	return func(c *app.Context) error {
-
-		// Log out the process for verbosity.
-		log.Dev(c.SessionID, "Auth", "Started")
-		log.Error(c.SessionID, "Auth", err, "Authentication Error")
-		log.Dev(c.SessionID, "Auth", "Completed")
-		return err
-	}
-}
-
 // authOff is used when authentication is turned off by not providing a public
 // key in the environment.
 func authOff(h app.Handler) app.Handler {
