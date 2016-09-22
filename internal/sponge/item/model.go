@@ -11,12 +11,17 @@ import (
 // validate is used to perform model field validation.
 var validate *validator.Validate
 
-// sourceIDField is used to infer item.ID from type and data.
-const sourceIDField = "id"
-
 func init() {
 	validate = validator.New(&validator.Config{TagName: "validate"})
 }
+
+//==============================================================================
+
+// sourceIDField is used to infer item.ID from type and data.
+const sourceIDField = "id"
+
+// itemIDTemplate describes the form of an item_id inferred from type and source_id.
+const itemIDTemplate = "%s_%v"
 
 //==============================================================================
 
@@ -43,15 +48,14 @@ func (item *Item) Validate() error {
 // InferIDFromData infers an item_id from type and source id.
 func (item *Item) InferIDFromData() error {
 
-	// Does the source_id field exist in the data?
 	// If a source id value is found, use it to compose the item_id for this item.
 	idValue, ok := item.Data[sourceIDField]
 	if !ok {
 		return fmt.Errorf("Cannot Infer ID: Unable to find source id field")
 	}
 
-	item.ID = item.Type + "_" + fmt.Sprintf("%v", idValue)
+	// Set the ID via the template.
+	item.ID = fmt.Sprintf(itemIDTemplate, item, idValue)
 
 	return nil
-
 }

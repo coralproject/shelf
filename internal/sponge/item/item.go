@@ -21,7 +21,7 @@ var ErrNotFound = errors.New("Set Not found")
 func Upsert(context interface{}, db *db.DB, item *Item) error {
 	log.Dev(context, "Upsert", "Started : ID[%s]", item.ID)
 
-	// if there is no ID, create one
+	// If there is no ID, create one.
 	if item.ID == "" {
 		item.ID = uuid.New()
 	}

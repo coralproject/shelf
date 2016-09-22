@@ -162,7 +162,7 @@ func TestGetAll(t *testing.T) {
 }
 
 // TestInferId tests the inference of an item_id from type and source id.
-func TestItemizeData(t *testing.T) {
+func TestInferId(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -171,15 +171,21 @@ func TestItemizeData(t *testing.T) {
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to load item data.json fixture: %v", tests.Failed, err)
 	}
+
+	// Create an item out of the data.
 	it := item.Item{
 		Type:    "test_type",
 		Version: 1,
 		Data:    d,
 	}
+
+	// Infer the id from the data.
 	if err := it.InferIDFromData(); err != nil {
 		t.Fatalf("\t%s\tShould be able to InferID from data containing field id: %v", tests.Failed, err)
 	}
-	if it.ID != it.Type+"_"+fmt.Sprintf("%v", d["id"]) {
+
+	// Check to ensure the id is as expected.
+	if it.ID != fmt.Sprintf("%s_%v", it.Type, d["id"]) {
 		t.Fatalf("\t%s\tShould infer item_id of form type + \"_\" + source_id: %v", tests.Failed, err)
 	}
 
@@ -188,11 +194,15 @@ func TestItemizeData(t *testing.T) {
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to load item data_without_id.json fixture: %v", tests.Failed, err)
 	}
+
+	// Create an item out of the data.
 	it = item.Item{
 		Type:    "test_type",
 		Version: 1,
 		Data:    d,
 	}
+
+	// Ensure that the id fails without the source_id in data.
 	if err := it.InferIDFromData(); err == nil {
 		t.Fatalf("\t%s\tShould not be able to InferID from data not containing field id: %v", tests.Failed, err)
 	}
