@@ -55,7 +55,7 @@ func (item *Item) InferIDFromData() error {
 	}
 
 	// Set the ID via the template.
-	item.ID = fmt.Sprintf(itemIDTemplate, item, idValue)
+	item.ID = fmt.Sprintf(itemIDTemplate, item.Type, idValue)
 
 	return nil
 }
