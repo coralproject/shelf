@@ -88,6 +88,14 @@ func TestAddRemoveGraph(t *testing.T) {
 			t.Logf("\t%s\tShould be able to get relationships from the graph.", tests.Success)
 
 			//----------------------------------------------------------------------
+			// Try to infer and add the relationships again.
+
+			if err := wire.AddToGraph(tests.Context, db, store, items[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to add an item again and maintain relationships : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add an item again and maintain relationships.", tests.Success)
+
+			//----------------------------------------------------------------------
 			// Remove the relationships from the graph.
 
 			params1 := wire.QuadParam{
