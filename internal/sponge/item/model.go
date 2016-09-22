@@ -17,11 +17,14 @@ func init() {
 
 //==============================================================================
 
-// sourceIDField is used to infer item.ID from type and data.
-const sourceIDField = "id"
+const (
 
-// itemIDTemplate describes the form of an item_id inferred from type and source_id.
-const itemIDTemplate = "%s_%v"
+	// sourceIDField is used to infer item.ID from type and data.
+	sourceIDField = "id"
+
+	// itemIDTemplate describes the form of an item_id inferred from type and source_id.
+	itemIDTemplate = "%s_%v"
+)
 
 //==============================================================================
 
@@ -51,7 +54,7 @@ func (item *Item) InferIDFromData() error {
 	// If a source id value is found, use it to compose the item_id for this item.
 	idValue, ok := item.Data[sourceIDField]
 	if !ok {
-		return fmt.Errorf("Cannot Infer ID: Unable to find source id field")
+		return fmt.Errorf("Cannot Infer ID: Unable to find source id field: %s", sourceIDField)
 	}
 
 	// Set the ID via the template.

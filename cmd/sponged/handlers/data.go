@@ -10,9 +10,6 @@ import (
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
-// defaultVersion is set to item.Version when no version is provided
-const defaultVersion = 1
-
 // dataHandle maintains the set of handlers for the data api, which is responsible
 // for all requests sending/requesting unstructured data not yet in item form.
 type dataHandle struct{}
@@ -22,13 +19,18 @@ var Data dataHandle
 
 //==============================================================================
 
+// defaultVersion is set to item.Version when no version is provided
+const defaultVersion = 1
+
+//==============================================================================
+
 // Upsert receives POSTed data, itemizes it then Upserts it via the item service
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
 func (dataHandle) Upsert(c *app.Context) error {
 
 	// Unmarshall the data packet from the Request Body.
-	var da map[string]interface{}
-	if err := json.NewDecoder(c.Request.Body).Decode(&da); err != nil {
+	var dat map[string]interface{}
+	if err := json.NewDecoder(c.Request.Body).Decode(&dat); err != nil {
 		return err
 	}
 
@@ -36,7 +38,7 @@ func (dataHandle) Upsert(c *app.Context) error {
 	it := item.Item{
 		Type:    c.Params["type"],
 		Version: defaultVersion,
-		Data:    da,
+		Data:    dat,
 	}
 
 	// Item.ID must be inferred from the source_id in the data.
@@ -49,7 +51,7 @@ func (dataHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	// Respond with no content success
+	// Respond with no content success.
 	c.Respond(nil, http.StatusNoContent)
 	return nil
 }
