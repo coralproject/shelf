@@ -127,7 +127,7 @@ func jsonItemJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/item.json", size: 300, mode: os.FileMode(420), modTime: time.Unix(1474484688, 0)}
+	info := bindataFileInfo{name: "json/item.json", size: 300, mode: os.FileMode(420), modTime: time.Unix(1474485118, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
