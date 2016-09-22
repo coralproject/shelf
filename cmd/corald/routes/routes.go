@@ -2,12 +2,14 @@ package routes
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/corald/fixtures"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
+	"github.com/coralproject/shelf/cmd/corald/midware"
 )
 
 func init() {
@@ -18,11 +20,13 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API(testing ...bool) http.Handler {
+	auth, err := midware.Auth()
+	if err != nil {
+		log.Error("startup", "Init", err, "Initializing Auth")
+		os.Exit(1)
+	}
 
-	// TODO: If authentication is on then configure
-	// it and provide proper middleware.
-
-	a := app.New()
+	a := app.New(auth)
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)

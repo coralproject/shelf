@@ -9,12 +9,6 @@
 			"revisionTime": "2016-07-16T02:56:31Z"
 		},
 		{
-			"checksumSHA1": "rF7KvNcRjzqvwSC5aeSTWDJ4XUM=",
-			"path": "github.com/anvilresearch/go-anvil",
-			"revision": "9530b9115e7b958b11a3f113bf28546bc076005f",
-			"revisionTime": "2016-05-03T02:00:42Z"
-		},
-		{
 			"checksumSHA1": "WWElstbt65X/2hn9bYATJuoLgPw=",
 			"path": "github.com/ardanlabs/kit/cfg",
 			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
@@ -51,7 +45,6 @@
 		},
 		{
 			"checksumSHA1": "m8QiHXKTQrHjCBfAQMqbPWKcMXk=",
-			"origin": "github.com/coralproject/shelf/vendor/github.com/ardanlabs/kit/web/app",
 			"path": "github.com/ardanlabs/kit/web/app",
 			"revision": "616cf009cc457ee07d9e48380853a0c0500c3719",
 			"revisionTime": "2016-09-16T14:58:49Z"
@@ -160,10 +153,10 @@
 			"revisionTime": "2016-01-09T20:38:47Z"
 		},
 		{
-			"checksumSHA1": "zZKFQ2lcwqkOhs3gIs3NKeLG2i8=",
+			"checksumSHA1": "0XJF0yZgAZB47NorNns2rB+NSmA=",
 			"path": "github.com/dgrijalva/jwt-go",
-			"revision": "a2c85815a77d0f951e33ba4db5ae93629a1530af",
-			"revisionTime": "2016-04-13T00:36:00Z"
+			"revision": "24c63f56522a87ec5339cc3567883f1039378fdb",
+			"revisionTime": "2016-08-31T18:35:34Z"
 		},
 		{
 			"checksumSHA1": "Lq5Fge0XqpxRfzbuh25XkVjFkF4=",
