@@ -17,14 +17,8 @@ func init() {
 
 //==============================================================================
 
-const (
-
-	// sourceIDField is used to infer item.ID from type and data.
-	sourceIDField = "id"
-
-	// itemIDTemplate describes the form of an item_id inferred from type and source_id.
-	itemIDTemplate = "%s_%v"
-)
+// sourceIDField is used to infer item.ID from type and data.
+const sourceIDField = "id"
 
 //==============================================================================
 
@@ -58,7 +52,7 @@ func (item *Item) InferIDFromData() error {
 	}
 
 	// Set the ID via the template.
-	item.ID = fmt.Sprintf(itemIDTemplate, item.Type, idValue)
+	item.ID = fmt.Sprintf("%s_%v", item.Type, idValue)
 
 	return nil
 }

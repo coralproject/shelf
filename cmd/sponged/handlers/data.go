@@ -19,13 +19,13 @@ var Data dataHandle
 
 //==============================================================================
 
-// defaultVersion is set to item.Version when no version is provided
+// defaultVersion is set to item.Version when no version is provided.
 const defaultVersion = 1
 
 //==============================================================================
 
 // Upsert receives POSTed data, itemizes it then Upserts it via the item service
-// 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
+// 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal.
 func (dataHandle) Upsert(c *app.Context) error {
 
 	// Unmarshall the data packet from the Request Body.
