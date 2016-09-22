@@ -31,6 +31,7 @@ cmd/xenia/xenia
 cmd/xeniad/xeniad
 cmd/askd/askd
 cmd/corald/corald
+cmd/sponged/sponged
 
 # Local development Config files
 config
