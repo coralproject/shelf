@@ -6,6 +6,7 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/pborman/uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -19,6 +20,11 @@ var ErrNotFound = errors.New("Set Not found")
 // Upsert upserts an item to the items collections.
 func Upsert(context interface{}, db *db.DB, item *Item) error {
 	log.Dev(context, "Upsert", "Started : ID[%s]", item.ID)
+
+	// If there is no ID, create one.
+	if item.ID == "" {
+		item.ID = uuid.New()
+	}
 
 	// Validate the item.
 	if err := item.Validate(); err != nil {

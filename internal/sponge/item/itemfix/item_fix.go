@@ -58,3 +58,20 @@ func Remove(context interface{}, db *db.DB, pattern string) error {
 
 	return nil
 }
+
+// GetData loads data based from data.json.
+func GetData(filename string) (map[string]interface{}, error) {
+	file, err := os.Open(path + filename)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+
+	var d map[string]interface{}
+	err = json.NewDecoder(file).Decode(&d)
+	if err != nil {
+		return nil, err
+	}
+
+	return d, nil
+}

@@ -73,4 +73,6 @@ func routes(a *app.App) {
 	a.Handle("GET", "/1.0/item/:id", handlers.Item.Retrieve)
 	a.Handle("PUT", "/1.0/item", handlers.Item.Upsert)
 	a.Handle("DELETE", "/1.0/item/:id", handlers.Item.Delete)
+
+	a.Handle("POST", "/1.0/data/:type", handlers.Data.Upsert)
 }
