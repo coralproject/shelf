@@ -88,6 +88,14 @@ func TestAddRemoveGraph(t *testing.T) {
 			t.Logf("\t%s\tShould be able to get relationships from the graph.", tests.Success)
 
 			//----------------------------------------------------------------------
+			// Try to infer and add the relationships again.
+
+			if err := wire.AddToGraph(tests.Context, db, store, items[0]); err != nil {
+				t.Fatalf("\t%s\tShould be able to add an item again and maintain relationships : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to add an item again and maintain relationships.", tests.Success)
+
+			//----------------------------------------------------------------------
 			// Remove the relationships from the graph.
 
 			params1 := wire.QuadParam{
@@ -172,6 +180,213 @@ func TestGraphParamFail(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to catch invalid quad parameters on remove : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to catch invalid quad parameters on remove.", tests.Success)
+		}
+	}
+}
+
+// TestAddToGraphFail tests if we can handle errors related to invalid inferred relationships.
+func TestAddToGraphFail(t *testing.T) {
+	db, store, _ := setupGraph(t)
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
+	{
+		t.Log("\tWhen starting from an empty graph")
+		{
+
+			//----------------------------------------------------------------------
+			// Infer invalid relationships and handle error.
+
+			itMap := map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid inferred relationships : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid inferred relationships.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item type and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item type : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item type.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item type and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    5,
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item type : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item type.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer missing item type and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch missing item type : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch missing item type.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item ID and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "",
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item ID : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item ID.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item ID and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": 5,
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item ID : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item ID.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer missing item ID and handle error.
+
+			itMap = map[string]interface{}{
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data": map[string]interface{}{
+					"author": "",
+					"parent": "",
+					"asset":  "",
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch missing item ID : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch missing item ID.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item data and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data":    2,
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item data : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item data.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer invalid item data and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "PTEST_comment",
+				"version": 2,
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item data : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item data.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer missing item data and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data": map[int]interface{}{
+					1: 2,
+					3: 4,
+				},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item data : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item data.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Infer missing item data and handle error.
+
+			itMap = map[string]interface{}{
+				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
+				"type":    "PTEST_comment",
+				"version": 2,
+				"data":    map[string]interface{}{},
+			}
+
+			if err := wire.AddToGraph(tests.Context, db, store, itMap); err == nil {
+				t.Fatalf("\t%s\tShould be able to catch invalid item data : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to catch invalid item data.", tests.Success)
+
 		}
 	}
 }
