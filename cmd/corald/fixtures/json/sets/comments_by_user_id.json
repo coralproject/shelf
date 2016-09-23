@@ -1,0 +1,36 @@
+{
+  "name": "comments_by_user",
+  "desc": "Returns a list of comments by user",
+  "pre_script": "",
+  "pst_script": "",
+  "params": [],
+  "queries": [
+    {
+      "name": "comments_by_user_id",
+      "type": "pipeline",
+      "collection": "items",
+      "commands": [
+        {
+          "$match": {
+            "data.userID": "#string:user_id"
+          }
+        },
+        {
+          "$sort": {
+            "status": -1
+          }
+        },
+        {
+          "$skip": 0
+        },
+        {
+          "$limit": 20
+        }
+      ],
+      "indexes": [],
+      "return": true
+    }
+  ],
+  "enabled": true,
+  "explain": false
+}

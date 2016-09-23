@@ -11,32 +11,32 @@
 		{
 			"checksumSHA1": "WWElstbt65X/2hn9bYATJuoLgPw=",
 			"path": "github.com/ardanlabs/kit/cfg",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"checksumSHA1": "5U36HUtCWHXh3+QgQivEcMCAPFU=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"checksumSHA1": "LtvZGFkHom2jtvFxc+rdJ+u++es=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"checksumSHA1": "Q7x7D7bjm4MKqcvfNfLuyJx6R8w=",
 			"path": "github.com/ardanlabs/kit/log",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"checksumSHA1": "TfieH23my6GTKr6POJatpoe0j/M=",
 			"path": "github.com/ardanlabs/kit/tests",
-			"revision": "a09737e5c92efd7daab87533ef25d8dd2d5bc86d",
-			"revisionTime": "2016-09-15T01:02:53Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"path": "github.com/ardanlabs/kit/web",
@@ -44,10 +44,10 @@
 			"revisionTime": "2015-12-11T17:17:53:34-05:00"
 		},
 		{
-			"checksumSHA1": "m8QiHXKTQrHjCBfAQMqbPWKcMXk=",
+			"checksumSHA1": "UXSVzoDBtQGf9PYPGNtq/E9RaBQ=",
 			"path": "github.com/ardanlabs/kit/web/app",
-			"revision": "616cf009cc457ee07d9e48380853a0c0500c3719",
-			"revisionTime": "2016-09-16T14:58:49Z"
+			"revision": "9af2b54685f7b5aafc11ef4d48299df3e21fa6b4",
+			"revisionTime": "2016-09-23T17:46:36Z"
 		},
 		{
 			"checksumSHA1": "Mhcn2hul4Cem30FwweAhndf54+k=",
