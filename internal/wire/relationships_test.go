@@ -98,19 +98,7 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Remove the relationships from the graph.
 
-			params1 := wire.QuadParam{
-				Subject:   "80aa936a-f618-4234-a7be-df59a14cf8de",
-				Predicate: "authored",
-				Object:    "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
-			}
-			params2 := wire.QuadParam{
-				Subject:   "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
-				Predicate: "on",
-				Object:    "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-			}
-			params := []wire.QuadParam{params1, params2}
-
-			if err := wire.RemoveFromGraph(tests.Context, store, params); err != nil {
+			if err := wire.RemoveFromGraph(tests.Context, db, store, items[0]); err != nil {
 				t.Fatalf("\t%s\tShould be able to remove relationships from the graph : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to remove relationships from the graph.", tests.Success)
@@ -145,41 +133,6 @@ func TestAddRemoveGraph(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to verify the empty graph", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to verify the empty graph.", tests.Success)
-		}
-	}
-}
-
-// TestGraphParamFail tests if we can handle invalid quad parameters.
-func TestGraphParamFail(t *testing.T) {
-	_, store, _ := setupGraph(t)
-	defer tests.DisplayLog()
-
-	t.Log("Given the need to add/remove relationship quads from the Cayley graph.")
-	{
-		t.Log("\tWhen starting from an empty graph")
-		{
-			//----------------------------------------------------------------------
-			// Create some example parameters to import into the graph.
-
-			params1 := wire.QuadParam{
-				Subject:   "",
-				Predicate: "",
-				Object:    "the ring",
-			}
-			params2 := wire.QuadParam{
-				Subject:   "orcs",
-				Predicate: "chase",
-				Object:    "frodo",
-			}
-			params := []wire.QuadParam{params1, params2}
-
-			//----------------------------------------------------------------------
-			// Try to remove the invalid relationship to the graph.
-
-			if err := wire.RemoveFromGraph(tests.Context, store, params); err == nil {
-				t.Fatalf("\t%s\tShould be able to catch invalid quad parameters on remove : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to catch invalid quad parameters on remove.", tests.Success)
 		}
 	}
 }

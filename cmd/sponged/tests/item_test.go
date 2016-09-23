@@ -230,7 +230,7 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Item.
 
-		url := "/1.0/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4"
+		url := "/1.0/item/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
 		r := tests.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
@@ -247,7 +247,7 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Item.
 
-		url = "/1.0/view/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4"
+		url = "/1.0/view/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -260,5 +260,38 @@ func TestDeleteItem(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould not be able to retrieve the item.", tests.Success)
 		}
+
+		//----------------------------------------------------------------------
+		// Check the inferred relationships.
+
+		opts := map[string]interface{}{
+			"database_name": cfg.MustString("MONGO_DB"),
+			"username":      cfg.MustString("MONGO_USER"),
+			"password":      cfg.MustString("MONGO_PASS"),
+		}
+
+		store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+		if err != nil {
+			t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
+		}
+
+		p := cayley.StartPath(store, quad.String("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+		it, _ := p.BuildIterator().Optimize()
+		defer it.Close()
+
+		var count int
+		for it.Next() {
+			count++
+		}
+		if err := it.Err(); err != nil {
+			t.Fatalf("\t%s\tShould be able to confirm removed relationships : %s", tests.Failed, err)
+		}
+		it.Close()
+
+		if count > 0 {
+			t.Fatalf("\t%s\tShould be able to confirm removed relationships.", tests.Failed)
+		}
+		t.Logf("\t%s\tShould be able to confirm removed relationships.", tests.Success)
+
 	}
 }

@@ -3,6 +3,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -77,10 +78,42 @@ func (itemHandle) Upsert(c *app.Context) error {
 // Delete removes the specified Item from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (itemHandle) Delete(c *app.Context) error {
+
+	// Get the item from the items collection.
+	items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{c.Params["id"]})
+	if err != nil {
+		if err == item.ErrNotFound {
+			err = app.ErrNotFound
+		}
+		return err
+	}
+
+	// Check to make sure we have the single item.
+	if len(items) != 1 {
+		return fmt.Errorf("Item ID corresponds to an unexpected number, %d, of items", len(items))
+	}
+
+	// Delete the item.
 	if err := item.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["id"]); err != nil {
 		if err == item.ErrNotFound {
 			err = app.ErrNotFound
 		}
+		return err
+	}
+
+	// Prepare the item map data.
+	itMap := map[string]interface{}{
+		"item_id": items[0].ID,
+		"type":    items[0].Type,
+		"version": items[0].Version,
+		"data":    items[0].Data,
+	}
+
+	// Remove the corresponding relationships from the graph.
+	if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+		fmt.Println("")
+		fmt.Println(err)
+		fmt.Println("")
 		return err
 	}
 
