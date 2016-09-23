@@ -111,9 +111,6 @@ func (itemHandle) Delete(c *app.Context) error {
 
 	// Remove the corresponding relationships from the graph.
 	if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
-		fmt.Println("")
-		fmt.Println(err)
-		fmt.Println("")
 		return err
 	}
 
