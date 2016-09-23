@@ -1,4 +1,4 @@
-//go:generate go-bindata -pkg fixtures -o assets.go json/
+//go:generate go-bindata -pkg fixtures -o assets.go json/...
 
 package fixtures
 
