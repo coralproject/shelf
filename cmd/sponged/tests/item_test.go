@@ -228,7 +228,7 @@ func TestDeleteItem(t *testing.T) {
 	t.Log("Given the need to delete an item.")
 	{
 		//----------------------------------------------------------------------
-		// Delete the View.
+		// Delete the Item.
 
 		url := "/1.0/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4"
 		r := tests.NewRequest("DELETE", url, nil)
