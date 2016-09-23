@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"
@@ -49,6 +50,42 @@ func (itemHandle) Upsert(c *app.Context) error {
 	var it item.Item
 	if err := json.NewDecoder(c.Request.Body).Decode(&it); err != nil {
 		return err
+	}
+
+	// See if the item already exists.
+	items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{it.ID})
+	if err != nil {
+		if err != item.ErrNotFound {
+			return err
+		}
+	}
+
+	// If we got more than one item, there is a problem.
+	if len(items) > 1 {
+		return fmt.Errorf("Expected one item, retrieved %d items.", len(items))
+	}
+
+	// Determine if the existing item is identical to the provided item.
+	if len(items) == 1 {
+
+		// If the item is identical, we don't have to do anything.
+		if reflect.DeepEqual(items[0], it) {
+			return nil
+		}
+
+		// If the item is not identical, remove the stale relationships by
+		// preparing an item map.
+		itMap := map[string]interface{}{
+			"item_id": items[0].ID,
+			"type":    items[0].Type,
+			"version": items[0].Version,
+			"data":    items[0].Data,
+		}
+
+		// Remove the corresponding relationships from the graph.
+		if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+			return err
+		}
 	}
 
 	// Add the item to the items collection.
