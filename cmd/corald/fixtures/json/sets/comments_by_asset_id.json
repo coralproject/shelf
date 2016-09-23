@@ -1,0 +1,25 @@
+{
+  "name": "comments_by_asset",
+  "desc": "Returns a list of comments by asset",
+  "pre_script": "",
+  "pst_script": "",
+  "params": [],
+  "queries": [
+    {
+      "name": "comments_by_asset_id",
+      "type": "pipeline",
+      "collection": "items",
+      "commands": [
+        {
+          "$match": {
+            "data.assetID": "#string:asset_id"
+          }
+        }
+      ],
+      "indexes": [],
+      "return": true
+    }
+  ],
+  "enabled": true,
+  "explain": false
+}
