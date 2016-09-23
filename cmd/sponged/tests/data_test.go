@@ -9,13 +9,12 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-
 	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
-// TestUpsertItem tests the insert and update of an item.
-func DataUpsertItem(t *testing.T) {
+// TestUpsertData tests the upsert of data into an item.
+func TestUpsertData(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
@@ -57,7 +56,6 @@ func DataUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the item.
 
-		var items []item.Item
 		url = "/1.0/item/" + fmt.Sprintf("%s_%v", typ, dat["id"])
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
@@ -77,12 +75,32 @@ func DataUpsertItem(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if itemsBack[0].ID != items[0].ID || itemsBack[0].Type != items[0].Type {
-				t.Logf("\t%+v", items[0])
-				t.Logf("\t%+v", itemsBack[0])
+			if len(itemsBack) == 0 {
+				t.Fatalf("\t%s\tShould be able to get back the same item.", tests.Failed)
+			}
+
+			if itemsBack[0].ID != fmt.Sprintf("%s_%v", typ, dat["id"]) || itemsBack[0].Type != typ {
 				t.Fatalf("\t%s\tShould be able to get back the same item.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same item.", tests.Success)
 		}
+
+		//----------------------------------------------------------------------
+		// Delete the Item.
+
+		url = "/1.0/item/" + fmt.Sprintf("%s_%v", typ, dat["id"])
+		r = tests.NewRequest("DELETE", url, nil)
+		w = httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url to delete : %s", url)
+		{
+			if w.Code != 204 {
+				t.Fatalf("\t%s\tShould be able to delete the item : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to delete the item.", tests.Success)
+		}
+
 	}
 }
