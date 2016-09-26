@@ -57,6 +57,10 @@ func routes(a *app.App) {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
-	a.Handle("POST", "/v1/item", fixtures.Handler("items/itemid", http.StatusCreated))
-	a.Handle("PUT", "/v1/item", handlers.Proxy(spongedURL, nil))
+	a.Handle("PUT", "/v1/item",
+		handlers.Proxy(spongedURL,
+			func(c *app.Context) string {
+				return "/1.0/item"
+			}))
+	//a.Handle("PUT", "/v1/item", handlers.Proxy(spongedURL, nil))
 }
