@@ -17,13 +17,13 @@
 
 
 #### <a name="pkg-files">Package files</a>
-[pattern_fix.go](/src/github.com/coralproject/shelf/internal/wire/pattern/patternfix/pattern_fix.go) 
+[patternfix.go](/src/github.com/coralproject/shelf/internal/wire/pattern/patternfix/patternfix.go) 
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/pattern_fix.go?s=1056:1130#L42)
+## <a name="Add">func</a> [Add](/src/target/patternfix.go?s=1056:1130#L42)
 ``` go
 func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error
 ```
@@ -31,7 +31,7 @@ Add inserts patterns for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/pattern_fix.go?s=374:437#L10)
+## <a name="Get">func</a> [Get](/src/target/patternfix.go?s=374:437#L10)
 ``` go
 func Get() ([]pattern.Pattern, []map[string]interface{}, error)
 ```
@@ -39,7 +39,7 @@ Get loads pattern data based on patterns.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/pattern_fix.go?s=1325:1389#L53)
+## <a name="Remove">func</a> [Remove](/src/target/patternfix.go?s=1325:1389#L53)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```

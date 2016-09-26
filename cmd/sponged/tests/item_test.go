@@ -23,6 +23,30 @@ const (
 	patternPrefix = "PTEST_"
 )
 
+// setup initializes for each indivdual test.
+func setup(t *testing.T) *cayley.Handle {
+	tests.ResetLog()
+
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString("MONGO_DB"),
+		"username":      cfg.MustString("MONGO_USER"),
+		"password":      cfg.MustString("MONGO_PASS"),
+	}
+
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
+	}
+
+	return store
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, store *cayley.Handle) {
+	store.Close()
+	tests.DisplayLog()
+}
+
 // TestRetrieveItems tests the retrieval of items.
 func TestRetrieveItems(t *testing.T) {
 	tests.ResetLog()
@@ -67,8 +91,8 @@ func TestRetrieveItems(t *testing.T) {
 
 // TestUpsertItem tests the insert and update of an item.
 func TestUpsertItem(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	store := setup(t)
+	defer teardown(t, store)
 
 	t.Log("Given the need to insert and then update an item.")
 	{
@@ -106,17 +130,6 @@ func TestUpsertItem(t *testing.T) {
 
 		//----------------------------------------------------------------------
 		// Check the inferred relationship.
-
-		opts := map[string]interface{}{
-			"database_name": cfg.MustString("MONGO_DB"),
-			"username":      cfg.MustString("MONGO_USER"),
-			"password":      cfg.MustString("MONGO_PASS"),
-		}
-
-		store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-		if err != nil {
-			t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
-		}
 
 		p := cayley.StartPath(store, quad.String("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
 		it, _ := p.BuildIterator().Optimize()
@@ -222,8 +235,8 @@ func TestUpsertItem(t *testing.T) {
 
 // TestDeleteItem tests the insert and deletion of a item.
 func TestDeleteItem(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	store := setup(t)
+	defer teardown(t, store)
 
 	t.Log("Given the need to delete an item.")
 	{
@@ -264,17 +277,6 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Check the inferred relationships.
 
-		opts := map[string]interface{}{
-			"database_name": cfg.MustString("MONGO_DB"),
-			"username":      cfg.MustString("MONGO_USER"),
-			"password":      cfg.MustString("MONGO_PASS"),
-		}
-
-		store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-		if err != nil {
-			t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
-		}
-
 		p := cayley.StartPath(store, quad.String("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
 		it, _ := p.BuildIterator().Optimize()
 		defer it.Close()
@@ -286,7 +288,6 @@ func TestDeleteItem(t *testing.T) {
 		if err := it.Err(); err != nil {
 			t.Fatalf("\t%s\tShould be able to confirm removed relationships : %s", tests.Failed, err)
 		}
-		it.Close()
 
 		if count > 0 {
 			t.Fatalf("\t%s\tShould be able to confirm removed relationships.", tests.Failed)

@@ -46,7 +46,7 @@ ErrInvalidID occurs when an ID is not in a valid form.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/form.go?s=8245:8305#L250)
+## <a name="Delete">func</a> [Delete](/src/target/form.go?s=8309:8369#L253)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -55,7 +55,7 @@ database collection.
 
 
 
-## <a name="List">func</a> [List](/src/target/form.go?s=7623:7697#L230)
+## <a name="List">func</a> [List](/src/target/form.go?s=7687:7761#L233)
 ``` go
 func List(context interface{}, db *db.DB, limit, skip int) ([]Form, error)
 ```
@@ -101,14 +101,14 @@ Steps, and help text relating to completing the Form.
 
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/form.go?s=6881:6952#L204)
+### <a name="Retrieve">func</a> [Retrieve](/src/target/form.go?s=6945:7016#L207)
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Form, error)
 ```
 Retrieve retrieves the form from the MongodB database collection.
 
 
-### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/form.go?s=5872:5955#L167)
+### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/form.go?s=5936:6019#L170)
 ``` go
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Form, error)
 ```
@@ -142,7 +142,7 @@ Stats describes the statistics being recorded by a specific Form.
 
 
 
-### <a name="UpdateStats">func</a> [UpdateStats](/src/target/form.go?s=4776:4851#L126)
+### <a name="UpdateStats">func</a> [UpdateStats](/src/target/form.go?s=4840:4915#L129)
 ``` go
 func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error)
 ```

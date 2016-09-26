@@ -56,7 +56,7 @@ MongoDB database collection.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/gallery.go?s=12217:12277#L397)
+## <a name="Delete">func</a> [Delete](/src/target/gallery.go?s=12367:12427#L397)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -64,7 +64,7 @@ Delete removes the given Gallery with the ID provided.
 
 
 
-## <a name="List">func</a> [List](/src/target/gallery.go?s=10432:10507#L330)
+## <a name="List">func</a> [List](/src/target/gallery.go?s=10582:10657#L330)
 ``` go
 func List(context interface{}, db *db.DB, formID string) ([]Gallery, error)
 ```
@@ -73,7 +73,7 @@ collection.
 
 
 
-## <a name="Update">func</a> [Update](/src/target/gallery.go?s=11348:11426#L365)
+## <a name="Update">func</a> [Update](/src/target/gallery.go?s=11498:11576#L365)
 ``` go
 func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error
 ```
@@ -134,7 +134,7 @@ Gallery is a Form that has been moved to a shared space.
 
 
 
-### <a name="AddAnswer">func</a> [AddAnswer](/src/target/gallery.go?s=7659:7758#L226)
+### <a name="AddAnswer">func</a> [AddAnswer](/src/target/gallery.go?s=7809:7908#L226)
 ``` go
 func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```
@@ -142,7 +142,7 @@ AddAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
 
 
-### <a name="RemoveAnswer">func</a> [RemoveAnswer](/src/target/gallery.go?s=9054:9156#L278)
+### <a name="RemoveAnswer">func</a> [RemoveAnswer](/src/target/gallery.go?s=9204:9306#L278)
 ``` go
 func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```

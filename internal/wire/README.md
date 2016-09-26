@@ -16,7 +16,7 @@ Package wire provides support for generating views.
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
 * [func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#AddToGraph)
-* [func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error](#RemoveFromGraph)
+* [func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#RemoveFromGraph)
 * [type QuadParam](#QuadParam)
   * [func (q *QuadParam) Validate() error](#QuadParam.Validate)
 * [type Result](#Result)
@@ -51,7 +51,7 @@ var (
 ```
 
 
-## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1229:1333#L39)
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1275:1379#L41)
 ``` go
 func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
@@ -59,16 +59,16 @@ AddToGraph adds relationships as quads into the cayley graph.
 
 
 
-## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2246:2339#L75)
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2329:2438#L79)
 ``` go
-func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error
+func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
 RemoveFromGraph removes relationship quads from the cayley graph.
 
 
 
 
-## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=828:991#L24)
+## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=874:1037#L26)
 ``` go
 type QuadParam struct {
     Subject   string `validate:"required,min=2"`
@@ -88,7 +88,7 @@ to/from the cayley graph.
 
 
 
-### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1050:1086#L31)
+### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1096:1132#L33)
 ``` go
 func (q *QuadParam) Validate() error
 ```

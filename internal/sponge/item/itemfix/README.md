@@ -13,17 +13,18 @@
 ## <a name="pkg-index">Index</a>
 * [func Add(context interface{}, db *db.DB, items []item.Item) error](#Add)
 * [func Get() ([]item.Item, error)](#Get)
+* [func GetData(filename string) (map[string]interface{}, error)](#GetData)
 * [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
-[item_fix.go](/src/github.com/coralproject/shelf/internal/sponge/item/itemfix/item_fix.go) 
+[itemfix.go](/src/github.com/coralproject/shelf/internal/sponge/item/itemfix/itemfix.go) 
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/item_fix.go?s=656:721#L27)
+## <a name="Add">func</a> [Add](/src/target/itemfix.go?s=656:721#L27)
 ``` go
 func Add(context interface{}, db *db.DB, items []item.Item) error
 ```
@@ -31,7 +32,7 @@ Add inserts items for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/item_fix.go?s=359:390#L10)
+## <a name="Get">func</a> [Get](/src/target/itemfix.go?s=359:390#L10)
 ``` go
 func Get() ([]item.Item, error)
 ```
@@ -39,7 +40,15 @@ Get loads item data based on item.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/item_fix.go?s=906:971#L38)
+## <a name="GetData">func</a> [GetData](/src/target/itemfix.go?s=1255:1316#L53)
+``` go
+func GetData(filename string) (map[string]interface{}, error)
+```
+GetData loads data based from data.json.
+
+
+
+## <a name="Remove">func</a> [Remove](/src/target/itemfix.go?s=906:971#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```

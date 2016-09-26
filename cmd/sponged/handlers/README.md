@@ -11,6 +11,8 @@ Package handlers contains the handler logic for processing requests.
 
 Package handlers contains the handler logic for processing requests.
 
+Package handlers contains the handler logic for processing requests.
+
 
 
 
@@ -19,11 +21,16 @@ Package handlers contains the handler logic for processing requests.
 
 
 #### <a name="pkg-files">Package files</a>
-[item.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/item.go) [version.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/version.go) 
+[data.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/data.go) [item.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/item.go) [version.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/version.go) 
 
 
 
 ## <a name="pkg-variables">Variables</a>
+``` go
+var Data dataHandle
+```
+Data fronts the access to the data service functionality.
+
 ``` go
 var Item itemHandle
 ```

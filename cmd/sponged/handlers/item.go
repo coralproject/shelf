@@ -3,7 +3,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"reflect"
 	"strings"
@@ -61,16 +60,10 @@ func (itemHandle) Upsert(c *app.Context) error {
 			}
 		}
 
-		// If we got more than one item, there is a problem.
-		if len(items) > 1 {
-			return fmt.Errorf("Expected one item, retrieved %d items.", len(items))
-		}
-
-		// Determine if the existing item is identical to the provided item.
-		if len(items) == 1 {
-
-			// If the item is identical, we don't have to do anything.
+		// If the item is identical, we don't have to do anything.
+		if len(items) > 0 {
 			if reflect.DeepEqual(items[0], it) {
+				c.Respond(nil, http.StatusNoContent)
 				return nil
 			}
 
@@ -125,11 +118,6 @@ func (itemHandle) Delete(c *app.Context) error {
 			err = app.ErrNotFound
 		}
 		return err
-	}
-
-	// Check to make sure we have the single item.
-	if len(items) != 1 {
-		return fmt.Errorf("Item ID corresponds to an unexpected number, %d, of items", len(items))
 	}
 
 	// Delete the item.

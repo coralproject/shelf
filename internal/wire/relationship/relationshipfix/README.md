@@ -17,13 +17,13 @@
 
 
 #### <a name="pkg-files">Package files</a>
-[relationship_fix.go](/src/github.com/coralproject/shelf/internal/wire/relationship/relationshipfix/relationship_fix.go) 
+[relationshipfix.go](/src/github.com/coralproject/shelf/internal/wire/relationship/relationshipfix/relationshipfix.go) 
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/relationship_fix.go?s=746:826#L27)
+## <a name="Add">func</a> [Add](/src/target/relationshipfix.go?s=746:826#L27)
 ``` go
 func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error
 ```
@@ -31,7 +31,7 @@ Add inserts relationships for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/relationship_fix.go?s=404:451#L10)
+## <a name="Get">func</a> [Get](/src/target/relationshipfix.go?s=404:451#L10)
 ``` go
 func Get() ([]relationship.Relationship, error)
 ```
@@ -39,7 +39,7 @@ Get loads relationship data based on relationships.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/relationship_fix.go?s=1028:1093#L38)
+## <a name="Remove">func</a> [Remove](/src/target/relationshipfix.go?s=1028:1093#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
