@@ -12,6 +12,9 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
 	"time"
 
 	"github.com/ardanlabs/kit/log"
@@ -122,4 +125,70 @@ func (c *Context) RespondInvalid(fields []Invalid) {
 // RespondError sends JSON describing the error
 func (c *Context) RespondError(error string, code int) {
 	c.Respond(jsonError{Error: error}, code)
+}
+
+// Proxy will setup a direct proxy inbetween this service and the destination
+// service.
+func (c *Context) Proxy(targetURL string, rewrite func(req *http.Request)) error {
+	target, err := url.Parse(targetURL)
+	if err != nil {
+		return err
+	}
+
+	// Define our custom request director to ensure that the correct headers are
+	// forwarded as well as having the request path and query rewritten
+	// properly.
+	director := func(req *http.Request) {
+		req.URL.Scheme = target.Scheme
+		req.URL.Host = target.Host
+		req.URL.Path = singleJoiningSlash(target.Path, req.URL.Path)
+
+		if target.RawQuery == "" || req.URL.RawQuery == "" {
+			req.URL.RawQuery = target.RawQuery + req.URL.RawQuery
+		} else {
+			req.URL.RawQuery = target.RawQuery + "&" + req.URL.RawQuery
+		}
+
+		// Set the headers on the incoming request by clearing them all out.
+		req.Header = make(http.Header)
+
+		// Rewrite the request for the director if a rewrite function was passed.
+		if rewrite != nil {
+			rewrite(req)
+		}
+	}
+
+	// Create a new reverse proxy. We need to to this here because for the path
+	// rewriting we may need access to variables stored in this specific
+	// request's path parameters which can allow to be overridden via the
+	// rewrite argument to this function.
+	proxy := httputil.ReverseProxy{Director: director}
+
+	// Create a new proxy response writer that will record the http status code
+	// issued by the reverse proxy.
+	prw := ProxyResponseWriter{
+		ResponseWriter: c.ResponseWriter,
+	}
+
+	// Serve the request via the built in handler here.
+	proxy.ServeHTTP(&prw, c.Request)
+
+	c.Status = prw.Status
+
+	return nil
+}
+
+// singleJoiningSlash ensures that there is a single joining slash inbetween the
+// url's that are being joined. This was sourced from the reverseproxy.go file
+// inside the net/http/httputil package in the stdlib.
+func singleJoiningSlash(a, b string) string {
+	aslash := strings.HasSuffix(a, "/")
+	bslash := strings.HasPrefix(b, "/")
+	switch {
+	case aslash && bslash:
+		return a + b[1:]
+	case !aslash && !bslash:
+		return a + "/" + b
+	}
+	return a + b
 }

@@ -7,7 +7,9 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/wire"
 )
 
 // dataHandle maintains the set of handlers for the data api, which is responsible
@@ -48,6 +50,19 @@ func (dataHandle) Upsert(c *app.Context) error {
 
 	// Upsert the item.
 	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &it); err != nil {
+		return err
+	}
+
+	// Prepare the generic item data map.
+	itMap := map[string]interface{}{
+		"item_id": it.ID,
+		"type":    it.Type,
+		"version": it.Version,
+		"data":    it.Data,
+	}
+
+	// Infer relationships and add them to the graph.
+	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
 		return err
 	}
 

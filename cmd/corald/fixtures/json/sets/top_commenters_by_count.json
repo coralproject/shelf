@@ -1,0 +1,18 @@
+{
+   "name":"top_commenters_by_count",
+   "desc":"Shows the top 20 commenters by number of comments",
+   "enabled":true,
+   "queries":[
+      {
+         "name":"top_commenters_by_count",
+         "type":"pipeline",
+         "collection":"items",
+         "return":true,
+         "commands":[
+            { "$group": { "_id": { "data.userID": "#string:user_id" }, "comments": { "$sum": 1 } } },
+            { "$sort": { "comments": -1 } },
+            { "$limit": 20 }
+         ]
+      }
+   ]
+}

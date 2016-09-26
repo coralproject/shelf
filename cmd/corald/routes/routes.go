@@ -10,18 +10,24 @@ import (
 	"github.com/coralproject/shelf/cmd/corald/handlers"
 )
 
+const (
+
+	// cfgSpongdURL is the config key for the url to the sponged service.
+	cfgSpongdURL = "SPONGED_URL"
+
+	// cfgXeniadURL is the config key for the url to the xeniad service.
+	cfgXeniadURL = "XENIAD_URL"
+)
+
 func init() {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
+	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
 }
 
 // API returns a handler for a set of routes.
 func API(testing ...bool) http.Handler {
-
-	// TODO: If authentication is on then configure
-	// it and provide proper middleware.
-
 	a := app.New()
 
 	log.Dev("startup", "Init", "Initalizing routes")
@@ -35,11 +41,22 @@ func API(testing ...bool) http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
-	a.Handle("GET", "/1.0/version", handlers.Version.List)
+	a.Handle("GET", "/v1/version", handlers.Version.List)
 
-	// TODO: For now these are sample routes.
-	a.Handle("GET", "/1.0/form", handlers.Form.List)
-	a.Handle("POST", "/1.0/form", fixtures.Handler("form", http.StatusCreated))
-	a.Handle("GET", "/1.0/form/:form_id", fixtures.Handler("form", http.StatusOK))
-	a.Handle("PUT", "/1.0/form/:form_id", fixtures.NoContent)
+	spongedURL := cfg.MustURL(cfgSpongdURL).String()
+	xeniadURL := cfg.MustURL(cfgXeniadURL).String()
+
+	a.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
+	a.Handle("POST", "/v1/form", fixtures.Handler("forms/form", http.StatusCreated))
+	a.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
+	a.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
+
+	a.Handle("GET", "/v1/item/:view_name/:item_key/:query_set",
+		handlers.Proxy(xeniadURL,
+			func(c *app.Context) string {
+				return "/v1/exec/" + c.Params["query_set"]
+			}))
+
+	a.Handle("POST", "/v1/item", fixtures.Handler("items/itemid", http.StatusCreated))
+	a.Handle("PUT", "/v1/item", handlers.Proxy(spongedURL, nil))
 }

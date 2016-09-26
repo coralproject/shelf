@@ -1,0 +1,50 @@
+[
+	{
+		"type": "PTEST_comment",
+		"inferences": [
+			{
+				"related_ID_field": "author",
+				"related_type": "PTEST_user",
+				"predicate": "authored",
+				"direction": "in",
+				"required": true
+			},
+			{
+				"related_ID_field": "parent",
+				"related_type": "PTEST_parent",
+				"predicate": "parented_by",
+				"direction": "out",
+				"required": false
+			},
+			{
+				"related_ID_field": "asset",
+				"related_type": "PTEST_asset",
+				"predicate": "on",
+				"direction": "out",
+				"required": true
+			}
+		]
+	},
+	{
+		"type": "PTEST_user",
+		"inferences": [
+			{
+				"related_ID_field": "role",
+				"predicate": "has_role",
+				"direction": "out",
+				"required": true
+			}
+		]
+	},
+	{
+		"type": "PTEST_asset",
+		"inferences": [
+			{
+				"related_ID_field": "section",
+				"predicate": "part_of",
+				"direction": "out",
+				"required": false
+			}
+		]
+	}
+]
