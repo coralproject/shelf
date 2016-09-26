@@ -226,7 +226,7 @@ func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
 	for k, v := range dataMap {
 
 		vString, ok := v.(string)
-		if !ok {
+		if !ok || vString == "" {
 			continue
 		}
 		itemData[k] = vString

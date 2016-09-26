@@ -38,7 +38,7 @@ func TestUpsertData(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Item.
 
-		typ := "test_type"
+		typ := "PTEST_comment"
 		url := "/1.0/data/" + typ
 		r := tests.NewRequest("POST", url, bytes.NewBuffer(itemStrData))
 		w := httptest.NewRecorder()

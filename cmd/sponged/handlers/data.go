@@ -65,6 +65,7 @@ func (dataHandle) Upsert(c *app.Context) error {
 	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
 		return err
 	}
+
 	// Respond with no content success.
 	c.Respond(nil, http.StatusNoContent)
 	return nil
