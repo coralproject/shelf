@@ -1,9 +1,7 @@
 package cmdregex
 
 import (
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/regex"
-
+	"github.com/coralproject/shelf/cmd/xenia/web"
 	"github.com/spf13/cobra"
 )
 
@@ -32,40 +30,13 @@ func addDel() {
 	regexCmd.AddCommand(cmd)
 }
 
-// runDelete is the code that implements the delete command.
+// runDelete issues the command talking to the web service.
 func runDelete(cmd *cobra.Command, args []string) {
-	if conn == nil {
-		runDeleteWeb(cmd)
-		return
-	}
-
-	runDeleteDB(cmd)
-}
-
-// runDeleteWeb issues the command talking to the web service.
-func runDeleteWeb(cmd *cobra.Command) {
 	verb := "DELETE"
 	url := "/1.0/regex/" + get.name
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
 		cmd.Println("Deleting Regex : ", err)
-	}
-
-	cmd.Println("Deleting Regex : Deleted")
-}
-
-// runDeleteDB issues the command talking to the DB.
-func runDeleteDB(cmd *cobra.Command) {
-	cmd.Printf("Deleting Regex : Name[%s]\n", delete.name)
-
-	if delete.name == "" {
-		cmd.Help()
-		return
-	}
-
-	if err := regex.Delete("", conn, delete.name); err != nil {
-		cmd.Println("Deleting Regex : ", err)
-		return
 	}
 
 	cmd.Println("Deleting Regex : Deleted")

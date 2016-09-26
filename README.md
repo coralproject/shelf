@@ -1,7 +1,11 @@
-# Xenia
+# Shelf
 
-[Xenia](https://github.com/coralproject/xenia) is a configurable service layer that publishes endpoints against [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).
+[Shelf](https://github.com/coralproject/shelf) is a configurable service layer that publishes endpoints against functionality for: 
+- [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).
+- importing, formatting, and validation of data.
+- management of relationships between pieces of data.
+- management and generation of views of imported data.
 
-All of the [Xenia documentation](http://coral-docs.readthedocs.io/en/latest/xenia/) (including [installation instructions](http://coral-docs.readthedocs.io/en/latest/xenia/install/)) can be found in the [Coral Project Documentation](http://coral-docs.readthedocs.io/en/latest/).
+All of the Shelf documentation (including installation instructions) can be found in the [Coral Project Documentation](https://coralprojectdocs.herokuapp.com/).
 
-The Xenia documentation [lives in Github](https://github.com/coralproject/docs/tree/master/xenia) in the "coralproject/docs/xenia" repository.
+Also, the Shelf documentation [lives in Github](https://github.com/coralproject/docs/tree/master/docs_dir/xenia) in the `coralproject/docs/docs_dir/xenia` repository (as shelf was previously named "xenia").

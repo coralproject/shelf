@@ -1,9 +1,6 @@
 package cmdquery
 
-import (
-	"github.com/ardanlabs/kit/db"
-	"github.com/spf13/cobra"
-)
+import "github.com/spf13/cobra"
 
 // queryCmd represents the parent for all query cli commands.
 var queryCmd = &cobra.Command{
@@ -11,13 +8,8 @@ var queryCmd = &cobra.Command{
 	Short: "query provides a xenia CLI for managing and executing queries.",
 }
 
-// Capture the database connection.
-var conn *db.DB
-
 // GetCommands returns the query commands.
-func GetCommands(db *db.DB) *cobra.Command {
-	conn = db
-
+func GetCommands() *cobra.Command {
 	addUpsert()
 	addGet()
 	addDel()

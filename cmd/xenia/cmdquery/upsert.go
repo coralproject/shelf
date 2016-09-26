@@ -6,10 +6,9 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/xenia/cmd/xenia/disk"
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/query"
-
+	"github.com/coralproject/shelf/cmd/xenia/disk"
+	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 
@@ -69,17 +68,9 @@ func runUpsert(cmd *cobra.Command, args []string) {
 			return
 		}
 
-		if conn != nil {
-			cmd.Printf("\n%+v\n", set)
-			if err := query.Upsert("", conn, set); err != nil {
-				cmd.Println("Upserting Set : ", err)
-				return
-			}
-		} else {
-			if err := runUpsertWeb(cmd, set); err != nil {
-				cmd.Println("Upserting Set : ", err)
-				return
-			}
+		if err := runUpsertWeb(cmd, set); err != nil {
+			cmd.Println("Upserting Set : ", err)
+			return
 		}
 
 		cmd.Println("\n", "Upserting Set : Upserted")
@@ -90,10 +81,6 @@ func runUpsert(cmd *cobra.Command, args []string) {
 		set, err := disk.LoadSet("", path)
 		if err != nil {
 			return err
-		}
-
-		if conn != nil {
-			return query.Upsert("", conn, set)
 		}
 
 		return runUpsertWeb(cmd, set)

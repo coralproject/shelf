@@ -1,0 +1,69 @@
+{
+  "id": "57daa6680cefe53d4b2adce0",
+  "status": "open",
+  "theme": {
+    "fieldTitleText": "#222222",
+    "footerBackground": "#FFFFFF",
+    "footerText": "#222222",
+    "formBackground": "#FFFFFF",
+    "headerBackground": "#FFFFFF",
+    "headerIntroText": "#444444",
+    "headerText": "#222222",
+    "inputBackground": "#FFFFFF",
+    "inputText": "#222222",
+    "progressBar": "#44AA44",
+    "progressBarBackground": "#CCCCCC",
+    "requiredAsterisk": "#939393",
+    "selectedItemBackground": "#2E343B",
+    "selectedItemText": "#FAFAFA",
+    "submitButtonBackground": "#F67D6E",
+    "submitButtonText": "#FFFFFF"
+  },
+  "settings": {
+    "baseUrl": "https://s3.amazonaws.com/nyt-stage/",
+    "inactiveMessage": "We are not currently accepting submissions. Thank you.",
+    "isActive": true,
+    "recaptcha": true,
+    "saveDestination": "https://pillar_stg.coralproject.net/v1/form/57daa6680cefe53d4b2adce0/submission",
+    "showFieldNumbers": true
+  },
+  "header": {
+    "description": "",
+    "heading": "wgg",
+    "title": "Dan test"
+  },
+  "footer": {
+    "conditions": ""
+  },
+  "finishedScreen": {
+    "description": "Thank you for helping us with our journalism. We read all submissions, and will be in touch if we have any more questions.",
+    "title": "Thanks."
+  },
+  "steps": [
+    {
+      "id": "fd231e0a-04f9-4612-ac24-6948e60eb2da",
+      "name": "first_step",
+      "widgets": [
+        {
+          "id": "66406fff-ac42-4efb-ad07-0094c8045f61",
+          "type": "field",
+          "identity": false,
+          "component": "TextField",
+          "title": "",
+          "description": "",
+          "wrapper": {},
+          "props": {}
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "responses": 1
+  },
+  "created_by": null,
+  "updated_by": null,
+  "deleted_by": null,
+  "date_created": "2016-09-15T13:47:20.978Z",
+  "date_updated": "2016-09-15T13:47:46.493Z",
+  "date_deleted": "0001-01-01T00:00:00Z"
+}

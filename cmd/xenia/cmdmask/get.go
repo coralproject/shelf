@@ -1,10 +1,7 @@
 package cmdmask
 
 import (
-	"encoding/json"
-
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/mask"
+	"github.com/coralproject/shelf/cmd/xenia/web"
 	"github.com/spf13/cobra"
 )
 
@@ -35,18 +32,8 @@ func addGet() {
 	maskCmd.AddCommand(cmd)
 }
 
-// runGet is the code that implements the get command.
+// runGet issues the command talking to the web service.
 func runGet(cmd *cobra.Command, args []string) {
-	if conn == nil {
-		runGetWeb(cmd)
-		return
-	}
-
-	runGetDB(cmd)
-}
-
-// runListWeb issues the command talking to the web service.
-func runGetWeb(cmd *cobra.Command) {
 	verb := "GET"
 	url := "/1.0/mask"
 
@@ -64,45 +51,4 @@ func runGetWeb(cmd *cobra.Command) {
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
-}
-
-// runGetDB issues the command talking to the DB.
-func runGetDB(cmd *cobra.Command) {
-	cmd.Printf("Getting Mask : Collection[%s] Field[%s]\n", get.collection, get.field)
-
-	if get.collection == "" {
-		get.collection = "*"
-	}
-
-	if get.field != "" {
-		msk, err := mask.GetByName("", conn, get.collection, get.field)
-		if err != nil {
-			cmd.Println("Getting Mask : ", err)
-			return
-		}
-
-		data, err := json.MarshalIndent(msk, "", "    ")
-		if err != nil {
-			cmd.Println("Getting Mask : ", err)
-			return
-		}
-
-		cmd.Printf("\n%s\n\n", string(data))
-		return
-	}
-
-	masks, err := mask.GetByCollection("", conn, get.collection)
-	if err != nil {
-		cmd.Println("Getting Mask : ", err)
-		return
-	}
-
-	data, err := json.MarshalIndent(masks, "", "    ")
-	if err != nil {
-		cmd.Println("Getting Mask : ", err)
-		return
-	}
-
-	cmd.Printf("\n%s\n\n", string(data))
-	return
 }

@@ -1,0 +1,64 @@
+[
+	{
+		"item_id": "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
+		"type": "PTEST_comment",
+		"version": 1,
+		"data": {
+			"body": "Computer, belay that order.",
+			"author": "80aa936a-f618-4234-a7be-df59a14cf8de",
+			"asset": "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"
+		}
+	},
+	{
+		"item_id": "6eaaa19f-da7a-4095-bbe3-cee7a7631dd4",
+		"type": "PTEST_comment",
+		"version": 1,
+		"data": {
+			"body": "Wouldn't that bring about chaos? My oath is between Captain Kargan and myself. Your only concern is with how you obey my orders. Or do you prefer the rank of prisoner to that of lieutenant?",
+			"author": "80aa936a-f618-4234-a7be-df59a14cf8de",
+			"asset": "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+			"parent": "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
+		}
+	},
+	{
+		"item_id": "d16790f8-13e9-4cb4-b9ef-d82835589660",
+		"type": "PTEST_comment",
+		"version": 1,
+		"data": {
+			"body": "And blowing into maximum warp speed, you appeared for an instant to be in two places at once. A lot of things can change in twelve years, Admiral.",
+			"author": "a63af637-58af-472b-98c7-f5c00743bac6",
+			"asset": "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"
+		}
+	},
+	{
+		"item_id": "80aa936a-f618-4234-a7be-df59a14cf8de",
+		"type": "PTEST_user",
+		"version": 1,
+		"data": {
+			"first_name": "Bilbo",
+			"last_name": "Baggins",
+			"email": "ringbearer@bagend.com",
+			"role": "hobbit"
+		}
+	},
+	{
+		"item_id": "a63af637-58af-472b-98c7-f5c00743bac6",
+		"type": "PTEST_user",
+		"version": 1,
+		"data": {
+			"name": "Gandalf",
+			"facebook_user": "whitewizard",
+			"role": "wizard"
+		}
+	},
+	{
+		"item_id": "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+		"type": "PTEST_asset",
+		"version": 1,
+		"data": {
+			"title": "Avoiding the pitfalls of the dark side of the force.",
+			"published": "2016-01-22 15:22:01",
+			"section": "tutorials"
+		}
+	}
+] 	

@@ -4,9 +4,8 @@ import (
 	"bytes"
 	"encoding/json"
 
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/query"
-
+	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/spf13/cobra"
 )
 
@@ -31,49 +30,55 @@ func addIndex() {
 		Run:   runIndex,
 	}
 
-	cmd.Flags().StringVarP(&get.name, "name", "n", "", "Name of the Set.")
+	cmd.Flags().StringVarP(&index.name, "name", "n", "", "Name of the Set.")
 
 	queryCmd.AddCommand(cmd)
 }
 
-// runIndex is the code that implements the index command.
+// runIndex issues the command talking to the web service.
 func runIndex(cmd *cobra.Command, args []string) {
 	cmd.Printf("Ensure Indexes : Name[%s]\n", index.name)
 
-	if index.name == "" {
-		cmd.Help()
-		return
-	}
-
-	set, err := query.GetByName("", conn, index.name)
+	set, err := runGetSet(cmd, index.name)
 	if err != nil {
 		cmd.Println("Ensure Indexes : ", err)
 		return
 	}
 
-	if err := query.EnsureIndexes("", conn, set); err != nil {
-		cmd.Println("Ensure Indexes : ", err)
-		return
-	}
-
-	cmd.Println("\n", "Ensure Indexes : Ensured")
-}
-
-// runIndexWeb issues the command talking to the web service.
-func runIndexWeb(cmd *cobra.Command, set *query.Set) error {
 	verb := "PUT"
-	url := "/1.0/index/" + set.Name
+	url := "/1.0/index/" + index.name
 
 	data, err := json.Marshal(set)
 	if err != nil {
-		return err
+		cmd.Println("Ensure Indexes : ", err)
+		return
 	}
 
 	cmd.Printf("\n%s\n\n", string(data))
 
 	if _, err := web.Request(cmd, verb, url, bytes.NewBuffer(data)); err != nil {
-		return err
+		cmd.Println("Ensure Indexes : ", err)
+		return
 	}
 
-	return nil
+	cmd.Println("\n", "Ensure Indexes : Ensured")
+	return
+}
+
+// runGetSet get a query set by name.
+func runGetSet(cmd *cobra.Command, name string) (query.Set, error) {
+	verb := "GET"
+	url := "/1.0/query/" + name
+
+	resp, err := web.Request(cmd, verb, url, nil)
+	if err != nil {
+		return query.Set{}, err
+	}
+
+	var set query.Set
+	if err = json.Unmarshal([]byte(resp), &set); err != nil {
+		return query.Set{}, err
+	}
+
+	return set, nil
 }

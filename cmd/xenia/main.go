@@ -4,17 +4,18 @@ package main
 import (
 	"os"
 
-	"github.com/coralproject/xenia/cmd/xenia/cmddb"
-	"github.com/coralproject/xenia/cmd/xenia/cmdmask"
-	"github.com/coralproject/xenia/cmd/xenia/cmdquery"
-	"github.com/coralproject/xenia/cmd/xenia/cmdregex"
-	"github.com/coralproject/xenia/cmd/xenia/cmdscript"
-
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-
+	"github.com/coralproject/shelf/cmd/xenia/cmddb"
+	"github.com/coralproject/shelf/cmd/xenia/cmdmask"
+	"github.com/coralproject/shelf/cmd/xenia/cmdpattern"
+	"github.com/coralproject/shelf/cmd/xenia/cmdquery"
+	"github.com/coralproject/shelf/cmd/xenia/cmdregex"
+	"github.com/coralproject/shelf/cmd/xenia/cmdrelationship"
+	"github.com/coralproject/shelf/cmd/xenia/cmdscript"
+	"github.com/coralproject/shelf/cmd/xenia/cmdview"
 	"github.com/spf13/cobra"
 )
 
@@ -80,10 +81,13 @@ func main() {
 
 	xenia.AddCommand(
 		cmddb.GetCommands(conn),
-		cmdquery.GetCommands(conn),
-		cmdscript.GetCommands(conn),
-		cmdregex.GetCommands(conn),
-		cmdmask.GetCommands(conn),
+		cmdquery.GetCommands(),
+		cmdscript.GetCommands(),
+		cmdregex.GetCommands(),
+		cmdmask.GetCommands(),
+		cmdrelationship.GetCommands(),
+		cmdview.GetCommands(),
+		cmdpattern.GetCommands(),
 	)
 	xenia.Execute()
 }

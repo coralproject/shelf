@@ -6,11 +6,10 @@ import (
 	"net/http"
 	"net/url"
 
-	"github.com/coralproject/xenia/internal/exec"
-	"github.com/coralproject/xenia/internal/query"
-
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/coralproject/shelf/internal/xenia"
+	"github.com/coralproject/shelf/internal/xenia/query"
 )
 
 // execHandle maintains the set of handlers for the exec api.
@@ -61,7 +60,7 @@ func execute(c *app.Context, set *query.Set) error {
 		}
 	}
 
-	result := exec.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
+	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

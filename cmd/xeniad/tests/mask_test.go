@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/internal/mask"
-	"github.com/coralproject/xenia/internal/mask/mfix"
-
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/xenia/mask"
+	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
 )
 
 // mCollection is the collection to use for everything.
@@ -150,8 +149,8 @@ func TestMaskUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the mask.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"collection":"` + mCollection + `","field":"test_insert","type":"left"}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"collection":"` + mCollection + `","field":"test_insert","type":"left"}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -202,8 +201,8 @@ func TestMaskUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the mask.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"collection":"` + mCollection + `","field":"test_insert","type":"right"}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"collection":"` + mCollection + `","field":"test_insert","type":"right"}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -273,8 +272,8 @@ func TestMaskDelete(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the mask.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"collection":"` + mCollection + `","field":"test_delete","type":"left"}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"collection":"` + mCollection + `","field":"test_delete","type":"left"}`)
 
 			if resp != recv {
 				t.Log(resp)

@@ -7,10 +7,9 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/coralproject/xenia/internal/query"
-	"github.com/coralproject/xenia/internal/query/qfix"
-
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/query/qfix"
 )
 
 // qPrefix is the base name for everything.
@@ -164,8 +163,8 @@ func TestQueryUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -216,8 +215,8 @@ func TestQueryUpsert(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"name":"` + qPrefix + `_upsert","desc":"C","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`)
 
 			if resp != recv {
 				t.Log(resp)
@@ -284,8 +283,8 @@ func TestQueryDelete(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to retrieve the set.", tests.Success)
 
-			recv := w.Body.String()
-			resp := `{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`
+			recv := tests.IndentJSON(w.Body.String())
+			resp := tests.IndentJSON(`{"name":"` + qPrefix + `_upsert","desc":"","pre_script":"","pst_script":"","params":[],"queries":[{"name":"Upsert","type":"pipeline","collection":"test_xenia_data","commands":[{"$match":{"station.d":"42021"}},{"$project":{"_id":0,"name":1}}],"indexes":[{"key":["station_id"],"unique":true}],"return":true}],"enabled":true,"explain":false}`)
 
 			if resp != recv {
 				t.Log(resp)

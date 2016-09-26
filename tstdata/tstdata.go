@@ -6,10 +6,9 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/coralproject/xenia/internal/exec"
-
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/xenia"
 	"gopkg.in/mgo.v2"
 )
 
@@ -20,7 +19,7 @@ const CollectionExecTest = "test_xenia_data"
 var path string
 
 func init() {
-	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/xenia/tstdata/"
+	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/tstdata/"
 }
 
 //==============================================================================
@@ -45,7 +44,7 @@ func Docs() ([]map[string]interface{}, error) {
 	}
 
 	for i := range docs {
-		exec.ProcessVariables("", docs[i], map[string]string{}, nil)
+		xenia.ProcessVariables("", docs[i], map[string]string{}, nil)
 	}
 
 	return docs, nil

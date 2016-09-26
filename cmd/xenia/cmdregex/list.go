@@ -1,9 +1,7 @@
 package cmdregex
 
 import (
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/regex"
-
+	"github.com/coralproject/shelf/cmd/xenia/web"
 	"github.com/spf13/cobra"
 )
 
@@ -24,18 +22,8 @@ func addList() {
 	regexCmd.AddCommand(cmd)
 }
 
-// runList is the code that implements the lists command.
+// runList issues the command talking to the web service.
 func runList(cmd *cobra.Command, args []string) {
-	if conn == nil {
-		runListWeb(cmd)
-		return
-	}
-
-	runListDB(cmd)
-}
-
-// runListWeb issues the command talking to the web service.
-func runListWeb(cmd *cobra.Command) {
 	verb := "GET"
 	url := "/1.0/regex"
 
@@ -45,23 +33,4 @@ func runListWeb(cmd *cobra.Command) {
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
-}
-
-// runListDB issues the command talking to the DB.
-func runListDB(cmd *cobra.Command) {
-	cmd.Println("Getting Regex List")
-
-	names, err := regex.GetNames("", conn)
-	if err != nil {
-		cmd.Println("Getting Regex List : ", err)
-		return
-	}
-
-	cmd.Println("")
-
-	for _, name := range names {
-		cmd.Println(name)
-	}
-
-	cmd.Println("")
 }

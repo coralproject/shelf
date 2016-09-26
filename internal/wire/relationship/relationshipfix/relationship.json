@@ -1,0 +1,37 @@
+[
+	{
+		"subject_types": [
+			"coral_comment"
+		],
+		"predicate": "RTEST_on",
+		"object_types": [
+			"coral_asset"
+		],
+		"in_string": "on",
+		"out_string": "having"
+	},
+	{
+		"subject_types": [
+			"coral_user"
+		],
+		"predicate": "RTEST_authored",
+		"object_types": [
+			"coral_comment"
+		],
+		"in_string": "authored",
+		"out_string": "authored by"
+	},
+	{
+		"subject_types": [
+			"coral_user"
+		],
+		"predicate": "RTEST_flagged",
+		"object_types": [
+			"coral_comment",
+			"coral_asset",
+			"coral_user"
+		],
+		"in_string": "flagged",
+		"out_string": "flagged by"
+	}
+]

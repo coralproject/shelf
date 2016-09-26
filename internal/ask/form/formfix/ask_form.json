@@ -1,0 +1,230 @@
+[
+  {
+    "status": "closed",
+    "stats": {
+      "responses": 26
+    },
+    "updated_by": null,
+    "footer": {
+      "conditions": "This is a conditions field"
+    },
+    "date_updated": "2016-07-12T15:46:13.666Z",
+    "settings": {
+      "showFieldNumbers": true,
+      "saveDestination": "https:\/\/pillar_stg.coralproject.net\/api\/form_submission\/",
+      "isActive": false,
+      "inactiveMessage": "We are not currently accepting submissions. Thank you."
+    },
+    "created_by": null,
+    "deleted_by": null,
+    "header": {
+      "description": "This is a sample ask!",
+      "title": "ASKTEST Birds survey"
+    },
+    "theme": null,
+    "steps": [
+      {
+        "widgets": [
+          {
+            "description": "",
+            "title": "What is your name?",
+            "component": "TextField",
+            "wrapper": {
+
+            },
+            "props": {
+
+            },
+            "type": "field",
+            "id": "95701",
+            "identity": true
+          },
+          {
+            "description": "",
+            "title": "Email",
+            "component": "TextField",
+            "wrapper": {
+              "required": true
+            },
+            "props": {
+              "validateAs": "email",
+              "validationMessage": "Please type a valid e-mail."
+            },
+            "type": "field",
+            "id": "91839",
+            "identity": true
+          },
+          {
+            "description": "",
+            "title": "What's your favorite bird?",
+            "component": "TextArea",
+            "wrapper": {
+
+            },
+            "props": {
+
+            },
+            "type": "field",
+            "id": "21932",
+            "identity": false
+          }
+        ],
+        "id": "512af9a9-cd3e-4db6-9294-28e650321148",
+        "name": "first_step"
+      }
+    ],
+    "date_deleted": "0001-01-01T00:00:00Z",
+    "finishedScreen": {
+      "description": "Thank you for helping us with our journalism. We read all submissions, and will be in touch if we have any more questions.",
+      "title": "Thanks."
+    },
+    "date_created": "2016-06-16T12:47:21.102Z",
+    "id": "57bfafc0f48614d3b8000001"
+  },
+  {
+    "status": "closed",
+    "stats": {
+      "responses": 10
+    },
+    "updated_by": null,
+    "footer": {
+      "conditions": "Disclaimer: I might not listen to what you say"
+    },
+    "date_updated": "2016-07-25T21:13:11.957Z",
+    "settings": {
+      "inactiveMessage": "We are not currently accepting submissi"
+    },
+    "created_by": null,
+    "deleted_by": null,
+    "header": {
+      "title": "ASKTEST What is the deal with Pok\u00e9mon Go?",
+      "description": "I want to decide if I should become a Pok\u00e9monster.\n",
+      "heading": "Headline doesn't show."
+    },
+    "theme": {
+      "selectedItemBackground": "#2E343B",
+      "formBackground": "#FFFFFF",
+      "submitButtonText": "#FFFFFF",
+      "progressBarBackground": "#CCCCCC",
+      "inputBackground": "#FFFFFF",
+      "headerText": "#222222",
+      "footerBackground": "#FFFFFF",
+      "selectedItemText": "#FAFAFA",
+      "fieldTitleText": "#222222",
+      "footerText": "#222222",
+      "requiredAsterisk": "#DDDDDD",
+      "inputText": "#222222",
+      "headerIntroText": "#444444",
+      "progressBar": "#44AA44",
+      "submitButtonBackground": "#F67D6E",
+      "headerBackground": "#FFFFFF"
+    },
+    "steps": [
+      {
+        "widgets": [
+          {
+            "description": "",
+            "title": "Do you play Pok\u00e9mon Go?",
+            "component": "MultipleChoice",
+            "wrapper": {
+              "required": true
+            },
+            "props": {
+              "multipleChoice": false,
+              "options": [
+                {
+                  "title": "Yes"
+                },
+                {
+                  "title": "No."
+                }
+              ],
+              "otherAllowed": false
+            },
+            "type": "field",
+            "id": "03cfa9b2-7181-4997-83b5-8e41588c8bf4",
+            "identity": false
+          },
+          {
+            "description": "",
+            "title": "Have you noticed a change around your city because of Pok\u00e9mon Go?",
+            "component": "MultipleChoice",
+            "wrapper": {
+
+            },
+            "props": {
+              "multipleChoice": false,
+              "options": [
+                {
+                  "title": "Yes"
+                },
+                {
+                  "title": "Maybe"
+                },
+                {
+                  "title": "No"
+                }
+              ],
+              "otherAllowed": true
+            },
+            "type": "field",
+            "id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb5",
+            "identity": false
+          },
+          {
+            "description": "",
+            "title": "Should *I* play Pok\u00e9mon Go?",
+            "component": "MultipleChoice",
+            "wrapper": {
+              "required": true
+            },
+            "props": {
+              "multipleChoice": false,
+              "options": [
+                {
+                  "title": "Yes"
+                },
+                {
+                  "title": "No"
+                },
+                {
+                  "title": "Only if you want to."
+                },
+                {
+                  "title": "I don't care."
+                }
+              ],
+              "otherAllowed": false
+            },
+            "type": "field",
+            "id": "43570565-9c92-4e88-a77b-41e5c57c54f5",
+            "identity": false
+          },
+          {
+            "description": "",
+            "title": "Why did you choose that answer?",
+            "component": "TextArea",
+            "wrapper": {
+
+            },
+            "props": {
+
+            },
+            "type": "field",
+            "id": "779cb8a2-99e8-44db-9098-5cd5c3674d3f",
+            "identity": false
+          }
+        ],
+        "id": "fd11d93b-24c0-4015-8beb-915a64822ef6",
+        "name": "first_step"
+      }
+    ],
+    "date_deleted": "0001-01-01T00:00:00Z",
+    "finishedScreen": {
+      "description": "Thank you for helping me with my Pok\u00e9decisions. I'll download it - or not - based on your votes. ",
+      "title": "Thanks."
+    },
+    "date_created": "2016-07-21T16:10:45.433Z",
+    "id": "57bfafaf784bfe0ec2000001"
+  }
+]

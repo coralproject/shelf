@@ -1,9 +1,7 @@
 package cmdmask
 
 import (
-	"github.com/coralproject/xenia/cmd/xenia/web"
-	"github.com/coralproject/xenia/internal/mask"
-
+	"github.com/coralproject/shelf/cmd/xenia/web"
 	"github.com/spf13/cobra"
 )
 
@@ -34,40 +32,13 @@ func addDel() {
 	maskCmd.AddCommand(cmd)
 }
 
-// runDelete is the code that implements the delete command.
+// runDelete issues the command talking to the web service.
 func runDelete(cmd *cobra.Command, args []string) {
-	if conn == nil {
-		runDeleteWeb(cmd)
-		return
-	}
-
-	runDeleteDB(cmd)
-}
-
-// runDeleteWeb issues the command talking to the web service.
-func runDeleteWeb(cmd *cobra.Command) {
 	verb := "DELETE"
 	url := "/1.0/mask/" + delete.collection + "/" + delete.field
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
 		cmd.Println("Deleting Mask : ", err)
-	}
-
-	cmd.Println("Deleting Mask : Deleted")
-}
-
-// runDeleteDB issues the command talking to the DB.
-func runDeleteDB(cmd *cobra.Command) {
-	cmd.Printf("Deleting Mask : Collection[%s] Field[%s]\n", delete.collection, delete.field)
-
-	if delete.collection == "" || delete.field == "" {
-		cmd.Help()
-		return
-	}
-
-	if err := mask.Delete("", conn, delete.collection, delete.field); err != nil {
-		cmd.Println("Deleting Mask : ", err)
-		return
 	}
 
 	cmd.Println("Deleting Mask : Deleted")

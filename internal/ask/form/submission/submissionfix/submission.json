@@ -1,0 +1,134 @@
+[
+  {
+    "id": "57be0427cc400bcd1d000003",
+    "form_id": "57be0437e65ada0851000002",
+    "number": 17,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332831",
+        "identity": true,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Option 1"
+            },
+            {
+              "index": 2,
+              "title": "Option 3"
+            },
+            {
+              "index": 1,
+              "title": "Option 2"
+            },
+            {
+              "index": 3,
+              "title": "Otheeeer"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "My question",
+        "props": {
+          "multipleChoice": true,
+          "options": [
+            {
+              "title": "Option 1"
+            },
+            {
+              "title": "Option 2"
+            },
+            {
+              "title": "Option 3"
+            }
+          ],
+          "otherAllowed": true
+        }
+      }
+    ],
+    "flags": [
+      "flagged",
+      "Test Tag"
+    ],
+    "header": {
+      "description": "My instructions",
+      "heading": "My headline",
+      "title": "FSTEST Multiple choice with other - Thursday test"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-07-28T17:22:18.451Z",
+    "date_updated": "2016-08-23T18:39:28.359Z"
+  },
+  {
+    "id": "57be042f01cb2748a2000002",
+    "form_id": "57be0437e65ada0851000002",
+    "number": 16,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332831",
+        "identity": true,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Option 1"
+            },
+            {
+              "index": 1,
+              "title": "Option 2"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "My question",
+        "props": {
+          "multipleChoice": true,
+          "options": [
+            {
+              "title": "Option 1"
+            },
+            {
+              "title": "Option 2"
+            },
+            {
+              "title": "Option 3"
+            }
+          ],
+          "otherAllowed": true
+        }
+      },
+      {
+        "widget_id": "40d552ac-7f1e-420b-9ac9-155a51332832",
+        "identity": true,
+        "answer": {
+          "text": "my answer"
+        },
+        "edited": null,
+        "question": "My second question"
+      }
+    ],
+    "flags": [
+      "flagged"
+    ],
+    "header": {
+      "description": "My instructions",
+      "heading": "My headline",
+      "title": "FSTEST Multiple choice with other - Thursday test"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-07-28T17:21:57.717Z",
+    "date_updated": "2016-08-22T19:29:01.281Z"
+  }
+]

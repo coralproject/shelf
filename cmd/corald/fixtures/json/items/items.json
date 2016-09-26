@@ -1,0 +1,29 @@
+[
+  {
+    "item_id": "1",
+    "type": "comment",
+    "version": 1,
+    "data":
+      {
+        "body": "Something body like.",
+        "title": "The comment",
+        "created_by": null,
+        "updated_by": null,
+        "date_created": "2016-09-15T13:47:20.978Z",
+        "date_updated": "2016-09-15T13:47:46.493Z"
+      }
+  },
+  {
+    "item_id": "2",
+    "type": "comment",
+    "version": 1,
+    "data":{
+      "body": "Something else body like.",
+      "title": "The other comment",
+      "created_by": null,
+      "updated_by": null,
+      "date_created": "2016-09-15T13:47:20.978Z",
+      "date_updated": "2016-09-15T13:47:46.493Z"
+    }
+  }
+]
