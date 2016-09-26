@@ -68,11 +68,11 @@ func API() http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
-	a.Handle("GET", "/1.0/version", handlers.Version.List)
+	a.Handle("GET", "/v1/version", handlers.Version.List)
 
-	a.Handle("GET", "/1.0/item/:id", handlers.Item.Retrieve)
-	a.Handle("PUT", "/1.0/item", handlers.Item.Upsert)
-	a.Handle("DELETE", "/1.0/item/:id", handlers.Item.Delete)
+	a.Handle("GET", "/v1/item/:id", handlers.Item.Retrieve)
+	a.Handle("PUT", "/v1/item", handlers.Item.Upsert)
+	a.Handle("DELETE", "/v1/item/:id", handlers.Item.Delete)
 
-	a.Handle("POST", "/1.0/data/:type", handlers.Data.Upsert)
+	a.Handle("POST", "/v1/data/:type", handlers.Data.Upsert)
 }

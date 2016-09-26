@@ -68,7 +68,6 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/v1/item",
 		handlers.Proxy(spongedURL,
 			func(c *app.Context) string {
-				return "/1.0/item"
+				return "/v1/item"
 			}))
-	//a.Handle("PUT", "/v1/item", handlers.Proxy(spongedURL, nil))
 }
