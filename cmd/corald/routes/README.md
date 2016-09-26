@@ -1,7 +1,7 @@
 
 
 # routes
-`import "github.com/coralproject/shelf/cmd/askd/routes"`
+`import "github.com/coralproject/shelf/cmd/corald/routes"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -11,19 +11,19 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func API() http.Handler](#API)
+* [func API(testing ...bool) http.Handler](#API)
 
 
 #### <a name="pkg-files">Package files</a>
-[routes.go](/src/github.com/coralproject/shelf/cmd/askd/routes/routes.go) 
+[routes.go](/src/github.com/coralproject/shelf/cmd/corald/routes/routes.go) 
 
 
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1723:1746#L49)
+## <a name="API">func</a> [API](/src/target/routes.go?s=673:711#L20)
 ``` go
-func API() http.Handler
+func API(testing ...bool) http.Handler
 ```
 API returns a handler for a set of routes.
 

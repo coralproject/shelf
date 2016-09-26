@@ -4,6 +4,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"reflect"
 	"strings"
 
 	"github.com/ardanlabs/kit/db"
@@ -50,6 +51,38 @@ func (itemHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
+	// See if the item already exists.
+	if it.ID != "" {
+		items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{it.ID})
+		if err != nil {
+			if err != item.ErrNotFound {
+				return err
+			}
+		}
+
+		// If the item is identical, we don't have to do anything.
+		if len(items) > 0 {
+			if reflect.DeepEqual(items[0], it) {
+				c.Respond(nil, http.StatusNoContent)
+				return nil
+			}
+
+			// If the item is not identical, remove the stale relationships by
+			// preparing an item map.
+			itMap := map[string]interface{}{
+				"item_id": items[0].ID,
+				"type":    items[0].Type,
+				"version": items[0].Version,
+				"data":    items[0].Data,
+			}
+
+			// Remove the corresponding relationships from the graph.
+			if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+				return err
+			}
+		}
+	}
+
 	// Add the item to the items collection.
 	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &it); err != nil {
 		return err
@@ -77,10 +110,34 @@ func (itemHandle) Upsert(c *app.Context) error {
 // Delete removes the specified Item from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (itemHandle) Delete(c *app.Context) error {
+
+	// Get the item from the items collection.
+	items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{c.Params["id"]})
+	if err != nil {
+		if err == item.ErrNotFound {
+			err = app.ErrNotFound
+		}
+		return err
+	}
+
+	// Delete the item.
 	if err := item.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["id"]); err != nil {
 		if err == item.ErrNotFound {
 			err = app.ErrNotFound
 		}
+		return err
+	}
+
+	// Prepare the item map data.
+	itMap := map[string]interface{}{
+		"item_id": items[0].ID,
+		"type":    items[0].Type,
+		"version": items[0].Version,
+		"data":    items[0].Data,
+	}
+
+	// Remove the corresponding relationships from the graph.
+	if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
 		return err
 	}
 

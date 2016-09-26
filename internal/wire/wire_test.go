@@ -18,18 +18,14 @@ import (
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire"
-	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
-	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
-	"github.com/coralproject/shelf/internal/wire/view/viewfix"
+	"github.com/coralproject/shelf/internal/wire/wirefix"
 )
 
 var mgoCfg mongo.Config
 
 const (
-	relPrefix     = "RTEST_"
-	itemPrefix    = "ITEST_"
-	viewPrefix    = "VTEST_"
-	patternPrefix = "PTEST_"
+	itemPrefix = "ITEST_"
+	wirePrefix = "WTEST_"
 )
 
 func init() {
@@ -89,59 +85,36 @@ func loadTestData(context interface{}, db *db.DB) error {
 	}
 
 	// -----------------------------------------------------------
-	// Load example patterns.
+	// Load example relationships, views, and patterns.
 
-	patterns, _, err := patternfix.Get()
+	rels, vs, pats, err := wirefix.Get()
 	if err != nil {
 		return err
 	}
 
-	if err := patternfix.Add(context, db, patterns); err != nil {
-		return err
-	}
-
-	// -----------------------------------------------------------
-	// Load example Relationships.
-
-	rels, err := relationshipfix.Get()
-	if err != nil {
-		return err
-	}
-
-	if err := relationshipfix.Add(context, db, rels); err != nil {
-		return err
-	}
-
-	// -----------------------------------------------------------
-	// Load example Views.
-
-	views, err := viewfix.Get()
-	if err != nil {
-		return err
-	}
-
-	if err := viewfix.Add(context, db, views); err != nil {
+	if err := wirefix.Add(context, db, rels, vs, pats); err != nil {
 		return err
 	}
 
 	// -----------------------------------------------------------
 	// Build the example graph.
 
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString("MONGO_DB"),
+		"username":      cfg.MustString("MONGO_USER"),
+		"password":      cfg.MustString("MONGO_PASS"),
+	}
 	if err := graph.InitQuadStore("mongo", cfg.MustString("MONGO_HOST"), opts); err != nil {
 		return err
 	}
 
 	var quads []quad.Quad
-	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", relPrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", relPrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
-	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", relPrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
+	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
+	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -167,25 +140,24 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	// Clear items, relationships, and views.
 
 	itemfix.Remove("context", db, itemPrefix)
-	relationshipfix.Remove("context", db, relPrefix)
-	viewfix.Remove("context", db, viewPrefix)
-	patternfix.Remove("context", db, patternPrefix)
+	wirefix.Remove("context", db, wirePrefix)
 
 	// ------------------------------------------------------------
 	// Clear cayley graph.
 
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString("MONGO_DB"),
+		"username":      cfg.MustString("MONGO_USER"),
+		"password":      cfg.MustString("MONGO_PASS"),
+	}
 
 	var quads []quad.Quad
-	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", relPrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", relPrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", relPrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
-	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", relPrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
+	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
+	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -214,10 +186,12 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	opts := make(map[string]interface{})
-	opts["database_name"] = cfg.MustString("MONGO_DB")
-	opts["username"] = cfg.MustString("MONGO_USER")
-	opts["password"] = cfg.MustString("MONGO_PASS")
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString("MONGO_DB"),
+		"username":      cfg.MustString("MONGO_USER"),
+		"password":      cfg.MustString("MONGO_PASS"),
+	}
+
 	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
@@ -246,7 +220,7 @@ func TestExecuteView(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "user comments",
+				ViewName: wirePrefix + "user comments",
 				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
@@ -280,7 +254,7 @@ func TestExecuteBackwardsView(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "thread_backwards",
+				ViewName: wirePrefix + "thread_backwards",
 				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
@@ -313,7 +287,7 @@ func TestPersistView(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName:          viewPrefix + "thread",
+				ViewName:          wirePrefix + "thread",
 				ItemKey:           "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 				ResultsCollection: "testcollection",
 			}
@@ -373,7 +347,7 @@ func TestPersistViewWithBuffer(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName:          viewPrefix + "thread",
+				ViewName:          wirePrefix + "thread",
 				ItemKey:           "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 				ResultsCollection: "testcollection",
 				BufferLimit:       2,
@@ -435,7 +409,7 @@ func TestExecuteNameFail(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "this view name does not exist",
+				ViewName: wirePrefix + "this view name does not exist",
 				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
@@ -469,7 +443,7 @@ func TestExecuteTypeFail(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "comments from authors flagged by a user",
+				ViewName: wirePrefix + "comments from authors flagged by a user",
 				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
@@ -503,7 +477,7 @@ func TestExecuteRelationshipFail(t *testing.T) {
 
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
-				ViewName: viewPrefix + "has invalid starting relationship",
+				ViewName: wirePrefix + "has invalid starting relationship",
 				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 

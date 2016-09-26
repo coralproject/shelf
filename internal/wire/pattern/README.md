@@ -68,10 +68,11 @@ Upsert upserts a pattern to the collection of currently utilized patterns.
 
 
 
-## <a name="Inference">type</a> [Inference](/src/target/model.go?s=500:835#L8)
+## <a name="Inference">type</a> [Inference](/src/target/model.go?s=500:896#L8)
 ``` go
 type Inference struct {
     RelIDField string `bson:"related_ID_field" json:"related_ID_field" validate:"required,min=2"`
+    RelType    string `bson:"related_type" json:"related_type"`
     Predicate  string `bson:"predicate" json:"predicate" validate:"required,min=2"`
     Direction  string `bson:"direction" json:"direction" validate:"required,min=2"`
     Required   bool   `bson:"required" json:"required"`
@@ -89,7 +90,7 @@ within an item.
 
 
 
-### <a name="Inference.Validate">func</a> (\*Inference) [Validate](/src/target/model.go?s=893:931#L16)
+### <a name="Inference.Validate">func</a> (\*Inference) [Validate](/src/target/model.go?s=954:992#L17)
 ``` go
 func (inf *Inference) Validate() error
 ```
@@ -98,7 +99,7 @@ Validate checks the Inference value for consistency.
 
 
 
-## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1108:1295#L25)
+## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1169:1356#L26)
 ``` go
 type Pattern struct {
     Type       string      `bson:"type" json:"type" validate:"required,min=2"`
@@ -124,7 +125,7 @@ GetByType retrieves a pattern by type from Mongo.
 
 
 
-### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1351:1385#L31)
+### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1412:1446#L32)
 ``` go
 func (p *Pattern) Validate() error
 ```

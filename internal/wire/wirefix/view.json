@@ -1,0 +1,95 @@
+ [
+	{
+		"name": "WTEST_thread",
+		"collection": "items",
+		"start_type": "coral_asset",
+		"path": [
+			{
+				"level": 1,
+				"direction": "in",
+				"predicate": "WTEST_on",
+				"tag": "comment"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "WTEST_authored",
+				"tag": "author"
+			}
+		]
+	},
+	{
+		"name": "WTEST_user comments",
+		"start_type": "coral_user",
+		"collection": "items",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "WTEST_authored",
+				"tag": "comment"
+			}
+		]
+	},
+	{
+		"name": "WTEST_comments from authors flagged by a user",
+		"start_type": "coral_invalid_type",
+		"collection": "items",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "WTEST_flagged"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "WTEST_authored",
+				"tag": "author"
+			},
+			{
+				"level": 3,
+				"direction": "out",
+				"predicate": "WTEST_authored",
+				"tag": "comment"
+			}
+		]
+	},
+	{
+		"name": "WTEST_has invalid starting relationship",
+		"start_type": "coral_user",
+		"collection": "items",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "WTEST_invalid"
+			},
+			{
+				"level": 2,
+				"direction": "in",
+				"predicate": "WTEST_authored",
+				"tag": "author"
+			}
+		]
+	},
+	{
+		"name": "WTEST_thread_backwards",
+		"collection": "items",
+		"start_type": "coral_user",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "WTEST_authored",
+				"tag": "comment"
+			},
+			{
+				"level": 2,
+				"direction": "out",
+				"predicate": "WTEST_on",
+				"tag": "asset"
+			}
+		]
+	}
+] 	

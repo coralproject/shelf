@@ -1,7 +1,7 @@
 
 
 # handlers
-`import "github.com/coralproject/shelf/cmd/askd/handlers"`
+`import "github.com/coralproject/shelf/cmd/corald/handlers"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -14,39 +14,30 @@ Package handlers contains the handler logic for processing requests.
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
+* [func Proxy(targetURL string, rewrite func(*app.Context) string) app.Handler](#Proxy)
 
 
 #### <a name="pkg-files">Package files</a>
-[form.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form.go) [form_gallery.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form_gallery.go) [form_submission.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form_submission.go) [version.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/version.go) 
+[proxy.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/proxy.go) [version.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/version.go) 
 
 
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrInvalidCaptcha = errors.New("captcha invalid")
-```
-ErrInvalidCaptcha is returned when a captcha is required for a form but it
-is not valid on the request.
-
-``` go
-var Form formHandle
-```
-Form fronts the access to the form service functionality.
-
-``` go
-var FormGallery formGalleryHandle
-```
-FormGallery fronts the access to the form service functionality.
-
-``` go
-var FormSubmission formSubmissionHandle
-```
-FormSubmission fronts the access to the form service functionality.
-
-``` go
 var Version verHandle
 ```
 Version fronts the access to the ver service functionality.
+
+
+
+## <a name="Proxy">func</a> [Proxy](/src/target/proxy.go?s=386:461#L2)
+``` go
+func Proxy(targetURL string, rewrite func(*app.Context) string) app.Handler
+```
+Proxy will setup a direct proxy inbetween this service and the destination
+service using the rewrite function if specified. If the rewrite function is
+not specified, the path on the target will be set to the target path
+concatenated with the request path.
 
 
 

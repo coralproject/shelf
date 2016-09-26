@@ -2,6 +2,7 @@ package item
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -65,6 +66,11 @@ func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error) {
 		}
 		log.Error(context, "GetByIDs", err, "Completed")
 		return items, err
+	}
+
+	// If we got an unexpected number of items, throw an error.
+	if len(ids) < len(items) {
+		return nil, fmt.Errorf("Expected %d items, got %d: ", len(ids), len(items))
 	}
 
 	log.Dev(context, "GetByIDs", "Completed")

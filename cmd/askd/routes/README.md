@@ -21,7 +21,7 @@
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1723:1746#L49)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1686:1709#L48)
 ``` go
 func API() http.Handler
 ```
