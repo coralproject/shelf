@@ -20,12 +20,14 @@ var (
 	ErrInvalidClaims = errors.New("invalid claims")
 )
 
+// cfgAuthPublicKey is the key for which the actual base64 + PEM encoded public
+// RSA key is stored.
 const cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 
 // authOff is used when authentication is turned off by not providing a public
 // key in the environment.
 func authOff(h app.Handler) app.Handler {
-	return func(c *app.Context) error {
+	f := func(c *app.Context) error {
 
 		// Log out the process for verbosity.
 		log.Dev(c.SessionID, "Auth", "Started")
@@ -33,6 +35,8 @@ func authOff(h app.Handler) app.Handler {
 		log.Dev(c.SessionID, "Auth", "Completed")
 		return h(c)
 	}
+
+	return f
 }
 
 // Auth handles token authentication.
@@ -44,12 +48,18 @@ func Auth() (app.Middleware, error) {
 		return authOff, nil
 	}
 
+	// Our public key has been encoded from a PEM encoded public RSA key into this
+	// publicKeyBase64Str. We need to decode the base64 string in order to get the
+	// PEM encoded certificate back out.
 	publicKeyPEM, err := base64.StdEncoding.DecodeString(publicKeyBase64Str)
 	if err != nil {
 		log.Error("startup", "Auth", err, "Can not setup Auth middleware")
 		return nil, err
 	}
 
+	// Now that we have our PEM encoded public RSA key, we can parse it using the
+	// methods built into the jwt librairy into something we can use to verify the
+	// incomming JWT's.
 	publicKey, err := jwt.ParseRSAPublicKeyFromPEM(publicKeyPEM)
 	if err != nil {
 		log.Error("startup", "Auth", err, "Can not setup Auth middleware")
@@ -58,8 +68,12 @@ func Auth() (app.Middleware, error) {
 
 	log.Dev("startup", "Auth", "Initalizing Auth")
 
-	return func(h app.Handler) app.Handler {
-		return func(c *app.Context) error {
+	// Create the middleware to actually return.
+	m := func(h app.Handler) app.Handler {
+
+		// Create the handler that we should return as a part of the middleware
+		// chain.
+		f := func(c *app.Context) error {
 			log.Dev(c.SessionID, "Auth", "Started")
 
 			// Extract the token from the Authorization header provided on the request.
@@ -72,7 +86,7 @@ func Auth() (app.Middleware, error) {
 
 			token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
 
-				// Don't forget to validate the alg is what you expect:
+				// Don't forget to validate the alg is what you expect.
 				if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 					return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 				}
@@ -114,5 +128,9 @@ func Auth() (app.Middleware, error) {
 			log.Dev(c.SessionID, "Auth", "Completed : Valid")
 			return h(c)
 		}
-	}, nil
+
+		return f
+	}
+
+	return m, nil
 }
