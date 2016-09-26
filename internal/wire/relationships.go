@@ -2,6 +2,7 @@ package wire
 
 import (
 	"errors"
+	"fmt"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
@@ -136,6 +137,16 @@ func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interf
 		// Check for the relevant field in the item.
 		if relID, ok := item.itemData[inf.RelIDField]; ok {
 
+			// If the rel field is empty, do not create the quad.
+			if relID == "" {
+				continue
+			}
+
+			// If we are using source ids and rel types, compose the id.
+			if inf.RelType != "" {
+				relID = fmt.Sprintf("%s_%v", inf.RelType, relID)
+			}
+
 			// Add the relationship parameters.
 			switch inf.Direction {
 			case inString:
@@ -215,7 +226,7 @@ func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
 	for k, v := range dataMap {
 
 		vString, ok := v.(string)
-		if !ok {
+		if !ok || vString == "" {
 			continue
 		}
 		itemData[k] = vString
