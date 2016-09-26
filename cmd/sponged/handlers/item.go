@@ -101,7 +101,8 @@ func (itemHandle) Upsert(c *app.Context) error {
 		return err
 	}
 
-	c.Respond(nil, http.StatusNoContent)
+	c.Respond(itMap, http.StatusOK)
+
 	return nil
 }
 
