@@ -18,6 +18,7 @@
 * [func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)](#GetByIDs)
 * [func Upsert(context interface{}, db *db.DB, item *Item) error](#Upsert)
 * [type Item](#Item)
+  * [func (item *Item) InferIDFromData() error](#Item.InferIDFromData)
   * [func (item *Item) Validate() error](#Item.Validate)
 
 
@@ -40,7 +41,7 @@ ErrNotFound is an error variable thrown when no results are returned from a Mong
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/item.go?s=1863:1923#L59)
+## <a name="Delete">func</a> [Delete](/src/target/item.go?s=2150:2210#L71)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -48,7 +49,7 @@ Delete removes an item from from Mongo.
 
 
 
-## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=1189:1264#L36)
+## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=1305:1380#L43)
 ``` go
 func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)
 ```
@@ -56,7 +57,7 @@ GetByIDs retrieves items by ID from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=465:526#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=499:560#L12)
 ``` go
 func Upsert(context interface{}, db *db.DB, item *Item) error
 ```
@@ -65,13 +66,13 @@ Upsert upserts an item to the items collections.
 
 
 
-## <a name="Item">type</a> [Item](/src/target/model.go?s=704:1003#L10)
+## <a name="Item">type</a> [Item](/src/target/model.go?s=889:1231#L19)
 ``` go
 type Item struct {
-    ID      string      `bson:"item_id" json:"item_id" validate:"required,min=36"`
-    Type    string      `bson:"type" json:"type" validate:"required,min=2"`
-    Version int         `bson:"version" json:"version" validate:"required,min=1"`
-    Data    interface{} `bson:"data" json:"data"`
+    ID      string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
+    Type    string                 `bson:"type" json:"type" validate:"required,min=2"`
+    Version int                    `bson:"version" json:"version" validate:"required,min=1"`
+    Data    map[string]interface{} `bson:"data" json:"data"`
 }
 ```
 Item is data, properties and behavior associated with one of a comment,
@@ -88,7 +89,16 @@ may differ greatly between items) is encoded into the Data interface.
 
 
 
-### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1061:1095#L18)
+### <a name="Item.InferIDFromData">func</a> (\*Item) [InferIDFromData](/src/target/model.go?s=1467:1508#L36)
+``` go
+func (item *Item) InferIDFromData() error
+```
+InferIDFromData infers an item_id from type and source id.
+
+
+
+
+### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1289:1323#L27)
 ``` go
 func (item *Item) Validate() error
 ```

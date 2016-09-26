@@ -86,8 +86,15 @@ func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[s
 }
 
 // RemoveFromGraph removes relationship quads from the cayley graph.
-func RemoveFromGraph(context interface{}, store *cayley.Handle, quadParams []QuadParam) error {
-	log.Dev(context, "RemoveFromGraph", "Started : %d Relationships", len(quadParams))
+func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error {
+	log.Dev(context, "RemoveFromGraph", "Started : %v", item)
+
+	// Infer the relationships in the item.
+	quadParams, err := inferRelationships(context, db, item)
+	if err != nil {
+		log.Error(context, "AddToGraph", err, "Completed")
+		return err
+	}
 
 	// Convert the given parameters into cayley quads.
 	tx := cayley.NewTransaction()
@@ -127,7 +134,10 @@ func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interf
 	// Get the relevant pattern.
 	p, err := pattern.GetByType(context, db, item.itemType)
 	if err != nil {
-		return nil, err
+		if err != pattern.ErrNotFound {
+			return nil, err
+		}
+		return nil, nil
 	}
 
 	// Loop over inferences in the pattern.

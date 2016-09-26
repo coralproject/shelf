@@ -12,7 +12,7 @@
 
 ## <a name="pkg-index">Index</a>
 * [func Add(context interface{}, db *db.DB, subs []submission.Submission) error](#Add)
-* [func Get(fixture string) ([]submission.Submission, error)](#Get)
+* [func GetMany(fileName string) ([]submission.Submission, error)](#GetMany)
 * [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
 
 
@@ -23,23 +23,23 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/submissionfix.go?s=726:802#L27)
+## <a name="Add">func</a> [Add](/src/target/submissionfix.go?s=767:843#L28)
 ``` go
 func Add(context interface{}, db *db.DB, subs []submission.Submission) error
 ```
-Add inserts forms for testing.
+Add inserts submissions to the DB for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/submissionfix.go?s=388:445#L10)
+## <a name="GetMany">func</a> [GetMany](/src/target/submissionfix.go?s=416:478#L10)
 ``` go
-func Get(fixture string) ([]submission.Submission, error)
+func GetMany(fileName string) ([]submission.Submission, error)
 ```
-Get loads form data based on forms.json.
+Get retrieves a submission document from the filesystem for testing.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/submissionfix.go?s=1012:1076#L38)
+## <a name="Remove">func</a> [Remove](/src/target/submissionfix.go?s=1053:1117#L39)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```

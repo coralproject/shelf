@@ -10,7 +10,6 @@ import (
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
 	_ "github.com/cayleygraph/cayley/graph/mongo"
-	"github.com/coralproject/shelf/cmd/wire/cmdgraph"
 	"github.com/coralproject/shelf/cmd/wire/cmdview"
 	"github.com/spf13/cobra"
 )
@@ -96,7 +95,6 @@ func main() {
 	// Add the graph and view commands to the CLI tool.
 	wire.AddCommand(
 		cmdview.GetCommands(mgoDB, graphDB),
-		cmdgraph.GetCommands(mgoDB, graphDB),
 	)
 
 	// Execute the command.

@@ -55,7 +55,7 @@ ErrInvalidID occurs when an ID is not in a valid form.
 
 
 
-## <a name="Count">func</a> [Count](/src/target/submission.go?s=10060:10130#L320)
+## <a name="Count">func</a> [Count](/src/target/submission.go?s=10136:10206#L321)
 ``` go
 func Count(context interface{}, db *db.DB, formID string) (int, error)
 ```
@@ -64,7 +64,7 @@ form id in the Form Submissions MongoDB database collection.
 
 
 
-## <a name="Create">func</a> [Create](/src/target/submission.go?s=4751:4839#L133)
+## <a name="Create">func</a> [Create](/src/target/submission.go?s=4827:4915#L134)
 ``` go
 func Create(context interface{}, db *db.DB, formID string, submission *Submission) error
 ```
@@ -73,7 +73,7 @@ the MongoDB database collection.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/submission.go?s=16178:16238#L544)
+## <a name="Delete">func</a> [Delete](/src/target/submission.go?s=16236:16296#L545)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -91,7 +91,7 @@ needed for the ask package to run.
 
 
 
-## <a name="RetrieveMany">func</a> [RetrieveMany](/src/target/submission.go?s=6594:6679#L196)
+## <a name="RetrieveMany">func</a> [RetrieveMany](/src/target/submission.go?s=6670:6755#L197)
 ``` go
 func RetrieveMany(context interface{}, db *db.DB, ids []string) ([]Submission, error)
 ```
@@ -100,14 +100,14 @@ RetrieveMany retrieves a list of Submission's from the MongoDB database collecti
 
 
 
-## <a name="Answer">type</a> [Answer](/src/target/submission.go?s=2880:3277#L94)
+## <a name="Answer">type</a> [Answer](/src/target/submission.go?s=2956:3353#L95)
 ``` go
 type Answer struct {
     WidgetID     string      `json:"widget_id" bson:"widget_id" validate:"required,len=24"`
     Identity     bool        `json:"identity" bson:"identity"`
     Answer       interface{} `json:"answer" bson:"answer"`
     EditedAnswer interface{} `json:"edited" bson:"edited"`
-    Question     interface{} `json:"question" bson:"question"`
+    Question     string      `json:"question" bson:"question"`
     Props        interface{} `json:"props" bson:"props"`
 }
 ```
@@ -123,7 +123,7 @@ with the specific question asked included as well.
 
 
 
-## <a name="AnswerInput">type</a> [AnswerInput](/src/target/submission.go?s=2438:2582#L78)
+## <a name="AnswerInput">type</a> [AnswerInput](/src/target/submission.go?s=2514:2658#L79)
 ``` go
 type AnswerInput struct {
     WidgetID string      `json:"widget_id" validate:"required"`
@@ -142,7 +142,7 @@ answer.
 
 
 
-### <a name="AnswerInput.Validate">func</a> (\*AnswerInput) [Validate](/src/target/submission.go?s=2642:2680#L84)
+### <a name="AnswerInput.Validate">func</a> (\*AnswerInput) [Validate](/src/target/submission.go?s=2718:2756#L85)
 ``` go
 func (f *AnswerInput) Validate() error
 ```
@@ -151,7 +151,7 @@ Validate checks the AnswerInput value for consistency.
 
 
 
-## <a name="SearchOpts">type</a> [SearchOpts](/src/target/submission.go?s=2285:2360#L70)
+## <a name="SearchOpts">type</a> [SearchOpts](/src/target/submission.go?s=2361:2436#L71)
 ``` go
 type SearchOpts struct {
     DscOrder bool
@@ -190,11 +190,12 @@ SearchResultCounts is a structured type containing the counts of results.
 
 
 
-## <a name="SearchResults">type</a> [SearchResults](/src/target/submission.go?s=2088:2191#L63)
+## <a name="SearchResults">type</a> [SearchResults](/src/target/submission.go?s=2088:2267#L63)
 ``` go
 type SearchResults struct {
     Counts      SearchResultCounts `json:"counts"`
-    Submissions []Submission
+    Submissions []Submission       `json:"submissions"`
+    CSVURL      string             `json:"csv_url"`
 }
 ```
 SearchResults is a structured type returning the results
@@ -206,7 +207,7 @@ expected from searching for submissions based on a form id.
 
 
 
-### <a name="Search">func</a> [Search](/src/target/submission.go?s=10899:11015#L353)
+### <a name="Search">func</a> [Search](/src/target/submission.go?s=10975:11091#L354)
 ``` go
 func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts SearchOpts) (*SearchResults, error)
 ```
@@ -217,7 +218,7 @@ using the provided search options.
 
 
 
-## <a name="Submission">type</a> [Submission](/src/target/submission.go?s=3452:4481#L106)
+## <a name="Submission">type</a> [Submission](/src/target/submission.go?s=3528:4557#L107)
 ``` go
 type Submission struct {
     ID             bson.ObjectId `json:"id" bson:"_id"`
@@ -245,7 +246,7 @@ submission.
 
 
 
-### <a name="AddFlag">func</a> [AddFlag](/src/target/submission.go?s=14204:14286#L470)
+### <a name="AddFlag">func</a> [AddFlag](/src/target/submission.go?s=14262:14344#L471)
 ``` go
 func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)
 ```
@@ -253,7 +254,7 @@ AddFlag adds, and de-duplicates a flag to a given
 Submission in the MongoDB database collection.
 
 
-### <a name="RemoveFlag">func</a> [RemoveFlag](/src/target/submission.go?s=15187:15272#L507)
+### <a name="RemoveFlag">func</a> [RemoveFlag](/src/target/submission.go?s=15245:15330#L508)
 ``` go
 func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)
 ```
@@ -261,7 +262,7 @@ RemoveFlag removes a flag from a given Submission in
 the MongoDB database collection.
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/submission.go?s=5803:5880#L170)
+### <a name="Retrieve">func</a> [Retrieve](/src/target/submission.go?s=5879:5956#L171)
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error)
 ```
@@ -269,7 +270,7 @@ Retrieve retrieves a Submission from the MongoDB database
 collection.
 
 
-### <a name="UpdateAnswer">func</a> [UpdateAnswer](/src/target/submission.go?s=8618:8719#L270)
+### <a name="UpdateAnswer">func</a> [UpdateAnswer](/src/target/submission.go?s=8694:8795#L271)
 ``` go
 func UpdateAnswer(context interface{}, db *db.DB, id string, answer AnswerInput) (*Submission, error)
 ```
@@ -277,7 +278,7 @@ UpdateAnswer updates the edited answer if it could find it
 inside the MongoDB database collection atomically.
 
 
-### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/submission.go?s=7538:7627#L232)
+### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/submission.go?s=7614:7703#L233)
 ``` go
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submission, error)
 ```
@@ -288,7 +289,7 @@ collection.
 
 
 
-### <a name="Submission.Validate">func</a> (\*Submission) [Validate](/src/target/submission.go?s=4540:4577#L123)
+### <a name="Submission.Validate">func</a> (\*Submission) [Validate](/src/target/submission.go?s=4616:4653#L124)
 ``` go
 func (s *Submission) Validate() error
 ```
