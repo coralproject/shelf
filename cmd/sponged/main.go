@@ -48,7 +48,7 @@ func main() {
 		writeTimeout = 30 * time.Second
 	)
 
-	if err := app.Run(":", routes.API(), readTimeout, writeTimeout); err != nil {
+	if err := app.Run(":4001", routes.API(), readTimeout, writeTimeout); err != nil {
 		log.Error("shutdown", "Init", err, "App Shutdown")
 		os.Exit(1)
 	}
