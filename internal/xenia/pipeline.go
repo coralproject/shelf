@@ -61,6 +61,16 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		agg += mongo.Query(command) + ",\n"
 	}
 
+	// Are we being asked to execute a view.
+	if q.Collection == "view" {
+
+		// GET/POST  “/exec/:query_name/view/:view_name/item_id
+		// vars[view]=="View Name"  vars[item_id]=="Key"
+		// Execute the View based on q.Collection generate UUID
+		// q.Collection = UUID
+		// defer CleanUp Collection
+	}
+
 	// Do we want the explain output.
 	if explain {
 
