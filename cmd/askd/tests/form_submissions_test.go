@@ -32,7 +32,7 @@ func TextExport(t *testing.T) {
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			t.Log("\tWhen we user version 1.0 of the export endpoint.")
+			t.Log("\tWhen we user version v1 of the export endpoint.")
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to get the URL of the file to download : %v", tests.Failed, w.Code)
 			}
@@ -70,7 +70,7 @@ func TestDownloadCSV(t *testing.T) {
 
 		t.Logf("\tWhen calling CSV URL : %s", url)
 		{
-			t.Log("\tWhen we user version 1.0 of the export endpoint.")
+			t.Log("\tWhen we user version v1 of the export endpoint.")
 			if w.Code != 200 {
 				t.Fatalf("\t%s\tShould be able to get the URL of the file to download : %v", tests.Failed, w.Code)
 			}
