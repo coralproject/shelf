@@ -54,7 +54,7 @@ func TestRetrieveItems(t *testing.T) {
 
 	t.Log("Given the need get a set of items by IDs.")
 	{
-		url := "/1.0/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4,ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660"
+		url := "/v1/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4,ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -62,7 +62,7 @@ func TestRetrieveItems(t *testing.T) {
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			t.Log("\tWhen we use version 1.0 of the item endpoint.")
+			t.Log("\tWhen we use version v1 of the item endpoint.")
 			if w.Code != 200 {
 				t.Fatalf("\t%s\tShould be able to retrieve the items : %v", tests.Failed, w.Code)
 			}
@@ -114,7 +114,7 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Item.
 
-		url := "/1.0/item"
+		url := "/v1/item"
 		r := tests.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
 		w := httptest.NewRecorder()
 
@@ -122,7 +122,7 @@ func TestUpsertItem(t *testing.T) {
 
 		t.Logf("\tWhen calling url to insert : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != 200 {
 				t.Fatalf("\t%s\tShould be able to insert the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to insert the item.", tests.Success)
@@ -150,7 +150,7 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the item.
 
-		url = "/1.0/item/" + items[0].ID
+		url = "/v1/item/" + items[0].ID
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -188,7 +188,7 @@ func TestUpsertItem(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
-		url = "/1.0/item"
+		url = "/v1/item"
 		r = tests.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
 		w = httptest.NewRecorder()
 
@@ -196,7 +196,7 @@ func TestUpsertItem(t *testing.T) {
 
 		t.Logf("\tWhen calling url to update : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != 200 {
 				t.Fatalf("\t%s\tShould be able to update the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to update the item.", tests.Success)
@@ -205,7 +205,7 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Item.
 
-		url = "/1.0/item/" + items[0].ID
+		url = "/v1/item/" + items[0].ID
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -243,7 +243,7 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Item.
 
-		url := "/1.0/item/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
+		url := "/v1/item/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
 		r := tests.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
@@ -260,7 +260,7 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Item.
 
-		url = "/1.0/view/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
+		url = "/v1/view/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
