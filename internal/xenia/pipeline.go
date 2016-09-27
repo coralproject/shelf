@@ -9,13 +9,16 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/cayleygraph/cayley"
+	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/pborman/uuid"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 // execPipeline executes the sepcified pipeline query.
-func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}, explain bool) (docs, []map[string]interface{}, error) {
+func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query.Query, vars map[string]string, data map[string]interface{}, explain bool) (docs, []map[string]interface{}, error) {
 
 	// I am returning commands as the second return value because if there
 	// is an error I need to send how far we got back to the client. If not,
@@ -61,14 +64,52 @@ func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[strin
 		agg += mongo.Query(command) + ",\n"
 	}
 
-	// Are we being asked to execute a view.
+	// Are we being asked to execute the query on a view.
 	if q.Collection == "view" {
 
-		// GET/POST  “/exec/:query_name/view/:view_name/item_id
-		// vars[view]=="View Name"  vars[item_id]=="Key"
-		// Execute the View based on q.Collection generate UUID
-		// q.Collection = UUID
-		// defer CleanUp Collection
+		// Make sure we have the information we need to execute the view.
+		viewName, ok := vars["view"]
+		if !ok {
+			return docs{}, commands, fmt.Errorf("Vars does not include \"view\".")
+		}
+
+		itemKey, ok := vars["item"]
+		if !ok {
+			return docs{}, commands, fmt.Errorf("Vars does not include \"item\".")
+		}
+
+		// Generate a unique name for the collection.
+		viewCol := uuid.New()
+
+		// Prepare the parameters for executing the view.
+		viewParams := wire.ViewParams{
+			ViewName:          viewName,
+			ItemKey:           itemKey,
+			ResultsCollection: viewCol,
+		}
+
+		// Execute the view.
+		if _, err := wire.Execute(context, db, graph, &viewParams); err != nil {
+			return docs{}, commands, err
+		}
+
+		// Defer clean up of the temporary collection.
+		defer func() error {
+
+			c, err := db.CollectionMGO(context, viewCol)
+			if err != nil {
+				return err
+			}
+
+			if err := c.DropCollection(); err != nil {
+				return err
+			}
+
+			return nil
+		}()
+
+		// Provide the query with the temporary collection name.
+		q.Collection = viewCol
 	}
 
 	// Do we want the explain output.

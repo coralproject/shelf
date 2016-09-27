@@ -54,27 +54,54 @@ func runTest(m *testing.M) int {
 
 	defer db.CloseMGO("context")
 
-	tstdata.Generate(db)
+	if err := tstdata.Generate(db); err != nil {
+		fmt.Println("Could not generate test data.")
+		return 1
+	}
 	defer tstdata.Drop(db)
 
-	loadQuery(db, "basic.json")
-	loadQuery(db, "basic_var.json")
+	if err := loadQuery(db, "basic.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
+	if err := loadQuery(db, "basic_var.json"); err != nil {
+		fmt.Println("Could not load queries in basic_var.json")
+		return 1
+	}
 	defer qfix.Remove(db, "QTEST_O")
 
-	loadScript(db, "basic_script_pre.json")
-	loadScript(db, "basic_script_pst.json")
+	if err := loadScript(db, "basic_script_pre.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pre.json")
+		return 1
+	}
+	if err := loadScript(db, "basic_script_pst.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pst.json")
+		return 1
+	}
 	defer sfix.Remove(db, "STEST_O")
 
-	loadMasks(db, "basic.json")
+	if err := loadMasks(db, "basic.json"); err != nil {
+		fmt.Println("Could not load masks.")
+		return 1
+	}
 	defer mfix.Remove(db, "test_xenia_data")
 
-	loadRelationships("context", db)
+	if err := loadRelationships("context", db); err != nil {
+		fmt.Println("Could not load relationships.")
+		return 1
+	}
 	defer relationshipfix.Remove("context", db, relPrefix)
 
-	loadViews("context", db)
+	if err := loadViews("context", db); err != nil {
+		fmt.Println("Could not load views.")
+		return 1
+	}
 	defer viewfix.Remove("context", db, viewPrefix)
 
-	loadPatterns("context", db)
+	if err := loadPatterns("context", db); err != nil {
+		fmt.Println("Could not load patterns")
+		return 1
+	}
 	defer patternfix.Remove("context", db, patternPrefix)
 
 	return m.Run()

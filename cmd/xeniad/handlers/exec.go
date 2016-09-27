@@ -8,6 +8,7 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/xenia"
 	"github.com/coralproject/shelf/internal/xenia/query"
 )
@@ -20,7 +21,7 @@ var Exec execHandle
 
 //==============================================================================
 
-// Name runs the specified Set and return results.
+// Name runs the specified Set and returns results.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (execHandle) Name(c *app.Context) error {
 	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
@@ -31,7 +32,28 @@ func (execHandle) Name(c *app.Context) error {
 		return err
 	}
 
-	return execute(c, set)
+	var vars map[string]string
+
+	return execute(c, set, vars)
+}
+
+// NameOnView runs the specified Set on a view and returns results.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (execHandle) NameOnView(c *app.Context) error {
+	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
+	if err != nil {
+		if err == query.ErrNotFound {
+			err = app.ErrNotFound
+		}
+		return err
+	}
+
+	vars := map[string]string{
+		"view": c.Params["view"],
+		"item": c.Params["item"],
+	}
+
+	return execute(c, set, vars)
 }
 
 // Custom runs the provided Set and return results.
@@ -42,25 +64,28 @@ func (execHandle) Custom(c *app.Context) error {
 		return err
 	}
 
-	return execute(c, set)
+	var vars map[string]string
+
+	return execute(c, set, vars)
 }
 
 //==============================================================================
 
 // execute takes a context and Set and executes the set returning
 // any possible response.
-func execute(c *app.Context, set *query.Set) error {
-	var vars map[string]string
+func execute(c *app.Context, set *query.Set, vars map[string]string) error {
 	if c.Request.URL.RawQuery != "" {
 		if m, err := url.ParseQuery(c.Request.URL.RawQuery); err == nil {
-			vars = make(map[string]string)
+			if vars == nil {
+				vars = make(map[string]string)
+			}
 			for k, v := range m {
 				vars[k] = v[0]
 			}
 		}
 	}
 
-	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
+	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil
