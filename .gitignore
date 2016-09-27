@@ -22,6 +22,7 @@ _testmain.go
 *.exe
 *.test
 *.prof
+.DS_Store
 
 # Config files
 *.cfg

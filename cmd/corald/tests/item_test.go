@@ -25,7 +25,7 @@ func TestItemsGET(t *testing.T) {
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			t.Log("\tWhen we user version 1.0 of the items endpoint.")
+			t.Log("\tWhen we user version v1 of the items endpoint.")
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve all the items for the query set High_quality_commenters_in_Politics: %v", tests.Failed, w.Code)
 			}

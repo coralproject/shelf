@@ -22,7 +22,7 @@ func TestQuerySets(t *testing.T) {
 
 	t.Log("Given the need get a set of query sets.")
 	{
-		url := "/1.0/query"
+		url := "/v1/query"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -64,7 +64,7 @@ func TestQueryByName(t *testing.T) {
 
 	t.Log("Given the need to get a specific query.")
 	{
-		url := "/1.0/query/" + qPrefix + "_basic"
+		url := "/v1/query/" + qPrefix + "_basic"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -116,7 +116,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Set.
 
-		url := "/1.0/query"
+		url := "/v1/query"
 		r := tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
@@ -133,7 +133,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Ensure the indexes.
 
-		url = "/1.0/index/QTEST_O_upsert"
+		url = "/v1/index/QTEST_O_upsert"
 		r = tests.NewRequest("PUT", url, nil)
 		w = httptest.NewRecorder()
 
@@ -150,7 +150,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/" + qPrefix + "_upsert"
+		url = "/v1/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -185,7 +185,7 @@ func TestQueryUpsert(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
-		url = "/1.0/query"
+		url = "/v1/query"
 		r = tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
 		w = httptest.NewRecorder()
 
@@ -202,7 +202,7 @@ func TestQueryUpsert(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/" + qPrefix + "_upsert"
+		url = "/v1/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -253,7 +253,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Set.
 
-		url := "/1.0/query"
+		url := "/v1/query"
 		r := tests.NewRequest("PUT", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
@@ -270,7 +270,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/" + qPrefix + "_upsert"
+		url = "/v1/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
@@ -297,7 +297,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Set.
 
-		url = "/1.0/query/" + qPrefix + "_upsert"
+		url = "/v1/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
@@ -314,7 +314,7 @@ func TestQueryDelete(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Set.
 
-		url = "/1.0/query/" + qPrefix + "_upsert"
+		url = "/v1/query/" + qPrefix + "_upsert"
 		r = tests.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
