@@ -46,7 +46,7 @@ func runIndex(cmd *cobra.Command, args []string) {
 	}
 
 	verb := "PUT"
-	url := "/1.0/index/" + index.name
+	url := "/v1/index/" + index.name
 
 	data, err := json.Marshal(set)
 	if err != nil {
@@ -68,7 +68,7 @@ func runIndex(cmd *cobra.Command, args []string) {
 // runGetSet get a query set by name.
 func runGetSet(cmd *cobra.Command, name string) (query.Set, error) {
 	verb := "GET"
-	url := "/1.0/query/" + name
+	url := "/v1/query/" + name
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {

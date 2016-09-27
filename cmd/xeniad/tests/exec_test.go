@@ -19,7 +19,7 @@ func TestExec(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query.")
 	{
-		url := "/1.0/exec/" + qPrefix + "_basic?station_id=42021"
+		url := "/v1/exec/" + qPrefix + "_basic?station_id=42021"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -64,7 +64,7 @@ func TestExecCustom(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
 
-		url := "/1.0/exec"
+		url := "/v1/exec"
 		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
@@ -97,7 +97,7 @@ func TestExecJSONP(t *testing.T) {
 
 	t.Log("Given the need to execute a specific query with JSONP output.")
 	{
-		url := "/1.0/exec/" + qPrefix + "_basic?station_id=42021&callback=handle_data"
+		url := "/v1/exec/" + qPrefix + "_basic?station_id=42021&callback=handle_data"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -159,7 +159,7 @@ func TestExecExplain(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the fixture.", tests.Success)
 
-		url := "/1.0/exec"
+		url := "/v1/exec"
 		r := tests.NewRequest("POST", url, bytes.NewBuffer(qsStrData))
 		w := httptest.NewRecorder()
 
