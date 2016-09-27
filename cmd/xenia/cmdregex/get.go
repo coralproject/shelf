@@ -33,7 +33,7 @@ func addGet() {
 // runGet issues the command talking to the web service.
 func runGet(cmd *cobra.Command, args []string) {
 	verb := "GET"
-	url := "/1.0/regex/" + get.name
+	url := "/v1/regex/" + get.name
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {

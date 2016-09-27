@@ -56,7 +56,7 @@ func runExec(cmd *cobra.Command, args []string) {
 // runExecWeb issues the command talking to the web service.
 func runExecWeb(cmd *cobra.Command, vars map[string]string) {
 	verb := "GET"
-	url := "/1.0/exec/" + exe.name
+	url := "/v1/exec/" + exe.name
 
 	if len(vars) > 0 {
 		var i int

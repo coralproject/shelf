@@ -35,7 +35,7 @@ func addDel() {
 // runDelete issues the command talking to the web service.
 func runDelete(cmd *cobra.Command, args []string) {
 	verb := "DELETE"
-	url := "/1.0/mask/" + delete.collection + "/" + delete.field
+	url := "/v1/mask/" + delete.collection + "/" + delete.field
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
 		cmd.Println("Deleting Mask : ", err)

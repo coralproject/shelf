@@ -25,7 +25,7 @@ func TestFormsGET(t *testing.T) {
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			t.Log("\tWhen we user version 1.0 of the forms endpoint.")
+			t.Log("\tWhen we user version v1 of the forms endpoint.")
 			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the forms list : %v", tests.Failed, w.Code)
 			}

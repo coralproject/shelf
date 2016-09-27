@@ -35,7 +35,7 @@ func addGet() {
 // runGet issues the command talking to the web service.
 func runGet(cmd *cobra.Command, args []string) {
 	verb := "GET"
-	url := "/1.0/pattern"
+	url := "/v1/pattern"
 
 	if get.ptype != "" {
 		url += "/" + get.ptype
