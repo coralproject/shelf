@@ -9,7 +9,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/corald/fixtures"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
-	"github.com/coralproject/shelf/cmd/corald/midware"
+	"github.com/coralproject/shelf/internal/platform/auth"
 )
 
 const (
@@ -19,6 +19,10 @@ const (
 
 	// cfgXeniadURL is the config key for the url to the xeniad service.
 	cfgXeniadURL = "XENIAD_URL"
+
+	// cfgAuthPublicKey is the config key for the public key used to verify
+	// tokens.
+	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 )
 
 func init() {
@@ -30,13 +34,26 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API(testing ...bool) http.Handler {
-	auth, err := midware.Auth()
+	a := app.New()
+
+	publicKey, err := cfg.String(cfgAuthPublicKey)
 	if err != nil {
-		log.Error("startup", "Init", err, "Initializing Auth")
-		os.Exit(1)
+		log.User("startup", "Init", "CORAL_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 
-	a := app.New(auth)
+	// If the public key is provided then add the auth middleware or fail using
+	// the provided public key.
+	if publicKey != "" {
+		authm, err := auth.Midware(publicKey)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
+		}
+
+		// Apply the authentication middleware on top of the application as the
+		// first middleware.
+		a.Use(authm)
+	}
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)

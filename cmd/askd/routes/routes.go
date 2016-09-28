@@ -13,6 +13,7 @@ import (
 	"github.com/coralproject/shelf/cmd/askd/handlers"
 	"github.com/coralproject/shelf/cmd/askd/midware"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
+	"github.com/coralproject/shelf/internal/platform/auth"
 )
 
 // Environmental variables.
@@ -22,8 +23,8 @@ const (
 	cfgMongoDB         = "MONGO_DB"
 	cfgMongoUser       = "MONGO_USER"
 	cfgMongoPassword   = "MONGO_PASS"
-	cfgAnvilHost       = "ANVIL_HOST"
 	cfgRecaptchaSecret = "RECAPTCHA_SECRET"
+	cfgAuthPublicKey   = "AUTH_PUBLIC_KEY"
 )
 
 func init() {
@@ -61,25 +62,29 @@ func API() http.Handler {
 		os.Exit(1)
 	}
 
-	// If authentication is on then configure Anvil.
-	/*
+	a := app.New()
 
-		// Anvil is temporarily disabled pending auth strategy
+	publicKey, err := cfg.String(cfgAuthPublicKey)
+	if err != nil {
+		log.User("startup", "Init", "XENIA_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+	}
 
-		var anv *anvil.Anvil
-		if url, err := cfg.String(cfgAnvilHost); err == nil {
-
-			log.Dev("startup", "Init", "Initalizing Anvil")
-			anv, err = anvil.New(url)
-			if err != nil {
-				log.Error("startup", "Init", err, "Initializing Anvil: %s", url)
-				os.Exit(1)
-			}
+	// If the public key is provided then add the auth middleware or fail using
+	// the provided public key.
+	if publicKey != "" {
+		authm, err := auth.Midware(publicKey)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
 		}
-	*/
 
-	a := app.New(midware.Mongo, midware.Auth)
-	//		a.Ctx["anvil"] = anv
+		// Apply the authentication middleware on top of the application as the
+		// first middleware.
+		a.Use(authm)
+	}
+
+	// Add in the Mongo midware.
+	a.Use(midware.Mongo)
 
 	// Load in the recaptcha secret from the config.
 	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
@@ -91,45 +96,12 @@ func API() http.Handler {
 
 	log.Dev("startup", "Init", "Initalizing routes")
 
-	//oldRoutes(a) // FIXME: remove on next API release
 	routes(a)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
 	a.CORS()
 
 	return a
-}
-
-// oldRoutes manages the handling of the API endpoints for the old style ported
-// from Ask.
-//
-// FIXME: remove on next API release
-func oldRoutes(a *app.App) {
-	// forms
-	a.Handle("POST", "/api/form", handlers.Form.Upsert)
-	a.Handle("PUT", "/api/form", handlers.Form.Upsert)
-	a.Handle("PUT", "/api/form/:id/status/:status", handlers.Form.UpdateStatus)
-	a.Handle("GET", "/api/forms", handlers.Form.List)
-	a.Handle("GET", "/api/form/:id", handlers.Form.Retrieve)
-	a.Handle("DELETE", "/api/form/:id", handlers.Form.Delete)
-
-	// form submissions
-	a.Handle("POST", "/api/form_submission/:id", handlers.FormSubmission.Create)
-	a.Handle("PUT", "/api/form_submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
-	a.Handle("GET", "/api/form_submissions/:form_id", handlers.FormSubmission.Search)
-	a.Handle("GET", "/api/form_submission/:id", handlers.FormSubmission.Retrieve)
-	a.Handle("PUT", "/api/form_submission/:id/:answer_id", handlers.FormSubmission.UpdateAnswer)
-	a.Handle("PUT", "/api/form_submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
-	a.Handle("DELETE", "/api/form_submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
-	a.Handle("DELETE", "/api/form_submission/:id", handlers.FormSubmission.Delete)
-
-	// form galleries
-	a.Handle("GET", "/api/form_gallery/:id", handlers.FormGallery.Retrieve)
-	a.Handle("GET", "/api/form_galleries/:form_id", handlers.FormGallery.RetrieveForForm)
-	a.Handle("GET", "/api/form_galleries/form/:form_id", handlers.FormGallery.RetrieveForForm)
-	a.Handle("PUT", "/api/form_gallery/:id/add/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
-	a.Handle("PUT", "/api/form_gallery/:id", handlers.FormGallery.Update)
-	a.Handle("DELETE", "/api/form_gallery/:id/remove/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
 }
 
 func routes(a *app.App) {
