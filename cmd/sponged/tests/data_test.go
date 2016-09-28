@@ -47,7 +47,7 @@ func TestUpsertData(t *testing.T) {
 
 		t.Logf("\tWhen calling url to insert : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != 200 {
 				t.Fatalf("\t%s\tShould be able to insert the data : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to insert the data.", tests.Success)
