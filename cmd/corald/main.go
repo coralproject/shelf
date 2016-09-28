@@ -1,4 +1,4 @@
-// Xenia is a web service for handling query related calls.
+// Coral is a web service for handling all calls to the Coral system.
 package main
 
 import (
