@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
 // TestItemsGET sample test for the GET call.
@@ -15,7 +16,7 @@ func TestItemsGET(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
-	t.Log("Given the need to test GET form call.")
+	t.Log("Given the need to test GET item call.")
 	{
 		url := "/v1/item/all/1/High_quality_commenters_in_Politics"
 		r := tests.NewRequest("GET", url, nil)
@@ -60,6 +61,43 @@ func TestItemsGET(t *testing.T) {
 				t.Errorf("\t%s\tShould have the correct id.", tests.Failed)
 			} else {
 				t.Logf("\t%s\tShould have the correct id.", tests.Success)
+			}
+		}
+	}
+}
+
+// TestItemPUT sample test for the PUT call.
+func TestItemPut(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need to test PUT item call.")
+	{
+		url := "/v1/item"
+		r := tests.NewRequest("PUT", url, nil)
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling url : %s", url)
+		{
+			t.Log("\tWhen we user version v1 of the items endpoint.")
+			if w.Code != http.StatusOK {
+				t.Fatalf("\t%s\tShould be able to save the item: %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to save the item.", tests.Success)
+
+			var result item.Item
+
+			err := json.NewDecoder(w.Body).Decode(&result)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the response : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the response.", tests.Success)
+
+			itemID := result.ID
+			if itemID == "" {
+				t.Errorf("\t%s\tShould have the correct type.", tests.Failed)
 			}
 		}
 	}
