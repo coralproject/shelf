@@ -11,9 +11,13 @@ import (
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
 	_ "github.com/cayleygraph/cayley/graph/mongo"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
+	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 	"github.com/coralproject/shelf/internal/xenia"
 	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
 	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/regex/rfix"
 	"github.com/coralproject/shelf/internal/xenia/script"
 	"github.com/coralproject/shelf/internal/xenia/script/sfix"
 	"github.com/coralproject/shelf/tstdata"
@@ -59,11 +63,89 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 
 	loadTestData(t, db)
 
+	if err := loadRegex(db, "number.json"); err != nil {
+		t.Fatalf("\t%s\tShould be able to load regex fixture : %v", tests.Failed, err)
+	}
+	if err := loadRegex(db, "email.json"); err != nil {
+		t.Fatalf("\t%s\tShould be able to load regex fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadRelationships("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load relationship fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadViews("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load view fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadItems("context", db); err != nil {
+
+	}
+
 	return db, store
+}
+
+// loadItems adds items to run tests.
+func loadItems(context interface{}, db *db.DB) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := itemfix.Add(context, db, items); err != nil {
+		return err
+	}
+	return nil
+}
+
+// loadRegex adds regex to run tests.
+func loadRegex(db *db.DB, file string) error {
+	rg, err := rfix.Get(file)
+	if err != nil {
+		return err
+	}
+
+	if err := rfix.Add(db, rg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadRelationships adds relationships to run tests.
+func loadRelationships(context interface{}, db *db.DB) error {
+	rels, err := relationshipfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := relationshipfix.Add(context, db, rels[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadViews adds views to run tests.
+func loadViews(context interface{}, db *db.DB) error {
+	views, err := viewfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := viewfix.Add(context, db, views[0:2]); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // teardown deinitializes for each indivdual test.
 func teardown(t *testing.T, db *db.DB, graph *cayley.Handle) {
+	relationshipfix.Remove("context", db, "RTEST_")
+	viewfix.Remove("context", db, "VTEST_")
+	rfix.Remove(db, "RTEST_")
+	itemfix.Remove("context", db, "ITEST_")
 	unloadTestData(t, db)
 	db.CloseMGO(tests.Context)
 	graph.Close()

@@ -200,7 +200,7 @@ func basicVarRegexFail() execSet {
 			Name:    "Basic Var Regex Fail",
 			Enabled: true,
 			Params: []query.Param{
-				{Name: "station_id", RegexName: "email"},
+				{Name: "station_id", RegexName: "RTEST_email"},
 			},
 			Queries: []query.Query{
 				{
@@ -216,7 +216,7 @@ func basicVarRegexFail() execSet {
 			},
 		},
 		results: []string{
-			`{"results":{"error":"Invalid[42021:email:Value \"42021\" does not match \"email\" expression]"}}`,
+			`{"results":{"error":"Invalid[42021:RTEST_email:Value \"42021\" does not match \"RTEST_email\" expression]"}}`,
 		},
 	}
 }
