@@ -20,6 +20,8 @@ func getNegExecSet() []execSet {
 		dataInMalformed(),
 		mongoRegexMalformed1(),
 		mongoRegexMalformed2(),
+		viewNameMissing(),
+		itemKeyMissing(),
 	}
 }
 
@@ -404,6 +406,72 @@ func mongoRegexMalformed2() execSet {
 		},
 		results: []string{
 			`{"results":{"commands":[{"$match":{"name":"#regex:/east"}},{"$group":{"_id":"station_id","count":{"$sum":1}}}],"error":"Parameter \"/east\" is not a regular expression"}}`,
+		},
+	}
+}
+
+// viewNameMissing performs a query without a required view name.
+func viewNameMissing() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{
+			"item":             "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+			"item_of_interest": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
+		},
+		set: &query.Set{
+			Name:    "Basic View",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "item_of_interest"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "ViewVars",
+					Type:       "pipeline",
+					Collection: "view",
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
+						{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"commands":[{"$match":{"item_id":"ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"}},{"$project":{"_id":0,"item_id":1}}],"error":"Vars does not include \"view\"."}}`,
+		},
+	}
+}
+
+// itemKeyMissing performs a query without a required item key.
+func itemKeyMissing() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{
+			"view":             "VTEST_thread",
+			"item_of_interest": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
+		},
+		set: &query.Set{
+			Name:    "Basic View",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "item_of_interest"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "ViewVars",
+					Type:       "pipeline",
+					Collection: "view",
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
+						{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":{"commands":[{"$match":{"item_id":"ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"}},{"$project":{"_id":0,"item_id":1}}],"error":"Vars does not include \"item\"."}}`,
 		},
 	}
 }

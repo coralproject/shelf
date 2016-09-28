@@ -656,7 +656,7 @@ func basicView() execSet {
 					Return:     true,
 					Commands: []map[string]interface{}{
 						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
-						//{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
+						{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
 					},
 				},
 			},

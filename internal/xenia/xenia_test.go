@@ -11,7 +11,9 @@ import (
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
 	_ "github.com/cayleygraph/cayley/graph/mongo"
+	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 	"github.com/coralproject/shelf/internal/xenia"
@@ -74,27 +76,64 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("\t%s\tShould be able to load relationship fixture : %v", tests.Failed, err)
 	}
 
+	if err := loadPatterns("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load pattern fixture : %v", tests.Failed, err)
+	}
+
 	if err := loadViews("context", db); err != nil {
 		t.Fatalf("\t%s\tShould be able to load view fixture : %v", tests.Failed, err)
 	}
 
-	if err := loadItems("context", db); err != nil {
-
+	if err := loadItems("context", db, store); err != nil {
+		t.Fatalf("\t%s\tShould be able to load items : %v", tests.Failed, err)
 	}
 
 	return db, store
 }
 
 // loadItems adds items to run tests.
-func loadItems(context interface{}, db *db.DB) error {
+func loadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
 	items, err := itemfix.Get()
 	if err != nil {
 		return err
 	}
 
-	if err := itemfix.Add(context, db, items); err != nil {
+	for _, itm := range items {
+		if err := sponge.Import(context, db, store, &itm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// loadPatterns adds patterns to run tests.
+func loadPatterns(context interface{}, db *db.DB) error {
+	ps, _, err := patternfix.Get()
+	if err != nil {
 		return err
 	}
+
+	if err := patternfix.Add(context, db, ps[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// unloadItems removes items from the items collection and the graph.
+func unloadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Remove(context, db, store, itm.ID); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -145,7 +184,7 @@ func teardown(t *testing.T, db *db.DB, graph *cayley.Handle) {
 	relationshipfix.Remove("context", db, "RTEST_")
 	viewfix.Remove("context", db, "VTEST_")
 	rfix.Remove(db, "RTEST_")
-	itemfix.Remove("context", db, "ITEST_")
+	unloadItems("context", db, graph)
 	unloadTestData(t, db)
 	db.CloseMGO(tests.Context)
 	graph.Close()
