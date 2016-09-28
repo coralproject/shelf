@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -47,7 +48,7 @@ func TestUpsertData(t *testing.T) {
 
 		t.Logf("\tWhen calling url to insert : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to insert the data : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to insert the data.", tests.Success)
@@ -64,7 +65,7 @@ func TestUpsertData(t *testing.T) {
 
 		t.Logf("\tWhen calling url to get : %s", url)
 		{
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the item.", tests.Success)
