@@ -97,7 +97,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 // runUpsertWeb issues the command talking to the web service.
 func runUpsertWeb(cmd *cobra.Command, set *query.Set) error {
 	verb := "PUT"
-	url := "/1.0/query"
+	url := "/v1/query"
 
 	data, err := json.Marshal(set)
 	if err != nil {

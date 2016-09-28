@@ -25,7 +25,7 @@ func addList() {
 // runList issues the command talking to the web service.
 func runList(cmd *cobra.Command, args []string) {
 	verb := "GET"
-	url := "/1.0/script"
+	url := "/v1/script"
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
