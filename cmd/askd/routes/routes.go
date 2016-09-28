@@ -64,27 +64,6 @@ func API() http.Handler {
 
 	a := app.New()
 
-	publicKey, err := cfg.String(cfgAuthPublicKey)
-	if err != nil {
-		log.User("startup", "Init", "XENIA_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
-	}
-
-	// If the public key is provided then add the auth middleware or fail using
-	// the provided public key.
-	if publicKey != "" {
-		log.Dev("startup", "Init", "Initializing Auth")
-
-		authm, err := auth.Midware(publicKey)
-		if err != nil {
-			log.Error("startup", "Init", err, "Initializing Auth")
-			os.Exit(1)
-		}
-
-		// Apply the authentication middleware on top of the application as the
-		// first middleware.
-		a.Use(authm)
-	}
-
 	// Add in the Mongo midware.
 	a.Use(midware.Mongo)
 
@@ -107,38 +86,73 @@ func API() http.Handler {
 }
 
 func routes(a *app.App) {
+
+	// Create a new app group which will be for internal functions that may have
+	// an optional layer of auth added to it.
+	internal := a.Group()
+
+	// Now we will load in the public key from the config. If found, we'll add a
+	// middleware to all internal endpoints that will ensure that we validate the
+	// requests coming in.
+
+	publicKey, err := cfg.String(cfgAuthPublicKey)
+	if err != nil || publicKey == "" {
+		log.User("startup", "Init", "XENIA_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+	}
+
+	// If the public key is provided then add the auth middleware or fail using
+	// the provided public key.
+	if publicKey != "" {
+		log.Dev("startup", "Init", "Initializing Auth")
+
+		authm, err := auth.Midware(publicKey)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
+		}
+
+		// Apply the authentication middleware on top of the application as the
+		// first middleware.
+		internal.Use(authm)
+	}
+
 	// global
-	a.Handle("GET", "/v1/version", handlers.Version.List)
+	internal.Handle("GET", "/v1/version", handlers.Version.List)
 
 	// forms
-	a.Handle("POST", "/v1/form", handlers.Form.Upsert)
-	a.Handle("GET", "/v1/form", handlers.Form.List)
-	a.Handle("PUT", "/v1/form/:id", handlers.Form.Upsert)
-	a.Handle("PUT", "/v1/form/:id/status/:status", handlers.Form.UpdateStatus)
-	a.Handle("GET", "/v1/form/:id", handlers.Form.Retrieve)
-	a.Handle("DELETE", "/v1/form/:id", handlers.Form.Delete)
+	internal.Handle("POST", "/v1/form", handlers.Form.Upsert)
+	internal.Handle("GET", "/v1/form", handlers.Form.List)
+	internal.Handle("PUT", "/v1/form/:id", handlers.Form.Upsert)
+	internal.Handle("PUT", "/v1/form/:id/status/:status", handlers.Form.UpdateStatus)
+	internal.Handle("GET", "/v1/form/:id", handlers.Form.Retrieve)
+	internal.Handle("DELETE", "/v1/form/:id", handlers.Form.Delete)
 
-	// form form submissions
-	a.Handle("POST", "/v1/form/:form_id/submission", handlers.FormSubmission.Create)
-	a.Handle("GET", "/v1/form/:form_id/submission", handlers.FormSubmission.Search)
-	a.Handle("GET", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)
-	a.Handle("PUT", "/v1/form/:form_id/submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
-	a.Handle("POST", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
-	a.Handle("DELETE", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
-	a.Handle("PUT", "/v1/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
-	a.Handle("DELETE", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
+	// form submissions
+	internal.Handle("GET", "/v1/form/:form_id/submission", handlers.FormSubmission.Search)
+	internal.Handle("GET", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)
+	internal.Handle("PUT", "/v1/form/:form_id/submission/:id/status/:status", handlers.FormSubmission.UpdateStatus)
+	internal.Handle("POST", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.AddFlag)
+	internal.Handle("DELETE", "/v1/form/:form_id/submission/:id/flag/:flag", handlers.FormSubmission.RemoveFlag)
+	internal.Handle("PUT", "/v1/form/:form_id/submission/:id/answer/:answer_id", handlers.FormSubmission.UpdateAnswer)
+	internal.Handle("DELETE", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Delete)
 
 	// temporal route to get CSV file - TO DO : move into a different service
-	a.Handle("GET", "/v1/form/:form_id/submission/export", handlers.FormSubmission.Download)
+	internal.Handle("GET", "/v1/form/:form_id/submission/export", handlers.FormSubmission.Download)
 
 	// form form galleries
-	a.Handle("GET", "/v1/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
+	internal.Handle("GET", "/v1/form/:form_id/gallery", handlers.FormGallery.RetrieveForForm)
 
 	// form galleries
-	a.Handle("GET", "/v1/form_gallery/:id", handlers.FormGallery.Retrieve)
-	a.Handle("PUT", "/v1/form_gallery/:id", handlers.FormGallery.Update)
-	a.Handle("POST", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
-	a.Handle("DELETE", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
+	internal.Handle("GET", "/v1/form_gallery/:id", handlers.FormGallery.Retrieve)
+	internal.Handle("PUT", "/v1/form_gallery/:id", handlers.FormGallery.Update)
+	internal.Handle("POST", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.AddAnswer)
+	internal.Handle("DELETE", "/v1/form_gallery/:id/submission/:submission_id/:answer_id", handlers.FormGallery.RemoveAnswer)
+
+	// Create a new app group which will be for external functions that will need
+	// to be publically exposed.
+	external := a.Group()
+
+	external.Handle("POST", "/v1/form/:form_id/submission", handlers.FormSubmission.Create)
 }
 
 func ensureDBIndexes() error {
