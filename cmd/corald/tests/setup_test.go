@@ -15,7 +15,6 @@ func init() {
 	// The call to API will force the init() function to initialize
 	// cfg, log and mongodb.
 	a = routes.API(true).(*app.App)
-
 }
 
 //==============================================================================
