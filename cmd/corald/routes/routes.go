@@ -23,6 +23,10 @@ const (
 	// cfgAuthPublicKey is the config key for the public key used to verify
 	// tokens.
 	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
+
+	// cfgPlatformPrivateKey is the private key used to sign new requests to the
+	// downstream service layer.
+	cfgPlatformPrivateKey = "PLATFORM_PRIVATE_KEY"
 )
 
 func init() {
@@ -44,6 +48,8 @@ func API(testing ...bool) http.Handler {
 	// If the public key is provided then add the auth middleware or fail using
 	// the provided public key.
 	if publicKey != "" {
+		log.Dev("startup", "Init", "Initializing Auth")
+
 		authm, err := auth.Midware(publicKey)
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
@@ -53,6 +59,29 @@ func API(testing ...bool) http.Handler {
 		// Apply the authentication middleware on top of the application as the
 		// first middleware.
 		a.Use(authm)
+	}
+
+	platformPrivateKey, err := cfg.String(cfgPlatformPrivateKey)
+	if err != nil {
+		log.User("startup", "Init", "CORAL_%s is missing, downstream platform authentication is disabled", cfgPlatformPrivateKey)
+	}
+
+	// If the platformPrivateKey is provided, then we should generate the token
+	// signing function to be used when composing requests down to the platform.
+	if platformPrivateKey != "" {
+		log.Dev("startup", "Init", "Initializing Downstream Platform Auth")
+
+		signer, err := auth.NewSigner(platformPrivateKey)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
+		}
+
+		// Requests can now be signed with the given signer function which we will
+		// save on the application wide context. In the event that a function
+		// requires a call down to a downstream platform, we will include a signed
+		// header using the signer function here.
+		a.Ctx["signer"] = signer
 	}
 
 	log.Dev("startup", "Init", "Initalizing routes")

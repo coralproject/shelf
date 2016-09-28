@@ -72,6 +72,8 @@ func API() http.Handler {
 	// If the public key is provided then add the auth middleware or fail using
 	// the provided public key.
 	if publicKey != "" {
+		log.Dev("startup", "Init", "Initializing Auth")
+
 		authm, err := auth.Midware(publicKey)
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
