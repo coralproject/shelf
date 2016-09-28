@@ -1,49 +1,32 @@
 
-
 # mfix
-`import "github.com/coralproject/shelf/internal/xenia/mask/mfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Add(db *db.DB, msk mask.Mask) error](#Add)
-* [func Get(fileName string) ([]mask.Mask, error)](#Get)
-* [func Remove(db *db.DB, collection string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[mfix.go](/src/github.com/coralproject/shelf/internal/xenia/mask/mfix/mfix.go) 
+    import "github.com/coralproject/shelf/internal/xenia/mask/mfix"
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/mfix.go?s=807:847#L31)
+
+## func Add
 ``` go
 func Add(db *db.DB, msk mask.Mask) error
 ```
 Add inserts a mask for testing.
 
 
-
-## <a name="Get">func</a> [Get](/src/target/mfix.go?s=496:542#L13)
+## func Get
 ``` go
 func Get(fileName string) ([]mask.Mask, error)
 ```
 Get retrieves a slice of mask documents from the filesystem for testing.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/mfix.go?s=1175:1222#L46)
+## func Remove
 ``` go
 func Remove(db *db.DB, collection string) error
 ```
 Remove is used to clear out all the test masks from the collection.
+
 
 
 

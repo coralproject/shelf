@@ -1,45 +1,11 @@
 
-
 # submission
-`import "github.com/coralproject/shelf/internal/ask/form/submission"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/internal/ask/form/submission"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Count(context interface{}, db *db.DB, formID string) (int, error)](#Count)
-* [func Create(context interface{}, db *db.DB, formID string, submission *Submission) error](#Create)
-* [func Delete(context interface{}, db *db.DB, id string) error](#Delete)
-* [func EnsureIndexes(context interface{}, db *db.DB) error](#EnsureIndexes)
-* [func RetrieveMany(context interface{}, db *db.DB, ids []string) ([]Submission, error)](#RetrieveMany)
-* [type Answer](#Answer)
-* [type AnswerInput](#AnswerInput)
-  * [func (f *AnswerInput) Validate() error](#AnswerInput.Validate)
-* [type SearchOpts](#SearchOpts)
-* [type SearchResultCounts](#SearchResultCounts)
-* [type SearchResults](#SearchResults)
-  * [func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts SearchOpts) (*SearchResults, error)](#Search)
-* [type Submission](#Submission)
-  * [func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)](#AddFlag)
-  * [func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)](#RemoveFlag)
-  * [func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error)](#Retrieve)
-  * [func UpdateAnswer(context interface{}, db *db.DB, id string, answer AnswerInput) (*Submission, error)](#UpdateAnswer)
-  * [func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submission, error)](#UpdateStatus)
-  * [func (s *Submission) Validate() error](#Submission.Validate)
 
-
-#### <a name="pkg-files">Package files</a>
-[submission.go](/src/github.com/coralproject/shelf/internal/ask/form/submission/submission.go) 
-
-
-## <a name="pkg-constants">Constants</a>
+## Constants
 ``` go
 const Collection = "form_submissions"
 ```
@@ -47,15 +13,14 @@ Collection is the mongo collection where Submission
 documents are saved.
 
 
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var ErrInvalidID = errors.New("ID is not in it's proper form")
 ```
 ErrInvalidID occurs when an ID is not in a valid form.
 
 
-
-## <a name="Count">func</a> [Count](/src/target/submission.go?s=10136:10206#L321)
+## func Count
 ``` go
 func Count(context interface{}, db *db.DB, formID string) (int, error)
 ```
@@ -63,8 +28,7 @@ Count returns the count of current submissions for a given
 form id in the Form Submissions MongoDB database collection.
 
 
-
-## <a name="Create">func</a> [Create](/src/target/submission.go?s=4827:4915#L134)
+## func Create
 ``` go
 func Create(context interface{}, db *db.DB, formID string, submission *Submission) error
 ```
@@ -72,8 +36,7 @@ Create adds a new Submission based on a given Form into
 the MongoDB database collection.
 
 
-
-## <a name="Delete">func</a> [Delete](/src/target/submission.go?s=16236:16296#L545)
+## func Delete
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -81,8 +44,7 @@ Delete removes a given Form Submission from the MongoDB
 database collection.
 
 
-
-## <a name="EnsureIndexes">func</a> [EnsureIndexes](/src/target/submission.go?s=1030:1086#L29)
+## func EnsureIndexes
 ``` go
 func EnsureIndexes(context interface{}, db *db.DB) error
 ```
@@ -90,8 +52,7 @@ EnsureIndexes perform index create commands against Mongo for the indexes
 needed for the ask package to run.
 
 
-
-## <a name="RetrieveMany">func</a> [RetrieveMany](/src/target/submission.go?s=6670:6755#L197)
+## func RetrieveMany
 ``` go
 func RetrieveMany(context interface{}, db *db.DB, ids []string) ([]Submission, error)
 ```
@@ -99,8 +60,7 @@ RetrieveMany retrieves a list of Submission's from the MongoDB database collecti
 
 
 
-
-## <a name="Answer">type</a> [Answer](/src/target/submission.go?s=2956:3353#L95)
+## type Answer
 ``` go
 type Answer struct {
     WidgetID     string      `json:"widget_id" bson:"widget_id" validate:"required,len=24"`
@@ -123,7 +83,8 @@ with the specific question asked included as well.
 
 
 
-## <a name="AnswerInput">type</a> [AnswerInput](/src/target/submission.go?s=2514:2658#L79)
+
+## type AnswerInput
 ``` go
 type AnswerInput struct {
     WidgetID string      `json:"widget_id" validate:"required"`
@@ -142,7 +103,8 @@ answer.
 
 
 
-### <a name="AnswerInput.Validate">func</a> (\*AnswerInput) [Validate](/src/target/submission.go?s=2718:2756#L85)
+
+### func (\*AnswerInput) Validate
 ``` go
 func (f *AnswerInput) Validate() error
 ```
@@ -150,8 +112,7 @@ Validate checks the AnswerInput value for consistency.
 
 
 
-
-## <a name="SearchOpts">type</a> [SearchOpts](/src/target/submission.go?s=2361:2436#L71)
+## type SearchOpts
 ``` go
 type SearchOpts struct {
     DscOrder bool
@@ -171,7 +132,8 @@ given forms submissions.
 
 
 
-## <a name="SearchResultCounts">type</a> [SearchResultCounts](/src/target/submission.go?s=1757:1963#L55)
+
+## type SearchResultCounts
 ``` go
 type SearchResultCounts struct {
     SearchByFlag     map[string]int `json:"search_by_flag"`
@@ -190,7 +152,8 @@ SearchResultCounts is a structured type containing the counts of results.
 
 
 
-## <a name="SearchResults">type</a> [SearchResults](/src/target/submission.go?s=2088:2267#L63)
+
+## type SearchResults
 ``` go
 type SearchResults struct {
     Counts      SearchResultCounts `json:"counts"`
@@ -207,7 +170,9 @@ expected from searching for submissions based on a form id.
 
 
 
-### <a name="Search">func</a> [Search](/src/target/submission.go?s=10975:11091#L354)
+
+
+### func Search
 ``` go
 func Search(context interface{}, db *db.DB, formID string, limit, skip int, opts SearchOpts) (*SearchResults, error)
 ```
@@ -217,8 +182,7 @@ using the provided search options.
 
 
 
-
-## <a name="Submission">type</a> [Submission](/src/target/submission.go?s=3528:4557#L107)
+## type Submission
 ``` go
 type Submission struct {
     ID             bson.ObjectId `json:"id" bson:"_id"`
@@ -246,7 +210,9 @@ submission.
 
 
 
-### <a name="AddFlag">func</a> [AddFlag](/src/target/submission.go?s=14262:14344#L471)
+
+
+### func AddFlag
 ``` go
 func AddFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)
 ```
@@ -254,7 +220,7 @@ AddFlag adds, and de-duplicates a flag to a given
 Submission in the MongoDB database collection.
 
 
-### <a name="RemoveFlag">func</a> [RemoveFlag](/src/target/submission.go?s=15245:15330#L508)
+### func RemoveFlag
 ``` go
 func RemoveFlag(context interface{}, db *db.DB, id, flag string) (*Submission, error)
 ```
@@ -262,7 +228,7 @@ RemoveFlag removes a flag from a given Submission in
 the MongoDB database collection.
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/submission.go?s=5879:5956#L171)
+### func Retrieve
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Submission, error)
 ```
@@ -270,7 +236,7 @@ Retrieve retrieves a Submission from the MongoDB database
 collection.
 
 
-### <a name="UpdateAnswer">func</a> [UpdateAnswer](/src/target/submission.go?s=8694:8795#L271)
+### func UpdateAnswer
 ``` go
 func UpdateAnswer(context interface{}, db *db.DB, id string, answer AnswerInput) (*Submission, error)
 ```
@@ -278,7 +244,7 @@ UpdateAnswer updates the edited answer if it could find it
 inside the MongoDB database collection atomically.
 
 
-### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/submission.go?s=7614:7703#L233)
+### func UpdateStatus
 ``` go
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Submission, error)
 ```
@@ -288,12 +254,12 @@ collection.
 
 
 
-
-### <a name="Submission.Validate">func</a> (\*Submission) [Validate](/src/target/submission.go?s=4616:4653#L124)
+### func (\*Submission) Validate
 ``` go
 func (s *Submission) Validate() error
 ```
 Validate checks the Submission value for consistency.
+
 
 
 
