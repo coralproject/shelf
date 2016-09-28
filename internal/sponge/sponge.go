@@ -92,15 +92,6 @@ func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string)
 		return err
 	}
 
-	// Delete the item.
-	if err := item.Delete(context, db, itemID); err != nil {
-		if err == item.ErrNotFound {
-			err = app.ErrNotFound
-		}
-		log.Error(context, "Remove", err, "Completed")
-		return err
-	}
-
 	// Prepare the item map data.
 	itmMap := map[string]interface{}{
 		"item_id": items[0].ID,
@@ -111,6 +102,15 @@ func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string)
 
 	// Remove the corresponding relationships from the graph.
 	if err := wire.RemoveFromGraph(context, db, graph, itmMap); err != nil {
+		log.Error(context, "Remove", err, "Completed")
+		return err
+	}
+
+	// Delete the item.
+	if err := item.Delete(context, db, itemID); err != nil {
+		if err == item.ErrNotFound {
+			err = app.ErrNotFound
+		}
 		log.Error(context, "Remove", err, "Completed")
 		return err
 	}
