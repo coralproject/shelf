@@ -59,13 +59,20 @@ func routes(a *app.App) {
 	a.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
 	a.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
 
-	a.Handle("GET", "/v1/item/:view_name/:item_key/:query_set",
+	// Start with this view :view_name on this item_key and run this query_set.
+	a.Handle("GET", "/v1/view/:view_name/:item_key/query/:query_set",
 		handlers.Proxy(xeniadURL,
 			func(c *app.Context) string {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
 	a.Handle("PUT", "/v1/item",
+		handlers.Proxy(spongedURL,
+			func(c *app.Context) string {
+				return "/v1/item"
+			}))
+
+	a.Handle("POST", "/v1/item",
 		handlers.Proxy(spongedURL,
 			func(c *app.Context) string {
 				return "/v1/item"
