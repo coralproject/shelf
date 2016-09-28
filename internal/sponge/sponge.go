@@ -26,8 +26,11 @@ func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item
 			}
 		}
 
-		// If the item is identical, we don't have to do anything.
+		// If we have an item already with this ID, we need to remove the
+		// existing relationships, assuming they are different.
 		if len(items) > 0 {
+
+			// If the item is identical, we don't have to do anything.
 			if reflect.DeepEqual(items[0], itm) {
 				log.Dev(context, "Import", "Completed")
 				return nil
@@ -44,7 +47,7 @@ func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item
 
 			// Remove the corresponding relationships from the graph.
 			if err := wire.RemoveFromGraph(context, db, graph, itmMap); err != nil {
-				log.Error(context, "Execute", err, "Completed")
+				log.Error(context, "Import", err, "Completed")
 				return err
 			}
 		}
