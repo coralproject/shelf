@@ -197,7 +197,7 @@ func TestUpsertItem(t *testing.T) {
 
 		t.Logf("\tWhen calling url to update : %s", url)
 		{
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to update the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to update the item.", tests.Success)
@@ -252,7 +252,7 @@ func TestDeleteItem(t *testing.T) {
 
 		t.Logf("\tWhen calling url to delete : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tShould be able to delete the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to delete the item.", tests.Success)
