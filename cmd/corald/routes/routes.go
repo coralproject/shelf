@@ -60,7 +60,7 @@ func routes(a *app.App) {
 	a.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
 
 	// Start with this view :view_name on this item_key and run this query_set.
-	a.Handle("GET", "/v1/view/:view_name/:item_key/query/:query_set",
+	a.Handle("GET", "/v1/exec/:view_name/:item_key/query/:query_set",
 		handlers.Proxy(xeniadURL,
 			func(c *app.Context) string {
 				return "/v1/exec/" + c.Params["query_set"]
