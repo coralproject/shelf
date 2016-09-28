@@ -16,7 +16,7 @@ func init() {
 	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/ask/form/submission/submissionfix/"
 }
 
-// Get retrieves a submission document from the filesystem for testing.
+// GetMany retrieves a submission document from the filesystem for testing.
 func GetMany(fileName string) ([]submission.Submission, error) {
 	file, err := os.Open(path + fileName)
 	if err != nil {
