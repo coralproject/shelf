@@ -46,14 +46,14 @@ func (itemHandle) Retrieve(c *app.Context) error {
 func (itemHandle) Upsert(c *app.Context) error {
 
 	// Decode the item.
-	var it item.Item
-	if err := json.NewDecoder(c.Request.Body).Decode(&it); err != nil {
+	var itm item.Item
+	if err := json.NewDecoder(c.Request.Body).Decode(&itm); err != nil {
 		return err
 	}
 
 	// See if the item already exists.
-	if it.ID != "" {
-		items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{it.ID})
+	if itm.ID != "" {
+		items, err := item.GetByIDs(c.SessionID, c.Ctx["DB"].(*db.DB), []string{itm.ID})
 		if err != nil {
 			if err != item.ErrNotFound {
 				return err
@@ -62,14 +62,14 @@ func (itemHandle) Upsert(c *app.Context) error {
 
 		// If the item is identical, we don't have to do anything.
 		if len(items) > 0 {
-			if reflect.DeepEqual(items[0], it) {
+			if reflect.DeepEqual(items[0], itm) {
 				c.Respond(nil, http.StatusNoContent)
 				return nil
 			}
 
 			// If the item is not identical, remove the stale relationships by
 			// preparing an item map.
-			itMap := map[string]interface{}{
+			itmMap := map[string]interface{}{
 				"item_id": items[0].ID,
 				"type":    items[0].Type,
 				"version": items[0].Version,
@@ -77,31 +77,32 @@ func (itemHandle) Upsert(c *app.Context) error {
 			}
 
 			// Remove the corresponding relationships from the graph.
-			if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+			if err := wire.RemoveFromGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itmMap); err != nil {
 				return err
 			}
 		}
 	}
 
 	// Add the item to the items collection.
-	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &it); err != nil {
+	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &itm); err != nil {
 		return err
 	}
 
 	// Prepare the generic item data map.
-	itMap := map[string]interface{}{
-		"item_id": it.ID,
-		"type":    it.Type,
-		"version": it.Version,
-		"data":    it.Data,
+	itmMap := map[string]interface{}{
+		"item_id": itm.ID,
+		"type":    itm.Type,
+		"version": itm.Version,
+		"data":    itm.Data,
 	}
 
 	// Infer relationships and add them to the graph.
-	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itmMap); err != nil {
 		return err
 	}
 
-	c.Respond(nil, http.StatusNoContent)
+	c.Respond(itmMap, http.StatusOK)
+
 	return nil
 }
 
