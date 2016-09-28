@@ -2,7 +2,9 @@
 package tests
 
 import (
+	"bytes"
 	"encoding/json"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -18,7 +20,7 @@ func TestItemsGET(t *testing.T) {
 
 	t.Log("Given the need to test GET item call.")
 	{
-		url := "/v1/item/all/1/High_quality_commenters_in_Politics"
+		url := "/v1/view/all/1/query/High_quality_commenters_in_Politics"
 		r := tests.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -74,7 +76,12 @@ func TestItemPut(t *testing.T) {
 	t.Log("Given the need to test PUT item call.")
 	{
 		url := "/v1/item"
-		r := tests.NewRequest("PUT", url, nil)
+		i := item.Item{Type: "comments", Version: 1, Data: map[string]interface{}{"content": "This is a new comment", "author_id": 1}}
+		payload, err := json.Marshal(i)
+		if err != nil {
+			log.Fatal("\t%s\tShould be able to marshal the item: %v", tests.Failed, err)
+		}
+		r := tests.NewRequest("PUT", url, bytes.NewReader(payload))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
