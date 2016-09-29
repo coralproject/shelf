@@ -17,8 +17,8 @@ func NewSigner(privateKeyBase64Str string) (Signer, error) {
 	// This is the signer function that provides the support for signing tokens.
 	f := func(claims map[string]interface{}) (string, error) {
 
-		// Create the new JWT token with the ES512 signing method.
-		token := jwt.NewWithClaims(jwt.SigningMethodES512, jwt.MapClaims(claims))
+		// Create the new JWT token with the ES384 signing method.
+		token := jwt.NewWithClaims(jwt.SigningMethodES384, jwt.MapClaims(claims))
 
 		// Actually sign the token.
 		return token.SignedString(privateKey)
