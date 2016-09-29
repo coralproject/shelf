@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -28,7 +29,7 @@ func TestExec(t *testing.T) {
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the query : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the query.", tests.Success)
