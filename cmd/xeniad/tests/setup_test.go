@@ -80,6 +80,10 @@ func runTest(m *testing.M) int {
 		fmt.Println("Could not load queries in basic.json")
 		return 1
 	}
+	if err := loadQuery(db, "basic_view.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
 	if err := loadQuery(db, "basic_var.json"); err != nil {
 		fmt.Println("Could not load queries in basic_var.json")
 		return 1

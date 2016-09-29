@@ -118,7 +118,7 @@ func routes(a *app.App) {
 
 	a.Handle("POST", "/v1/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
-	a.Handle("GET", "/v1/exec/:name/query/:view/:item", handlers.Exec.NameOnView)
+	a.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView)
 
 	a.Handle("GET", "/v1/relationship", handlers.Relationship.List)
 	a.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)
