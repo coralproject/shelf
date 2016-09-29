@@ -2,6 +2,7 @@ package item_test
 
 import (
 	"fmt"
+	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
@@ -109,8 +110,60 @@ func TestUpsertDelete(t *testing.T) {
 	}
 }
 
+// TestGetByID tests if we can get a single item from the db.
+func TestGetByID(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+	defer db.CloseMGO(tests.Context)
+
+	defer func() {
+		if err := itemfix.Remove(tests.Context, db, prefix); err != nil {
+			t.Fatalf("\t%s\tShould be able to remove the items : %v", tests.Failed, err)
+		}
+		t.Logf("\t%s\tShould be able to remove the items.", tests.Success)
+	}()
+
+	t.Log("Given the need to get an item in the database by ID.")
+	{
+		t.Log("\tWhen starting from an empty items collection")
+		{
+			items, err := itemfix.Get()
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able retrieve item fixture : %s", tests.Failed, err)
+			}
+
+			var itemIDs []string
+			for _, it := range items {
+				if err := item.Upsert(tests.Context, db, &it); err != nil {
+					t.Fatalf("\t%s\tShould be able to upsert items : %s", tests.Failed, err)
+				}
+				itemIDs = append(itemIDs, it.ID)
+			}
+			t.Logf("\t%s\tShould be able to upsert items.", tests.Success)
+
+			itmBack, err := item.GetByID(tests.Context, db, itemIDs[0])
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to get an item by ID : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get an item by ID.", tests.Success)
+
+			if !reflect.DeepEqual(items[0], itmBack) {
+				t.Logf("\t%+v", items[0])
+				t.Logf("\t%+v", itmBack)
+				t.Fatalf("\t%s\tShould be able to get back the same item.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get back the same item.", tests.Success)
+		}
+	}
+}
+
 // TestGetByIDs tests if we can get items from the db.
-func TestGetAll(t *testing.T) {
+func TestGetByIDs(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 

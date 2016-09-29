@@ -214,11 +214,11 @@ func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
 
 	itemID, ok := val.(string)
 	if !ok {
-		return parsedItem{}, ErrItemType
+		return parsedItem{}, ErrItemID
 	}
 
 	if itemID == "" {
-		return parsedItem{}, ErrItemType
+		return parsedItem{}, ErrItemID
 	}
 
 	// Validate and extract the item data.

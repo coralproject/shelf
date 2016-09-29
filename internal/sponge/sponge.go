@@ -16,9 +16,12 @@ import (
 func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item) error {
 	log.Dev(context, "Import", "Started : ID[%s]", itm.ID)
 
-	// See if the item already exists.
+	// If the item exists and is different than the provided item,
+	// we need to remove existing relationships.
 	if itm.ID != "" {
-		items, err := item.GetByIDs(context, db, []string{itm.ID})
+
+		// Get the item if it exists.
+		itmOrig, err := item.GetByID(context, db, itm.ID)
 		if err != nil {
 			if err != item.ErrNotFound {
 				log.Error(context, "Import", err, "Completed")
@@ -26,12 +29,13 @@ func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item
 			}
 		}
 
-		// If we have an item already with this ID, we need to remove the
-		// existing relationships, assuming they are different.
-		if len(items) > 0 {
+		// If the item exits, we need to determine if the item is the
+		// same as the original.  If not, we need to update the
+		// relationships.
+		if itmOrig.ID != "" {
 
 			// If the item is identical, we don't have to do anything.
-			if reflect.DeepEqual(items[0], itm) {
+			if reflect.DeepEqual(itmOrig, itm) {
 				log.Dev(context, "Import", "Completed")
 				return nil
 			}
@@ -39,10 +43,10 @@ func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item
 			// If the item is not identical, remove the stale relationships by
 			// preparing an item map.
 			itmMap := map[string]interface{}{
-				"item_id": items[0].ID,
-				"type":    items[0].Type,
-				"version": items[0].Version,
-				"data":    items[0].Data,
+				"item_id": itmOrig.ID,
+				"type":    itmOrig.Type,
+				"version": itmOrig.Version,
+				"data":    itmOrig.Data,
 			}
 
 			// Remove the corresponding relationships from the graph.
