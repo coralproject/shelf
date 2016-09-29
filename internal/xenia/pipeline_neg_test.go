@@ -22,6 +22,7 @@ func getNegExecSet() []execSet {
 		mongoRegexMalformed2(),
 		viewNameMissing(),
 		itemKeyMissing(),
+		outsideView(),
 	}
 }
 
@@ -472,6 +473,40 @@ func itemKeyMissing() execSet {
 		},
 		results: []string{
 			`{"results":{"commands":[{"$match":{"item_id":"ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"}},{"$project":{"_id":0,"item_id":1}}],"error":"Vars does not include \"item\"."}}`,
+		},
+	}
+}
+
+// outsideView performs simple query on a view for an item not inthe view.
+func outsideView() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{
+			"view":             "VTEST_user comments",
+			"item":             "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+			"item_of_interest": "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660",
+		},
+		set: &query.Set{
+			Name:    "Basic View",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "item_of_interest"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "ViewVars",
+					Type:       "pipeline",
+					Collection: "view",
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
+						{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"ViewVars","Docs":[]}]}`,
 		},
 	}
 }
