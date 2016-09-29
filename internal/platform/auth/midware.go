@@ -1,12 +1,16 @@
 package auth
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web/app"
 	jwt "github.com/dgrijalva/jwt-go"
 )
+
+// ErrInvalidToken is returned when the token provided is not valid.
+var ErrInvalidToken = errors.New("invalid token")
 
 // Midware handles token authentication for external authentication
 // sources.
@@ -33,7 +37,9 @@ func Midware(publicKeyBase64Str string) (app.Middleware, error) {
 				return app.ErrNotAuthorized
 			}
 
-			token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, func(token *jwt.Token) (interface{}, error) {
+			// This describes the key validation function to provide the certificate
+			// to validate the signature on the passed in JWT.
+			keyValidation := func(token *jwt.Token) (interface{}, error) {
 
 				// Don't forget to validate the alg is what you expect.
 				if _, ok := token.Method.(*jwt.SigningMethodECDSA); !ok {
@@ -42,9 +48,11 @@ func Midware(publicKeyBase64Str string) (app.Middleware, error) {
 
 				// Return with the public key that was provided in the config.
 				return publicKey, nil
-			})
+			}
 
-			// Return with the error if there was an issue parsing the token.
+			// Here we actually parse/verify the signature on the JWT and extract the
+			// claims.
+			token, err := jwt.ParseWithClaims(tokenString, &jwt.MapClaims{}, keyValidation)
 			if err != nil {
 				log.Error(c.SessionID, "auth : Midware", err, "Token could not be parsed")
 				return app.ErrNotAuthorized

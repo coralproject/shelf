@@ -2,6 +2,10 @@ package auth
 
 import jwt "github.com/dgrijalva/jwt-go"
 
+// Signer is a function that can be used to sign claims with and generate a
+// signed JWT token from them.
+type Signer func(claims map[string]interface{}) (string, error)
+
 // NewSigner will return a signer that can be used to sign tokens for a given
 // set of claims.
 func NewSigner(privateKeyBase64Str string) (Signer, error) {
@@ -10,18 +14,15 @@ func NewSigner(privateKeyBase64Str string) (Signer, error) {
 		return nil, err
 	}
 
+	// This is the signer function that provides the support for signing tokens.
 	f := func(claims map[string]interface{}) (string, error) {
 
-		// Create the new JWT token with the RS512 signing method.
+		// Create the new JWT token with the ES512 signing method.
 		token := jwt.NewWithClaims(jwt.SigningMethodES512, jwt.MapClaims(claims))
 
-		// And actually sign the token.
+		// Actually sign the token.
 		return token.SignedString(privateKey)
 	}
 
 	return f, nil
 }
-
-// Signer is a function that can be used to sign claims with and generate a
-// signed JWT token from them.
-type Signer func(claims map[string]interface{}) (string, error)

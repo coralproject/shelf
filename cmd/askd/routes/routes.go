@@ -62,10 +62,7 @@ func API() http.Handler {
 		os.Exit(1)
 	}
 
-	a := app.New()
-
-	// Add in the Mongo midware.
-	a.Use(midware.Mongo)
+	a := app.New(midware.Mongo)
 
 	// Load in the recaptcha secret from the config.
 	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
