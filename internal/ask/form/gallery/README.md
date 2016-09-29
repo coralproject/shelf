@@ -1,37 +1,11 @@
 
-
 # gallery
-`import "github.com/coralproject/shelf/internal/ask/form/gallery"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/internal/ask/form/gallery"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Create(context interface{}, db *db.DB, gallery *Gallery) error](#Create)
-* [func Delete(context interface{}, db *db.DB, id string) error](#Delete)
-* [func List(context interface{}, db *db.DB, formID string) ([]Gallery, error)](#List)
-* [func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error](#Update)
-* [type Answer](#Answer)
-  * [func (a *Answer) Validate() error](#Answer.Validate)
-* [type Gallery](#Gallery)
-  * [func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)](#AddAnswer)
-  * [func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)](#RemoveAnswer)
-  * [func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error)](#Retrieve)
-  * [func (fg *Gallery) Validate() error](#Gallery.Validate)
 
-
-#### <a name="pkg-files">Package files</a>
-[gallery.go](/src/github.com/coralproject/shelf/internal/ask/form/gallery/gallery.go) 
-
-
-## <a name="pkg-constants">Constants</a>
+## Constants
 ``` go
 const Collection = "form_galleries"
 ```
@@ -39,15 +13,14 @@ Collection is the mongo collection where Gallery documents are
 saved.
 
 
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var ErrInvalidID = errors.New("ID is not in it's proper form")
 ```
 ErrInvalidID occurs when an ID is not in a valid form.
 
 
-
-## <a name="Create">func</a> [Create](/src/target/gallery.go?s=2584:2651#L67)
+## func Create
 ``` go
 func Create(context interface{}, db *db.DB, gallery *Gallery) error
 ```
@@ -55,16 +28,14 @@ Create adds a form gallery based on the form id provided into the
 MongoDB database collection.
 
 
-
-## <a name="Delete">func</a> [Delete](/src/target/gallery.go?s=12367:12427#L397)
+## func Delete
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
 Delete removes the given Gallery with the ID provided.
 
 
-
-## <a name="List">func</a> [List](/src/target/gallery.go?s=10582:10657#L330)
+## func List
 ``` go
 func List(context interface{}, db *db.DB, formID string) ([]Gallery, error)
 ```
@@ -72,8 +43,7 @@ List retrives the form galleries for a given form from the MongoDB database
 collection.
 
 
-
-## <a name="Update">func</a> [Update](/src/target/gallery.go?s=11498:11576#L365)
+## func Update
 ``` go
 func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error
 ```
@@ -82,8 +52,7 @@ collection.
 
 
 
-
-## <a name="Answer">type</a> [Answer](/src/target/gallery.go?s=1037:1420#L28)
+## type Answer
 ``` go
 type Answer struct {
     SubmissionID    bson.ObjectId       `json:"submission_id" bson:"submission_id" validate:"required"`
@@ -104,7 +73,8 @@ Gallery.
 
 
 
-### <a name="Answer.Validate">func</a> (\*Answer) [Validate](/src/target/gallery.go?s=1474:1507#L36)
+
+### func (\*Answer) Validate
 ``` go
 func (a *Answer) Validate() error
 ```
@@ -112,8 +82,7 @@ Validate checks the Anser value for consistency.
 
 
 
-
-## <a name="Gallery">type</a> [Gallery](/src/target/gallery.go?s=1646:2312#L45)
+## type Gallery
 ``` go
 type Gallery struct {
     ID          bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
@@ -134,7 +103,9 @@ Gallery is a Form that has been moved to a shared space.
 
 
 
-### <a name="AddAnswer">func</a> [AddAnswer](/src/target/gallery.go?s=7809:7908#L226)
+
+
+### func AddAnswer
 ``` go
 func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```
@@ -142,7 +113,7 @@ AddAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
 
 
-### <a name="RemoveAnswer">func</a> [RemoveAnswer](/src/target/gallery.go?s=9204:9306#L278)
+### func RemoveAnswer
 ``` go
 func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```
@@ -150,7 +121,7 @@ RemoveAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/gallery.go?s=3375:3449#L92)
+### func Retrieve
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error)
 ```
@@ -160,12 +131,12 @@ collection as well as hydrating the form gallery with form submissions.
 
 
 
-
-### <a name="Gallery.Validate">func</a> (\*Gallery) [Validate](/src/target/gallery.go?s=2368:2403#L57)
+### func (\*Gallery) Validate
 ``` go
 func (fg *Gallery) Validate() error
 ```
 Validate checks the Gallery value for consistency.
+
 
 
 

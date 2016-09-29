@@ -1,31 +1,18 @@
 
-
 # cmdpattern
-`import "github.com/coralproject/shelf/cmd/xenia/cmdpattern"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func GetCommands() *cobra.Command](#GetCommands)
-
-
-#### <a name="pkg-files">Package files</a>
-[commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdpattern/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdpattern/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdpattern/get.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdpattern/upsert.go) 
+    import "github.com/coralproject/shelf/cmd/xenia/cmdpattern"
 
 
 
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=290:323#L2)
+
+## func GetCommands
 ``` go
 func GetCommands() *cobra.Command
 ```
 GetCommands returns the pattern commands.
+
 
 
 

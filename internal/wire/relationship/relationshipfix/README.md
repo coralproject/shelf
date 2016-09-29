@@ -1,49 +1,32 @@
 
-
 # relationshipfix
-`import "github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error](#Add)
-* [func Get() ([]relationship.Relationship, error)](#Get)
-* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[relationshipfix.go](/src/github.com/coralproject/shelf/internal/wire/relationship/relationshipfix/relationshipfix.go) 
+    import "github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/relationshipfix.go?s=746:826#L27)
+
+## func Add
 ``` go
 func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error
 ```
 Add inserts relationships for testing.
 
 
-
-## <a name="Get">func</a> [Get](/src/target/relationshipfix.go?s=404:451#L10)
+## func Get
 ``` go
 func Get() ([]relationship.Relationship, error)
 ```
 Get loads relationship data based on relationships.json.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/relationshipfix.go?s=1028:1093#L38)
+## func Remove
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes relationships in Mongo that match a given pattern.
+
 
 
 

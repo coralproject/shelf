@@ -1,49 +1,32 @@
 
-
 # submissionfix
-`import "github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Add(context interface{}, db *db.DB, subs []submission.Submission) error](#Add)
-* [func GetMany(fileName string) ([]submission.Submission, error)](#GetMany)
-* [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[submissionfix.go](/src/github.com/coralproject/shelf/internal/ask/form/submission/submissionfix/submissionfix.go) 
+    import "github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/submissionfix.go?s=767:843#L28)
+
+## func Add
 ``` go
 func Add(context interface{}, db *db.DB, subs []submission.Submission) error
 ```
 Add inserts submissions to the DB for testing.
 
 
-
-## <a name="GetMany">func</a> [GetMany](/src/target/submissionfix.go?s=416:478#L10)
+## func GetMany
 ``` go
 func GetMany(fileName string) ([]submission.Submission, error)
 ```
-Get retrieves a submission document from the filesystem for testing.
+GetMany retrieves a submission document from the filesystem for testing.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/submissionfix.go?s=1053:1117#L39)
+## func Remove
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```
 Remove removes forms in Mongo that match a given pattern.
+
 
 
 
