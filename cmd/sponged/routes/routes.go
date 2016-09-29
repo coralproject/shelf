@@ -12,6 +12,7 @@ import (
 	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/sponged/handlers"
 	"github.com/coralproject/shelf/cmd/sponged/midware"
+	"github.com/coralproject/shelf/internal/platform/auth"
 )
 
 // Environmental variables.
@@ -21,7 +22,7 @@ const (
 	cfgMongoDB       = "MONGO_DB"
 	cfgMongoUser     = "MONGO_USER"
 	cfgMongoPassword = "MONGO_PASS"
-	cfgAnvilHost     = "ANVIL_HOST"
+	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 )
 
 func init() {
@@ -54,8 +55,31 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
+	a := app.New()
 
-	a := app.New(midware.Mongo, midware.Cayley, midware.Auth)
+	publicKey, err := cfg.String(cfgAuthPublicKey)
+	if err != nil {
+		log.User("startup", "Init", "SPONGE_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+	}
+
+	// If the public key is provided then add the auth middleware or fail using
+	// the provided public key.
+	if publicKey != "" {
+		log.Dev("startup", "Init", "Initializing Auth")
+
+		authm, err := auth.Midware(publicKey)
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
+		}
+
+		// Apply the authentication middleware on top of the application as the
+		// first middleware.
+		a.Use(authm)
+	}
+
+	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
+	a.Use(midware.Mongo, midware.Cayley)
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)

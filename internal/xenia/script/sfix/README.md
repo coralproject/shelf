@@ -1,50 +1,33 @@
 
-
 # sfix
-`import "github.com/coralproject/shelf/internal/xenia/script/sfix"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Add(db *db.DB, scr script.Script) error](#Add)
-* [func Get(fileName string) (script.Script, error)](#Get)
-* [func Remove(db *db.DB, pattern string) error](#Remove)
-
-
-#### <a name="pkg-files">Package files</a>
-[sfix.go](/src/github.com/coralproject/shelf/internal/xenia/script/sfix/sfix.go) 
+    import "github.com/coralproject/shelf/internal/xenia/script/sfix"
 
 
 
 
 
-## <a name="Add">func</a> [Add](/src/target/sfix.go?s=824:868#L31)
+
+## func Add
 ``` go
 func Add(db *db.DB, scr script.Script) error
 ```
 Add inserts a script for testing.
 
 
-
-## <a name="Get">func</a> [Get](/src/target/sfix.go?s=489:537#L13)
+## func Get
 ``` go
 func Get(fileName string) (script.Script, error)
 ```
 Get retrieves a set document from the filesystem for testing.
 
 
-
-## <a name="Remove">func</a> [Remove](/src/target/sfix.go?s=1084:1128#L41)
+## func Remove
 ``` go
 func Remove(db *db.DB, pattern string) error
 ```
 Remove is used to clear out all the test sets from the collection.
 All test documents must start with STEST in their name.
+
 
 
 
