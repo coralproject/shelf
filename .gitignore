@@ -26,9 +26,6 @@ _testmain.go
 
 .DS_Store
 
-# Config files
-*.cfg
-
 # Build files
 cmd/xenia/xenia
 cmd/xeniad/xeniad
