@@ -16,7 +16,7 @@ import (
 const Collection = "items"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Item(s) Not found")
 
 // Upsert upserts an item to the items collections.
 func Upsert(context interface{}, db *db.DB, item *Item) error {
