@@ -112,6 +112,27 @@ func routes(a *app.App) {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
+	// Execute xenia queries directly.
+	a.Handle("GET", "/v1/exec/:query_set",
+		handlers.Proxy(xeniadURL,
+			func(c *app.Context) string {
+				return "/v1/exec/" + c.Params["query_set"]
+			}))
+
+	// Send a new query to xenia.
+	a.Handle("PUT", "/v1/query",
+		handlers.Proxy(xeniadURL,
+			func(c *app.Context) string {
+				return "/v1/query"
+			}))
+
+	// Execute a custom xenia query.
+	a.Handle("POST", "/v1/exec",
+		handlers.Proxy(xeniadURL,
+			func(c *app.Context) string {
+				return "/v1/exec"
+			}))
+
 	a.Handle("PUT", "/v1/item",
 		handlers.Proxy(spongedURL,
 			func(c *app.Context) string {
