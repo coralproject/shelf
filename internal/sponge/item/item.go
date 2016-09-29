@@ -57,7 +57,7 @@ func GetByID(context interface{}, db *db.DB, id string) (Item, error) {
 	var itm Item
 	f := func(c *mgo.Collection) error {
 		q := bson.M{"item_id": id}
-		log.Dev(context, "Find", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
+		log.Dev(context, "GetByID", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
 		return c.Find(q).One(&itm)
 	}
 	if err := db.ExecuteMGO(context, Collection, f); err != nil {
