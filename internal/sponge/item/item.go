@@ -49,6 +49,29 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 	return nil
 }
 
+// GetByID retrieves a single item by ID from Mongo.
+func GetByID(context interface{}, db *db.DB, id string) (Item, error) {
+	log.Dev(context, "GetByID", "Started : ID[%s]", id)
+
+	// Get the items from Mongo.
+	var itm Item
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"item_id": id}
+		log.Dev(context, "Find", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
+		return c.Find(q).One(&itm)
+	}
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+		log.Error(context, "GetByID", err, "Completed")
+		return itm, err
+	}
+
+	log.Dev(context, "GetByID", "Completed")
+	return itm, nil
+}
+
 // GetByIDs retrieves items by ID from Mongo.
 func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error) {
 	log.Dev(context, "GetByIDs", "Started : IDs%v", ids)
