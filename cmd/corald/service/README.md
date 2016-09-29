@@ -23,6 +23,14 @@ RewritePath will rewrite the path given a PathRewriter and return the request
 director function.
 
 
+## func SignServiceRequest
+``` go
+func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
+```
+SignServiceRequest will take a given signer, and adds a Authorization header
+with the token that is generated from the signer.
+
+
 
 
 

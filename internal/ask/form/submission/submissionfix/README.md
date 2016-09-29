@@ -18,7 +18,7 @@ Add inserts submissions to the DB for testing.
 ``` go
 func GetMany(fileName string) ([]submission.Submission, error)
 ```
-Get retrieves a submission document from the filesystem for testing.
+GetMany retrieves a submission document from the filesystem for testing.
 
 
 ## func Remove
