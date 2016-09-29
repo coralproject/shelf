@@ -112,10 +112,10 @@ func routes(a *app.App) {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
-	// Execute xenia queries directly
+	// Execute xenia queries directly.
 	a.Handle("GET", "/v1/exec/:query_set", handlers.Proxy(xeniadURL, nil))
 
-	// Post a new query to xenia
+	// Send a new query to xenia.
 	a.Handle("PUT", "/v1/query", handlers.Proxy(xeniadURL, nil))
 
 	a.Handle("PUT", "/v1/item",
