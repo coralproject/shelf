@@ -23,7 +23,7 @@
 
 ## <a name="Request">func</a> [Request](/src/target/web.go?s=256:345#L10)
 ``` go
-func Request(cmd *cobra.Command, verb string, url string, post io.Reader) (string, error)
+func Request(cmd *cobra.Command, verb, path string, post io.Reader) (string, error)
 ```
 Request provides support for executing commands against the
 web service.
