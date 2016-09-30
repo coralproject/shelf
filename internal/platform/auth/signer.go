@@ -52,6 +52,12 @@ func SignRequest(context interface{}, signer Signer, claims map[string]interface
 
 	now := time.Now()
 
+	// Ensure that the claims object is not nil, if it is, then we should create a
+	// fresh one.
+	if claims == nil {
+		claims = map[string]interface{}{}
+	}
+
 	// The claims currently just use the reserved keys, in the future we can add
 	// any other POD into this map that can be used downstream.
 	claims["jti"] = uuid.New()
