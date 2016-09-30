@@ -34,7 +34,7 @@ func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pat
 	}
 	file.Close()
 
-	file, err := os.Open(path + "relationship.json")
+	file, err = os.Open(path + "relationship.json")
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
