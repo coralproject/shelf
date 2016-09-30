@@ -1,28 +1,44 @@
 
-# sponge
-    import "github.com/coralproject/shelf/internal/sponge"
 
+# sponge
+`import "github.com/coralproject/shelf/internal/sponge"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 Package sponge provides support for item importing.
 
 
 
 
+## <a name="pkg-index">Index</a>
+* [func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item) error](#Import)
+* [func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string) error](#Remove)
 
 
-## func Import
+#### <a name="pkg-files">Package files</a>
+[sponge.go](/src/github.com/coralproject/shelf/internal/sponge/sponge.go) 
+
+
+
+
+
+## <a name="Import">func</a> [Import](/src/target/sponge.go?s=410:497#L6)
 ``` go
 func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item) error
 ```
 Import imports an item into the items collections and into the graph database.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/sponge.go?s=2397:2483#L76)
 ``` go
 func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string) error
 ```
 Remove removes an item into the items collection and remove any
 corresponding quads from the graph database.
-
 
 
 

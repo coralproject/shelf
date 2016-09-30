@@ -1,11 +1,27 @@
 
+
 # tstdata
-    import "github.com/coralproject/shelf/tstdata"
+`import "github.com/coralproject/shelf/tstdata"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [func Docs() ([]map[string]interface{}, error)](#Docs)
+* [func Drop(db *db.DB)](#Drop)
+* [func Generate(db *db.DB) error](#Generate)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[tstdata.go](/src/github.com/coralproject/shelf/tstdata/tstdata.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const CollectionExecTest = "test_xenia_data"
 ```
@@ -14,27 +30,29 @@ going to store the xenia test data.
 
 
 
-## func Docs
+
+## <a name="Docs">func</a> [Docs](/src/target/tstdata.go?s=601:646#L18)
 ``` go
 func Docs() ([]map[string]interface{}, error)
 ```
 Docs reads the fixture and returns the documents.
 
 
-## func Drop
+
+## <a name="Drop">func</a> [Drop](/src/target/tstdata.go?s=1584:1604#L69)
 ``` go
 func Drop(db *db.DB)
 ```
 Drop drops the temp collection.
 
 
-## func Generate
+
+## <a name="Generate">func</a> [Generate](/src/target/tstdata.go?s=1140:1170#L45)
 ``` go
 func Generate(db *db.DB) error
 ```
 Generate creates a temp collection with data
 that can be used for testing things.
-
 
 
 
