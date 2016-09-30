@@ -23,6 +23,8 @@ const (
 	cfgPlatformPrivateKey = "PLATFORM_PRIVATE_KEY"
 )
 
+// authSigner is the signing function that is used when the downstream
+// authentication is enabled.
 var authSigner auth.Signer
 
 func init() {
@@ -32,29 +34,30 @@ func init() {
 	}
 
 	platformPrivateKey, err := cfg.String(cfgPlatformPrivateKey)
-	if err != nil {
-		log.Printf("Downstream Auth : Disabled : %s\n", err.Error())
+	if err != nil || platformPrivateKey == "" {
+		if err != nil {
+			log.Printf("Downstream Auth : Disabled : %s\n", err.Error())
+			return
+		}
+
+		log.Printf("Downstream Auth : Disabled\n")
 		return
 	}
 
 	// If the platformPrivateKey is provided, then we should generate the token
 	// signing function to be used when composing requests down to the platform.
-	if platformPrivateKey != "" {
-		signer, err := auth.NewSigner(platformPrivateKey)
-		if err != nil {
-			log.Printf("Downstream Auth : Error : %s", err.Error())
-			os.Exit(1)
-		}
-
-		// Requests can now be signed with the given signer function which we will
-		// save on the application wide context. In the event that a function
-		// requires a call down to a downstream platform, we will include a signed
-		// header using the signer function here.
-		authSigner = signer
-		log.Println("Downstream Auth : Enabled")
-	} else {
-		log.Printf("Downstream Auth : Disabled : %s\n", err.Error())
+	signer, err := auth.NewSigner(platformPrivateKey)
+	if err != nil {
+		log.Printf("Downstream Auth : Error : %s", err.Error())
+		os.Exit(1)
 	}
+
+	// Requests can now be signed with the given signer function which we will
+	// save on the application wide context. In the event that a function
+	// requires a call down to a downstream platform, we will include a signed
+	// header using the signer function here.
+	authSigner = signer
+	log.Println("Downstream Auth : Enabled")
 }
 
 // Request provides support for executing commands against the

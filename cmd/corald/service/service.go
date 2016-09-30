@@ -7,7 +7,7 @@ import (
 	"github.com/coralproject/shelf/internal/platform/auth"
 )
 
-// SignServiceRequest signts a request with the claims necisary to authenticate
+// SignServiceRequest signs a request with the claims necessary to authenticate
 // with downstream services.
 func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error {
 	claims := map[string]interface{}{}

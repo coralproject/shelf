@@ -49,7 +49,6 @@ func SignRequest(context interface{}, signer Signer, claims map[string]interface
 	// Create the new claims object for the token that we're using to send
 	// downstream. This includes a unique identifier with the expiry set in the
 	// future and set as not valid before the current date.
-
 	now := time.Now()
 
 	// Ensure that the claims object is not nil, if it is, then we should create a
