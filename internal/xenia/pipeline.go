@@ -67,49 +67,14 @@ func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query
 	// Are we being asked to execute the query on a view.
 	if q.Collection == "view" {
 
-		// Make sure we have the information we need to execute the view.
-		viewName, ok := vars["view"]
-		if !ok {
-			return docs{}, commands, fmt.Errorf("Vars does not include \"view\".")
-		}
-
-		itemKey, ok := vars["item"]
-		if !ok {
-			return docs{}, commands, fmt.Errorf("Vars does not include \"item\".")
-		}
-
-		// Generate a unique name for the collection.
-		viewCol := uuid.New()
-
-		// Prepare the parameters for executing the view.
-		viewParams := wire.ViewParams{
-			ViewName:          viewName,
-			ItemKey:           itemKey,
-			ResultsCollection: viewCol,
-		}
-
-		// Execute the view.
-		if _, err := wire.Execute(context, db, graph, &viewParams); err != nil {
+		// Materialize the view for the query.
+		viewCol, err := materializeView(context, db, graph, q, vars)
+		if err != nil {
 			return docs{}, commands, err
 		}
 
 		// Defer clean up of the temporary collection.
-		defer func() error {
-
-			c, err := db.CollectionMGO(context, viewCol)
-			if err != nil {
-				return err
-			}
-
-			if err := c.DropCollection(); err != nil {
-				return err
-			}
-
-			return nil
-		}()
-
-		// Provide the query with the temporary collection name.
-		q.Collection = viewCol
+		defer cleanupView(context, db, viewCol)
 	}
 
 	// Do we want the explain output.
@@ -208,6 +173,56 @@ func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query
 	}
 
 	return docs{q.Name, results}, commands, nil
+}
+
+// materializeView executes a view, creates a temporary collection for the view, and
+// modifies the query to query the temporary collection.
+func materializeView(context interface{}, db *db.DB, graph *cayley.Handle, q *query.Query, vars map[string]string) (string, error) {
+
+	// Make sure we have the information we need to execute the view.
+	viewName, ok := vars["view"]
+	if !ok {
+		return "", fmt.Errorf("Vars does not include \"view\".")
+	}
+
+	itemKey, ok := vars["item"]
+	if !ok {
+		return "", fmt.Errorf("Vars does not include \"item\".")
+	}
+
+	// Generate a unique name for the collection.
+	viewCol := uuid.New()
+
+	// Prepare the parameters for executing the view.
+	viewParams := wire.ViewParams{
+		ViewName:          viewName,
+		ItemKey:           itemKey,
+		ResultsCollection: viewCol,
+	}
+
+	// Execute the view.
+	if _, err := wire.Execute(context, db, graph, &viewParams); err != nil {
+		return viewCol, err
+	}
+
+	// Provide the query with the temporary collection name.
+	q.Collection = viewCol
+
+	return viewCol, nil
+}
+
+// cleanupView removed a tempory view collection.
+func cleanupView(context interface{}, db *db.DB, viewCol string) error {
+	c, err := db.CollectionMGO(context, viewCol)
+	if err != nil {
+		return err
+	}
+
+	if err := c.DropCollection(); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // saveResult processes the $save command for this result.
