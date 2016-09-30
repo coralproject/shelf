@@ -16,17 +16,13 @@ import (
 	"github.com/cayleygraph/cayley/graph"
 	_ "github.com/cayleygraph/cayley/graph/mongo"
 	"github.com/cayleygraph/cayley/quad"
-	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/wire/wirefix"
 )
 
 var mgoCfg mongo.Config
 
-const (
-	itemPrefix = "ITEST_"
-	wirePrefix = "WTEST_"
-)
+const wirePrefix = "WTEST_"
 
 func init() {
 	// Initialize the configuration and logging systems. Plus anything
@@ -73,26 +69,14 @@ func runTest(m *testing.M) int {
 func loadTestData(context interface{}, db *db.DB) error {
 
 	// -----------------------------------------------------------
-	// Load example Items.
+	// Load example items, relationships, views, and patterns.
 
-	items, err := itemfix.Get()
+	items, rels, vs, pats, err := wirefix.Get()
 	if err != nil {
 		return err
 	}
 
-	if err := itemfix.Add(context, db, items); err != nil {
-		return err
-	}
-
-	// -----------------------------------------------------------
-	// Load example relationships, views, and patterns.
-
-	rels, vs, pats, err := wirefix.Get()
-	if err != nil {
-		return err
-	}
-
-	if err := wirefix.Add(context, db, rels, vs, pats); err != nil {
+	if err := wirefix.Add(context, db, items, rels, vs, pats); err != nil {
 		return err
 	}
 
@@ -109,12 +93,12 @@ func loadTestData(context interface{}, db *db.DB) error {
 	}
 
 	var quads []quad.Quad
-	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
-	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make(wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
+	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
+	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -139,7 +123,6 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	// ------------------------------------------------------------
 	// Clear items, relationships, and views.
 
-	itemfix.Remove("context", db, itemPrefix)
 	wirefix.Remove("context", db, wirePrefix)
 
 	// ------------------------------------------------------------
@@ -152,12 +135,12 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	}
 
 	var quads []quad.Quad
-	quads = append(quads, quad.Make("ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
-	quads = append(quads, quad.Make("ITEST_80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", "ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
-	quads = append(quads, quad.Make("ITEST_a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", "ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make(wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", wirePrefix+"on", wirePrefix+"c1b2bbfe-af9f-4903-8777-bd47c4d5b20a", ""))
+	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
+	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
+	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -221,7 +204,7 @@ func TestExecuteView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: wirePrefix + "user comments",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
@@ -234,9 +217,43 @@ func TestExecuteView(t *testing.T) {
 			// Check the resulting items.
 			items, ok := result.Results.([]bson.M)
 			if !ok || len(items) != 2 {
-				t.Fatalf("\t%s\tShould be able to get 2 items in the view : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
+		}
+	}
+}
+
+// TestExecuteReturnRoot tests the generation of a view, opting not to persist the view
+// but returning a root item.
+func TestExecuteReturnRoot(t *testing.T) {
+	db, store := setup(t)
+	defer teardown(t, db)
+
+	t.Log("Given the need to generate a view.")
+	{
+		t.Log("\tWhen using the view, relationship, and item fixtures.")
+		{
+
+			// Form the view parameters.
+			viewParams := wire.ViewParams{
+				ViewName: wirePrefix + "user comments return root",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
+			}
+
+			// Generate the view.
+			result, err := wire.Execute(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the resulting items.
+			items, ok := result.Results.([]bson.M)
+			if !ok || len(items) != 3 {
+				t.Fatalf("\t%s\tShould be able to get 3 items in the view.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get 3 items in the view.", tests.Success)
 		}
 	}
 }
@@ -255,7 +272,7 @@ func TestExecuteBackwardsView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: wirePrefix + "thread_backwards",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
@@ -268,7 +285,7 @@ func TestExecuteBackwardsView(t *testing.T) {
 			// Check the resulting items.
 			items, ok := result.Results.([]bson.M)
 			if !ok || len(items) != 3 {
-				t.Fatalf("\t%s\tShould be able to get e items in the view : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get e items in the view", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 3 items in the view.", tests.Success)
 		}
@@ -288,7 +305,7 @@ func TestPersistView(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName:          wirePrefix + "thread",
-				ItemKey:           "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+				ItemKey:           wirePrefix + "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 				ResultsCollection: "testcollection",
 			}
 
@@ -302,7 +319,7 @@ func TestPersistView(t *testing.T) {
 			// Check the result message.
 			msg, ok := result.Results.(bson.M)
 			if !ok || msg["number_of_results"] != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get 5 items in the view", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
 
@@ -318,7 +335,7 @@ func TestPersistView(t *testing.T) {
 			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
 
 			if len(viewItems) != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
 
@@ -348,7 +365,7 @@ func TestPersistViewWithBuffer(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName:          wirePrefix + "thread",
-				ItemKey:           "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+				ItemKey:           wirePrefix + "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
 				ResultsCollection: "testcollection",
 				BufferLimit:       2,
 			}
@@ -363,7 +380,7 @@ func TestPersistViewWithBuffer(t *testing.T) {
 			// Check the result message.
 			msg, ok := result.Results.(bson.M)
 			if !ok || msg["number_of_results"] != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get 5 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
 
@@ -379,7 +396,7 @@ func TestPersistViewWithBuffer(t *testing.T) {
 			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
 
 			if len(viewItems) != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection : %s", tests.Failed, err)
+				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
 
@@ -410,7 +427,7 @@ func TestExecuteNameFail(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: wirePrefix + "this view name does not exist",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
@@ -444,7 +461,7 @@ func TestExecuteTypeFail(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: wirePrefix + "comments from authors flagged by a user",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.
@@ -478,7 +495,7 @@ func TestExecuteRelationshipFail(t *testing.T) {
 			// Form the view parameters.
 			viewParams := wire.ViewParams{
 				ViewName: wirePrefix + "has invalid starting relationship",
-				ItemKey:  "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
 			}
 
 			// Generate the view.

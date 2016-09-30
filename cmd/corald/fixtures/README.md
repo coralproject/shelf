@@ -1,13 +1,38 @@
 
+
 # fixtures
-    import "github.com/coralproject/shelf/cmd/corald/fixtures"
+`import "github.com/coralproject/shelf/cmd/corald/fixtures"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Asset(name string) ([]byte, error)](#Asset)
+* [func AssetDir(name string) ([]string, error)](#AssetDir)
+* [func AssetInfo(name string) (os.FileInfo, error)](#AssetInfo)
+* [func AssetNames() []string](#AssetNames)
+* [func Error(err error) app.Handler](#Error)
+* [func Handler(name string, code int) app.Handler](#Handler)
+* [func Load(name string, v interface{}) error](#Load)
+* [func MustAsset(name string) []byte](#MustAsset)
+* [func NoContent(c *app.Context) error](#NoContent)
+* [func RestoreAsset(dir, name string) error](#RestoreAsset)
+* [func RestoreAssets(dir, name string) error](#RestoreAssets)
+
+
+#### <a name="pkg-files">Package files</a>
+[assets.go](/src/github.com/coralproject/shelf/cmd/corald/fixtures/assets.go) [fixtures.go](/src/github.com/coralproject/shelf/cmd/corald/fixtures/fixtures.go) 
 
 
 
 
 
-
-## func Asset
+## <a name="Asset">func</a> [Asset](/src/target/assets.go?s=124470:124509#L252)
 ``` go
 func Asset(name string) ([]byte, error)
 ```
@@ -16,7 +41,8 @@ It returns an error if the asset could not be found or
 could not be loaded.
 
 
-## func AssetDir
+
+## <a name="AssetDir">func</a> [AssetDir](/src/target/assets.go?s=126944:126988#L325)
 ``` go
 func AssetDir(name string) ([]string, error)
 ```
@@ -38,7 +64,8 @@ AssetDir("foo.txt") and AssetDir("notexist") would return an error
 AssetDir("") will return []string{"data"}.
 
 
-## func AssetInfo
+
+## <a name="AssetInfo">func</a> [AssetInfo](/src/target/assets.go?s=125229:125277#L278)
 ``` go
 func AssetInfo(name string) (os.FileInfo, error)
 ```
@@ -47,28 +74,32 @@ It returns an error if the asset could not be found or
 could not be loaded.
 
 
-## func AssetNames
+
+## <a name="AssetNames">func</a> [AssetNames](/src/target/assets.go?s=125625:125651#L291)
 ``` go
 func AssetNames() []string
 ```
 AssetNames returns the names of the assets.
 
 
-## func Error
+
+## <a name="Error">func</a> [Error](/src/target/fixtures.go?s=645:678#L23)
 ``` go
 func Error(err error) app.Handler
 ```
 Error will simply return the error to the calling request stack.
 
 
-## func Handler
+
+## <a name="Handler">func</a> [Handler](/src/target/fixtures.go?s=1014:1061#L38)
 ``` go
 func Handler(name string, code int) app.Handler
 ```
 Handler will serve a JSON payload as the endpoint response.
 
 
-## func Load
+
+## <a name="Load">func</a> [Load](/src/target/fixtures.go?s=239:282#L5)
 ``` go
 func Load(name string, v interface{}) error
 ```
@@ -76,7 +107,8 @@ Load unmarshals the specified fixture into the provided
 data value.
 
 
-## func MustAsset
+
+## <a name="MustAsset">func</a> [MustAsset](/src/target/assets.go?s=124933:124967#L266)
 ``` go
 func MustAsset(name string) []byte
 ```
@@ -84,26 +116,28 @@ MustAsset is like Asset but panics when Asset would return an error.
 It simplifies safe initialization of global variables.
 
 
-## func NoContent
+
+## <a name="NoContent">func</a> [NoContent](/src/target/fixtures.go?s=859:895#L32)
 ``` go
 func NoContent(c *app.Context) error
 ```
 NoContent simply responds with a HTTP Status Code of 204.
 
 
-## func RestoreAsset
+
+## <a name="RestoreAsset">func</a> [RestoreAsset](/src/target/assets.go?s=128643:128684#L372)
 ``` go
 func RestoreAsset(dir, name string) error
 ```
 RestoreAsset restores an asset under the given directory
 
 
-## func RestoreAssets
+
+## <a name="RestoreAssets">func</a> [RestoreAssets](/src/target/assets.go?s=129207:129249#L397)
 ``` go
 func RestoreAssets(dir, name string) error
 ```
 RestoreAssets restores an asset under the given directory recursively
-
 
 
 

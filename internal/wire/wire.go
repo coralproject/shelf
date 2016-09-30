@@ -82,7 +82,7 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 	}
 
 	// Retrieve the item IDs for the view.
-	ids, err := viewIDs(v, graphPath, graphDB)
+	ids, err := viewIDs(v, graphPath, viewParams.ItemKey, graphDB)
 	if err != nil {
 		log.Error(context, "Execute", err, "Completed")
 		return errResult(err), err
@@ -214,7 +214,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 }
 
 // viewIDs retrieves the item IDs associated with the view.
-func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, error) {
+func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) ([]string, error) {
 
 	// Build the Cayley iterator.
 	it := path.BuildIterator()
@@ -259,6 +259,11 @@ func viewIDs(v *view.View, path *path.Path, graphDB *cayley.Handle) ([]string, e
 		}
 	}
 	ids = ids[:j]
+
+	// Add root item.
+	if v.ReturnRoot == true {
+		ids = append(ids, key)
+	}
 
 	return ids, nil
 }

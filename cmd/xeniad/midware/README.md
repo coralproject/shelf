@@ -1,18 +1,31 @@
 
+
 # midware
-    import "github.com/coralproject/shelf/cmd/xeniad/midware"
+`import "github.com/coralproject/shelf/cmd/xeniad/midware"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Mongo(h app.Handler) app.Handler](#Mongo)
+
+
+#### <a name="pkg-files">Package files</a>
+[mongo.go](/src/github.com/coralproject/shelf/cmd/xeniad/midware/mongo.go) 
 
 
 
 
 
-
-## func Mongo
+## <a name="Mongo">func</a> [Mongo](/src/target/mongo.go?s=274:311#L4)
 ``` go
 func Mongo(h app.Handler) app.Handler
 ```
 Mongo handles session management.
-
 
 
 

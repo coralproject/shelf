@@ -1,19 +1,32 @@
 
+
 # web
-    import "github.com/coralproject/shelf/cmd/xenia/web"
+`import "github.com/coralproject/shelf/cmd/xenia/web"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Request(cmd *cobra.Command, verb string, url string, post io.Reader) (string, error)](#Request)
+
+
+#### <a name="pkg-files">Package files</a>
+[web.go](/src/github.com/coralproject/shelf/cmd/xenia/web/web.go) 
 
 
 
 
 
-
-## func Request
+## <a name="Request">func</a> [Request](/src/target/web.go?s=256:345#L10)
 ``` go
-func Request(cmd *cobra.Command, verb string, url string, post io.Reader) (string, error)
+func Request(cmd *cobra.Command, verb, path string, post io.Reader) (string, error)
 ```
 Request provides support for executing commands against the
 web service.
-
 
 
 
