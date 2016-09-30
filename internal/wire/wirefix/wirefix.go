@@ -21,17 +21,18 @@ func init() {
 
 // Get loads relationship, view, and pattern data based on *.json files.
 func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error) {
-	itemFile, err := os.Open(path + "items.json")
+	file, err := os.Open(path + "items.json")
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
-	defer itemFile.Close()
+	defer file.Close()
 
 	var items []item.Item
-	err = json.NewDecoder(itemFile).Decode(&items)
+	err = json.NewDecoder(file).Decode(&items)
 	if err != nil {
 		return nil, nil, nil, nil, err
 	}
+	file.Close()
 
 	file, err := os.Open(path + "relationship.json")
 	if err != nil {
