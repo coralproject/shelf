@@ -37,6 +37,14 @@ Midware handles token authentication for external authentication
 sources.
 
 
+## func SignRequest
+``` go
+func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error
+```
+SignRequest will take a given signer, and adds a Authorization header
+with the token that is generated from the signer.
+
+
 
 ## type Signer
 ``` go

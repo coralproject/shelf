@@ -27,8 +27,8 @@ director function.
 ``` go
 func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
 ```
-SignServiceRequest will take a given signer, and adds a Authorization header
-with the token that is generated from the signer.
+SignServiceRequest signts a request with the claims necisary to authenticate
+with downstream services.
 
 
 
