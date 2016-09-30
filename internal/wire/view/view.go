@@ -14,7 +14,7 @@ import (
 const Collection = "views"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("View Not found")
 
 // Upsert upserts a view to the collection of currently utilized views.
 func Upsert(context interface{}, db *db.DB, view *View) error {
