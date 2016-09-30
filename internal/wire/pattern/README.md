@@ -1,39 +1,65 @@
 
+
 # pattern
-    import "github.com/coralproject/shelf/internal/wire/pattern"
+`import "github.com/coralproject/shelf/internal/wire/pattern"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, itemType string) error](#Delete)
+* [func GetAll(context interface{}, db *db.DB) ([]Pattern, error)](#GetAll)
+* [func Upsert(context interface{}, db *db.DB, pattern *Pattern) error](#Upsert)
+* [type Inference](#Inference)
+  * [func (inf *Inference) Validate() error](#Inference.Validate)
+* [type Pattern](#Pattern)
+  * [func GetByType(context interface{}, db *db.DB, itemType string) (*Pattern, error)](#GetByType)
+  * [func (p *Pattern) Validate() error](#Pattern.Validate)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[model.go](/src/github.com/coralproject/shelf/internal/wire/pattern/model.go) [pattern.go](/src/github.com/coralproject/shelf/internal/wire/pattern/pattern.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const Collection = "patterns"
 ```
 Collection is the Mongo collection containing pattern metadata.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrNotFound = errors.New("Set Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/pattern.go?s=2565:2631#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, itemType string) error
 ```
 Delete removes a pattern from from Mongo.
 
 
-## func GetAll
+
+## <a name="GetAll">func</a> [GetAll](/src/target/pattern.go?s=1263:1325#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]Pattern, error)
 ```
 GetAll retrieves the current patterns from Mongo.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/pattern.go?s=502:569#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, pattern *Pattern) error
 ```
@@ -41,7 +67,8 @@ Upsert upserts a pattern to the collection of currently utilized patterns.
 
 
 
-## type Inference
+
+## <a name="Inference">type</a> [Inference](/src/target/model.go?s=500:916#L8)
 ``` go
 type Inference struct {
     RelIDField string `bson:"related_ID_field" json:"related_ID_field" validate:"required,min=2"`
@@ -63,8 +90,7 @@ within an item.
 
 
 
-
-### func (\*Inference) Validate
+### <a name="Inference.Validate">func</a> (\*Inference) [Validate](/src/target/model.go?s=974:1012#L17)
 ``` go
 func (inf *Inference) Validate() error
 ```
@@ -72,7 +98,8 @@ Validate checks the Inference value for consistency.
 
 
 
-## type Pattern
+
+## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1189:1376#L26)
 ``` go
 type Pattern struct {
     Type       string      `bson:"type" json:"type" validate:"required,min=2"`
@@ -88,9 +115,7 @@ item of an certain type.
 
 
 
-
-
-### func GetByType
+### <a name="GetByType">func</a> [GetByType](/src/target/pattern.go?s=1872:1953#L58)
 ``` go
 func GetByType(context interface{}, db *db.DB, itemType string) (*Pattern, error)
 ```
@@ -99,12 +124,12 @@ GetByType retrieves a pattern by type from Mongo.
 
 
 
-### func (\*Pattern) Validate
+
+### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1432:1466#L32)
 ``` go
 func (p *Pattern) Validate() error
 ```
 Validate checks the Pattern value for consistency.
-
 
 
 

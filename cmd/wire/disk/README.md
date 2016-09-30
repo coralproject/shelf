@@ -1,13 +1,29 @@
 
+
 # disk
-    import "github.com/coralproject/shelf/cmd/wire/disk"
+`import "github.com/coralproject/shelf/cmd/wire/disk"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
+* [func LoadItem(context interface{}, path string) (map[string]interface{}, error)](#LoadItem)
+* [func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error)](#LoadQuadParams)
+
+
+#### <a name="pkg-files">Package files</a>
+[disk.go](/src/github.com/coralproject/shelf/cmd/wire/disk/disk.go) 
 
 
 
 
 
-
-## func LoadDir
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1579:1636#L50)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -15,7 +31,8 @@ LoadDir loadsup a given directory, calling a load function for each valid
 json file found.
 
 
-## func LoadItem
+
+## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=971:1050#L27)
 ``` go
 func LoadItem(context interface{}, path string) (map[string]interface{}, error)
 ```
@@ -23,13 +40,13 @@ LoadItem serializes the content of an item from a file using the
 given file path. Returns the serialized item values.
 
 
-## func LoadQuadParams
+
+## <a name="LoadQuadParams">func</a> [LoadQuadParams](/src/target/disk.go?s=303:382#L5)
 ``` go
 func LoadQuadParams(context interface{}, path string) ([]wire.QuadParam, error)
 ```
 LoadQuadParams serializes the content of a set of QuadParams from a file using the
 given file path. Returns the serialized QuadParams value.
-
 
 
 

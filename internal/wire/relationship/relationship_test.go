@@ -140,15 +140,22 @@ func TestGetAll(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to upsert relationships.", tests.Success)
 
-			rels2, err := relationship.GetAll(tests.Context, db)
+			relsBack, err := relationship.GetAll(tests.Context, db)
 			if err != nil {
 				t.Fatalf("\t%s\tShould be able to get all relationships : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get all relationships.", tests.Success)
 
-			if !reflect.DeepEqual(rels, rels2) {
+			var filteredRels []relationship.Relationship
+			for _, rel := range relsBack {
+				if rel.Predicate[0:len(prefix)] == prefix {
+					filteredRels = append(filteredRels, rel)
+				}
+			}
+
+			if !reflect.DeepEqual(rels, filteredRels) {
 				t.Logf("\t%+v", rels)
-				t.Logf("\t%+v", rels2)
+				t.Logf("\t%+v", filteredRels)
 				t.Fatalf("\t%s\tShould be able to get back the same relationships.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same relationships.", tests.Success)

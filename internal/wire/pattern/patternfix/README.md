@@ -1,32 +1,49 @@
 
+
 # patternfix
-    import "github.com/coralproject/shelf/internal/wire/pattern/patternfix"
+`import "github.com/coralproject/shelf/internal/wire/pattern/patternfix"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error](#Add)
+* [func Get() ([]pattern.Pattern, []map[string]interface{}, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
+
+
+#### <a name="pkg-files">Package files</a>
+[patternfix.go](/src/github.com/coralproject/shelf/internal/wire/pattern/patternfix/patternfix.go) 
 
 
 
 
 
-
-## func Add
+## <a name="Add">func</a> [Add](/src/target/patternfix.go?s=1056:1130#L42)
 ``` go
 func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error
 ```
 Add inserts patterns for testing.
 
 
-## func Get
+
+## <a name="Get">func</a> [Get](/src/target/patternfix.go?s=374:437#L10)
 ``` go
 func Get() ([]pattern.Pattern, []map[string]interface{}, error)
 ```
 Get loads pattern data based on patterns.json.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/patternfix.go?s=1325:1389#L53)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```
 Remove removes patterns in Mongo that match a given prefix.
-
 
 
 

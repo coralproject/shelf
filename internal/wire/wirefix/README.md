@@ -1,32 +1,49 @@
 
+
 # wirefix
-    import "github.com/coralproject/shelf/internal/wire/wirefix"
+`import "github.com/coralproject/shelf/internal/wire/wirefix"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error](#Add)
+* [func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
+
+
+#### <a name="pkg-files">Package files</a>
+[wirefix.go](/src/github.com/coralproject/shelf/internal/wire/wirefix/wirefix.go) 
 
 
 
 
 
-
-## func Add
+## <a name="Add">func</a> [Add](/src/target/wirefix.go?s=1730:1876#L66)
 ``` go
-func Add(context interface{}, db *db.DB, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error
+func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error
 ```
 Add inserts relationships, views, and patterns for testing.
 
 
-## func Get
+
+## <a name="Get">func</a> [Get](/src/target/wirefix.go?s=549:641#L13)
 ``` go
-func Get() ([]relationship.Relationship, []view.View, []pattern.Pattern, error)
+func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error)
 ```
 Get loads relationship, view, and pattern data based on *.json files.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/wirefix.go?s=2427:2491#L95)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```
 Remove removes relationships, views, and patterns in Mongo that match a given pattern.
-
 
 
 

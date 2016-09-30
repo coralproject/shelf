@@ -1,19 +1,38 @@
 
+
 # auth
-    import "github.com/coralproject/shelf/internal/platform/auth"
+`import "github.com/coralproject/shelf/internal/platform/auth"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)](#DecodePrivateKey)
+* [func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)](#DecodePublicKey)
+* [func Midware(publicKeyBase64Str string) (app.Middleware, error)](#Midware)
+* [type Signer](#Signer)
+  * [func NewSigner(privateKeyBase64Str string) (Signer, error)](#NewSigner)
 
 
-## Variables
+#### <a name="pkg-files">Package files</a>
+[keys.go](/src/github.com/coralproject/shelf/internal/platform/auth/keys.go) [midware.go](/src/github.com/coralproject/shelf/internal/platform/auth/midware.go) [signer.go](/src/github.com/coralproject/shelf/internal/platform/auth/signer.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrInvalidToken = errors.New("invalid token")
 ```
 ErrInvalidToken is returned when the token provided is not valid.
 
 
-## func DecodePrivateKey
+
+## <a name="DecodePrivateKey">func</a> [DecodePrivateKey](/src/target/keys.go?s=1053:1129#L25)
 ``` go
 func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)
 ```
@@ -21,7 +40,8 @@ DecodePrivateKey pulls the private key out of the string passed by first
 decoding from base64 and parsing the PEM encoding.
 
 
-## func DecodePublicKey
+
+## <a name="DecodePublicKey">func</a> [DecodePublicKey](/src/target/keys.go?s=225:298#L2)
 ``` go
 func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)
 ```
@@ -29,7 +49,8 @@ DecodePublicKey pulls the public key out of the string passed by first
 decoding from base64 and parsing the PEM encoding.
 
 
-## func Midware
+
+## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=347:410#L7)
 ``` go
 func Midware(publicKeyBase64Str string) (app.Middleware, error)
 ```
@@ -46,7 +67,8 @@ with the token that is generated from the signer.
 
 
 
-## type Signer
+
+## <a name="Signer">type</a> [Signer](/src/target/signer.go?s=163:226#L1)
 ``` go
 type Signer func(claims map[string]interface{}) (string, error)
 ```
@@ -59,15 +81,12 @@ signed JWT token from them.
 
 
 
-
-
-### func NewSigner
+### <a name="NewSigner">func</a> [NewSigner](/src/target/signer.go?s=324:382#L1)
 ``` go
 func NewSigner(privateKeyBase64Str string) (Signer, error)
 ```
 NewSigner will return a signer that can be used to sign tokens for a given
 set of claims.
-
 
 
 

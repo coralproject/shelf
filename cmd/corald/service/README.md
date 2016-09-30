@@ -1,13 +1,29 @@
 
+
 # service
-    import "github.com/coralproject/shelf/cmd/corald/service"
+`import "github.com/coralproject/shelf/cmd/corald/service"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Rewrite(c *app.Context) func(*http.Request)](#Rewrite)
+* [func RewritePath(c *app.Context, targetPath string) func(*http.Request)](#RewritePath)
+* [func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error](#SignServiceRequest)
+
+
+#### <a name="pkg-files">Package files</a>
+[service.go](/src/github.com/coralproject/shelf/cmd/corald/service/service.go) 
 
 
 
 
 
-
-## func Rewrite
+## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=1972:2020#L47)
 ``` go
 func Rewrite(c *app.Context) func(*http.Request)
 ```
@@ -15,7 +31,8 @@ Rewrite will add service request headers to the request and add other
 standards.
 
 
-## func RewritePath
+
+## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=2426:2497#L69)
 ``` go
 func RewritePath(c *app.Context, targetPath string) func(*http.Request)
 ```
@@ -23,13 +40,13 @@ RewritePath will rewrite the path given a PathRewriter and return the request
 director function.
 
 
-## func SignServiceRequest
+
+## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=334:421#L5)
 ``` go
 func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
 ```
 SignServiceRequest signts a request with the claims necisary to authenticate
 with downstream services.
-
 
 
 

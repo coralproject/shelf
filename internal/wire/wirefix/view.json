@@ -2,7 +2,7 @@
 	{
 		"name": "WTEST_thread",
 		"collection": "items",
-		"start_type": "coral_asset",
+		"start_type": "WTEST_asset",
 		"path": [
 			{
 				"level": 1,
@@ -20,7 +20,7 @@
 	},
 	{
 		"name": "WTEST_user comments",
-		"start_type": "coral_user",
+		"start_type": "WTEST_user",
 		"collection": "items",
 		"path": [
 			{
@@ -33,7 +33,7 @@
 	},
 	{
 		"name": "WTEST_comments from authors flagged by a user",
-		"start_type": "coral_invalid_type",
+		"start_type": "WTEST_invalid_type",
 		"collection": "items",
 		"path": [
 			{
@@ -57,7 +57,7 @@
 	},
 	{
 		"name": "WTEST_has invalid starting relationship",
-		"start_type": "coral_user",
+		"start_type": "WTEST_user",
 		"collection": "items",
 		"path": [
 			{
@@ -76,7 +76,7 @@
 	{
 		"name": "WTEST_thread_backwards",
 		"collection": "items",
-		"start_type": "coral_user",
+		"start_type": "WTEST_user",
 		"path": [
 			{
 				"level": 1,
@@ -89,6 +89,20 @@
 				"direction": "out",
 				"predicate": "WTEST_on",
 				"tag": "asset"
+			}
+		]
+	},
+	{
+		"name": "WTEST_user comments return root",
+		"start_type": "WTEST_user",
+		"return_root": true,
+		"collection": "items",
+		"path": [
+			{
+				"level": 1,
+				"direction": "out",
+				"predicate": "WTEST_authored",
+				"tag": "comment"
 			}
 		]
 	}
