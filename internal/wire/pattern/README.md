@@ -45,7 +45,7 @@ Upsert upserts a pattern to the collection of currently utilized patterns.
 ``` go
 type Inference struct {
     RelIDField string `bson:"related_ID_field" json:"related_ID_field" validate:"required,min=2"`
-    RelType    string `bson:"related_type" json:"related_type"`
+    RelType    string `bson:"related_type,omitempty" json:"related_type,omitempty"`
     Predicate  string `bson:"predicate" json:"predicate" validate:"required,min=2"`
     Direction  string `bson:"direction" json:"direction" validate:"required,min=2"`
     Required   bool   `bson:"required" json:"required"`

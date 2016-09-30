@@ -14,7 +14,7 @@ Collection is the Mongo collection containing item values.
 
 ## Variables
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Item(s) Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
@@ -61,6 +61,13 @@ may differ greatly between items) is encoded into the Data interface.
 
 
 
+
+
+### func GetByID
+``` go
+func GetByID(context interface{}, db *db.DB, id string) (Item, error)
+```
+GetByID retrieves a single item by ID from Mongo.
 
 
 
