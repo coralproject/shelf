@@ -67,6 +67,11 @@ func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query
 	// Are we being asked to execute the query on a view.
 	if q.Collection == "view" {
 
+		// Check if we have a graph handle.
+		if graph == nil {
+			return docs{}, commands, fmt.Errorf("Invalid graph handle.")
+		}
+
 		// Materialize the view for the query.
 		viewCol, err := materializeView(context, db, graph, q, vars)
 		if err != nil {

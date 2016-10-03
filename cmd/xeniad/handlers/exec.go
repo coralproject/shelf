@@ -74,6 +74,8 @@ func (execHandle) Custom(c *app.Context) error {
 // execute takes a context and Set and executes the set returning
 // any possible response.
 func execute(c *app.Context, set *query.Set, vars map[string]string) error {
+
+	// Parse the vars in the query string.
 	if c.Request.URL.RawQuery != "" {
 		if m, err := url.ParseQuery(c.Request.URL.RawQuery); err == nil {
 			if vars == nil {
@@ -85,7 +87,19 @@ func execute(c *app.Context, set *query.Set, vars map[string]string) error {
 		}
 	}
 
-	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), set, vars)
+	// Get the result.
+	var result *query.Result
+
+	// If the query is a query on a view, provide the graph handle.
+	// Otherwise just provide the db.DB value.
+	for _, q := range set.Queries {
+		if q.Collection == "view" {
+			result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), set, vars)
+			c.Respond(result, http.StatusOK)
+			return nil
+		}
+	}
+	result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), nil, set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil
