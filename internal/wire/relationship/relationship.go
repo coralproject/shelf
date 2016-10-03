@@ -14,7 +14,7 @@ import (
 const Collection = "relationships"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Relationship Not found")
 
 // Upsert upserts a relationship to the collection of currently utilized relationships.
 func Upsert(context interface{}, db *db.DB, rel *Relationship) error {

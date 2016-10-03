@@ -1,9 +1,6 @@
 package routes
 
 import (
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
@@ -81,19 +78,13 @@ func API(testing ...bool) http.Handler {
 		a.Use(authm)
 	}
 
-	a.Use(midware.Mongo)
+	a.Use(midware.Mongo, midware.Cayley)
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
 	a.CORS()
-
-	// It has been decided the website is no longer required.
-	// if testing == nil {
-	// 	log.Dev("startup", "Init", "Initalizing website")
-	// 	website(a)
-	// }
 
 	return a
 }
@@ -127,6 +118,7 @@ func routes(a *app.App) {
 
 	a.Handle("POST", "/v1/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
+	a.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView)
 
 	a.Handle("GET", "/v1/relationship", handlers.Relationship.List)
 	a.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)
@@ -143,42 +135,4 @@ func routes(a *app.App) {
 	a.Handle("GET", "/v1/pattern/:type", handlers.Pattern.Retrieve)
 	a.Handle("DELETE", "/v1/pattern/:type", handlers.Pattern.Delete)
 
-}
-
-// website manages the serving of web files for the project.
-func website(a *app.App) {
-	fs := http.FileServer(http.Dir("static"))
-	h1 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
-		fs.ServeHTTP(rw, r)
-	}
-
-	a.TreeMux.Handle("GET", "/dist/*path", h1)
-	a.TreeMux.Handle("GET", "/img/*path", h1)
-	a.TreeMux.Handle("GET", "/", h1)
-
-	h2 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
-		data, _ := ioutil.ReadFile("static/index.html")
-		io.WriteString(rw, string(data))
-	}
-
-	file, err := os.Open("static/routes.json")
-	if err != nil {
-		log.Error("startup", "Init", err, "Initializing website")
-		os.Exit(1)
-	}
-
-	defer file.Close()
-
-	var routes []struct {
-		URL string
-	}
-
-	if err := json.NewDecoder(file).Decode(&routes); err != nil {
-		log.Error("startup", "Init", err, "Initializing website")
-		os.Exit(1)
-	}
-
-	for _, route := range routes {
-		a.TreeMux.Handle("GET", route.URL, h2)
-	}
 }

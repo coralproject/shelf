@@ -146,9 +146,16 @@ func TestGetAll(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to get all views.", tests.Success)
 
-			if !reflect.DeepEqual(views1, views2) {
+			var filteredViews []view.View
+			for _, vw := range views2 {
+				if vw.Name[0:len(prefix)] == prefix {
+					filteredViews = append(filteredViews, vw)
+				}
+			}
+
+			if !reflect.DeepEqual(views1, filteredViews) {
 				t.Logf("\t%+v", views1)
-				t.Logf("\t%+v", views2)
+				t.Logf("\t%+v", filteredViews)
 				t.Fatalf("\t%s\tShould be able to get back the same views.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same views.", tests.Success)

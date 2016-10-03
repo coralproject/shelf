@@ -1,0 +1,22 @@
+{
+   "name":"QTEST_O_basic_view",
+   "desc":"",
+   "enabled":true,
+   "params":[
+	   {
+		   "name": "item_of_interest"
+	   }
+   ],
+   "queries":[
+      {
+         "name":"BasicView",
+         "type":"pipeline",
+         "collection":"view",
+         "return":true,
+         "commands":[
+            {"$match": {"item_id" : "#string:item_of_interest"}},
+            {"$project": {"_id": 0, "item_id": 1}}
+         ]
+      }
+   ]
+}
