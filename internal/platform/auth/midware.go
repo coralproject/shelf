@@ -12,9 +12,16 @@ import (
 // ErrInvalidToken is returned when the token provided is not valid.
 var ErrInvalidToken = errors.New("invalid token")
 
+// MidwareOpts describes the options for configuring the Midware.
+type MidwareOpts struct {
+	// AllowQueryString is true when we want to allow accessing the tokenString
+	// from the query string as a fallback.
+	AllowQueryString bool
+}
+
 // Midware handles token authentication for external authentication
 // sources.
-func Midware(publicKeyBase64Str string) (app.Middleware, error) {
+func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, error) {
 	publicKey, err := DecodePublicKey(publicKeyBase64Str)
 	if err != nil {
 		log.Error("startup", "auth : Midware", err, "Can not decode the public key base64 encoding")
@@ -31,6 +38,14 @@ func Midware(publicKeyBase64Str string) (app.Middleware, error) {
 
 			// Extract the token from the Authorization header provided on the request.
 			tokenString := c.Request.Header.Get("Authorization")
+
+			if tokenString == "" && config.AllowQueryString {
+
+				// In the event that the request does not have a header key for the
+				// Authorization header, then we need to try and access it from the URL
+				// query parameters if this was enabled from our config.
+				tokenString = c.Request.URL.Query().Get("access_token")
+			}
 
 			if tokenString == "" {
 				log.Error(c.SessionID, "auth : Midware", ErrInvalidToken, "No token on request")

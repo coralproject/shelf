@@ -67,7 +67,7 @@ func API() http.Handler {
 	if publicKey != "" {
 		log.Dev("startup", "Init", "Initializing Auth")
 
-		authm, err := auth.Midware(publicKey)
+		authm, err := auth.Midware(publicKey, auth.MidwareOpts{})
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
 			os.Exit(1)
