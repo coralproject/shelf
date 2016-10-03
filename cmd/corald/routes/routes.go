@@ -100,6 +100,7 @@ func routes(a *app.App) {
 	spongedURL := cfg.MustURL(cfgSpongdURL).String()
 	xeniadURL := cfg.MustURL(cfgXeniadURL).String()
 
+	// CRU- for forms
 	a.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
 	a.Handle("POST", "/v1/form", fixtures.Handler("forms/form", http.StatusCreated))
 	a.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
@@ -133,12 +134,14 @@ func routes(a *app.App) {
 				return "/v1/exec"
 			}))
 
+	// C-UD for Items
+	a.Handle("GET", "/v1/items/:item_id", fixtures.Handler("items/items", http.StatusOK))
+	// PUT and POST do the same action. Upsert.
 	a.Handle("PUT", "/v1/item",
 		handlers.Proxy(spongedURL,
 			func(c *app.Context) string {
 				return "/v1/item"
 			}))
-
 	a.Handle("POST", "/v1/item",
 		handlers.Proxy(spongedURL,
 			func(c *app.Context) string {
