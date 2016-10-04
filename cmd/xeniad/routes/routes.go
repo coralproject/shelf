@@ -91,6 +91,11 @@ func API(testing ...bool) http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
+
+	// Create a new app group which will be for graph functions that have an
+	// addition graph midware layer added to it.
+	graphGroup := a.Group(midware.Cayley)
+
 	a.Handle("GET", "/v1/version", handlers.Version.List)
 
 	a.Handle("GET", "/v1/script", handlers.Script.List)
@@ -118,7 +123,8 @@ func routes(a *app.App) {
 
 	a.Handle("POST", "/v1/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
-	a.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView, midware.Cayley)
+	graphGroup.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView)
+	graphGroup.Handle("POST", "/v1/exec/view/:view/:item", handlers.Exec.CustomOnView)
 
 	a.Handle("GET", "/v1/relationship", handlers.Relationship.List)
 	a.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)

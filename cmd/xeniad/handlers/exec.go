@@ -68,6 +68,22 @@ func (execHandle) Custom(c *app.Context) error {
 	return execute(c, set, vars)
 }
 
+// CustomOnView runs the provided Set on a view and return results.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (execHandle) CustomOnView(c *app.Context) error {
+	var set *query.Set
+	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
+		return err
+	}
+
+	vars := map[string]string{
+		"view": c.Params["view"],
+		"item": c.Params["item"],
+	}
+
+	return execute(c, set, vars)
+}
+
 //==============================================================================
 
 // execute takes a context and Set and executes the set returning
