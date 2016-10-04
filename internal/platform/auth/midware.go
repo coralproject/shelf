@@ -14,6 +14,7 @@ var ErrInvalidToken = errors.New("invalid token")
 
 // MidwareOpts describes the options for configuring the Midware.
 type MidwareOpts struct {
+
 	// AllowQueryString is true when we want to allow accessing the tokenString
 	// from the query string as a fallback.
 	AllowQueryString bool
