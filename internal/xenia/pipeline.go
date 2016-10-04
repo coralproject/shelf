@@ -9,7 +9,6 @@ import (
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/pborman/uuid"
@@ -18,7 +17,7 @@ import (
 )
 
 // execPipeline executes the sepcified pipeline query.
-func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query.Query, vars map[string]string, data map[string]interface{}, explain bool) (docs, []map[string]interface{}, error) {
+func execPipeline(context interface{}, db *db.DB, q *query.Query, vars map[string]string, data map[string]interface{}, explain bool) (docs, []map[string]interface{}, error) {
 
 	// I am returning commands as the second return value because if there
 	// is an error I need to send how far we got back to the client. If not,
@@ -67,13 +66,8 @@ func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query
 	// Are we being asked to execute the query on a view.
 	if q.Collection == "view" {
 
-		// Check if we have a graph handle.
-		if graph == nil {
-			return docs{}, commands, fmt.Errorf("Invalid graph handle.")
-		}
-
 		// Materialize the view for the query.
-		viewCol, err := materializeView(context, db, graph, q, vars)
+		viewCol, err := materializeView(context, db, q, vars)
 		if err != nil {
 			return docs{}, commands, err
 		}
@@ -182,7 +176,13 @@ func execPipeline(context interface{}, db *db.DB, graph *cayley.Handle, q *query
 
 // materializeView executes a view, creates a temporary collection for the view, and
 // modifies the query to query the temporary collection.
-func materializeView(context interface{}, db *db.DB, graph *cayley.Handle, q *query.Query, vars map[string]string) (string, error) {
+func materializeView(context interface{}, db *db.DB, q *query.Query, vars map[string]string) (string, error) {
+
+	// Make sure we have a valid connection to the graph.
+	graph, err := db.GraphHandle(context)
+	if err != nil {
+		return "", err
+	}
 
 	// Make sure we have the information we need to execute the view.
 	viewName, ok := vars["view"]

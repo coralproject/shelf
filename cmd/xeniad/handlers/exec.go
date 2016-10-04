@@ -8,7 +8,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/xenia"
 	"github.com/coralproject/shelf/internal/xenia/query"
 )
@@ -88,18 +87,7 @@ func execute(c *app.Context, set *query.Set, vars map[string]string) error {
 	}
 
 	// Get the result.
-	var result *query.Result
-
-	// If the query is a query on a view, provide the graph handle.
-	// Otherwise just provide the db.DB value.
-	for _, q := range set.Queries {
-		if q.Collection == "view" {
-			result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), set, vars)
-			c.Respond(result, http.StatusOK)
-			return nil
-		}
-	}
-	result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), nil, set, vars)
+	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

@@ -15,16 +15,22 @@
 			"revisionTime": "2016-09-28T21:36:00Z"
 		},
 		{
-			"checksumSHA1": "5U36HUtCWHXh3+QgQivEcMCAPFU=",
+			"checksumSHA1": "FkmpVEY/i6IOwhw/fzBNRxoV83g=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "4844e7e20c1710237dc35e44e843a2bda2730045",
-			"revisionTime": "2016-09-28T21:36:00Z"
+			"revision": "85310c615198f176ee0eb4d271c0846e1ac9f892",
+			"revisionTime": "2016-10-03T20:30:08Z"
+		},
+		{
+			"checksumSHA1": "umu2YNMN5D1lT9m9ZdkgP1FFn7k=",
+			"path": "github.com/ardanlabs/kit/db/cayley",
+			"revision": "85310c615198f176ee0eb4d271c0846e1ac9f892",
+			"revisionTime": "2016-10-03T20:30:08Z"
 		},
 		{
 			"checksumSHA1": "LtvZGFkHom2jtvFxc+rdJ+u++es=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "4844e7e20c1710237dc35e44e843a2bda2730045",
-			"revisionTime": "2016-09-28T21:36:00Z"
+			"revision": "85310c615198f176ee0eb4d271c0846e1ac9f892",
+			"revisionTime": "2016-10-03T20:30:08Z"
 		},
 		{
 			"checksumSHA1": "Q7x7D7bjm4MKqcvfNfLuyJx6R8w=",
@@ -144,6 +150,12 @@
 			"path": "github.com/cayleygraph/cayley/writer",
 			"revision": "dca8ef5ecffbefc52e845dd513c546fbe1882292",
 			"revisionTime": "2016-08-19T17:31:27Z"
+		},
+		{
+			"checksumSHA1": "HzI1LOqVj2/2ovQmpKYUuNK0VVk=",
+			"path": "github.com/cznic/mathutil",
+			"revision": "78ad7f262603437f0ecfebc835d80094f89c8f54",
+			"revisionTime": "2016-06-13T10:48:31Z"
 		},
 		{
 			"checksumSHA1": "jqSVRDK7dGg6E/NikVq1Kw6gdbA=",

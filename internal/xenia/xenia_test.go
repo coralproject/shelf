@@ -7,9 +7,9 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
+	kitcayley "github.com/ardanlabs/kit/db/cayley"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	"github.com/cayleygraph/cayley"
 	_ "github.com/cayleygraph/cayley/graph/mongo"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
@@ -44,7 +44,7 @@ func init() {
 }
 
 // setup initializes for each indivdual test.
-func setup(t *testing.T) (*db.DB, *cayley.Handle) {
+func setup(t *testing.T) *db.DB {
 	tests.ResetLog()
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
@@ -52,15 +52,14 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	opts := map[string]interface{}{
-		"database_name": cfg.MustString("MONGO_DB"),
-		"username":      cfg.MustString("MONGO_USER"),
-		"password":      cfg.MustString("MONGO_PASS"),
+	cayleyCfg := kitcayley.Config{
+		Host:     cfg.MustString("MONGO_HOST"),
+		DB:       cfg.MustString("MONGO_DB"),
+		User:     cfg.MustString("MONGO_USER"),
+		Password: cfg.MustString("MONGO_PASS"),
 	}
-
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
+	if err := db.OpenCayley(tests.Context, cayleyCfg); err != nil {
+		t.Fatalf("%s\tShould be able to get a Cayley connection : %v", tests.Failed, err)
 	}
 
 	loadTestData(t, db)
@@ -84,15 +83,21 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("\t%s\tShould be able to load view fixture : %v", tests.Failed, err)
 	}
 
-	if err := loadItems("context", db, store); err != nil {
+	if err := loadItems("context", db); err != nil {
 		t.Fatalf("\t%s\tShould be able to load items : %v", tests.Failed, err)
 	}
 
-	return db, store
+	return db
 }
 
 // loadItems adds items to run tests.
-func loadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+func loadItems(context interface{}, db *db.DB) error {
+
+	store, err := db.GraphHandle(context)
+	if err != nil {
+		return err
+	}
+
 	items, err := itemfix.Get()
 	if err != nil {
 		return err
@@ -122,7 +127,13 @@ func loadPatterns(context interface{}, db *db.DB) error {
 }
 
 // unloadItems removes items from the items collection and the graph.
-func unloadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+func unloadItems(context interface{}, db *db.DB) error {
+
+	store, err := db.GraphHandle(context)
+	if err != nil {
+		return err
+	}
+
 	items, err := itemfix.Get()
 	if err != nil {
 		return err
@@ -180,14 +191,14 @@ func loadViews(context interface{}, db *db.DB) error {
 }
 
 // teardown deinitializes for each indivdual test.
-func teardown(t *testing.T, db *db.DB, graph *cayley.Handle) {
-	relationshipfix.Remove("context", db, "RTEST_")
-	viewfix.Remove("context", db, "VTEST_")
+func teardown(t *testing.T, db *db.DB) {
+	relationshipfix.Remove(tests.Context, db, "RTEST_")
+	viewfix.Remove(tests.Context, db, "VTEST_")
 	rfix.Remove(db, "RTEST_")
-	unloadItems("context", db, graph)
+	unloadItems(tests.Context, db)
 	unloadTestData(t, db)
 	db.CloseMGO(tests.Context)
-	graph.Close()
+	db.CloseCayley(tests.Context)
 	tests.DisplayLog()
 }
 
@@ -195,8 +206,8 @@ func teardown(t *testing.T, db *db.DB, graph *cayley.Handle) {
 
 // TestExecuteSet tests the execution of different Sets that should succeed.
 func TestExecuteSet(t *testing.T) {
-	db, graph := setup(t)
-	defer teardown(t, db, graph)
+	db := setup(t)
+	defer teardown(t, db)
 
 	// Build our table of the different test sets.
 	execSets := []struct {
@@ -218,7 +229,7 @@ func TestExecuteSet(t *testing.T) {
 				tf := func(t *testing.T) {
 					t.Logf("\tWhen using Execute Set %s", es.set.Name)
 					{
-						result := xenia.Exec(tests.Context, db, graph, es.set, es.vars)
+						result := xenia.Exec(tests.Context, db, es.set, es.vars)
 
 						data, err := json.Marshal(result)
 						if err != nil {
