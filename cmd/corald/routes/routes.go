@@ -113,6 +113,13 @@ func routes(a *app.App) {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
+	// Execute the view :view_name on this :item_key.
+	a.Handle("GET", "/v1/exec/view/:view_name/:item_key",
+		handlers.Proxy(xeniadURL,
+			func(c *app.Context) string {
+				return "/v1/exec/view/" + c.Params["view_name"] + "/" + c.Params["item_key"]
+			}))
+
 	// Execute xenia queries directly.
 	a.Handle("GET", "/v1/exec/:query_set",
 		handlers.Proxy(xeniadURL,
@@ -120,14 +127,14 @@ func routes(a *app.App) {
 				return "/v1/exec/" + c.Params["query_set"]
 			}))
 
-	// Send a new query to xenia.
+	// Send a new query to xenia. - TEMPORAL
 	a.Handle("PUT", "/v1/query",
 		handlers.Proxy(xeniadURL,
 			func(c *app.Context) string {
 				return "/v1/query"
 			}))
 
-	// Execute a custom xenia query.
+	// Execute a custom xenia query. - TEMPORAL
 	a.Handle("POST", "/v1/exec",
 		handlers.Proxy(xeniadURL,
 			func(c *app.Context) string {
@@ -135,7 +142,16 @@ func routes(a *app.App) {
 			}))
 
 	// C-UD for Items
-	a.Handle("GET", "/v1/items/:item_id", fixtures.Handler("items/items", http.StatusOK))
+
+	// //Get a single item and all related items
+	// a.Handle("GET", "/v1/items/:type/:item_id",
+	// 	handlers.Proxy(xeniadURL,
+	// 		func(c *app.Context) string {
+	// 			return "/v1/exec?view=item-on-a-item&item=" + params["item_id"] + "&query_set=filter_by_type&type=" + params["type"]
+	// 		}))
+	//fixtures.Handler("items/items", http.StatusOK))
+	// /v1/exec?view=comments-on-a-comment&item=57c486628835dfd623fb9349
+
 	// PUT and POST do the same action. Upsert.
 	a.Handle("PUT", "/v1/item",
 		handlers.Proxy(spongedURL,
