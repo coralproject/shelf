@@ -94,13 +94,6 @@ func GetByID(context interface{}, db *db.DB, id string) (Item, error)
 GetByID retrieves a single item by ID from Mongo.
 
 
-### func GetByID
-``` go
-func GetByID(context interface{}, db *db.DB, id string) (Item, error)
-```
-GetByID retrieves a single item by ID from Mongo.
-
-
 
 
 

@@ -41,13 +41,13 @@ Collection is the Mongo collection containing view metadata.
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("View Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/view.go?s=2458:2520#L81)
+## <a name="Delete">func</a> [Delete](/src/target/view.go?s=2459:2521#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
@@ -55,7 +55,7 @@ Delete removes a view from from Mongo.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/view.go?s=1218:1277#L36)
+## <a name="GetAll">func</a> [GetAll](/src/target/view.go?s=1219:1278#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]View, error)
 ```
@@ -63,7 +63,7 @@ GetAll retrieves the current views from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/view.go?s=487:548#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/view.go?s=488:549#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, view *View) error
 ```
@@ -162,7 +162,7 @@ View contains metadata about a view.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/view.go?s=1801:1875#L58)
+### <a name="GetByName">func</a> [GetByName](/src/target/view.go?s=1802:1876#L58)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (*View, error)
 ```

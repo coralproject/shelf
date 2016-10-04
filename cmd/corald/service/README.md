@@ -23,7 +23,7 @@
 
 
 
-## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=1972:2020#L47)
+## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=513:561#L10)
 ``` go
 func Rewrite(c *app.Context) func(*http.Request)
 ```
@@ -32,7 +32,7 @@ standards.
 
 
 
-## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=2426:2497#L69)
+## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=967:1038#L32)
 ``` go
 func RewritePath(c *app.Context, targetPath string) func(*http.Request)
 ```
@@ -41,11 +41,11 @@ director function.
 
 
 
-## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=334:421#L5)
+## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=243:330#L2)
 ``` go
 func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
 ```
-SignServiceRequest signts a request with the claims necisary to authenticate
+SignServiceRequest signs a request with the claims necessary to authenticate
 with downstream services.
 
 
