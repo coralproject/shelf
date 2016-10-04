@@ -33,7 +33,7 @@ type Item struct {
 	Version   int                    `bson:"version" json:"version" validate:"required,min=1"`
 	Data      map[string]interface{} `bson:"data" json:"data"`
 	CreatedAt time.Time              `bson:"created_at" json:"created_at"`
-	UpdatedAt time.Time              `bson:"updated_at,omitempty" json:"updated_at,omitempty"`
+	UpdatedAt time.Time              `bson:"updated_at" json:"updated_at"`
 }
 
 // Validate validates an Item value with the validator.
