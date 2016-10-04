@@ -3,6 +3,7 @@ package item
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -32,6 +33,14 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 		log.Error(context, "Upsert", err, "Completed")
 		return err
 	}
+
+	// If CreatedAt is not set, set it. This allows for CreatedAt to be set for data import.
+	if item.CreatedAt.IsZero() {
+		item.CreatedAt = time.Now()
+	}
+
+	// Always update UpdatedAt.
+	item.UpdatedAt = time.Now()
 
 	// Upsert the item.
 	f := func(c *mgo.Collection) error {
