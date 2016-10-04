@@ -102,7 +102,14 @@ func routes(a *app.App) {
 	if publicKey != "" {
 		log.Dev("startup", "Init", "Initializing Auth")
 
-		authm, err := auth.Midware(publicKey)
+		// We are allowing the query string to act as the access token provider
+		// because this service has endpoints that are accessed directly currently
+		// and we need someway to authenticate to these endpoints.
+		authmOpts := auth.MidwareOpts{
+			AllowQueryString: true,
+		}
+
+		authm, err := auth.Midware(publicKey, authmOpts)
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
 			os.Exit(1)
