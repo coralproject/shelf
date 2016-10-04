@@ -15,22 +15,22 @@
 			"revisionTime": "2016-09-28T21:36:00Z"
 		},
 		{
-			"checksumSHA1": "sCQfhfyotBXkqKyc3eV/Nb5HACg=",
+			"checksumSHA1": "HepuYFNdRLBpfE+SeHlUITGaxuM=",
 			"path": "github.com/ardanlabs/kit/db",
-			"revision": "a821f60defc8de69862ddd5f317a8fa43843523d",
-			"revisionTime": "2016-10-04T17:59:27Z"
+			"revision": "3480d8987e267e38a7ae907c553674097f56e86b",
+			"revisionTime": "2016-10-04T18:06:17Z"
 		},
 		{
 			"checksumSHA1": "AO5x2BZwumB6+gqBu7YCP6jq/sU=",
 			"path": "github.com/ardanlabs/kit/db/cayley",
-			"revision": "a821f60defc8de69862ddd5f317a8fa43843523d",
-			"revisionTime": "2016-10-04T17:59:27Z"
+			"revision": "3480d8987e267e38a7ae907c553674097f56e86b",
+			"revisionTime": "2016-10-04T18:06:17Z"
 		},
 		{
 			"checksumSHA1": "mxSAukKHrvy9y7OtWyxblLERj8I=",
 			"path": "github.com/ardanlabs/kit/db/mongo",
-			"revision": "a821f60defc8de69862ddd5f317a8fa43843523d",
-			"revisionTime": "2016-10-04T17:59:27Z"
+			"revision": "3480d8987e267e38a7ae907c553674097f56e86b",
+			"revisionTime": "2016-10-04T18:06:17Z"
 		},
 		{
 			"checksumSHA1": "Q7x7D7bjm4MKqcvfNfLuyJx6R8w=",
