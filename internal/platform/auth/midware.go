@@ -40,11 +40,10 @@ func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, err
 			// Extract the token from the Authorization header provided on the request.
 			tokenString := c.Request.Header.Get("Authorization")
 
+			// In the event that the request does not have a header key for the
+			// Authorization header, and we are allowed to check the query string, then
+			// we need to try and access it from the URL query parameters.
 			if tokenString == "" && config.AllowQueryString {
-
-				// In the event that the request does not have a header key for the
-				// Authorization header, then we need to try and access it from the URL
-				// query parameters if this was enabled from our config.
 				tokenString = c.Request.URL.Query().Get("access_token")
 			}
 
