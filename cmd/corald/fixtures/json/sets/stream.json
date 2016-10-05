@@ -1,0 +1,20 @@
+{
+   "name": "stream",
+   "pre_script": "",
+   "pst_script": "",
+   "params": [],
+   "queries": [
+     {
+       "name": "stream_comments",
+       "type": "pipeline",
+       "collection": "items",
+       "commands": [
+           {"$match": {"$or": [{"type": "comment"}, {"type": "stream"}]}}
+       ],
+       "indexes": [],
+       "return": true
+     }
+   ],
+   "enabled": true,
+   "explain": false
+}

@@ -1,0 +1,14 @@
+{
+  "name": "user_comments_return_root",
+  "start_type": "coral_user",
+  "return_root": true,
+  "collection": "items",
+  "path": [
+    {
+      "level": 1,
+      "direction": "out",
+      "predicate": "authored",
+      "tag": "comment"
+    }
+  ]
+}

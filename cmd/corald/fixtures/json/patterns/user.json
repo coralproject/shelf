@@ -1,0 +1,11 @@
+{
+  "type": "user",
+  "inferences": [
+    {
+      "related_ID_field": "role",
+      "predicate": "has_role",
+      "direction": "out",
+      "required": true
+    }
+  ]
+}

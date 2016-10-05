@@ -1,0 +1,13 @@
+{
+  "name": "user comments",
+  "start_type": "user",
+  "collection": "items",
+  "path": [
+    {
+      "level": 1,
+      "direction": "out",
+      "predicate": "authored",
+      "tag": "comment"
+    }
+  ]
+}

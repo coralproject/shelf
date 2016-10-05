@@ -1,0 +1,11 @@
+{
+    "subject_types": [
+      "comment"
+    ],
+    "predicate": "on",
+    "object_types": [
+      "comment"
+    ],
+    "in_string": "on",
+    "out_string": "having"
+  }
