@@ -2,6 +2,7 @@ package item
 
 import (
 	"fmt"
+	"time"
 
 	validator "gopkg.in/bluesuncorp/validator.v8"
 )
@@ -27,10 +28,12 @@ const sourceIDField = "id"
 // are formatted with an ID, Type, and Version, and asssociated data (which
 // may differ greatly between items) is encoded into the Data interface.
 type Item struct {
-	ID      string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
-	Type    string                 `bson:"type" json:"type" validate:"required,min=2"`
-	Version int                    `bson:"version" json:"version" validate:"required,min=1"`
-	Data    map[string]interface{} `bson:"data" json:"data"`
+	ID        string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
+	Type      string                 `bson:"type" json:"type" validate:"required,min=2"`
+	Version   int                    `bson:"version" json:"version" validate:"required,min=1"`
+	Data      map[string]interface{} `bson:"data" json:"data"`
+	CreatedAt time.Time              `bson:"created_at" json:"created_at"`
+	UpdatedAt time.Time              `bson:"updated_at" json:"updated_at"`
 }
 
 // Validate validates an Item value with the validator.
