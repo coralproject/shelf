@@ -78,7 +78,7 @@ func API(testing ...bool) http.Handler {
 		a.Use(authm)
 	}
 
-	a.Use(midware.Mongo, midware.Cayley)
+	a.Use(midware.Mongo)
 
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(a)
@@ -91,6 +91,7 @@ func API(testing ...bool) http.Handler {
 
 // routes manages the handling of the API endpoints.
 func routes(a *app.App) {
+
 	a.Handle("GET", "/v1/version", handlers.Version.List)
 
 	a.Handle("GET", "/v1/script", handlers.Script.List)
@@ -118,7 +119,8 @@ func routes(a *app.App) {
 
 	a.Handle("POST", "/v1/exec", handlers.Exec.Custom)
 	a.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
-	a.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView)
+	a.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView, midware.Cayley)
+	a.Handle("POST", "/v1/exec/view/:view/:item", handlers.Exec.CustomOnView, midware.Cayley)
 
 	a.Handle("GET", "/v1/relationship", handlers.Relationship.List)
 	a.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)

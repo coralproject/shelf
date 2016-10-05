@@ -8,7 +8,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
-	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/xenia"
 	"github.com/coralproject/shelf/internal/xenia/query"
 )
@@ -69,6 +68,22 @@ func (execHandle) Custom(c *app.Context) error {
 	return execute(c, set, vars)
 }
 
+// CustomOnView runs the provided Set on a view and return results.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (execHandle) CustomOnView(c *app.Context) error {
+	var set *query.Set
+	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
+		return err
+	}
+
+	vars := map[string]string{
+		"view": c.Params["view"],
+		"item": c.Params["item"],
+	}
+
+	return execute(c, set, vars)
+}
+
 //==============================================================================
 
 // execute takes a context and Set and executes the set returning
@@ -88,18 +103,7 @@ func execute(c *app.Context, set *query.Set, vars map[string]string) error {
 	}
 
 	// Get the result.
-	var result *query.Result
-
-	// If the query is a query on a view, provide the graph handle.
-	// Otherwise just provide the db.DB value.
-	for _, q := range set.Queries {
-		if q.Collection == "view" {
-			result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), set, vars)
-			c.Respond(result, http.StatusOK)
-			return nil
-		}
-	}
-	result = xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), nil, set, vars)
+	result := xenia.Exec(c.SessionID, c.Ctx["DB"].(*db.DB), set, vars)
 
 	c.Respond(result, http.StatusOK)
 	return nil

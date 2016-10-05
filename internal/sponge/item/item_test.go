@@ -91,6 +91,14 @@ func TestUpsertDelete(t *testing.T) {
 			t.Logf("\t%s\tShould be able to get back the same item.", tests.Success)
 
 			//----------------------------------------------------------------------
+			// Check that CreatedAt and UpdatedAt were set.
+
+			if itemsBack[0].CreatedAt.IsZero() || itemsBack[0].UpdatedAt.IsZero() {
+				t.Fatalf("\t%s\tShould set CreatedAt and UpdatedAt on upsert.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould set CreatedAt and UpdatedAt on upsert.", tests.Success)
+
+			//----------------------------------------------------------------------
 			// Delete the item.
 
 			if err := item.Delete(tests.Context, db, items[0].ID); err != nil {
@@ -152,7 +160,8 @@ func TestGetByID(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to get an item by ID.", tests.Success)
 
-			if !reflect.DeepEqual(items[0], itmBack) {
+			// Check equality for all immutable fields: ID, Version, Data. Timestamps will change on Upsert.
+			if !reflect.DeepEqual(items[0].Data, itmBack.Data) || (items[0].ID != itmBack.ID) || (items[0].Version != itmBack.Version) {
 				t.Logf("\t%+v", items[0])
 				t.Logf("\t%+v", itmBack)
 				t.Fatalf("\t%s\tShould be able to get back the same item.", tests.Failed)

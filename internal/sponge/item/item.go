@@ -3,6 +3,7 @@ package item
 import (
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/db/mongo"
@@ -26,6 +27,16 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 	if item.ID == "" {
 		item.ID = uuid.New()
 	}
+
+	// If CreatedAt is not set, set it. Usually, CreatedAt is joined with the setting of the ID.
+	// In our case, custom ids may be created outside this package for new items. For these
+	// cases we check that a CreatedAt is not yet set.
+	if item.CreatedAt.IsZero() {
+		item.CreatedAt = time.Now()
+	}
+
+	// Always update UpdatedAt.
+	item.UpdatedAt = time.Now()
 
 	// Validate the item.
 	if err := item.Validate(); err != nil {

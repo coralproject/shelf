@@ -8,7 +8,6 @@ import (
 
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/coralproject/shelf/internal/xenia/script"
 	"gopkg.in/mgo.v2/bson"
@@ -27,7 +26,7 @@ var emptyResult []docs
 //==============================================================================
 
 // Exec executes the specified query set by name.
-func Exec(context interface{}, db *db.DB, graph *cayley.Handle, set *query.Set, vars map[string]string) *query.Result {
+func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result {
 	log.Dev(context, "Exec", "Started : Name[%s]", set.Name)
 
 	// Validate the set that is provided.
@@ -70,7 +69,7 @@ func Exec(context interface{}, db *db.DB, graph *cayley.Handle, set *query.Set, 
 		// We only have pipeline right now.
 		switch strings.ToLower(q.Type) {
 		case "pipeline":
-			result, commands, err = execPipeline(context, db, graph, &q, vars, data, set.Explain)
+			result, commands, err = execPipeline(context, db, &q, vars, data, set.Explain)
 		}
 
 		// Was there an error processing the query.
