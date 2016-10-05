@@ -28,19 +28,21 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 		item.ID = uuid.New()
 	}
 
-	// Validate the item.
-	if err := item.Validate(); err != nil {
-		log.Error(context, "Upsert", err, "Completed")
-		return err
-	}
-
-	// If CreatedAt is not set, set it. This allows for CreatedAt to be set for data import.
+	// If CreatedAt is not set, set it. Usually, CreatedAt is joined with the setting of the ID.
+	// In our case, custom ids may be created outside this package for new items. For these
+	// cases we check that a CreatedAt is not yet set.
 	if item.CreatedAt.IsZero() {
 		item.CreatedAt = time.Now()
 	}
 
 	// Always update UpdatedAt.
 	item.UpdatedAt = time.Now()
+
+	// Validate the item.
+	if err := item.Validate(); err != nil {
+		log.Error(context, "Upsert", err, "Completed")
+		return err
+	}
 
 	// Upsert the item.
 	f := func(c *mgo.Collection) error {
