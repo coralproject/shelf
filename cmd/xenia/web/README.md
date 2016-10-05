@@ -11,7 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Request(cmd *cobra.Command, verb string, url string, post io.Reader) (string, error)](#Request)
+* [func Request(cmd *cobra.Command, verb, path string, post io.Reader) (string, error)](#Request)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -21,7 +21,7 @@
 
 
 
-## <a name="Request">func</a> [Request](/src/target/web.go?s=256:345#L10)
+## <a name="Request">func</a> [Request](/src/target/web.go?s=1731:1814#L55)
 ``` go
 func Request(cmd *cobra.Command, verb, path string, post io.Reader) (string, error)
 ```

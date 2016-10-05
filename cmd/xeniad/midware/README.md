@@ -11,13 +11,22 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Cayley(h app.Handler) app.Handler](#Cayley)
 * [func Mongo(h app.Handler) app.Handler](#Mongo)
 
 
 #### <a name="pkg-files">Package files</a>
-[mongo.go](/src/github.com/coralproject/shelf/cmd/xeniad/midware/mongo.go) 
+[cayley.go](/src/github.com/coralproject/shelf/cmd/xeniad/midware/cayley.go) [mongo.go](/src/github.com/coralproject/shelf/cmd/xeniad/midware/mongo.go) 
 
 
+
+
+
+## <a name="Cayley">func</a> [Cayley](/src/target/cayley.go?s=476:514#L11)
+``` go
+func Cayley(h app.Handler) app.Handler
+```
+Cayley handles session management.
 
 
 

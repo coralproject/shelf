@@ -9,7 +9,10 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/web/app"
+	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/cmd/xeniad/routes"
+	"github.com/coralproject/shelf/internal/sponge"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
@@ -54,28 +57,78 @@ func runTest(m *testing.M) int {
 
 	defer db.CloseMGO("context")
 
-	tstdata.Generate(db)
+	opts := map[string]interface{}{
+		"database_name": cfg.MustString("MONGO_DB"),
+		"username":      cfg.MustString("MONGO_USER"),
+		"password":      cfg.MustString("MONGO_PASS"),
+	}
+
+	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	if err != nil {
+		fmt.Println("Unable to get Cayley handle")
+		return 1
+	}
+	defer store.Close()
+
+	if err := tstdata.Generate(db); err != nil {
+		fmt.Println("Could not generate test data.")
+		return 1
+	}
 	defer tstdata.Drop(db)
 
-	loadQuery(db, "basic.json")
-	loadQuery(db, "basic_var.json")
+	if err := loadQuery(db, "basic.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
+	if err := loadQuery(db, "basic_view.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
+	if err := loadQuery(db, "basic_var.json"); err != nil {
+		fmt.Println("Could not load queries in basic_var.json")
+		return 1
+	}
 	defer qfix.Remove(db, "QTEST_O")
 
-	loadScript(db, "basic_script_pre.json")
-	loadScript(db, "basic_script_pst.json")
+	if err := loadScript(db, "basic_script_pre.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pre.json")
+		return 1
+	}
+	if err := loadScript(db, "basic_script_pst.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pst.json")
+		return 1
+	}
 	defer sfix.Remove(db, "STEST_O")
 
-	loadMasks(db, "basic.json")
+	if err := loadMasks(db, "basic.json"); err != nil {
+		fmt.Println("Could not load masks.")
+		return 1
+	}
 	defer mfix.Remove(db, "test_xenia_data")
 
-	loadRelationships("context", db)
+	if err := loadRelationships("context", db); err != nil {
+		fmt.Println("Could not load relationships.")
+		return 1
+	}
 	defer relationshipfix.Remove("context", db, relPrefix)
 
-	loadViews("context", db)
+	if err := loadViews("context", db); err != nil {
+		fmt.Println("Could not load views.")
+		return 1
+	}
 	defer viewfix.Remove("context", db, viewPrefix)
 
-	loadPatterns("context", db)
+	if err := loadPatterns("context", db); err != nil {
+		fmt.Println("Could not load patterns")
+		return 1
+	}
 	defer patternfix.Remove("context", db, patternPrefix)
+
+	if err := loadItems("context", db, store); err != nil {
+		fmt.Println("Could not import items")
+		return 1
+	}
+	defer unloadItems("context", db, store)
 
 	return m.Run()
 }
@@ -161,6 +214,38 @@ func loadPatterns(context interface{}, db *db.DB) error {
 
 	if err := patternfix.Add(context, db, ps[0:2]); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// loadItems adds items to run tests.
+func loadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Import(context, db, store, &itm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// unloadItems removes items from the items collection and the graph.
+func unloadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Remove(context, db, store, itm.ID); err != nil {
+			return err
+		}
 	}
 
 	return nil

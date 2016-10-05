@@ -14,7 +14,7 @@ import (
 const Collection = "patterns"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Pattern Not found")
 
 // Upsert upserts a pattern to the collection of currently utilized patterns.
 func Upsert(context interface{}, db *db.DB, pattern *Pattern) error {

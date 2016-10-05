@@ -14,7 +14,9 @@
 * [Variables](#pkg-variables)
 * [func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)](#DecodePrivateKey)
 * [func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)](#DecodePublicKey)
-* [func Midware(publicKeyBase64Str string) (app.Middleware, error)](#Midware)
+* [func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, error)](#Midware)
+* [func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error](#SignRequest)
+* [type MidwareOpts](#MidwareOpts)
 * [type Signer](#Signer)
   * [func NewSigner(privateKeyBase64Str string) (Signer, error)](#NewSigner)
 
@@ -50,15 +52,16 @@ decoding from base64 and parsing the PEM encoding.
 
 
 
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=347:410#L7)
+## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=584:667#L15)
 ``` go
-func Midware(publicKeyBase64Str string) (app.Middleware, error)
+func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, error)
 ```
 Midware handles token authentication for external authentication
 sources.
 
 
-## func SignRequest
+
+## <a name="SignRequest">func</a> [SignRequest](/src/target/signer.go?s=1062:1168#L29)
 ``` go
 func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error
 ```
@@ -68,7 +71,27 @@ with the token that is generated from the signer.
 
 
 
-## <a name="Signer">type</a> [Signer](/src/target/signer.go?s=163:226#L1)
+## <a name="MidwareOpts">type</a> [MidwareOpts](/src/target/midware.go?s=333:502#L6)
+``` go
+type MidwareOpts struct {
+
+    // AllowQueryString is true when we want to allow accessing the tokenString
+    // from the query string as a fallback.
+    AllowQueryString bool
+}
+```
+MidwareOpts describes the options for configuring the Midware.
+
+
+
+
+
+
+
+
+
+
+## <a name="Signer">type</a> [Signer](/src/target/signer.go?s=248:311#L4)
 ``` go
 type Signer func(claims map[string]interface{}) (string, error)
 ```
@@ -81,7 +104,7 @@ signed JWT token from them.
 
 
 
-### <a name="NewSigner">func</a> [NewSigner](/src/target/signer.go?s=324:382#L1)
+### <a name="NewSigner">func</a> [NewSigner](/src/target/signer.go?s=409:467#L8)
 ``` go
 func NewSigner(privateKeyBase64Str string) (Signer, error)
 ```

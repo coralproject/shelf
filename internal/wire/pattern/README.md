@@ -37,13 +37,13 @@ Collection is the Mongo collection containing pattern metadata.
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Pattern Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/pattern.go?s=2565:2631#L81)
+## <a name="Delete">func</a> [Delete](/src/target/pattern.go?s=2569:2635#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, itemType string) error
 ```
@@ -51,7 +51,7 @@ Delete removes a pattern from from Mongo.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/pattern.go?s=1263:1325#L36)
+## <a name="GetAll">func</a> [GetAll](/src/target/pattern.go?s=1267:1329#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]Pattern, error)
 ```
@@ -59,7 +59,7 @@ GetAll retrieves the current patterns from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/pattern.go?s=502:569#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/pattern.go?s=506:573#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, pattern *Pattern) error
 ```
@@ -115,7 +115,7 @@ item of an certain type.
 
 
 
-### <a name="GetByType">func</a> [GetByType](/src/target/pattern.go?s=1872:1953#L58)
+### <a name="GetByType">func</a> [GetByType](/src/target/pattern.go?s=1876:1957#L58)
 ``` go
 func GetByType(context interface{}, db *db.DB, itemType string) (*Pattern, error)
 ```

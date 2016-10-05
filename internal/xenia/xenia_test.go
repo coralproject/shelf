@@ -7,11 +7,19 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/db"
+	kitcayley "github.com/ardanlabs/kit/db/cayley"
 	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
+	_ "github.com/cayleygraph/cayley/graph/mongo"
+	"github.com/coralproject/shelf/internal/sponge"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
+	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
+	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
+	"github.com/coralproject/shelf/internal/wire/view/viewfix"
 	"github.com/coralproject/shelf/internal/xenia"
 	"github.com/coralproject/shelf/internal/xenia/mask/mfix"
 	"github.com/coralproject/shelf/internal/xenia/query"
+	"github.com/coralproject/shelf/internal/xenia/regex/rfix"
 	"github.com/coralproject/shelf/internal/xenia/script"
 	"github.com/coralproject/shelf/internal/xenia/script/sfix"
 	"github.com/coralproject/shelf/tstdata"
@@ -35,12 +43,171 @@ func init() {
 	tests.InitMongo(cfg)
 }
 
+// setup initializes for each indivdual test.
+func setup(t *testing.T) *db.DB {
+	tests.ResetLog()
+
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
+	if err != nil {
+		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
+	}
+
+	cayleyCfg := kitcayley.Config{
+		Host:     cfg.MustString("MONGO_HOST"),
+		DB:       cfg.MustString("MONGO_DB"),
+		User:     cfg.MustString("MONGO_USER"),
+		Password: cfg.MustString("MONGO_PASS"),
+	}
+	if err := db.OpenCayley(tests.Context, cayleyCfg); err != nil {
+		t.Fatalf("%s\tShould be able to get a Cayley connection : %v", tests.Failed, err)
+	}
+
+	loadTestData(t, db)
+
+	if err := loadRegex(db, "number.json"); err != nil {
+		t.Fatalf("\t%s\tShould be able to load regex fixture : %v", tests.Failed, err)
+	}
+	if err := loadRegex(db, "email.json"); err != nil {
+		t.Fatalf("\t%s\tShould be able to load regex fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadRelationships("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load relationship fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadPatterns("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load pattern fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadViews("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load view fixture : %v", tests.Failed, err)
+	}
+
+	if err := loadItems("context", db); err != nil {
+		t.Fatalf("\t%s\tShould be able to load items : %v", tests.Failed, err)
+	}
+
+	return db
+}
+
+// loadItems adds items to run tests.
+func loadItems(context interface{}, db *db.DB) error {
+
+	store, err := db.GraphHandle(context)
+	if err != nil {
+		return err
+	}
+
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Import(context, db, store, &itm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// loadPatterns adds patterns to run tests.
+func loadPatterns(context interface{}, db *db.DB) error {
+	ps, _, err := patternfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := patternfix.Add(context, db, ps[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// unloadItems removes items from the items collection and the graph.
+func unloadItems(context interface{}, db *db.DB) error {
+
+	store, err := db.GraphHandle(context)
+	if err != nil {
+		return err
+	}
+
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Remove(context, db, store, itm.ID); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// loadRegex adds regex to run tests.
+func loadRegex(db *db.DB, file string) error {
+	rg, err := rfix.Get(file)
+	if err != nil {
+		return err
+	}
+
+	if err := rfix.Add(db, rg); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadRelationships adds relationships to run tests.
+func loadRelationships(context interface{}, db *db.DB) error {
+	rels, err := relationshipfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := relationshipfix.Add(context, db, rels[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// loadViews adds views to run tests.
+func loadViews(context interface{}, db *db.DB) error {
+	views, err := viewfix.Get()
+	if err != nil {
+		return err
+	}
+
+	if err := viewfix.Add(context, db, views[0:2]); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// teardown deinitializes for each indivdual test.
+func teardown(t *testing.T, db *db.DB) {
+	relationshipfix.Remove(tests.Context, db, "RTEST_")
+	viewfix.Remove(tests.Context, db, "VTEST_")
+	rfix.Remove(db, "RTEST_")
+	unloadItems(tests.Context, db)
+	unloadTestData(t, db)
+	db.CloseMGO(tests.Context)
+	db.CloseCayley(tests.Context)
+	tests.DisplayLog()
+}
+
 //==============================================================================
 
 // TestExecuteSet tests the execution of different Sets that should succeed.
 func TestExecuteSet(t *testing.T) {
-	tests.ResetLog()
-	defer tests.DisplayLog()
+	db := setup(t)
+	defer teardown(t, db)
 
 	// Build our table of the different test sets.
 	execSets := []struct {
@@ -50,24 +217,6 @@ func TestExecuteSet(t *testing.T) {
 		{typ: "Positive", set: getPosExecSet()},
 		{typ: "Negative", set: getNegExecSet()},
 	}
-
-	db, err := db.NewMGO(tests.Context, tests.TestSession)
-	if err != nil {
-		t.Fatalf("\t%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
-	}
-	defer db.CloseMGO(tests.Context)
-
-	t.Log("Given the need to load the test data.")
-	{
-		loadTestData(t, db)
-	}
-
-	defer func() {
-		t.Log("Given the need to unload the test data.")
-		{
-			unloadTestData(t, db)
-		}
-	}()
 
 	// Iterate over all the different test sets.
 	for _, execSet := range execSets {

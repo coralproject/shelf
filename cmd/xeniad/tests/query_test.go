@@ -49,7 +49,7 @@ func TestQuerySets(t *testing.T) {
 				}
 			}
 
-			if count != 2 {
+			if count != 3 {
 				t.Fatalf("\t%s\tShould have two query sets : %d", tests.Failed, count)
 			}
 			t.Logf("\t%s\tShould have two query sets.", tests.Success)
