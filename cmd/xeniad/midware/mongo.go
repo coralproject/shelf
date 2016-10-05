@@ -30,10 +30,10 @@ func Mongo(h app.Handler) app.Handler {
 			return app.ErrDBNotConfigured
 		}
 
-		log.Dev(c.SessionID, "Mongo", "******> Capture Mongo Session")
+		log.Dev(c.SessionID, "Mongo", "Capture Mongo Session")
 		c.Ctx["DB"] = mgoDB
 		defer func() {
-			log.Dev(c.SessionID, "Mongo", "******> Release Mongo Session")
+			log.Dev(c.SessionID, "Mongo", "Release Mongo Session")
 			mgoDB.CloseMGO("Mongo")
 		}()
 

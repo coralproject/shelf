@@ -42,9 +42,9 @@ func Cayley(h app.Handler) app.Handler {
 			return app.ErrDBNotConfigured
 		}
 
-		log.Dev(c.SessionID, "Cayley", "******> Capture Cayley Session")
+		log.Dev(c.SessionID, "Cayley", "Capture Cayley Session")
 		defer func() {
-			log.Dev(c.SessionID, "Cayley", "******> Release Cayley Session")
+			log.Dev(c.SessionID, "Cayley", "Release Cayley Session")
 			db.CloseCayley(c.SessionID)
 		}()
 
