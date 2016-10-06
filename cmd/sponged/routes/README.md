@@ -31,7 +31,7 @@ const (
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1158:1181#L33)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1298:1321#L35)
 ``` go
 func API() http.Handler
 ```
