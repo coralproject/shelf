@@ -24,7 +24,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/itemfix.go?s=656:721#L27)
+## <a name="Add">func</a> [Add](/src/target/itemfix.go?s=679:744#L27)
 ``` go
 func Add(context interface{}, db *db.DB, items []item.Item) error
 ```
@@ -32,7 +32,7 @@ Add inserts items for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/itemfix.go?s=359:390#L10)
+## <a name="Get">func</a> [Get](/src/target/itemfix.go?s=382:413#L10)
 ``` go
 func Get() ([]item.Item, error)
 ```
@@ -40,7 +40,7 @@ Get loads item data based on item.json.
 
 
 
-## <a name="GetData">func</a> [GetData](/src/target/itemfix.go?s=1255:1316#L53)
+## <a name="GetData">func</a> [GetData](/src/target/itemfix.go?s=1278:1339#L53)
 ``` go
 func GetData(filename string) (map[string]interface{}, error)
 ```
@@ -48,7 +48,7 @@ GetData loads data based from data.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/itemfix.go?s=906:971#L38)
+## <a name="Remove">func</a> [Remove](/src/target/itemfix.go?s=929:994#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```

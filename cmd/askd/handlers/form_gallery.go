@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/ask/form/gallery"
+	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 // formGalleryHandle maintains the set of handlers for the form gallery api.
@@ -17,7 +17,7 @@ var FormGallery formGalleryHandle
 
 // AddAnswer adds an answer to a form gallery in the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formGalleryHandle) AddAnswer(c *app.Context) error {
+func (formGalleryHandle) AddAnswer(c *web.Context) error {
 	id := c.Params["id"]
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
@@ -33,7 +33,7 @@ func (formGalleryHandle) AddAnswer(c *app.Context) error {
 
 // AddAnswer removes an answer from a form gallery in the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
+func (formGalleryHandle) RemoveAnswer(c *web.Context) error {
 	id := c.Params["id"]
 	submissionID := c.Params["submission_id"]
 	answerID := c.Params["answer_id"]
@@ -50,7 +50,7 @@ func (formGalleryHandle) RemoveAnswer(c *app.Context) error {
 // RetrieveForForm retrieves a collection of galleries based on a specific form
 // id.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
+func (formGalleryHandle) RetrieveForForm(c *web.Context) error {
 	formID := c.Params["form_id"]
 
 	galleries, err := gallery.List(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
@@ -64,7 +64,7 @@ func (formGalleryHandle) RetrieveForForm(c *app.Context) error {
 
 // Retrieve retrieves a FormGallery based on it's id.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formGalleryHandle) Retrieve(c *app.Context) error {
+func (formGalleryHandle) Retrieve(c *web.Context) error {
 	id := c.Params["id"]
 
 	gallery, err := gallery.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
@@ -78,7 +78,7 @@ func (formGalleryHandle) Retrieve(c *app.Context) error {
 
 // Update updates a FormGallery based on it's id and it's provided payload.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formGalleryHandle) Update(c *app.Context) error {
+func (formGalleryHandle) Update(c *web.Context) error {
 	var g gallery.Gallery
 	if err := json.NewDecoder(c.Request.Body).Decode(&g); err != nil {
 		return err

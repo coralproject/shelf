@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/mask"
 )
 
@@ -19,11 +19,11 @@ var Mask maskHandle
 
 // List returns all the existing mask in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (maskHandle) List(c *app.Context) error {
+func (maskHandle) List(c *web.Context) error {
 	masks, err := mask.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == mask.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -34,7 +34,7 @@ func (maskHandle) List(c *app.Context) error {
 
 // Retrieve returns the specified mask from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (maskHandle) Retrieve(c *app.Context) error {
+func (maskHandle) Retrieve(c *web.Context) error {
 	collection := c.Params["collection"]
 	field := c.Params["field"]
 
@@ -46,7 +46,7 @@ func (maskHandle) Retrieve(c *app.Context) error {
 		masks, err := mask.GetByCollection(c.SessionID, c.Ctx["DB"].(*db.DB), collection)
 		if err != nil {
 			if err == mask.ErrNotFound {
-				err = app.ErrNotFound
+				err = web.ErrNotFound
 			}
 			return err
 		}
@@ -58,7 +58,7 @@ func (maskHandle) Retrieve(c *app.Context) error {
 	msk, err := mask.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), collection, field)
 	if err != nil {
 		if err == mask.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -71,7 +71,7 @@ func (maskHandle) Retrieve(c *app.Context) error {
 
 // Upsert inserts or updates the posted mask document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
-func (maskHandle) Upsert(c *app.Context) error {
+func (maskHandle) Upsert(c *web.Context) error {
 	var msk mask.Mask
 	if err := json.NewDecoder(c.Request.Body).Decode(&msk); err != nil {
 		return err
@@ -89,10 +89,10 @@ func (maskHandle) Upsert(c *app.Context) error {
 
 // Delete removes the specified mask from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (maskHandle) Delete(c *app.Context) error {
+func (maskHandle) Delete(c *web.Context) error {
 	if err := mask.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["collection"], c.Params["field"]); err != nil {
 		if err == mask.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}

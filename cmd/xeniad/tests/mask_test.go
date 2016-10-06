@@ -23,7 +23,7 @@ func TestMasks(t *testing.T) {
 	t.Log("Given the need get a set of masks.")
 	{
 		url := "/v1/mask"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -65,7 +65,7 @@ func TestMaskByName(t *testing.T) {
 	t.Log("Given the need to get a specific mask.")
 	{
 		url := "/v1/mask/" + mCollection + "/observation_time"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -120,7 +120,7 @@ func TestMaskUpsert(t *testing.T) {
 		// Insert the Mask.
 
 		url := "/v1/mask"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -137,7 +137,7 @@ func TestMaskUpsert(t *testing.T) {
 		// Retrieve the Mask.
 
 		url = "/v1/mask/" + mCollection + "/test_insert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -172,7 +172,7 @@ func TestMaskUpsert(t *testing.T) {
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
 		url = "/v1/mask"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -189,7 +189,7 @@ func TestMaskUpsert(t *testing.T) {
 		// Retrieve the Mask.
 
 		url = "/v1/mask/" + mCollection + "/test_insert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -243,7 +243,7 @@ func TestMaskDelete(t *testing.T) {
 		// Insert the Mask.
 
 		url := "/v1/mask"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(mskStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -260,7 +260,7 @@ func TestMaskDelete(t *testing.T) {
 		// Retrieve the Mask.
 
 		url = "/v1/mask/" + mCollection + "/test_delete"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -287,7 +287,7 @@ func TestMaskDelete(t *testing.T) {
 		// Delete the Mask.
 
 		url = "/v1/mask/" + mCollection + "/test_delete"
-		r = tests.NewRequest("DELETE", url, nil)
+		r = httptest.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -304,7 +304,7 @@ func TestMaskDelete(t *testing.T) {
 		// Retrieve the Mask.
 
 		url = "/v1/mask/" + mCollection + "/test_delete"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

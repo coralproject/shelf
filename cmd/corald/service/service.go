@@ -3,7 +3,7 @@ package service
 import (
 	"net/http"
 
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/platform/auth"
 )
 
@@ -17,12 +17,12 @@ func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request
 
 // Rewrite will add service request headers to the request and add other
 // standards.
-func Rewrite(c *app.Context) func(*http.Request) {
+func Rewrite(c *web.Context) func(*http.Request) {
 
 	f := func(r *http.Request) {
 
 		// Extract the signer from the application context.
-		signer, ok := c.App.Ctx["signer"].(auth.Signer)
+		signer, ok := c.Web.Ctx["signer"].(auth.Signer)
 		if !ok {
 			return
 		}
@@ -39,7 +39,7 @@ func Rewrite(c *app.Context) func(*http.Request) {
 
 // RewritePath will rewrite the path given a PathRewriter and return the request
 // director function.
-func RewritePath(c *app.Context, targetPath string) func(*http.Request) {
+func RewritePath(c *web.Context, targetPath string) func(*http.Request) {
 
 	f := func(r *http.Request) {
 

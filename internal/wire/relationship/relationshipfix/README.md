@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/relationshipfix.go?s=746:826#L27)
+## <a name="Add">func</a> [Add](/src/target/relationshipfix.go?s=769:849#L27)
 ``` go
 func Add(context interface{}, db *db.DB, rels []relationship.Relationship) error
 ```
@@ -31,7 +31,7 @@ Add inserts relationships for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/relationshipfix.go?s=404:451#L10)
+## <a name="Get">func</a> [Get](/src/target/relationshipfix.go?s=427:474#L10)
 ``` go
 func Get() ([]relationship.Relationship, error)
 ```
@@ -39,7 +39,7 @@ Get loads relationship data based on relationships.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/relationshipfix.go?s=1028:1093#L38)
+## <a name="Remove">func</a> [Remove](/src/target/relationshipfix.go?s=1051:1116#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```

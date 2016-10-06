@@ -4,15 +4,10 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"io"
-	"net/http"
-	"net/url"
 	"os"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 )
 
@@ -60,25 +55,6 @@ func Init(cfgKey string) {
 		return ll
 	}
 	log.Init(&logdash, logLevel, log.Ldefault)
-}
-
-// InitMongo initializes the mongodb connections for testing.
-func InitMongo(cfg mongo.Config) {
-	if err := db.RegMasterSession("Test", TestSession, cfg); err != nil {
-		log.Error("Test", "Init", err, "Completed")
-		logdash.WriteTo(os.Stdout)
-		os.Exit(1)
-	}
-}
-
-// NewRequest used to setup a request for mocking API calls with httptreemux.
-func NewRequest(method, path string, body io.Reader) *http.Request {
-	r, _ := http.NewRequest(method, path, body)
-	u, _ := url.Parse(path)
-	r.URL = u
-	r.RequestURI = path
-
-	return r
 }
 
 // IndentJSON takes a JSON payload as a string and re-indents it to make

@@ -4,10 +4,9 @@ package sponge
 import (
 	"reflect"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
 	"github.com/cayleygraph/cayley"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/wire"
 )
@@ -89,9 +88,6 @@ func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string)
 	// Get the item from the items collection.
 	items, err := item.GetByIDs(context, db, []string{itemID})
 	if err != nil {
-		if err == item.ErrNotFound {
-			err = app.ErrNotFound
-		}
 		log.Error(context, "Remove", err, "Completed")
 		return err
 	}
@@ -112,9 +108,6 @@ func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string)
 
 	// Delete the item.
 	if err := item.Delete(context, db, itemID); err != nil {
-		if err == item.ErrNotFound {
-			err = app.ErrNotFound
-		}
 		log.Error(context, "Remove", err, "Completed")
 		return err
 	}

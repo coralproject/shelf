@@ -6,60 +6,56 @@ import (
 	"time"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/sponged/handlers"
-	"github.com/coralproject/shelf/cmd/sponged/midware"
-	"github.com/coralproject/shelf/internal/platform/auth"
+	"github.com/coralproject/shelf/internal/platform/app"
+	"github.com/coralproject/shelf/internal/platform/db"
+	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	"github.com/coralproject/shelf/internal/platform/midware/cayley"
+	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
-// Environmental variables.
 const (
-	cfgMongoHost     = "MONGO_HOST"
-	cfgMongoAuthDB   = "MONGO_AUTHDB"
-	cfgMongoDB       = "MONGO_DB"
-	cfgMongoUser     = "MONGO_USER"
-	cfgMongoPassword = "MONGO_PASS"
+
+	// Namespace is the key that is the prefix for configuration in the
+	// environment.
+	Namespace = "SPONGE"
+
+	// cfgMongoURI is the key for the URI to the MongoDB service.
+	cfgMongoURI = "MONGO_URI"
+
+	// cfgAuthPublicKey is the key for the public key used for verifying the
+	// inbound requests.
 	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 )
 
 func init() {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "SPONGE"})
-
-	// Initialize MongoDB.
-	if _, err := cfg.String(cfgMongoHost); err == nil {
-		cfg := mongo.Config{
-			Host:     cfg.MustString(cfgMongoHost),
-			AuthDB:   cfg.MustString(cfgMongoAuthDB),
-			DB:       cfg.MustString(cfgMongoDB),
-			User:     cfg.MustString(cfgMongoUser),
-			Password: cfg.MustString(cfgMongoPassword),
-			Timeout:  25 * time.Second,
-		}
-
-		// The web framework middleware for Mongo is using the name of the
-		// database as the name of the master session by convention. So use
-		// cfg.DB as the second argument when creating the master session.
-		if err := db.RegMasterSession("startup", cfg.DB, cfg); err != nil {
-			log.Error("startup", "Init", err, "Initializing MongoDB")
-			os.Exit(1)
-		}
-	}
+	app.Init(cfg.EnvProvider{Namespace: Namespace})
 }
 
 //==============================================================================
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	a := app.New()
+	mongoURI := cfg.MustURL(cfgMongoURI)
+
+	// The web framework middleware for Mongo is using the name of the
+	// database as the name of the master session by convention. So use
+	// cfg.DB as the second argument when creating the master session.
+	if err := db.RegMasterSession("startup", mongoURI.Path, mongoURI.String(), 25*time.Second); err != nil {
+		log.Error("startup", "Init", err, "Initializing MongoDB")
+		os.Exit(1)
+	}
+
+	w := web.New()
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
 	if err != nil {
-		log.User("startup", "Init", "SPONGE_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 
 	// If the public key is provided then add the auth middleware or fail using
@@ -67,7 +63,7 @@ func API() http.Handler {
 	if publicKey != "" {
 		log.Dev("startup", "Init", "Initializing Auth")
 
-		authm, err := auth.Midware(publicKey, auth.MidwareOpts{})
+		authm, err := authm.Midware(publicKey, authm.MidwareOpts{})
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
 			os.Exit(1)
@@ -75,29 +71,29 @@ func API() http.Handler {
 
 		// Apply the authentication middleware on top of the application as the
 		// first middleware.
-		a.Use(authm)
+		w.Use(authm)
 	}
 
 	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
-	a.Use(midware.Mongo, midware.Cayley)
+	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
 	log.Dev("startup", "Init", "Initalizing routes")
-	routes(a)
+	routes(w)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
-	a.CORS()
+	w.CORS()
 
-	return a
+	return w
 }
 
 // routes manages the handling of the API endpoints.
-func routes(a *app.App) {
-	a.Handle("GET", "/v1/version", handlers.Version.List)
+func routes(w *web.Web) {
+	w.Handle("GET", "/v1/version", handlers.Version.List)
 
-	a.Handle("GET", "/v1/item/:id", handlers.Item.Retrieve)
-	a.Handle("PUT", "/v1/item", handlers.Item.Import)
-	a.Handle("POST", "/v1/item", handlers.Item.Import)
-	a.Handle("DELETE", "/v1/item/:id", handlers.Item.Remove)
+	w.Handle("GET", "/v1/item/:id", handlers.Item.Retrieve)
+	w.Handle("PUT", "/v1/item", handlers.Item.Import)
+	w.Handle("POST", "/v1/item", handlers.Item.Import)
+	w.Handle("DELETE", "/v1/item/:id", handlers.Item.Remove)
 
-	a.Handle("POST", "/v1/data/:type", handlers.Data.Import)
+	w.Handle("POST", "/v1/data/:type", handlers.Data.Import)
 }

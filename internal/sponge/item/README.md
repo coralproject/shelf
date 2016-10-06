@@ -42,7 +42,7 @@ ErrNotFound is an error variable thrown when no results are returned from a Mong
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/item.go?s=2806:2866#L94)
+## <a name="Delete">func</a> [Delete](/src/target/item.go?s=3218:3278#L105)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -50,7 +50,7 @@ Delete removes an item from from Mongo.
 
 
 
-## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=1961:2036#L66)
+## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=2373:2448#L77)
 ``` go
 func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)
 ```
@@ -58,7 +58,7 @@ GetByIDs retrieves items by ID from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=503:564#L12)
+## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=557:618#L13)
 ``` go
 func Upsert(context interface{}, db *db.DB, item *Item) error
 ```
@@ -67,13 +67,15 @@ Upsert upserts an item to the items collections.
 
 
 
-## <a name="Item">type</a> [Item](/src/target/model.go?s=889:1231#L19)
+## <a name="Item">type</a> [Item](/src/target/model.go?s=897:1391#L20)
 ``` go
 type Item struct {
-    ID      string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
-    Type    string                 `bson:"type" json:"type" validate:"required,min=2"`
-    Version int                    `bson:"version" json:"version" validate:"required,min=1"`
-    Data    map[string]interface{} `bson:"data" json:"data"`
+    ID        string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
+    Type      string                 `bson:"type" json:"type" validate:"required,min=2"`
+    Version   int                    `bson:"version" json:"version" validate:"required,min=1"`
+    Data      map[string]interface{} `bson:"data" json:"data"`
+    CreatedAt time.Time              `bson:"created_at" json:"created_at"`
+    UpdatedAt time.Time              `bson:"updated_at" json:"updated_at"`
 }
 ```
 Item is data, properties and behavior associated with one of a comment,
@@ -87,7 +89,7 @@ may differ greatly between items) is encoded into the Data interface.
 
 
 
-### <a name="GetByID">func</a> [GetByID](/src/target/item.go?s=1316:1385#L43)
+### <a name="GetByID">func</a> [GetByID](/src/target/item.go?s=1728:1797#L54)
 ``` go
 func GetByID(context interface{}, db *db.DB, id string) (Item, error)
 ```
@@ -97,7 +99,7 @@ GetByID retrieves a single item by ID from Mongo.
 
 
 
-### <a name="Item.InferIDFromData">func</a> (\*Item) [InferIDFromData](/src/target/model.go?s=1467:1508#L36)
+### <a name="Item.InferIDFromData">func</a> (\*Item) [InferIDFromData](/src/target/model.go?s=1627:1668#L39)
 ``` go
 func (item *Item) InferIDFromData() error
 ```
@@ -106,7 +108,7 @@ InferIDFromData infers an item_id from type and source id.
 
 
 
-### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1289:1323#L27)
+### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1449:1483#L30)
 ``` go
 func (item *Item) Validate() error
 ```

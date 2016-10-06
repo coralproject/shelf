@@ -6,9 +6,9 @@ import (
 	"net"
 	"time"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/platform/db/mongo"
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/pborman/uuid"

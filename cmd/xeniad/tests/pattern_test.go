@@ -25,7 +25,7 @@ func TestListPatterns(t *testing.T) {
 	t.Log("Given the need get a set of patterns.")
 	{
 		url := "/v1/pattern"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -68,7 +68,7 @@ func TestRetrievePattern(t *testing.T) {
 	t.Log("Given the need to get a specific pattern.")
 	{
 		url := "/v1/pattern/" + patternPrefix + "comment"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -120,7 +120,7 @@ func TestUpsertPattern(t *testing.T) {
 		// Insert the Pattern.
 
 		url := "/v1/pattern"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(pStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(pStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -137,7 +137,7 @@ func TestUpsertPattern(t *testing.T) {
 		// Retrieve the Pattern.
 
 		url = "/v1/pattern/" + patternPrefix + "asset"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -175,7 +175,7 @@ func TestUpsertPattern(t *testing.T) {
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
 		url = "/v1/pattern"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(pStrData))
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(pStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -192,7 +192,7 @@ func TestUpsertPattern(t *testing.T) {
 		// Retrieve the Pattern.
 
 		url = "/v1/pattern/" + patternPrefix + "article"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -230,7 +230,7 @@ func TestDeletePattern(t *testing.T) {
 		// Delete the Pattern.
 
 		url := "/v1/pattern/" + patternPrefix + "comment"
-		r := tests.NewRequest("DELETE", url, nil)
+		r := httptest.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -247,7 +247,7 @@ func TestDeletePattern(t *testing.T) {
 		// Retrieve the Pattern.
 
 		url = "/v1/pattern/" + patternPrefix + "comment"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

@@ -51,7 +51,7 @@ var (
 ```
 
 
-## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1275:1379#L41)
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1298:1402#L41)
 ``` go
 func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
@@ -59,7 +59,7 @@ AddToGraph adds relationships as quads into the cayley graph.
 
 
 
-## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2329:2438#L79)
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2352:2461#L79)
 ``` go
 func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
@@ -68,7 +68,7 @@ RemoveFromGraph removes relationship quads from the cayley graph.
 
 
 
-## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=874:1037#L26)
+## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=897:1060#L26)
 ``` go
 type QuadParam struct {
     Subject   string `validate:"required,min=2"`
@@ -88,7 +88,7 @@ to/from the cayley graph.
 
 
 
-### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1096:1132#L33)
+### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1119:1155#L33)
 ``` go
 func (q *QuadParam) Validate() error
 ```
@@ -97,7 +97,7 @@ Validate checks the QuadParams value for consistency.
 
 
 
-## <a name="Result">type</a> [Result](/src/target/wire.go?s=911:971#L27)
+## <a name="Result">type</a> [Result](/src/target/wire.go?s=934:994#L27)
 ``` go
 type Result struct {
     Results interface{} `json:"results"`
@@ -111,7 +111,7 @@ Result represents what a user will receive after generating a view.
 
 
 
-### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1589:1701#L51)
+### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1612:1724#L51)
 ``` go
 func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
@@ -121,7 +121,7 @@ Execute executes a graph query to generate the specified view.
 
 
 
-## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1222:1439#L41)
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1245:1462#L41)
 ``` go
 type ViewParams struct {
     ViewName          string `json:"view_name"`

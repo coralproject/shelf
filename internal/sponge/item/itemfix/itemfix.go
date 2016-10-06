@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/sponge/item"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

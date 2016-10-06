@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/mfix.go?s=807:847#L31)
+## <a name="Add">func</a> [Add](/src/target/mfix.go?s=830:870#L31)
 ``` go
 func Add(db *db.DB, msk mask.Mask) error
 ```
@@ -31,7 +31,7 @@ Add inserts a mask for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/mfix.go?s=496:542#L13)
+## <a name="Get">func</a> [Get](/src/target/mfix.go?s=519:565#L13)
 ``` go
 func Get(fileName string) ([]mask.Mask, error)
 ```
@@ -39,7 +39,7 @@ Get retrieves a slice of mask documents from the filesystem for testing.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/mfix.go?s=1175:1222#L46)
+## <a name="Remove">func</a> [Remove](/src/target/mfix.go?s=1198:1245#L46)
 ``` go
 func Remove(db *db.DB, collection string) error
 ```
