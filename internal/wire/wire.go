@@ -229,7 +229,10 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 
 	// Build the Cayley iterator.
 	it := path.BuildIterator()
-	it, _ = it.Optimize()
+	it, err = it.Optimize()
+	if err != nil {
+		return nil, err
+	}
 	defer it.Close()
 
 	// Extract any tags in the View value.
@@ -294,8 +297,29 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 }
 
 // extractEmbeddedRel extracts a relationship that needs to be embedded on a view item.
-func extractEmbeddedRels(v *view.View, taggedIDs map[string]string) (EmbeddedRels, error) {
+func extractEmbeddedRels(v *view.View, taggedIDs map[string]string, key string) (EmbeddedRels, error) {
 
+	// Extract the ordering of the tagged view items.
+	tagOrder := make(map[string]int)
+	orderTag := make(map[int]string)
+	for _, segment := range v.Path {
+		if segment.Tag != "" {
+			tagOrder[segment.Tag] = segment.Level
+			orderTag[segment.Level] = segment.Tag
+		}
+	}
+
+	// Loop over the taggedIDs determining the embedding based on the ordering
+	// of the view path.
+	for id, tag := range taggedIDs {
+
+		// Get the order of the tagged ID.
+		order := tagOrder[tag]
+
+		// If the order is greater than 1, we should embed one level up.
+		if order > 1 {
+		}
+	}
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
