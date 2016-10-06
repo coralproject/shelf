@@ -17,13 +17,8 @@ import (
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
-const (
-	// itemPrefix is the base name for items.
-	itemPrefix = "ITEST_"
-
-	// patternPrefix is the base name for patterns.
-	patternPrefix = "PTEST_"
-)
+// itemPrefix is the base name for items.
+const itemPrefix = "ITEST_"
 
 // setup initializes for each indivdual test.
 func setup(t *testing.T) *cayley.Handle {

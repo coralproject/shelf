@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 
 	"github.com/ardanlabs/kit/log"
-	"github.com/coralproject/shelf/internal/wire/pattern"
 	"github.com/coralproject/shelf/internal/wire/relationship"
 	"github.com/coralproject/shelf/internal/wire/view"
 	"github.com/coralproject/shelf/internal/xenia/mask"
@@ -124,28 +123,6 @@ func LoadRelationship(context interface{}, path string) (relationship.Relationsh
 
 	log.Dev(context, "LoadRelationship", "Completed")
 	return rel, nil
-}
-
-// LoadPattern serializes the content of a Pattern from a file using the
-// given file path. Returns the serialized Pattern value.
-func LoadPattern(context interface{}, path string) (pattern.Pattern, error) {
-	log.Dev(context, "LoadPattern", "Started : File %s", path)
-
-	file, err := os.Open(path)
-	if err != nil {
-		log.Error(context, "LoadPattern", err, "Completed")
-		return pattern.Pattern{}, err
-	}
-	defer file.Close()
-
-	var p pattern.Pattern
-	if err = json.NewDecoder(file).Decode(&p); err != nil {
-		log.Error(context, "LoadPattern", err, "Completed")
-		return pattern.Pattern{}, err
-	}
-
-	log.Dev(context, "LoadPattern", "Completed")
-	return p, nil
 }
 
 // LoadView serializes the content of a View from a file using the

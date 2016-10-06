@@ -6,8 +6,8 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/coralproject/shelf/cmd/xenia/disk"
-	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/cmd/sponge/disk"
+	"github.com/coralproject/shelf/cmd/sponge/web"
 	"github.com/coralproject/shelf/internal/wire/pattern"
 	"github.com/spf13/cobra"
 )

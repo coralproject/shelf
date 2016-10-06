@@ -134,10 +134,4 @@ func routes(w *web.Web) {
 	w.Handle("PUT", "/v1/view", handlers.View.Upsert)
 	w.Handle("GET", "/v1/view/:name", handlers.View.Retrieve)
 	w.Handle("DELETE", "/v1/view/:name", handlers.View.Delete)
-
-	w.Handle("GET", "/v1/pattern", handlers.Pattern.List)
-	w.Handle("PUT", "/v1/pattern", handlers.Pattern.Upsert)
-	w.Handle("GET", "/v1/pattern/:type", handlers.Pattern.Retrieve)
-	w.Handle("DELETE", "/v1/pattern/:type", handlers.Pattern.Delete)
-
 }

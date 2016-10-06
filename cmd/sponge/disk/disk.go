@@ -8,6 +8,7 @@ import (
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/sponge/item"
+	"github.com/coralproject/shelf/internal/wire/pattern"
 )
 
 // LoadItem serializes the content of Items from a file using the
@@ -30,6 +31,28 @@ func LoadItem(context interface{}, path string) (*item.Item, error) {
 
 	log.Dev(context, "LoadItem", "Completed")
 	return &it, nil
+}
+
+// LoadPattern serializes the content of a Pattern from a file using the
+// given file path. Returns the serialized Pattern value.
+func LoadPattern(context interface{}, path string) (pattern.Pattern, error) {
+	log.Dev(context, "LoadPattern", "Started : File %s", path)
+
+	file, err := os.Open(path)
+	if err != nil {
+		log.Error(context, "LoadPattern", err, "Completed")
+		return pattern.Pattern{}, err
+	}
+	defer file.Close()
+
+	var p pattern.Pattern
+	if err = json.NewDecoder(file).Decode(&p); err != nil {
+		log.Error(context, "LoadPattern", err, "Completed")
+		return pattern.Pattern{}, err
+	}
+
+	log.Dev(context, "LoadPattern", "Completed")
+	return p, nil
 }
 
 // LoadDir loadsup a given directory, calling a load function for each valid

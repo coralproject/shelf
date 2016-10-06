@@ -8,7 +8,6 @@ import (
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/cmd/xenia/cmddb"
 	"github.com/coralproject/shelf/cmd/xenia/cmdmask"
-	"github.com/coralproject/shelf/cmd/xenia/cmdpattern"
 	"github.com/coralproject/shelf/cmd/xenia/cmdquery"
 	"github.com/coralproject/shelf/cmd/xenia/cmdregex"
 	"github.com/coralproject/shelf/cmd/xenia/cmdrelationship"
@@ -81,7 +80,6 @@ func main() {
 		cmdmask.GetCommands(),
 		cmdrelationship.GetCommands(),
 		cmdview.GetCommands(),
-		cmdpattern.GetCommands(),
 	)
 	xenia.Execute()
 }

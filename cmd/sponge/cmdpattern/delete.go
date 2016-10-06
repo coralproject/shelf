@@ -1,7 +1,7 @@
 package cmdpattern
 
 import (
-	"github.com/coralproject/shelf/cmd/xenia/web"
+	"github.com/coralproject/shelf/cmd/sponge/web"
 	"github.com/spf13/cobra"
 )
 
