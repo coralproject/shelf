@@ -10,12 +10,12 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/ask"
 	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
+	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 // ErrInvalidCaptcha is returned when a captcha is required for a form but it
@@ -31,7 +31,7 @@ var FormSubmission formSubmissionHandle
 // Create creates a new FormSubmission based on the payload of replies and the
 // formID that is being submitted.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) Create(c *app.Context) error {
+func (formSubmissionHandle) Create(c *web.Context) error {
 	var payload struct {
 		Recaptcha string                   `json:"recaptcha"`
 		Answers   []submission.AnswerInput `json:"replies"`
@@ -40,13 +40,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 		return err
 	}
 
-	// FIXME: remove "comma ok" check after API migration. This is requried
-	// because there is a wildcard collision inbetween the form_id and the id
-	// for the specific endpoints old/new.
-	formID, ok := c.Params["form_id"]
-	if !ok {
-		formID = c.Params["id"]
-	}
+	formID := c.Params["form_id"]
 
 	{
 		// We should check to see if the form has a recaptcha property.
@@ -64,7 +58,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 			}
 
 			body := url.Values{
-				"secret":   []string{c.App.Ctx["recaptcha"].(string)},
+				"secret":   []string{c.Web.Ctx["recaptcha"].(string)},
 				"response": []string{payload.Recaptcha},
 			}
 
@@ -120,7 +114,7 @@ func (formSubmissionHandle) Create(c *app.Context) error {
 // UpdateStatus updates the status of a FormSubmission based on the route
 // params.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) UpdateStatus(c *app.Context) error {
+func (formSubmissionHandle) UpdateStatus(c *web.Context) error {
 	id := c.Params["id"]
 	status := c.Params["status"]
 
@@ -137,7 +131,7 @@ func (formSubmissionHandle) UpdateStatus(c *app.Context) error {
 // UpdateAnswer updates an answer based on the payload submitted to the
 // endpoint.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
+func (formSubmissionHandle) UpdateAnswer(c *web.Context) error {
 	var editedAnswer struct {
 		Edited string
 	}
@@ -165,7 +159,7 @@ func (formSubmissionHandle) UpdateAnswer(c *app.Context) error {
 // Search retrieves a set of FormSubmission's based on the search params
 // provided in the query string.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) Search(c *app.Context) error {
+func (formSubmissionHandle) Search(c *web.Context) error {
 	formID := c.Params["form_id"]
 
 	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
@@ -200,7 +194,7 @@ func (formSubmissionHandle) Search(c *app.Context) error {
 // Download retrieves a set of FormSubmission's based on the search params
 // provided in the query string and generates a CSV with the replies.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) Download(c *app.Context) error {
+func (formSubmissionHandle) Download(c *web.Context) error {
 
 	if c.Request.URL.Query().Get("download") != "true" {
 
@@ -257,7 +251,7 @@ func (formSubmissionHandle) Download(c *app.Context) error {
 
 // Retrieves a given FormSubmission based on the route params.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) Retrieve(c *app.Context) error {
+func (formSubmissionHandle) Retrieve(c *web.Context) error {
 	id := c.Params["id"]
 
 	s, err := submission.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
@@ -272,23 +266,10 @@ func (formSubmissionHandle) Retrieve(c *app.Context) error {
 
 // Removes a FormSubmission based on the route params.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) Delete(c *app.Context) error {
+func (formSubmissionHandle) Delete(c *web.Context) error {
 	id := c.Params["id"]
 
-	// FIXME: pull out ", ok" check once old API has been deprecated.
-	formID, ok := c.Params["form_id"]
-	if !ok {
-
-		// If in the event that the url does not contain the form id, we should get
-		// it from the database by looking up the requested submission.
-
-		sub, err := submission.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
-		if err != nil {
-			return err
-		}
-
-		formID = sub.FormID.Hex()
-	}
+	formID := c.Params["form_id"]
 
 	err := ask.DeleteSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), id, formID)
 	if err != nil {
@@ -303,7 +284,7 @@ func (formSubmissionHandle) Delete(c *app.Context) error {
 // AddFlag adds a new flag to a given FormSubmission based on the provided route
 // params.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) AddFlag(c *app.Context) error {
+func (formSubmissionHandle) AddFlag(c *web.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 
@@ -320,7 +301,7 @@ func (formSubmissionHandle) AddFlag(c *app.Context) error {
 // RemoveFlag removes a given flag from a FormSubmission based on the provided
 // route params.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formSubmissionHandle) RemoveFlag(c *app.Context) error {
+func (formSubmissionHandle) RemoveFlag(c *web.Context) error {
 	id := c.Params["id"]
 	flag := c.Params["flag"]
 

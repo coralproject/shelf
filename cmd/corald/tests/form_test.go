@@ -18,7 +18,7 @@ func TestFormsGET(t *testing.T) {
 	t.Log("Given the need to test GET form call.")
 	{
 		url := "/v1/form"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

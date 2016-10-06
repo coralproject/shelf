@@ -6,13 +6,21 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/corald/fixtures"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
+	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/auth"
+	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 )
 
 const (
+
+	// Namespace is the key that is the prefix for configuration in the
+	// environment.
+	Namespace = "CORAL"
 
 	// cfgSpongdURL is the config key for the url to the sponged service.
 	cfgSpongdURL = "SPONGED_URL"
@@ -20,8 +28,8 @@ const (
 	// cfgXeniadURL is the config key for the url to the xeniad service.
 	cfgXeniadURL = "XENIAD_URL"
 
-	// cfgAuthPublicKey is the config key for the public key used to verify
-	// tokens.
+	// cfgAuthPublicKey is the key for the public key used for verifying the
+	// inbound requests.
 	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
 
 	// cfgPlatformPrivateKey is the private key used to sign new requests to the
@@ -33,16 +41,16 @@ func init() {
 
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "CORAL"})
+	app.Init(cfg.EnvProvider{Namespace: Namespace})
 }
 
 // API returns a handler for a set of routes.
-func API(testing ...bool) http.Handler {
-	a := app.New()
+func API() http.Handler {
+	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
-	if err != nil {
-		log.User("startup", "Init", "CORAL_%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+	if err != nil || publicKey == "" {
+		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 
 	// If the public key is provided then add the auth middleware or fail using
@@ -50,7 +58,7 @@ func API(testing ...bool) http.Handler {
 	if publicKey != "" {
 		log.Dev("startup", "Init", "Initializing Auth")
 
-		authm, err := auth.Midware(publicKey, auth.MidwareOpts{})
+		authm, err := authm.Midware(publicKey, authm.MidwareOpts{})
 		if err != nil {
 			log.Error("startup", "Init", err, "Initializing Auth")
 			os.Exit(1)
@@ -58,12 +66,12 @@ func API(testing ...bool) http.Handler {
 
 		// Apply the authentication middleware on top of the application as the
 		// first middleware.
-		a.Use(authm)
+		w.Use(authm)
 	}
 
 	platformPrivateKey, err := cfg.String(cfgPlatformPrivateKey)
-	if err != nil {
-		log.User("startup", "Init", "CORAL_%s is missing, downstream platform authentication is disabled", cfgPlatformPrivateKey)
+	if err != nil || platformPrivateKey == "" {
+		log.User("startup", "Init", "%s is missing, downstream platform authentication is disabled", cfgPlatformPrivateKey)
 	}
 
 	// If the platformPrivateKey is provided, then we should generate the token
@@ -73,7 +81,7 @@ func API(testing ...bool) http.Handler {
 
 		signer, err := auth.NewSigner(platformPrivateKey)
 		if err != nil {
-			log.Error("startup", "Init", err, "Initializing Auth")
+			log.Error("startup", "Init", err, "Initializing Downstream Platform Auth")
 			os.Exit(1)
 		}
 
@@ -81,67 +89,59 @@ func API(testing ...bool) http.Handler {
 		// save on the application wide context. In the event that a function
 		// requires a call down to a downstream platform, we will include a signed
 		// header using the signer function here.
-		a.Ctx["signer"] = signer
+		w.Ctx["signer"] = signer
 	}
 
 	log.Dev("startup", "Init", "Initalizing routes")
-	routes(a)
+	routes(w)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
-	a.CORS()
+	w.CORS()
 
-	return a
+	return w
 }
 
 // routes manages the handling of the API endpoints.
-func routes(a *app.App) {
-	a.Handle("GET", "/v1/version", handlers.Version.List)
+func routes(w *web.Web) {
+	w.Handle("GET", "/v1/version", handlers.Version.List)
 
 	spongedURL := cfg.MustURL(cfgSpongdURL).String()
 	xeniadURL := cfg.MustURL(cfgXeniadURL).String()
 
 	// CRU- for forms
-	a.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
-	a.Handle("POST", "/v1/form", fixtures.Handler("forms/form", http.StatusCreated))
-	a.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
-	a.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
+	w.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
+	w.Handle("POST", "/v1/form", fixtures.Handler("forms/form", http.StatusCreated))
+	w.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
+	w.Handle("PUT", "/v1/form/:form_id", fixtures.NoContent)
 
 	// Execute the :query_set on the view :view_name on this :item_key.
-	a.Handle("GET", "/v1/exec/:query_set/view/:view_name/:item_key",
-		handlers.Proxy(xeniadURL,
-			func(c *app.Context) string {
-				return "/v1/exec/" + c.Params["query_set"]
-			}))
+	w.Handle("GET", "/v1/exec/:query_set/view/:view_name/:item_key",
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
 	// Execute the view :view_name on this :item_key.
-	a.Handle("GET", "/v1/exec/view/:view_name/:item_key",
+	w.Handle("GET", "/v1/exec/view/:view_name/:item_key",
 		handlers.Proxy(xeniadURL,
-			func(c *app.Context) string {
+			func(c *web.Context) string {
 				return "/v1/exec/view/" + c.Params["view_name"] + "/" + c.Params["item_key"]
 			}))
 
 	// Execute xenia queries directly.
-	a.Handle("GET", "/v1/exec/:query_set",
-		handlers.Proxy(xeniadURL,
-			func(c *app.Context) string {
-				return "/v1/exec/" + c.Params["query_set"]
-			}))
+	w.Handle("GET", "/v1/exec/:query_set",
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
-	// Send a new query to xenia. - TEMPORAL
-	a.Handle("PUT", "/v1/query",
-		handlers.Proxy(xeniadURL,
-			func(c *app.Context) string {
-				return "/v1/query"
-			}))
+	// Send a new query to xenia. ********* TEMPORAL *********
+	w.Handle("PUT", "/v1/query",
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/query" }))
 
-	// Execute a custom xenia query. - TEMPORAL
-	a.Handle("POST", "/v1/exec",
-		handlers.Proxy(xeniadURL,
-			func(c *app.Context) string {
-				return "/v1/exec"
-			}))
+	// Execute a custom xenia query. ********* TEMPORAL *********
+	w.Handle("POST", "/v1/exec",
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
-	// C-UD for Items
+	w.Handle("PUT", "/v1/item",
+		handlers.Proxy(spongedURL, func(c *web.Context) string { return "/v1/item" }))
+
+	w.Handle("POST", "/v1/item",
+		handlers.Proxy(spongedURL, func(c *web.Context) string { return "/v1/item" }))
 
 	// //Get a single item and all related items
 	// a.Handle("GET", "/v1/items/:type/:item_id",
@@ -151,16 +151,4 @@ func routes(a *app.App) {
 	// 		}))
 	//fixtures.Handler("items/items", http.StatusOK))
 	// /v1/exec?view=comments-on-a-comment&item=57c486628835dfd623fb9349
-
-	// PUT and POST do the same action. Upsert.
-	a.Handle("PUT", "/v1/item",
-		handlers.Proxy(spongedURL,
-			func(c *app.Context) string {
-				return "/v1/item"
-			}))
-	a.Handle("POST", "/v1/item",
-		handlers.Proxy(spongedURL,
-			func(c *app.Context) string {
-				return "/v1/item"
-			}))
 }

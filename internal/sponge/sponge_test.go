@@ -7,18 +7,15 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
-	_ "github.com/cayleygraph/cayley/graph/mongo"
 	"github.com/cayleygraph/cayley/quad"
+	"github.com/coralproject/shelf/internal/platform/db"
+	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 )
-
-var mgoCfg mongo.Config
 
 const (
 	// itemPrefix is the base name for items.
@@ -29,20 +26,10 @@ const (
 )
 
 func init() {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
 	tests.Init("SPONGE")
-
-	// Initialize MongoDB using the `tests.TestSession` as the name of the
-	// master session.
-	mgoCfg = mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
-	}
-	tests.InitMongo(mgoCfg)
 }
 
 // TestMain helps to clean up the test data.
@@ -53,9 +40,17 @@ func TestMain(m *testing.M) {
 // runTest initializes the environment for the tests and allows for
 // the proper return code if the test fails or succeeds.
 func runTest(m *testing.M) int {
+
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
+		return 1
+	}
+
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
-		fmt.Println("MongoDB is not configured")
+		fmt.Println("Can't get mongo session: " + err.Error())
 		return 1
 	}
 	defer db.CloseMGO(tests.Context)
@@ -91,15 +86,9 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	opts := map[string]interface{}{
-		"database_name": cfg.MustString("MONGO_DB"),
-		"username":      cfg.MustString("MONGO_USER"),
-		"password":      cfg.MustString("MONGO_PASS"),
-	}
-
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
 	if err != nil {
-		t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
+		t.Fatalf("%s\tShould be able to get a cayley handle : %v", tests.Failed, err)
 	}
 
 	return db, store

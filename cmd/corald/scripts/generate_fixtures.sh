@@ -3,6 +3,7 @@
 # Check if the Go runtime is installed.
 if ! [ -x "$(which go)" ]; then
   echo "Go is not installed." >&2
+  exit 1
 fi
 
 # Check if go-bindata is installed.

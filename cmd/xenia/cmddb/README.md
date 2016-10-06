@@ -34,7 +34,7 @@ var (
 ```
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=366:408#L8)
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=389:431#L8)
 ``` go
 func GetCommands(db *db.DB) *cobra.Command
 ```
@@ -43,7 +43,7 @@ GetCommands returns the db commands.
 
 
 
-## <a name="Collection">type</a> [Collection](/src/target/create.go?s=1177:1268#L46)
+## <a name="Collection">type</a> [Collection](/src/target/create.go?s=1200:1291#L46)
 ``` go
 type Collection struct {
     Name    string  `json:"name"`
@@ -61,7 +61,7 @@ Collection is the container for a db collection definition.
 
 
 
-## <a name="DBMeta">type</a> [DBMeta](/src/target/create.go?s=1050:1112#L41)
+## <a name="DBMeta">type</a> [DBMeta](/src/target/create.go?s=1073:1135#L41)
 ``` go
 type DBMeta struct {
     Cols []Collection `json:"collections"`
@@ -78,7 +78,7 @@ DBMeta is the container for all db objects.
 
 
 
-## <a name="Field">type</a> [Field](/src/target/create.go?s=1494:1612#L59)
+## <a name="Field">type</a> [Field](/src/target/create.go?s=1517:1635#L59)
 ``` go
 type Field struct {
     Name      string `json:"name"`
@@ -97,7 +97,7 @@ Field is the container for a field definition.
 
 
 
-## <a name="Index">type</a> [Index](/src/target/create.go?s=1321:1442#L52)
+## <a name="Index">type</a> [Index](/src/target/create.go?s=1344:1465#L52)
 ``` go
 type Index struct {
     Name     string  `json:"name"`

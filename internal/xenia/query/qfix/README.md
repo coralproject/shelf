@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/qfix.go?s=789:830#L31)
+## <a name="Add">func</a> [Add](/src/target/qfix.go?s=812:853#L31)
 ``` go
 func Add(db *db.DB, set *query.Set) error
 ```
@@ -31,7 +31,7 @@ Add inserts a set for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/qfix.go?s=487:532#L13)
+## <a name="Get">func</a> [Get](/src/target/qfix.go?s=510:555#L13)
 ``` go
 func Get(fileName string) (*query.Set, error)
 ```
@@ -39,7 +39,7 @@ Get retrieves a set document from the filesystem for testing.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/qfix.go?s=1046:1090#L41)
+## <a name="Remove">func</a> [Remove](/src/target/qfix.go?s=1069:1113#L41)
 ``` go
 func Remove(db *db.DB, pattern string) error
 ```

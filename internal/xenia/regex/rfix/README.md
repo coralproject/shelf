@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/rfix.go?s=815:857#L31)
+## <a name="Add">func</a> [Add](/src/target/rfix.go?s=838:880#L31)
 ``` go
 func Add(db *db.DB, rgx regex.Regex) error
 ```
@@ -31,7 +31,7 @@ Add inserts a regex for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/rfix.go?s=489:535#L13)
+## <a name="Get">func</a> [Get](/src/target/rfix.go?s=512:558#L13)
 ``` go
 func Get(fileName string) (regex.Regex, error)
 ```
@@ -39,7 +39,7 @@ Get retrieves a regex document from the filesystem for testing.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/rfix.go?s=1215:1259#L47)
+## <a name="Remove">func</a> [Remove](/src/target/rfix.go?s=1238:1282#L47)
 ``` go
 func Remove(db *db.DB, pattern string) error
 ```

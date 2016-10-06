@@ -21,7 +21,7 @@
 
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=471:537#L14)
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=494:560#L14)
 ``` go
 func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command
 ```

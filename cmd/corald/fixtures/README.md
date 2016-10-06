@@ -16,11 +16,11 @@
 * [func AssetDir(name string) ([]string, error)](#AssetDir)
 * [func AssetInfo(name string) (os.FileInfo, error)](#AssetInfo)
 * [func AssetNames() []string](#AssetNames)
-* [func Error(err error) app.Handler](#Error)
-* [func Handler(name string, code int) app.Handler](#Handler)
+* [func Error(err error) web.Handler](#Error)
+* [func Handler(name string, code int) web.Handler](#Handler)
 * [func Load(name string, v interface{}) error](#Load)
 * [func MustAsset(name string) []byte](#MustAsset)
-* [func NoContent(c *app.Context) error](#NoContent)
+* [func NoContent(c *web.Context) error](#NoContent)
 * [func RestoreAsset(dir, name string) error](#RestoreAsset)
 * [func RestoreAssets(dir, name string) error](#RestoreAssets)
 
@@ -83,23 +83,23 @@ AssetNames returns the names of the assets.
 
 
 
-## <a name="Error">func</a> [Error](/src/target/fixtures.go?s=645:678#L23)
+## <a name="Error">func</a> [Error](/src/target/fixtures.go?s=641:674#L23)
 ``` go
-func Error(err error) app.Handler
+func Error(err error) web.Handler
 ```
 Error will simply return the error to the calling request stack.
 
 
 
-## <a name="Handler">func</a> [Handler](/src/target/fixtures.go?s=1014:1061#L38)
+## <a name="Handler">func</a> [Handler](/src/target/fixtures.go?s=1010:1057#L38)
 ``` go
-func Handler(name string, code int) app.Handler
+func Handler(name string, code int) web.Handler
 ```
 Handler will serve a JSON payload as the endpoint response.
 
 
 
-## <a name="Load">func</a> [Load](/src/target/fixtures.go?s=239:282#L5)
+## <a name="Load">func</a> [Load](/src/target/fixtures.go?s=235:278#L5)
 ``` go
 func Load(name string, v interface{}) error
 ```
@@ -117,9 +117,9 @@ It simplifies safe initialization of global variables.
 
 
 
-## <a name="NoContent">func</a> [NoContent](/src/target/fixtures.go?s=859:895#L32)
+## <a name="NoContent">func</a> [NoContent](/src/target/fixtures.go?s=855:891#L32)
 ``` go
-func NoContent(c *app.Context) error
+func NoContent(c *web.Context) error
 ```
 NoContent simply responds with a HTTP Status Code of 204.
 

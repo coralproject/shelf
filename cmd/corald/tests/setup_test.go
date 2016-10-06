@@ -2,20 +2,14 @@
 package tests
 
 import (
+	"net/http"
 	"os"
 	"testing"
 
-	"github.com/ardanlabs/kit/web/app"
 	"github.com/coralproject/shelf/cmd/corald/routes"
 )
 
-var a *app.App
-
-func init() {
-	// The call to API will force the init() function to initialize
-	// cfg, log and mongodb.
-	a = routes.API(true).(*app.App)
-}
+var a http.Handler
 
 //==============================================================================
 
@@ -27,5 +21,7 @@ func TestMain(m *testing.M) {
 // runTest initializes the environment for the tests and allows for
 // the proper return code if the test fails or succeeds.
 func runTest(m *testing.M) int {
+	a = routes.API()
+
 	return m.Run()
 }

@@ -3,10 +3,10 @@ package wire_test
 import (
 	"testing"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/quad"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 )

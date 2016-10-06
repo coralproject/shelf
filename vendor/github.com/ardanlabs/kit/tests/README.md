@@ -36,25 +36,19 @@ DisplayLog writes the logdash data to standand out, if testing in verbose mode
 was turned on.
 
 
+## func IndentJSON
+``` go
+func IndentJSON(j string) string
+```
+IndentJSON takes a JSON payload as a string and re-indents it to make
+comparing expected strings to tests strings during testing.
+
+
 ## func Init
 ``` go
 func Init(cfgKey string)
 ```
 Init initializes the log package.
-
-
-## func InitMongo
-``` go
-func InitMongo(cfg mongo.Config)
-```
-InitMongo initializes the mongodb connections for testing.
-
-
-## func NewRequest
-``` go
-func NewRequest(method, path string, body io.Reader) *http.Request
-```
-NewRequest used to setup a request for mocking API calls with httptreemux.
 
 
 ## func ResetLog

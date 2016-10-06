@@ -5,29 +5,28 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/cmd/xenia/cmddb"
 	"github.com/coralproject/shelf/cmd/xenia/cmdmask"
-	"github.com/coralproject/shelf/cmd/xenia/cmdpattern"
 	"github.com/coralproject/shelf/cmd/xenia/cmdquery"
 	"github.com/coralproject/shelf/cmd/xenia/cmdregex"
 	"github.com/coralproject/shelf/cmd/xenia/cmdrelationship"
 	"github.com/coralproject/shelf/cmd/xenia/cmdscript"
 	"github.com/coralproject/shelf/cmd/xenia/cmdview"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/spf13/cobra"
 )
 
-// Config environmental variables.
 const (
-	cfgLoggingLevel  = "LOGGING_LEVEL"
-	cfgMongoHost     = "MONGO_HOST"
-	cfgMongoAuthDB   = "MONGO_AUTHDB"
-	cfgMongoDB       = "MONGO_DB"
-	cfgMongoUser     = "MONGO_USER"
-	cfgMongoPassword = "MONGO_PASS"
-	cfgWebHost       = "WEB_HOST"
+
+	// cfgLoggingLevel is the key for the logging level.
+	cfgLoggingLevel = "LOGGING_LEVEL"
+
+	// cfgMongoURI is the key for the URI to the MongoDB service.
+	cfgMongoURI = "MONGO_URI"
+
+	// cfgWebHost is the key for the web host.
+	cfgWebHost = "WEB_HOST"
 )
 
 var xenia = &cobra.Command{
@@ -57,26 +56,20 @@ func main() {
 	if _, errHost := cfg.String(cfgWebHost); errHost != nil {
 		xenia.Println("Configuring MongoDB")
 
-		cfg := mongo.Config{
-			Host:     cfg.MustString(cfgMongoHost),
-			AuthDB:   cfg.MustString(cfgMongoAuthDB),
-			DB:       cfg.MustString(cfgMongoDB),
-			User:     cfg.MustString(cfgMongoUser),
-			Password: cfg.MustString(cfgMongoPassword),
-		}
+		mongoURI := cfg.MustURL(cfgMongoURI)
 
-		err := db.RegMasterSession("startup", cfg.DB, cfg)
+		err := db.RegMasterSession("startup", mongoURI.Path, mongoURI.String(), 0)
 		if err != nil {
 			xenia.Println("Unable to initialize MongoDB")
 			os.Exit(1)
 		}
 
-		conn, err = db.NewMGO("", cfg.DB)
+		conn, err = db.NewMGO("startup", mongoURI.Path)
 		if err != nil {
 			xenia.Println("Unable to get MongoDB session")
 			os.Exit(1)
 		}
-		defer conn.CloseMGO("")
+		defer conn.CloseMGO("startup")
 	}
 
 	xenia.AddCommand(
@@ -87,7 +80,6 @@ func main() {
 		cmdmask.GetCommands(),
 		cmdrelationship.GetCommands(),
 		cmdview.GetCommands(),
-		cmdpattern.GetCommands(),
 	)
 	xenia.Execute()
 }

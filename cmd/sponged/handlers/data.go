@@ -5,9 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
-	"github.com/cayleygraph/cayley"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
@@ -28,7 +27,7 @@ const defaultVersion = 1
 
 // Import receives POSTed data, itemizes it then imports it via the item API.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal.
-func (dataHandle) Import(c *app.Context) error {
+func (dataHandle) Import(c *web.Context) error {
 
 	// Unmarshall the data packet from the Request Body.
 	var dat map[string]interface{}
@@ -48,9 +47,16 @@ func (dataHandle) Import(c *app.Context) error {
 		return err
 	}
 
+	db := c.Ctx["DB"].(*db.DB)
+
+	graphHandle, err := db.GraphHandle(c.SessionID)
+	if err != nil {
+		return err
+	}
+
 	// Upsert the item into the items collection and add/remove necessary
 	// quads to/from the graph.
-	if err := sponge.Import(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), &itm); err != nil {
+	if err := sponge.Import(c.SessionID, db, graphHandle, &itm); err != nil {
 		return err
 	}
 

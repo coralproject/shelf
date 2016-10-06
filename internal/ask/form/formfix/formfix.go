@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/coralproject/shelf/internal/ask/form"
+	"github.com/coralproject/shelf/internal/platform/db"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )

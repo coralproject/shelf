@@ -11,8 +11,8 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Rewrite(c *app.Context) func(*http.Request)](#Rewrite)
-* [func RewritePath(c *app.Context, targetPath string) func(*http.Request)](#RewritePath)
+* [func Rewrite(c *web.Context) func(*http.Request)](#Rewrite)
+* [func RewritePath(c *web.Context, targetPath string) func(*http.Request)](#RewritePath)
 * [func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error](#SignServiceRequest)
 
 
@@ -23,25 +23,25 @@
 
 
 
-## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=513:561#L10)
+## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=509:557#L10)
 ``` go
-func Rewrite(c *app.Context) func(*http.Request)
+func Rewrite(c *web.Context) func(*http.Request)
 ```
 Rewrite will add service request headers to the request and add other
 standards.
 
 
 
-## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=967:1038#L32)
+## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=963:1034#L32)
 ``` go
-func RewritePath(c *app.Context, targetPath string) func(*http.Request)
+func RewritePath(c *web.Context, targetPath string) func(*http.Request)
 ```
 RewritePath will rewrite the path given a PathRewriter and return the request
 director function.
 
 
 
-## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=243:330#L2)
+## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=239:326#L2)
 ``` go
 func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
 ```

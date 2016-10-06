@@ -66,7 +66,7 @@ Set of error variables.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/query.go?s=9238:9300#L348)
+## <a name="Delete">func</a> [Delete](/src/target/query.go?s=9284:9346#L348)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
@@ -74,7 +74,7 @@ Delete is used to remove an existing Set document.
 
 
 
-## <a name="EnsureIndexes">func</a> [EnsureIndexes](/src/target/query.go?s=1196:1262#L38)
+## <a name="EnsureIndexes">func</a> [EnsureIndexes](/src/target/query.go?s=1242:1308#L38)
 ``` go
 func EnsureIndexes(context interface{}, db *db.DB, set *Set) error
 ```
@@ -84,7 +84,7 @@ regardless if one fails. Then reports all failures.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/query.go?s=5707:5780#L218)
+## <a name="GetAll">func</a> [GetAll](/src/target/query.go?s=5753:5826#L218)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) ([]Set, error)
 ```
@@ -92,7 +92,7 @@ GetAll retrieves a list of sets.
 
 
 
-## <a name="GetNames">func</a> [GetNames](/src/target/query.go?s=4579:4642#L172)
+## <a name="GetNames">func</a> [GetNames](/src/target/query.go?s=4625:4688#L172)
 ``` go
 func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
@@ -100,7 +100,7 @@ GetNames retrieves a list of query names.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/query.go?s=2412:2471#L85)
+## <a name="Upsert">func</a> [Upsert](/src/target/query.go?s=2458:2517#L85)
 ``` go
 func Upsert(context interface{}, db *db.DB, set *Set) error
 ```
@@ -224,14 +224,14 @@ Set contains the configuration details for a rule set.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/query.go?s=6792:6865#L260)
+### <a name="GetByName">func</a> [GetByName](/src/target/query.go?s=6838:6911#L260)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```
 GetByName retrieves the document for the specified Set.
 
 
-### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/query.go?s=7755:7839#L296)
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/query.go?s=7801:7885#L296)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (*Set, error)
 ```

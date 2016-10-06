@@ -1,13 +1,14 @@
 package pattern_test
 
 import (
+	"fmt"
+	"os"
 	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/wire/pattern"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 )
@@ -15,21 +16,26 @@ import (
 // prefix is what we are looking to delete after the test.
 const prefix = "PTEST_"
 
-func init() {
+func TestMain(m *testing.M) {
+	os.Exit(runTest(m))
+}
+
+// runTest initializes the environment for the tests and allows for
+// the proper return code if the test fails or succeeds.
+func runTest(m *testing.M) int {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
 	tests.Init("XENIA")
 
 	// Initialize MongoDB using the `tests.TestSession` as the name of the
 	// master session.
-	cfg := mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
+		return 1
 	}
-	tests.InitMongo(cfg)
+
+	return m.Run()
 }
 
 //==============================================================================
@@ -114,7 +120,7 @@ func TestUpsertDelete(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the pattern.
 
-			pat, err = pattern.GetByType(tests.Context, db, patterns[0].Type)
+			_, err = pattern.GetByType(tests.Context, db, patterns[0].Type)
 			if err == nil {
 				t.Fatalf("\t%s\tShould generate an error when getting a pattern with the deleted type : %s", tests.Failed, err)
 			}

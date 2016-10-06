@@ -31,7 +31,7 @@ ErrInvalidID occurs when an ID is not in a valid form.
 
 
 
-## <a name="CreateSubmission">func</a> [CreateSubmission](/src/target/ask.go?s=1938:2072#L61)
+## <a name="CreateSubmission">func</a> [CreateSubmission](/src/target/ask.go?s=1961:2095#L61)
 ``` go
 func CreateSubmission(context interface{}, db *db.DB, formID string, answers []submission.AnswerInput) (*submission.Submission, error)
 ```
@@ -40,7 +40,7 @@ of answers related to it.
 
 
 
-## <a name="DeleteSubmission">func</a> [DeleteSubmission](/src/target/ask.go?s=3900:3978#L140)
+## <a name="DeleteSubmission">func</a> [DeleteSubmission](/src/target/ask.go?s=3923:4001#L140)
 ``` go
 func DeleteSubmission(context interface{}, db *db.DB, id, formID string) error
 ```
@@ -48,7 +48,7 @@ DeleteSubmission deletes a submission as well as updating a form's stats.
 
 
 
-## <a name="UpsertForm">func</a> [UpsertForm](/src/target/ask.go?s=1006:1073#L25)
+## <a name="UpsertForm">func</a> [UpsertForm](/src/target/ask.go?s=1029:1096#L25)
 ``` go
 func UpsertForm(context interface{}, db *db.DB, f *form.Form) error
 ```

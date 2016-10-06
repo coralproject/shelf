@@ -47,7 +47,7 @@ ErrInvalidID occurs when an ID is not in a valid form.
 
 
 
-## <a name="Create">func</a> [Create](/src/target/gallery.go?s=2584:2651#L67)
+## <a name="Create">func</a> [Create](/src/target/gallery.go?s=2630:2697#L67)
 ``` go
 func Create(context interface{}, db *db.DB, gallery *Gallery) error
 ```
@@ -56,7 +56,7 @@ MongoDB database collection.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/gallery.go?s=12367:12427#L397)
+## <a name="Delete">func</a> [Delete](/src/target/gallery.go?s=12413:12473#L397)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -64,7 +64,7 @@ Delete removes the given Gallery with the ID provided.
 
 
 
-## <a name="List">func</a> [List](/src/target/gallery.go?s=10582:10657#L330)
+## <a name="List">func</a> [List](/src/target/gallery.go?s=10628:10703#L330)
 ``` go
 func List(context interface{}, db *db.DB, formID string) ([]Gallery, error)
 ```
@@ -73,7 +73,7 @@ collection.
 
 
 
-## <a name="Update">func</a> [Update](/src/target/gallery.go?s=11498:11576#L365)
+## <a name="Update">func</a> [Update](/src/target/gallery.go?s=11544:11622#L365)
 ``` go
 func Update(context interface{}, db *db.DB, id string, gallery *Gallery) error
 ```
@@ -83,7 +83,7 @@ collection.
 
 
 
-## <a name="Answer">type</a> [Answer](/src/target/gallery.go?s=1037:1420#L28)
+## <a name="Answer">type</a> [Answer](/src/target/gallery.go?s=1083:1466#L28)
 ``` go
 type Answer struct {
     SubmissionID    bson.ObjectId       `json:"submission_id" bson:"submission_id" validate:"required"`
@@ -104,7 +104,7 @@ Gallery.
 
 
 
-### <a name="Answer.Validate">func</a> (\*Answer) [Validate](/src/target/gallery.go?s=1474:1507#L36)
+### <a name="Answer.Validate">func</a> (\*Answer) [Validate](/src/target/gallery.go?s=1520:1553#L36)
 ``` go
 func (a *Answer) Validate() error
 ```
@@ -113,7 +113,7 @@ Validate checks the Anser value for consistency.
 
 
 
-## <a name="Gallery">type</a> [Gallery](/src/target/gallery.go?s=1646:2312#L45)
+## <a name="Gallery">type</a> [Gallery](/src/target/gallery.go?s=1692:2358#L45)
 ``` go
 type Gallery struct {
     ID          bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
@@ -134,7 +134,7 @@ Gallery is a Form that has been moved to a shared space.
 
 
 
-### <a name="AddAnswer">func</a> [AddAnswer](/src/target/gallery.go?s=7809:7908#L226)
+### <a name="AddAnswer">func</a> [AddAnswer](/src/target/gallery.go?s=7855:7954#L226)
 ``` go
 func AddAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```
@@ -142,7 +142,7 @@ AddAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
 
 
-### <a name="RemoveAnswer">func</a> [RemoveAnswer](/src/target/gallery.go?s=9204:9306#L278)
+### <a name="RemoveAnswer">func</a> [RemoveAnswer](/src/target/gallery.go?s=9250:9352#L278)
 ``` go
 func RemoveAnswer(context interface{}, db *db.DB, id, submissionID, answerID string) (*Gallery, error)
 ```
@@ -150,7 +150,7 @@ RemoveAnswer adds an answer to a form gallery. Duplicated answers
 are de-duplicated automatically and will not return an error.
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/gallery.go?s=3375:3449#L92)
+### <a name="Retrieve">func</a> [Retrieve](/src/target/gallery.go?s=3421:3495#L92)
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Gallery, error)
 ```
@@ -161,7 +161,7 @@ collection as well as hydrating the form gallery with form submissions.
 
 
 
-### <a name="Gallery.Validate">func</a> (\*Gallery) [Validate](/src/target/gallery.go?s=2368:2403#L57)
+### <a name="Gallery.Validate">func</a> (\*Gallery) [Validate](/src/target/gallery.go?s=2414:2449#L57)
 ``` go
 func (fg *Gallery) Validate() error
 ```

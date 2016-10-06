@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/regex"
 )
 
@@ -19,11 +19,11 @@ var Regex regexHandle
 
 // List returns all the existing regex in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (regexHandle) List(c *app.Context) error {
+func (regexHandle) List(c *web.Context) error {
 	rgxs, err := regex.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == regex.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -34,11 +34,11 @@ func (regexHandle) List(c *app.Context) error {
 
 // Retrieve returns the specified regex from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (regexHandle) Retrieve(c *app.Context) error {
+func (regexHandle) Retrieve(c *web.Context) error {
 	rgx, err := regex.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == regex.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -51,7 +51,7 @@ func (regexHandle) Retrieve(c *app.Context) error {
 
 // Upsert inserts or updates the posted Regex document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
-func (regexHandle) Upsert(c *app.Context) error {
+func (regexHandle) Upsert(c *web.Context) error {
 	var rgx regex.Regex
 	if err := json.NewDecoder(c.Request.Body).Decode(&rgx); err != nil {
 		return err
@@ -69,10 +69,10 @@ func (regexHandle) Upsert(c *app.Context) error {
 
 // Delete removes the specified Regex from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (regexHandle) Delete(c *app.Context) error {
+func (regexHandle) Delete(c *web.Context) error {
 	if err := regex.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"]); err != nil {
 		if err == regex.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}

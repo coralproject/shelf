@@ -2,15 +2,14 @@ package xenia_test
 
 import (
 	"encoding/json"
+	"fmt"
+	"os"
 	"strings"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	kitcayley "github.com/ardanlabs/kit/db/cayley"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
-	_ "github.com/cayleygraph/cayley/graph/mongo"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
@@ -26,21 +25,26 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func init() {
+func TestMain(m *testing.M) {
+	os.Exit(runTest(m))
+}
+
+// runTest initializes the environment for the tests and allows for
+// the proper return code if the test fails or succeeds.
+func runTest(m *testing.M) int {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
 	tests.Init("XENIA")
 
 	// Initialize MongoDB using the `tests.TestSession` as the name of the
 	// master session.
-	cfg := mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
+		return 1
 	}
-	tests.InitMongo(cfg)
+
+	return m.Run()
 }
 
 // setup initializes for each indivdual test.
@@ -52,13 +56,7 @@ func setup(t *testing.T) *db.DB {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	cayleyCfg := kitcayley.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
-	}
-	if err := db.OpenCayley(tests.Context, cayleyCfg); err != nil {
+	if err := db.OpenCayley(tests.Context, cfg.MustURL("MONGO_URI").String()); err != nil {
 		t.Fatalf("%s\tShould be able to get a Cayley connection : %v", tests.Failed, err)
 	}
 

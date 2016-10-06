@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strconv"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/ask"
 	"github.com/coralproject/shelf/internal/ask/form"
+	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 // formHandle maintains the set of handlers for the form api.
@@ -21,7 +21,7 @@ var Form formHandle
 
 // Upsert upserts a form into the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formHandle) Upsert(c *app.Context) error {
+func (formHandle) Upsert(c *web.Context) error {
 	var form form.Form
 	if err := json.NewDecoder(c.Request.Body).Decode(&form); err != nil {
 		return err
@@ -39,7 +39,7 @@ func (formHandle) Upsert(c *app.Context) error {
 
 // UpdateStatus updates the status of a form in the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formHandle) UpdateStatus(c *app.Context) error {
+func (formHandle) UpdateStatus(c *web.Context) error {
 	id := c.Params["id"]
 	status := c.Params["status"]
 
@@ -55,7 +55,7 @@ func (formHandle) UpdateStatus(c *app.Context) error {
 // List retrieves a list of forms based on the query parameters from the
 // store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formHandle) List(c *app.Context) error {
+func (formHandle) List(c *web.Context) error {
 	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
 	if err != nil {
 		limit = 0
@@ -77,7 +77,7 @@ func (formHandle) List(c *app.Context) error {
 
 // Retrieve retrieves a single form from the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formHandle) Retrieve(c *app.Context) error {
+func (formHandle) Retrieve(c *web.Context) error {
 	id := c.Params["id"]
 
 	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
@@ -91,7 +91,7 @@ func (formHandle) Retrieve(c *app.Context) error {
 
 // Delete removes a single form from the store.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (formHandle) Delete(c *app.Context) error {
+func (formHandle) Delete(c *web.Context) error {
 	id := c.Params["id"]
 
 	err := form.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), id)

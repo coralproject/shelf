@@ -14,7 +14,7 @@ Package handlers contains the handler logic for processing requests.
 
 ## <a name="pkg-index">Index</a>
 * [Variables](#pkg-variables)
-* [func Proxy(targetURL string, rewrite func(*app.Context) string) app.Handler](#Proxy)
+* [func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler](#Proxy)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -30,9 +30,9 @@ Version fronts the access to the ver service functionality.
 
 
 
-## <a name="Proxy">func</a> [Proxy](/src/target/proxy.go?s=386:461#L2)
+## <a name="Proxy">func</a> [Proxy](/src/target/proxy.go?s=382:457#L2)
 ``` go
-func Proxy(targetURL string, rewrite func(*app.Context) string) app.Handler
+func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler
 ```
 Proxy will setup a direct proxy inbetween this service and the destination
 service using the rewrite function if specified. If the rewrite function is
