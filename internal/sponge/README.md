@@ -25,7 +25,7 @@ Package sponge provides support for item importing.
 
 
 
-## <a name="Import">func</a> [Import](/src/target/sponge.go?s=410:497#L6)
+## <a name="Import">func</a> [Import](/src/target/sponge.go?s=397:484#L5)
 ``` go
 func Import(context interface{}, db *db.DB, graph *cayley.Handle, itm *item.Item) error
 ```
@@ -33,7 +33,7 @@ Import imports an item into the items collections and into the graph database.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/sponge.go?s=2397:2483#L76)
+## <a name="Remove">func</a> [Remove](/src/target/sponge.go?s=2384:2470#L75)
 ``` go
 func Remove(context interface{}, db *db.DB, graph *cayley.Handle, itemID string) error
 ```

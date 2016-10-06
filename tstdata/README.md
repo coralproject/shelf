@@ -31,7 +31,7 @@ going to store the xenia test data.
 
 
 
-## <a name="Docs">func</a> [Docs](/src/target/tstdata.go?s=601:646#L18)
+## <a name="Docs">func</a> [Docs](/src/target/tstdata.go?s=624:669#L18)
 ``` go
 func Docs() ([]map[string]interface{}, error)
 ```
@@ -39,7 +39,7 @@ Docs reads the fixture and returns the documents.
 
 
 
-## <a name="Drop">func</a> [Drop](/src/target/tstdata.go?s=1584:1604#L69)
+## <a name="Drop">func</a> [Drop](/src/target/tstdata.go?s=1607:1627#L69)
 ``` go
 func Drop(db *db.DB)
 ```
@@ -47,7 +47,7 @@ Drop drops the temp collection.
 
 
 
-## <a name="Generate">func</a> [Generate](/src/target/tstdata.go?s=1140:1170#L45)
+## <a name="Generate">func</a> [Generate](/src/target/tstdata.go?s=1163:1193#L45)
 ``` go
 func Generate(db *db.DB) error
 ```

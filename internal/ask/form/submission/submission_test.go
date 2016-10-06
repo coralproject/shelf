@@ -1,37 +1,40 @@
 package submission_test
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"testing"
 	"time"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
 	"github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
+	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 // prefix is what we are looking to delete after the test.
 const prefix = "FSTEST"
 
 func TestMain(m *testing.M) {
+	os.Exit(runTest(m))
+}
+
+// runTest initializes the environment for the tests and allows for
+// the proper return code if the test fails or succeeds.
+func runTest(m *testing.M) int {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	tests.Init("XENIA")
+	tests.Init("ASK")
 
 	// Initialize MongoDB using the `tests.TestSession` as the name of the
 	// master session.
-	cfg := mongo.Config{
-		Host:     cfg.MustString("MONGO_HOST"),
-		AuthDB:   cfg.MustString("MONGO_AUTHDB"),
-		DB:       cfg.MustString("MONGO_DB"),
-		User:     cfg.MustString("MONGO_USER"),
-		Password: cfg.MustString("MONGO_PASS"),
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
+		return 1
 	}
-	tests.InitMongo(cfg)
 
 	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
@@ -46,7 +49,7 @@ func TestMain(m *testing.M) {
 		log.Fatal("Can't ensure the database indexes")
 	}
 
-	os.Exit(m.Run())
+	return m.Run()
 }
 
 func setup(t *testing.T, fixture string) ([]submission.Submission, *db.DB) {

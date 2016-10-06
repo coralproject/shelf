@@ -46,7 +46,7 @@ ErrInvalidID occurs when an ID is not in a valid form.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/form.go?s=8309:8369#L253)
+## <a name="Delete">func</a> [Delete](/src/target/form.go?s=8355:8415#L253)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
@@ -55,7 +55,7 @@ database collection.
 
 
 
-## <a name="List">func</a> [List](/src/target/form.go?s=7687:7761#L233)
+## <a name="List">func</a> [List](/src/target/form.go?s=7733:7807#L233)
 ``` go
 func List(context interface{}, db *db.DB, limit, skip int) ([]Form, error)
 ```
@@ -63,7 +63,7 @@ List retrieves a list of forms from the MongodB database collection.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/form.go?s=3584:3645#L84)
+## <a name="Upsert">func</a> [Upsert](/src/target/form.go?s=3630:3691#L84)
 ``` go
 func Upsert(context interface{}, db *db.DB, form *Form) error
 ```
@@ -72,7 +72,7 @@ Upsert upserts the provided form into the MongoDB database collection.
 
 
 
-## <a name="Form">type</a> [Form](/src/target/form.go?s=2063:3265#L54)
+## <a name="Form">type</a> [Form](/src/target/form.go?s=2109:3311#L54)
 ``` go
 type Form struct {
     ID             bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
@@ -101,14 +101,14 @@ Steps, and help text relating to completing the Form.
 
 
 
-### <a name="Retrieve">func</a> [Retrieve](/src/target/form.go?s=6945:7016#L207)
+### <a name="Retrieve">func</a> [Retrieve](/src/target/form.go?s=6991:7062#L207)
 ``` go
 func Retrieve(context interface{}, db *db.DB, id string) (*Form, error)
 ```
 Retrieve retrieves the form from the MongodB database collection.
 
 
-### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/form.go?s=5936:6019#L170)
+### <a name="UpdateStatus">func</a> [UpdateStatus](/src/target/form.go?s=5982:6065#L170)
 ``` go
 func UpdateStatus(context interface{}, db *db.DB, id, status string) (*Form, error)
 ```
@@ -119,7 +119,7 @@ the MongodB database collection.
 
 
 
-### <a name="Form.Validate">func</a> (\*Form) [Validate](/src/target/form.go?s=3318:3349#L73)
+### <a name="Form.Validate">func</a> (\*Form) [Validate](/src/target/form.go?s=3364:3395#L73)
 ``` go
 func (f *Form) Validate() error
 ```
@@ -128,7 +128,7 @@ Validate checks the Form value for consistency.
 
 
 
-## <a name="Stats">type</a> [Stats](/src/target/form.go?s=1774:1846#L46)
+## <a name="Stats">type</a> [Stats](/src/target/form.go?s=1820:1892#L46)
 ``` go
 type Stats struct {
     Responses int `json:"responses" bson:"responses"`
@@ -142,7 +142,7 @@ Stats describes the statistics being recorded by a specific Form.
 
 
 
-### <a name="UpdateStats">func</a> [UpdateStats](/src/target/form.go?s=4840:4915#L129)
+### <a name="UpdateStats">func</a> [UpdateStats](/src/target/form.go?s=4886:4961#L129)
 ``` go
 func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error)
 ```
@@ -152,7 +152,7 @@ UpdateStats updates the Stats on a given Form.
 
 
 
-## <a name="Step">type</a> [Step](/src/target/form.go?s=1548:1703#L39)
+## <a name="Step">type</a> [Step](/src/target/form.go?s=1594:1749#L39)
 ``` go
 type Step struct {
     ID      string   `json:"id" bson:"_id"`
@@ -171,7 +171,7 @@ Step is a collection of Widget's.
 
 
 
-## <a name="Widget">type</a> [Widget](/src/target/form.go?s=1040:1509#L27)
+## <a name="Widget">type</a> [Widget](/src/target/form.go?s=1086:1555#L27)
 ``` go
 type Widget struct {
     ID          string      `json:"id" bson:"_id"`

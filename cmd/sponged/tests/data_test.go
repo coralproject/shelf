@@ -41,7 +41,7 @@ func TestUpsertData(t *testing.T) {
 
 		typ := "PTEST_comment"
 		url := "/v1/data/" + typ
-		r := tests.NewRequest("POST", url, bytes.NewBuffer(itemStrData))
+		r := httptest.NewRequest("POST", url, bytes.NewBuffer(itemStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -58,7 +58,7 @@ func TestUpsertData(t *testing.T) {
 		// Retrieve the item.
 
 		url = "/v1/item/" + fmt.Sprintf("%s_%v", typ, dat["id"])
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -90,7 +90,7 @@ func TestUpsertData(t *testing.T) {
 		// Delete the Item.
 
 		url = "/v1/item/" + fmt.Sprintf("%s_%v", typ, dat["id"])
-		r = tests.NewRequest("DELETE", url, nil)
+		r = httptest.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

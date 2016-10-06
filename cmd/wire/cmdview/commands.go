@@ -1,8 +1,8 @@
 package cmdview
 
 import (
-	"github.com/ardanlabs/kit/db"
 	"github.com/cayleygraph/cayley"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/spf13/cobra"
 )
 

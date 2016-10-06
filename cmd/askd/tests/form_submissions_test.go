@@ -25,7 +25,7 @@ func TextExport(t *testing.T) {
 	t.Log("Given the need download submissions in a CSV format.")
 	{
 		url := "/v1/form/57be0437e65ada0851000002/submission/export"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -63,7 +63,7 @@ func TestDownloadCSV(t *testing.T) {
 	t.Log("Given the need download submissions in a CSV format.")
 	{
 		url := "/v1/form/57be0437e65ada0851000002/submission/export?download=true"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

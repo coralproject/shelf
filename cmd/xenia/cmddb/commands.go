@@ -1,7 +1,7 @@
 package cmddb
 
 import (
-	"github.com/ardanlabs/kit/db"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/spf13/cobra"
 )
 

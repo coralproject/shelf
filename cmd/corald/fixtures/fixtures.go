@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 )
 
 // Load unmarshals the specified fixture into the provided
@@ -30,22 +30,22 @@ func Load(name string, v interface{}) error {
 }
 
 // Error will simply return the error to the calling request stack.
-func Error(err error) app.Handler {
+func Error(err error) web.Handler {
 
 	// Create this really, really simple handler.
-	return app.Handler(func(c *app.Context) error {
+	return web.Handler(func(c *web.Context) error {
 		return err
 	})
 }
 
 // NoContent simply responds with a HTTP Status Code of 204.
-func NoContent(c *app.Context) error {
+func NoContent(c *web.Context) error {
 	c.Respond(nil, http.StatusNoContent)
 	return nil
 }
 
 // Handler will serve a JSON payload as the endpoint response.
-func Handler(name string, code int) app.Handler {
+func Handler(name string, code int) web.Handler {
 
 	// Load the fixture for response.
 	var fixture interface{}
@@ -55,7 +55,7 @@ func Handler(name string, code int) app.Handler {
 
 	// Provide the handler which will just serve the json fixture
 	// out to the client.
-	return app.Handler(func(c *app.Context) error {
+	return web.Handler(func(c *web.Context) error {
 
 		// Respond with the fixture and the code.
 		c.Respond(fixture, code)

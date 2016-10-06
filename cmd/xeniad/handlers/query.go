@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/query"
 )
 
@@ -20,11 +20,11 @@ var Query queryHandle
 
 // List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (queryHandle) List(c *app.Context) error {
+func (queryHandle) List(c *web.Context) error {
 	sets, err := query.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == query.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -35,11 +35,11 @@ func (queryHandle) List(c *app.Context) error {
 
 // Retrieve returns the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (queryHandle) Retrieve(c *app.Context) error {
+func (queryHandle) Retrieve(c *web.Context) error {
 	set, err := query.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == query.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -52,7 +52,7 @@ func (queryHandle) Retrieve(c *app.Context) error {
 
 // Upsert inserts or updates the posted Set document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
-func (queryHandle) Upsert(c *app.Context) error {
+func (queryHandle) Upsert(c *web.Context) error {
 	var set query.Set
 	if err := json.NewDecoder(c.Request.Body).Decode(&set); err != nil {
 		return err
@@ -68,13 +68,13 @@ func (queryHandle) Upsert(c *app.Context) error {
 
 // EnsureIndexes makes sure indexes for the specified set exist.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
-func (queryHandle) EnsureIndexes(c *app.Context) error {
+func (queryHandle) EnsureIndexes(c *web.Context) error {
 	db := c.Ctx["DB"].(*db.DB)
 
 	set, err := query.GetByName(c.SessionID, db, c.Params["name"])
 	if err != nil {
 		if err == query.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -91,10 +91,10 @@ func (queryHandle) EnsureIndexes(c *app.Context) error {
 
 // Delete removes the specified Set from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (queryHandle) Delete(c *app.Context) error {
+func (queryHandle) Delete(c *web.Context) error {
 	if err := query.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"]); err != nil {
 		if err == query.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}

@@ -11,26 +11,17 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
 * [func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)](#DecodePrivateKey)
 * [func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)](#DecodePublicKey)
-* [func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, error)](#Midware)
 * [func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error](#SignRequest)
-* [type MidwareOpts](#MidwareOpts)
 * [type Signer](#Signer)
   * [func NewSigner(privateKeyBase64Str string) (Signer, error)](#NewSigner)
 
 
 #### <a name="pkg-files">Package files</a>
-[keys.go](/src/github.com/coralproject/shelf/internal/platform/auth/keys.go) [midware.go](/src/github.com/coralproject/shelf/internal/platform/auth/midware.go) [signer.go](/src/github.com/coralproject/shelf/internal/platform/auth/signer.go) 
+[keys.go](/src/github.com/coralproject/shelf/internal/platform/auth/keys.go) [signer.go](/src/github.com/coralproject/shelf/internal/platform/auth/signer.go) 
 
 
-
-## <a name="pkg-variables">Variables</a>
-``` go
-var ErrInvalidToken = errors.New("invalid token")
-```
-ErrInvalidToken is returned when the token provided is not valid.
 
 
 
@@ -52,41 +43,12 @@ decoding from base64 and parsing the PEM encoding.
 
 
 
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=584:667#L15)
-``` go
-func Midware(publicKeyBase64Str string, config MidwareOpts) (app.Middleware, error)
-```
-Midware handles token authentication for external authentication
-sources.
-
-
-
 ## <a name="SignRequest">func</a> [SignRequest](/src/target/signer.go?s=1062:1168#L29)
 ``` go
 func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error
 ```
 SignRequest will take a given signer, and adds a Authorization header
 with the token that is generated from the signer.
-
-
-
-
-## <a name="MidwareOpts">type</a> [MidwareOpts](/src/target/midware.go?s=333:502#L6)
-``` go
-type MidwareOpts struct {
-
-    // AllowQueryString is true when we want to allow accessing the tokenString
-    // from the query string as a fallback.
-    AllowQueryString bool
-}
-```
-MidwareOpts describes the options for configuring the Midware.
-
-
-
-
-
-
 
 
 

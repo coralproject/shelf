@@ -11,6 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
 * [func API(testing ...bool) http.Handler](#API)
 
 
@@ -18,10 +19,19 @@
 [routes.go](/src/github.com/coralproject/shelf/cmd/xeniad/routes/routes.go) 
 
 
+## <a name="pkg-constants">Constants</a>
+``` go
+const (
+
+    // Namespace is the key that is the prefix for configuration in the
+    // environment.
+    Namespace = "XENIA"
+)
+```
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1636:1674#L47)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1156:1194#L33)
 ``` go
 func API(testing ...bool) http.Handler
 ```

@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/wirefix.go?s=1731:1877#L67)
+## <a name="Add">func</a> [Add](/src/target/wirefix.go?s=1754:1900#L67)
 ``` go
 func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error
 ```
@@ -31,7 +31,7 @@ Add inserts relationships, views, and patterns for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/wirefix.go?s=549:641#L13)
+## <a name="Get">func</a> [Get](/src/target/wirefix.go?s=572:664#L13)
 ``` go
 func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error)
 ```
@@ -39,7 +39,7 @@ Get loads relationship, view, and pattern data based on *.json files.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/wirefix.go?s=2428:2492#L96)
+## <a name="Remove">func</a> [Remove](/src/target/wirefix.go?s=2451:2515#L96)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```

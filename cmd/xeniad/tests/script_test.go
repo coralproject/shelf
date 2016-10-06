@@ -23,7 +23,7 @@ func TestScripts(t *testing.T) {
 	t.Log("Given the need get a set of scripts.")
 	{
 		url := "/v1/script"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -65,7 +65,7 @@ func TestScriptByName(t *testing.T) {
 	t.Log("Given the need to get a specific script.")
 	{
 		url := "/v1/script/" + sPrefix + "_basic_script_pre"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -117,7 +117,7 @@ func TestScriptUpsert(t *testing.T) {
 		// Insert the Script.
 
 		url := "/v1/script"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -134,7 +134,7 @@ func TestScriptUpsert(t *testing.T) {
 		// Retrieve the Script.
 
 		url = "/v1/script/" + sPrefix + "_upsert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -169,7 +169,7 @@ func TestScriptUpsert(t *testing.T) {
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
 		url = "/v1/script"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -186,7 +186,7 @@ func TestScriptUpsert(t *testing.T) {
 		// Retrieve the Script.
 
 		url = "/v1/script/" + sPrefix + "_upsert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -237,7 +237,7 @@ func TestScriptDelete(t *testing.T) {
 		// Insert the Script.
 
 		url := "/v1/script"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(scrStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -254,7 +254,7 @@ func TestScriptDelete(t *testing.T) {
 		// Retrieve the Script.
 
 		url = "/v1/script/" + sPrefix + "_upsert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -281,7 +281,7 @@ func TestScriptDelete(t *testing.T) {
 		// Delete the Script.
 
 		url = "/v1/script/" + sPrefix + "_upsert"
-		r = tests.NewRequest("DELETE", url, nil)
+		r = httptest.NewRequest("DELETE", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -298,7 +298,7 @@ func TestScriptDelete(t *testing.T) {
 		// Retrieve the Script.
 
 		url = "/v1/script/" + sPrefix + "_upsert"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

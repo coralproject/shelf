@@ -51,7 +51,7 @@ Set of error variables.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/script.go?s=9697:9759#L365)
+## <a name="Delete">func</a> [Delete](/src/target/script.go?s=9743:9805#L365)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
@@ -59,7 +59,7 @@ Delete is used to remove an existing Set document.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/script.go?s=4275:4351#L166)
+## <a name="GetAll">func</a> [GetAll](/src/target/script.go?s=4321:4397#L166)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error)
 ```
@@ -67,7 +67,7 @@ GetAll retrieves a list of scripts.
 
 
 
-## <a name="GetByNames">func</a> [GetByNames](/src/target/script.go?s=6355:6436#L244)
+## <a name="GetByNames">func</a> [GetByNames](/src/target/script.go?s=6401:6482#L244)
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error)
 ```
@@ -75,7 +75,7 @@ GetByNames retrieves the documents for the specified names.
 
 
 
-## <a name="GetNames">func</a> [GetNames](/src/target/script.go?s=3138:3201#L120)
+## <a name="GetNames">func</a> [GetNames](/src/target/script.go?s=3184:3247#L120)
 ``` go
 func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
@@ -83,7 +83,7 @@ GetNames retrieves a list of script names.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/script.go?s=965:1026#L33)
+## <a name="Upsert">func</a> [Upsert](/src/target/script.go?s=1011:1072#L33)
 ``` go
 func Upsert(context interface{}, db *db.DB, scr Script) error
 ```
@@ -107,14 +107,14 @@ Script contain pre and post commands to use per set or per query.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/script.go?s=5379:5454#L208)
+### <a name="GetByName">func</a> [GetByName](/src/target/script.go?s=5425:5500#L208)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (Script, error)
 ```
 GetByName retrieves the document for the specified name.
 
 
-### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/script.go?s=8162:8248#L313)
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/script.go?s=8208:8294#L313)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Script, error)
 ```

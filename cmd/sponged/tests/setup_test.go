@@ -3,24 +3,19 @@ package tests
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/cmd/sponged/routes"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 )
 
-var a *app.App
-
-func init() {
-	// The call to API will force the init() function to initialize
-	// cfg, log and mongodb.
-	a = routes.API().(*app.App)
-}
+var a http.Handler
 
 //==============================================================================
 
@@ -32,27 +27,30 @@ func TestMain(m *testing.M) {
 // runTest initializes the environment for the tests and allows for
 // the proper return code if the test fails or succeeds.
 func runTest(m *testing.M) int {
-	// In order to get a Mongo session we need the name of the database we
-	// are using. The web framework middleware is using this by convention.
-	dbName, err := cfg.String("MONGO_DB")
-	if err != nil {
-		fmt.Println("MongoDB is not configured")
+
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
 		return 1
 	}
 
-	db, err := db.NewMGO("context", dbName)
+	// Setup the app for performing tests.
+	a = routes.API()
+
+	// Snatch the mongo session so we can create some test data.
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
 		fmt.Println("Unable to get Mongo session")
 		return 1
 	}
+	defer db.CloseMGO(tests.Context)
 
-	defer db.CloseMGO("context")
+	loadItems(tests.Context, db)
+	defer itemfix.Remove(tests.Context, db, itemPrefix)
 
-	loadItems("context", db)
-	defer itemfix.Remove("context", db, itemPrefix)
-
-	loadPatterns("context", db)
-	defer patternfix.Remove("context", db, patternPrefix)
+	loadPatterns(tests.Context, db)
+	defer patternfix.Remove(tests.Context, db, patternPrefix)
 
 	return m.Run()
 }

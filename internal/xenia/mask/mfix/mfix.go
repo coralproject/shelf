@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/mask"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"

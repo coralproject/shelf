@@ -5,8 +5,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/mask"
 	"gopkg.in/mgo.v2/bson"
 )

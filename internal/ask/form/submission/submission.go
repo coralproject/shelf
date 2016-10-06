@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/platform/db/mongo"
 
 	validator "gopkg.in/bluesuncorp/validator.v8"
 	mgo "gopkg.in/mgo.v2"

@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
 	"github.com/coralproject/shelf/cmd/corald/routes"
 )
@@ -48,7 +48,7 @@ func main() {
 		writeTimeout = 30 * time.Second
 	)
 
-	if err := app.Run(":16180", routes.API(), readTimeout, writeTimeout); err != nil {
+	if err := web.Run(":16180", routes.API(), readTimeout, writeTimeout); err != nil {
 		log.Error("shutdown", "Init", err, "App Shutdown")
 		os.Exit(1)
 	}

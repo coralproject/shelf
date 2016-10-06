@@ -26,7 +26,7 @@ of commands.
 
 
 
-## <a name="Exec">func</a> [Exec](/src/target/xenia.go?s=670:765#L19)
+## <a name="Exec">func</a> [Exec](/src/target/xenia.go?s=693:788#L19)
 ``` go
 func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result
 ```

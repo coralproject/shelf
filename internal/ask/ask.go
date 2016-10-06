@@ -7,11 +7,11 @@ import (
 	validator "gopkg.in/bluesuncorp/validator.v8"
 	"gopkg.in/mgo.v2/bson"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/gallery"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
+	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 //==============================================================================

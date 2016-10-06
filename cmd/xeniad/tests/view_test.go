@@ -24,7 +24,7 @@ func TestListViews(t *testing.T) {
 	t.Log("Given the need get a set of views.")
 	{
 		url := "/v1/view"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -66,7 +66,7 @@ func TestRetrieveView(t *testing.T) {
 	t.Log("Given the need to get a specific view.")
 	{
 		url := "/v1/view/" + viewPrefix + "thread"
-		r := tests.NewRequest("GET", url, nil)
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -118,7 +118,7 @@ func TestUpsertView(t *testing.T) {
 		// Insert the View.
 
 		url := "/v1/view"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(viewStrData))
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(viewStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -135,7 +135,7 @@ func TestUpsertView(t *testing.T) {
 		// Retrieve the View.
 
 		url = "/v1/view/" + viewPrefix + "comments%20from%20authors%20flagged%20by%20a%20user"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -173,7 +173,7 @@ func TestUpsertView(t *testing.T) {
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
 		url = "/v1/view"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(viewStrData))
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(viewStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -190,7 +190,7 @@ func TestUpsertView(t *testing.T) {
 		// Retrieve the View.
 
 		url = "/v1/view/" + viewPrefix + "better_name"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -228,7 +228,7 @@ func TestDeleteView(t *testing.T) {
 		// Delete the View.
 
 		url := "/v1/view/" + viewPrefix + "thread"
-		r := tests.NewRequest("DELETE", url, nil)
+		r := httptest.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -245,7 +245,7 @@ func TestDeleteView(t *testing.T) {
 		// Retrieve the View.
 
 		url = "/v1/view/" + viewPrefix + "thread"
-		r = tests.NewRequest("GET", url, nil)
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

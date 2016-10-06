@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/formfix.go?s=665:728#L27)
+## <a name="Add">func</a> [Add](/src/target/formfix.go?s=688:751#L27)
 ``` go
 func Add(context interface{}, db *db.DB, fms []form.Form) error
 ```
@@ -31,7 +31,7 @@ Add inserts forms for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/formfix.go?s=354:399#L10)
+## <a name="Get">func</a> [Get](/src/target/formfix.go?s=377:422#L10)
 ``` go
 func Get(fixture string) ([]form.Form, error)
 ```
@@ -39,7 +39,7 @@ Get loads form data based on forms.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/formfix.go?s=911:976#L38)
+## <a name="Remove">func</a> [Remove](/src/target/formfix.go?s=934:999#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
