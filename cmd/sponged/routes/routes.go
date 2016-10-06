@@ -97,5 +97,10 @@ func routes(w *web.Web) {
 	w.Handle("POST", "/v1/item", handlers.Item.Import)
 	w.Handle("DELETE", "/v1/item/:id", handlers.Item.Remove)
 
+	w.Handle("GET", "/v1/pattern", handlers.Pattern.List)
+	w.Handle("PUT", "/v1/pattern", handlers.Pattern.Upsert)
+	w.Handle("GET", "/v1/pattern/:type", handlers.Pattern.Retrieve)
+	w.Handle("DELETE", "/v1/pattern/:type", handlers.Pattern.Delete)
+
 	w.Handle("POST", "/v1/data/:type", handlers.Data.Import)
 }

@@ -7,6 +7,7 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/cmd/sponge/cmditem"
+	"github.com/coralproject/shelf/cmd/sponge/cmdpattern"
 	"github.com/spf13/cobra"
 )
 
@@ -46,7 +47,10 @@ func main() {
 	sponge.Println("Using log level", logLevel())
 
 	// Add the item commands to the CLI tool.
-	sponge.AddCommand(cmditem.GetCommands())
+	sponge.AddCommand(
+		cmditem.GetCommands(),
+		cmdpattern.GetCommands(),
+	)
 
 	// Execute the command.
 	sponge.Execute()

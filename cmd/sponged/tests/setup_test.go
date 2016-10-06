@@ -46,10 +46,16 @@ func runTest(m *testing.M) int {
 	}
 	defer db.CloseMGO(tests.Context)
 
-	loadItems(tests.Context, db)
+	if err := loadItems(tests.Context, db); err != nil {
+		fmt.Println("Could not load items")
+		return 1
+	}
 	defer itemfix.Remove(tests.Context, db, itemPrefix)
 
-	loadPatterns(tests.Context, db)
+	if err := loadPatterns(tests.Context, db); err != nil {
+		fmt.Println("Could not load patterns")
+		return 1
+	}
 	defer patternfix.Remove(tests.Context, db, patternPrefix)
 
 	return m.Run()
