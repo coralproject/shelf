@@ -142,13 +142,4 @@ func routes(w *web.Web) {
 
 	w.Handle("POST", "/v1/item",
 		handlers.Proxy(spongedURL, func(c *web.Context) string { return "/v1/item" }))
-
-	// //Get a single item and all related items
-	// a.Handle("GET", "/v1/items/:type/:item_id",
-	// 	handlers.Proxy(xeniadURL,
-	// 		func(c *app.Context) string {
-	// 			return "/v1/exec?view=item-on-a-item&item=" + params["item_id"] + "&query_set=filter_by_type&type=" + params["type"]
-	// 		}))
-	//fixtures.Handler("items/items", http.StatusOK))
-	// /v1/exec?view=comments-on-a-comment&item=57c486628835dfd623fb9349
 }
