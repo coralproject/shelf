@@ -113,41 +113,23 @@ func routes(w *web.Web) {
 
 	// Execute the :query_set on the view :view_name on this :item_key.
 	w.Handle("GET", "/v1/exec/:query_set/view/:view_name/:item_key",
-		handlers.Proxy(xeniadURL,
-			func(c *web.Context) string {
-				return "/v1/exec/" + c.Params["query_set"]
-			}))
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
 	// Execute xenia queries directly.
 	w.Handle("GET", "/v1/exec/:query_set",
-		handlers.Proxy(xeniadURL,
-			func(c *web.Context) string {
-				return "/v1/exec/" + c.Params["query_set"]
-			}))
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
 	// Send a new query to xenia.
 	w.Handle("PUT", "/v1/query",
-		handlers.Proxy(xeniadURL,
-			func(c *web.Context) string {
-				return "/v1/query"
-			}))
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/query" }))
 
 	// Execute a custom xenia query.
 	w.Handle("POST", "/v1/exec",
-		handlers.Proxy(xeniadURL,
-			func(c *web.Context) string {
-				return "/v1/exec"
-			}))
+		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
 	w.Handle("PUT", "/v1/item",
-		handlers.Proxy(spongedURL,
-			func(c *web.Context) string {
-				return "/v1/item"
-			}))
+		handlers.Proxy(spongedURL, func(c *web.Context) string { return "/v1/item" }))
 
 	w.Handle("POST", "/v1/item",
-		handlers.Proxy(spongedURL,
-			func(c *web.Context) string {
-				return "/v1/item"
-			}))
+		handlers.Proxy(spongedURL, func(c *web.Context) string { return "/v1/item" }))
 }
