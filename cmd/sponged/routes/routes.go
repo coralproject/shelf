@@ -13,6 +13,8 @@ import (
 	"github.com/coralproject/shelf/internal/platform/db"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
 	"github.com/coralproject/shelf/internal/platform/midware/cayley"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
@@ -51,10 +53,10 @@ func API() http.Handler {
 		os.Exit(1)
 	}
 
-	w := web.New()
+	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
-	if err != nil {
+	if err != nil || publicKey == "" {
 		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 

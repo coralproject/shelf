@@ -12,6 +12,8 @@ import (
 	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/auth"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 )
 
 const (
@@ -44,10 +46,10 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	w := web.New()
+	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
-	if err != nil {
+	if err != nil || publicKey == "" {
 		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 
@@ -68,7 +70,7 @@ func API() http.Handler {
 	}
 
 	platformPrivateKey, err := cfg.String(cfgPlatformPrivateKey)
-	if err != nil {
+	if err != nil || platformPrivateKey == "" {
 		log.User("startup", "Init", "%s is missing, downstream platform authentication is disabled", cfgPlatformPrivateKey)
 	}
 

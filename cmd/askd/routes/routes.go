@@ -14,6 +14,8 @@ import (
 	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/platform/midware/auth"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
@@ -63,7 +65,7 @@ func API() http.Handler {
 		os.Exit(1)
 	}
 
-	w := web.New(mongo.Midware(mongoURI))
+	w := web.New(logm.Midware, errorm.Midware, mongo.Midware(mongoURI))
 
 	// Load in the recaptcha secret from the config.
 	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {

@@ -13,6 +13,8 @@ import (
 	"github.com/coralproject/shelf/internal/platform/db"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
 	"github.com/coralproject/shelf/internal/platform/midware/cayley"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
@@ -40,7 +42,7 @@ func init() {
 //==============================================================================
 
 // API returns a handler for a set of routes.
-func API(testing ...bool) http.Handler {
+func API() http.Handler {
 	mongoURI := cfg.MustURL(cfgMongoURI)
 
 	// The web framework middleware for Mongo is using the name of the
@@ -51,10 +53,10 @@ func API(testing ...bool) http.Handler {
 		os.Exit(1)
 	}
 
-	w := web.New()
+	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
-	if err != nil {
+	if err != nil || publicKey == "" {
 		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
 	}
 

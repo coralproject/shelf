@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"time"
 
+	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/corald/handlers"
@@ -20,6 +21,9 @@ var (
 	BuildDate   = "<unknown>"
 	IntVersion  = "201606291000"
 )
+
+// cfgHost is the key to the config option to where the service will bind to.
+const cfgHost = "HOST"
 
 func main() {
 	log.User("startup", "Init", "Revision     : %q", GitRevision)
@@ -48,7 +52,11 @@ func main() {
 		writeTimeout = 30 * time.Second
 	)
 
-	if err := web.Run(":16180", routes.API(), readTimeout, writeTimeout); err != nil {
+	host := cfg.MustString(cfgHost)
+
+	log.User("startup", "Init", "Binding web service to %s", host)
+
+	if err := web.Run(host, routes.API(), readTimeout, writeTimeout); err != nil {
 		log.Error("shutdown", "Init", err, "App Shutdown")
 		os.Exit(1)
 	}
