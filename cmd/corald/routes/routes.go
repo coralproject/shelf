@@ -108,6 +108,7 @@ func routes(w *web.Web) {
 	spongedURL := cfg.MustURL(cfgSpongdURL).String()
 	xeniadURL := cfg.MustURL(cfgXeniadURL).String()
 
+	// CRU- for forms
 	w.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
 	w.Handle("POST", "/v1/form", fixtures.Handler("forms/form", http.StatusCreated))
 	w.Handle("GET", "/v1/form/:form_id", fixtures.Handler("forms/form", http.StatusOK))
@@ -117,15 +118,22 @@ func routes(w *web.Web) {
 	w.Handle("GET", "/v1/exec/:query_set/view/:view_name/:item_key",
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
+	// Get all the items from the view :view_name on this :item_key.
+	w.Handle("GET", "/v1/exec/view/:view_name/:item_key",
+		handlers.Proxy(xeniadURL,
+			func(c *web.Context) string {
+				return "/v1/exec/view/" + c.Params["view_name"] + "/" + c.Params["item_key"]
+			}))
+
 	// Execute xenia queries directly.
 	w.Handle("GET", "/v1/exec/:query_set",
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
-	// Send a new query to xenia.
+	// Send a new query to xenia. ********* TEMPORAL *********
 	w.Handle("PUT", "/v1/query",
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/query" }))
 
-	// Execute a custom xenia query.
+	// Execute a custom xenia query. ********* TEMPORAL *********
 	w.Handle("POST", "/v1/exec",
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
