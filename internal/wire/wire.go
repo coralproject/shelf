@@ -213,6 +213,17 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 	return graphPath, nil
 }
 
+// EmbeddedRel includes information needed to embed an indication of a relationship
+// into an item in a view.
+type EmbeddedRel struct {
+	ItemID     string
+	Predicate  string
+	EmbeddedID string
+}
+
+// EmbeddedRels is a slice of EmbeddedRel.
+type EmbeddedRels []EmbeddedRel
+
 // viewIDs retrieves the item IDs associated with the view.
 func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) ([]string, error) {
 
@@ -231,6 +242,7 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 
 	// Retrieve the end path and tagged item IDs.
 	var ids []string
+	var embeds EmbeddedRels
 	for it.Next() {
 
 		// Tag the results.
@@ -238,11 +250,24 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 		it.TagResults(resultTags)
 
 		// Extract the tagged item IDs.
+		taggedIDs := make(map[string]string)
 		for _, tag := range viewTags {
 			if t, ok := resultTags[tag]; ok {
+
+				// Append the view item ID.
 				ids = append(ids, quad.NativeOf(graphDB.NameOf(t)).(string))
+
+				// Add the tagged ID to the tagged map for embedded
+				// relationship extraction.
+				taggedIDs[quad.NativeOf(graphDB.NameOf(t)).(string)] = tag
+				embed, err := extractEmbeddedRels(v, taggedIDs)
+				embeds = append(embeds, embed...)
 			}
 		}
+
+		// Extract any IDs that need to be embedded in view items.
+		embed, err := extractEmbeddedRels(v, taggedIDs)
+		embeds = append(embeds, embed...)
 	}
 	if it.Err() != nil {
 		return ids, it.Err()
@@ -266,6 +291,11 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 	}
 
 	return ids, nil
+}
+
+// extractEmbeddedRel extracts a relationship that needs to be embedded on a view item.
+func extractEmbeddedRels(v *view.View, taggedIDs map[string]string) (EmbeddedRels, error) {
+
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
