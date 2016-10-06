@@ -1,7 +1,7 @@
 
 
-# log
-`import "github.com/coralproject/shelf/internal/platform/midware/log"`
+# error
+`import "github.com/coralproject/shelf/internal/platform/midware/error"`
 
 * [Overview](#pkg-overview)
 * [Index](#pkg-index)
@@ -15,17 +15,17 @@
 
 
 #### <a name="pkg-files">Package files</a>
-[midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/log/midware.go) 
+[midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/error/midware.go) 
 
 
 
 
 
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=138:180#L1)
+## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=136:178#L1)
 ``` go
 func Midware(next web.Handler) web.Handler
 ```
-Midware handles the request logging.
+Midware for catching errors.
 
 
 

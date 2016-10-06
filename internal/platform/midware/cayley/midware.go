@@ -26,11 +26,11 @@ func Midware(mongoURI *url.URL) web.Middleware {
 				return web.ErrDBNotConfigured
 			}
 
-			log.Dev(c.SessionID, "Midware", "Capture Cayley Session")
+			log.Dev(c.SessionID, "cayley : Midware", "Capture Cayley Session")
 
 			// Close the Cayley session when the handler returns.
 			defer func() {
-				log.Dev(c.SessionID, "Midware", "Release Cayley Session")
+				log.Dev(c.SessionID, "cayley : Midware", "Release Cayley Session")
 				db.CloseCayley(c.SessionID)
 			}()
 

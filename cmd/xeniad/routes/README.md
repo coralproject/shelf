@@ -12,7 +12,7 @@
 
 ## <a name="pkg-index">Index</a>
 * [Constants](#pkg-constants)
-* [func API(testing ...bool) http.Handler](#API)
+* [func API() http.Handler](#API)
 
 
 #### <a name="pkg-files">Package files</a>
@@ -31,9 +31,9 @@ const (
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1156:1194#L33)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1296:1319#L35)
 ``` go
-func API(testing ...bool) http.Handler
+func API() http.Handler
 ```
 API returns a handler for a set of routes.
 
