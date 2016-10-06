@@ -24,7 +24,7 @@ Package cayley provides support for the cayley Graph DB with a Mongo backend.
 
 
 
-## <a name="InitQuadStore">func</a> [InitQuadStore](/src/target/cayley.go?s=1375:1416#L46)
+## <a name="InitQuadStore">func</a> [InitQuadStore](/src/target/cayley.go?s=1404:1445#L48)
 ``` go
 func InitQuadStore(mongoURL string) error
 ```
@@ -32,7 +32,7 @@ InitQuadStore initializes the quadstore.
 
 
 
-## <a name="New">func</a> [New](/src/target/cayley.go?s=919:968#L26)
+## <a name="New">func</a> [New](/src/target/cayley.go?s=948:997#L28)
 ``` go
 func New(mongoURL string) (*cayley.Handle, error)
 ```

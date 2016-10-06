@@ -107,7 +107,7 @@ changes to be delivered to the server.
 
 
 
-### <a name="DB.CloseCayley">func</a> (\*DB) [CloseCayley](/src/target/cayley.go?s=964:1010#L28)
+### <a name="DB.CloseCayley">func</a> (\*DB) [CloseCayley](/src/target/cayley.go?s=968:1014#L28)
 ``` go
 func (db *DB) CloseCayley(context interface{})
 ```
@@ -161,7 +161,7 @@ ExecuteMGOTimeout is used to execute MongoDB commands with a timeout.
 
 
 
-### <a name="DB.GraphHandle">func</a> (\*DB) [GraphHandle](/src/target/cayley.go?s=755:825#L19)
+### <a name="DB.GraphHandle">func</a> (\*DB) [GraphHandle](/src/target/cayley.go?s=759:829#L19)
 ``` go
 func (db *DB) GraphHandle(context interface{}) (*cayley.Handle, error)
 ```
@@ -170,7 +170,7 @@ GraphHandle returns the Cayley graph handle for graph interactions.
 
 
 
-### <a name="DB.OpenCayley">func</a> (\*DB) [OpenCayley](/src/target/cayley.go?s=501:569#L8)
+### <a name="DB.OpenCayley">func</a> (\*DB) [OpenCayley](/src/target/cayley.go?s=503:571#L8)
 ``` go
 func (db *DB) OpenCayley(context interface{}, mongoURL string) error
 ```
