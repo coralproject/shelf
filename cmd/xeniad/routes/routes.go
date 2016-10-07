@@ -82,7 +82,7 @@ func API() http.Handler {
 	routes(w)
 
 	log.Dev("startup", "Init", "Initalizing CORS")
-	w.CORS()
+	w.Use(w.CORS())
 
 	return w
 }
