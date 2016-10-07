@@ -119,9 +119,11 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 // validateStartType verifies the start type of a view path.
 func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 
-	// Extract the first level relationship predicate.
+	// Declare variables to track the first level relationship predicate.
 	var firstRel string
 	var firstDir string
+
+	// Extract the first level relationship predicate.
 	for _, segment := range v.Path {
 		if segment.Level == 1 {
 			firstRel = segment.Predicate
@@ -162,9 +164,14 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 	// Sort the view Path value.
 	sort.Sort(v.Path)
 
-	// Loop over the path segments translating the path.
+	// graphPath will contain the entire strict graph path.
 	var graphPath *path.Path
+
+	// subPaths will contain each sub path of the full graph path,
+	// as a separate graph path.
 	var subPaths []path.Path
+
+	// Loop over the path segments translating the path.
 	level := 1
 	for _, segment := range v.Path {
 
