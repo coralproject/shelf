@@ -78,11 +78,11 @@ func API() http.Handler {
 
 	w.Use(mongo.Midware(mongoURI))
 
-	log.Dev("startup", "Init", "Initalizing routes")
-	routes(w)
-
 	log.Dev("startup", "Init", "Initalizing CORS")
 	w.Use(w.CORS())
+
+	log.Dev("startup", "Init", "Initalizing routes")
+	routes(w)
 
 	return w
 }

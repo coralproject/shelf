@@ -75,12 +75,11 @@ func API() http.Handler {
 		log.Dev("startup", "Init", "Recaptcha Disabled")
 	}
 
-	log.Dev("startup", "Init", "Initalizing routes")
-
-	routes(w)
-
 	log.Dev("startup", "Init", "Initalizing CORS")
 	w.Use(w.CORS())
+
+	log.Dev("startup", "Init", "Initalizing routes")
+	routes(w)
 
 	return w
 }

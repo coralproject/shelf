@@ -79,11 +79,11 @@ func API() http.Handler {
 	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
 	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
-	log.Dev("startup", "Init", "Initalizing routes")
-	routes(w)
-
 	log.Dev("startup", "Init", "Initalizing CORS")
 	w.Use(w.CORS())
+
+	log.Dev("startup", "Init", "Initalizing routes")
+	routes(w)
 
 	return w
 }
