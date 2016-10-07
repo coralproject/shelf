@@ -28,7 +28,7 @@ func Rewrite(c *web.Context) func(*http.Request) {
 		}
 
 		// Sign the service request with the signer.
-		if err := SignServiceRequest(c, signer, r); err != nil {
+		if err := SignServiceRequest(c.SessionID, signer, r); err != nil {
 			return
 		}
 
