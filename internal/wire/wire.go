@@ -164,6 +164,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 
 	// Loop over the path segments translating the path.
 	var graphPath *path.Path
+	var subPaths []path.Path
 	level := 1
 	for _, segment := range v.Path {
 
@@ -190,6 +191,9 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 				graphPath = graphPath.Clone().Tag(segment.Tag)
 			}
 
+			// Track this as a subpath.
+			subPaths = append(subPaths, *graphPath)
+
 			level++
 			continue
 		}
@@ -207,10 +211,28 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 			graphPath = graphPath.Clone().Tag(segment.Tag)
 		}
 
+		// Add this as a subpath.
+		subPaths = append(subPaths, *graphPath)
+
 		level++
 	}
 
-	return graphPath, nil
+	// If we are forcing a strict path, return only the resulting or
+	// tagged items along the full path.
+	if v.StrictPath {
+		return graphPath, nil
+	}
+
+	// Build the outputPath.
+	var outputPath *path.Path
+	outputPath = &subPaths[0]
+	if len(subPaths) > 1 {
+		for _, subPath := range subPaths[1:] {
+			outputPath = outputPath.Or(&subPath)
+		}
+	}
+
+	return outputPath, nil
 }
 
 // viewIDs retrieves the item IDs associated with the view.
