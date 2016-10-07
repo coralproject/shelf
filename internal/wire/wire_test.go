@@ -11,6 +11,7 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
+	"github.com/cayleygraph/cayley/graph"
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/platform/db"
 	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
@@ -57,6 +58,13 @@ func runTest(m *testing.M) int {
 
 // loadTestData adds all the test data into the database.
 func loadTestData(context interface{}, db *db.DB) error {
+
+	// Make sure the old data is clear.
+	if err := unloadTestData(context, db); err != nil {
+		if !graph.IsQuadNotExist(err) {
+			return err
+		}
+	}
 
 	// -----------------------------------------------------------
 	// Load example items, relationships, views, and patterns.
