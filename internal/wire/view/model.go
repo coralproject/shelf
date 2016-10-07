@@ -58,6 +58,7 @@ type View struct {
 	Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
 	StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
 	ReturnRoot bool   `bson:"return_root,omitempty" json:"return_root,omitempty"`
+	StrictPath bool   `bson:"strict_path,omitempty" json:"strict_path,omitempty"`
 	Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 

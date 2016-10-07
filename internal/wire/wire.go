@@ -119,9 +119,11 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 // validateStartType verifies the start type of a view path.
 func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 
-	// Extract the first level relationship predicate.
+	// Declare variables to track the first level relationship predicate.
 	var firstRel string
 	var firstDir string
+
+	// Extract the first level relationship predicate.
 	for _, segment := range v.Path {
 		if segment.Level == 1 {
 			firstRel = segment.Predicate
@@ -162,8 +164,14 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 	// Sort the view Path value.
 	sort.Sort(v.Path)
 
-	// Loop over the path segments translating the path.
+	// graphPath will contain the entire strict graph path.
 	var graphPath *path.Path
+
+	// subPaths will contain each sub path of the full graph path,
+	// as a separate graph path.
+	var subPaths []path.Path
+
+	// Loop over the path segments translating the path.
 	level := 1
 	for _, segment := range v.Path {
 
@@ -190,6 +198,9 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 				graphPath = graphPath.Clone().Tag(segment.Tag)
 			}
 
+			// Track this as a subpath.
+			subPaths = append(subPaths, *graphPath)
+
 			level++
 			continue
 		}
@@ -207,10 +218,28 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 			graphPath = graphPath.Clone().Tag(segment.Tag)
 		}
 
+		// Add this as a subpath.
+		subPaths = append(subPaths, *graphPath)
+
 		level++
 	}
 
-	return graphPath, nil
+	// If we are forcing a strict path, return only the resulting or
+	// tagged items along the full path.
+	if v.StrictPath {
+		return graphPath, nil
+	}
+
+	// Build the outputPath.
+	var outputPath *path.Path
+	outputPath = &subPaths[0]
+	if len(subPaths) > 1 {
+		for _, subPath := range subPaths[1:] {
+			outputPath = outputPath.Or(&subPath)
+		}
+	}
+
+	return outputPath, nil
 }
 
 // viewIDs retrieves the item IDs associated with the view.

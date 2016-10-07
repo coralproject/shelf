@@ -152,9 +152,16 @@ func TestGetAll(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to get all patterns.", tests.Success)
 
-			if !reflect.DeepEqual(patterns, patternsBack) {
+			var filteredPats []pattern.Pattern
+			for _, pat := range patternsBack {
+				if pat.Type[0:len(prefix)] == prefix {
+					filteredPats = append(filteredPats, pat)
+				}
+			}
+
+			if !reflect.DeepEqual(patterns, filteredPats) {
 				t.Logf("\t%+v", patterns)
-				t.Logf("\t%+v", patternsBack)
+				t.Logf("\t%+v", filteredPats)
 				t.Fatalf("\t%s\tShould be able to get back the same patterns.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get back the same patterns.", tests.Success)
