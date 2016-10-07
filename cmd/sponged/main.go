@@ -52,7 +52,7 @@ func main() {
 		writeTimeout = 30 * time.Second
 	)
 
-	host := cfg.MustURL(cfgHost).Host
+	host := cfg.MustString(cfgHost)
 
 	log.User("startup", "Init", "Binding web service to %s", host)
 
