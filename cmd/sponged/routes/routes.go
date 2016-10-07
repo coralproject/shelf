@@ -30,6 +30,9 @@ const (
 	// cfgAuthPublicKey is the key for the public key used for verifying the
 	// inbound requests.
 	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
+
+	// cfgEnableCORS is set the key to the state for CORS on the service.
+	cfgEnableCORS = "ENABLE_CORS"
 )
 
 func init() {
@@ -79,11 +82,15 @@ func API() http.Handler {
 	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
 	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
+	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
+		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
+		w.Use(w.CORS())
+	} else {
+		log.Dev("startup", "Init", "CORS Disabled")
+	}
+
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(w)
-
-	log.Dev("startup", "Init", "Initalizing CORS")
-	w.Use(w.CORS())
 
 	return w
 }

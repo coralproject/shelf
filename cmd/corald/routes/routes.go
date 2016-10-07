@@ -35,6 +35,9 @@ const (
 	// cfgPlatformPrivateKey is the private key used to sign new requests to the
 	// downstream service layer.
 	cfgPlatformPrivateKey = "PLATFORM_PRIVATE_KEY"
+
+	// cfgEnableCORS is set the key to the state for CORS on the service.
+	cfgEnableCORS = "ENABLE_CORS"
 )
 
 func init() {
@@ -92,11 +95,15 @@ func API() http.Handler {
 		w.Ctx["signer"] = signer
 	}
 
+	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
+		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
+		w.Use(w.CORS())
+	} else {
+		log.Dev("startup", "Init", "CORS Disabled")
+	}
+
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(w)
-
-	log.Dev("startup", "Init", "Initalizing CORS")
-	w.Use(w.CORS())
 
 	return w
 }
