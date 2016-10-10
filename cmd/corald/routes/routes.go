@@ -126,7 +126,7 @@ func routes(w *web.Web) {
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec/" + c.Params["query_set"] }))
 
 	// Get all the items from the view :view_name on this :item_key.
-	w.Handle("GET", "/v1/exec/view/:view_name/:item_key",
+	w.Handle("POST", "/v1/exec/view/:view_name/:item_key",
 		handlers.Proxy(xeniadURL,
 			func(c *web.Context) string {
 				return "/v1/exec/view/" + c.Params["view_name"] + "/" + c.Params["item_key"]
