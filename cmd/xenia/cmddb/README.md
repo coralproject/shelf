@@ -1,30 +1,12 @@
 
-
 # cmddb
-`import "github.com/coralproject/shelf/cmd/xenia/cmddb"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/cmd/xenia/cmddb"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func GetCommands(db *db.DB) *cobra.Command](#GetCommands)
-* [type Collection](#Collection)
-* [type DBMeta](#DBMeta)
-* [type Field](#Field)
-* [type Index](#Index)
 
 
-#### <a name="pkg-files">Package files</a>
-[commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmddb/commands.go) [create.go](/src/github.com/coralproject/shelf/cmd/xenia/cmddb/create.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var (
     // ErrCollectionExists is return when a collection to be
@@ -33,8 +15,7 @@ var (
 )
 ```
 
-
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=389:431#L8)
+## func GetCommands
 ``` go
 func GetCommands(db *db.DB) *cobra.Command
 ```
@@ -42,8 +23,7 @@ GetCommands returns the db commands.
 
 
 
-
-## <a name="Collection">type</a> [Collection](/src/target/create.go?s=1200:1291#L46)
+## type Collection
 ``` go
 type Collection struct {
     Name    string  `json:"name"`
@@ -61,7 +41,8 @@ Collection is the container for a db collection definition.
 
 
 
-## <a name="DBMeta">type</a> [DBMeta](/src/target/create.go?s=1073:1135#L41)
+
+## type DBMeta
 ``` go
 type DBMeta struct {
     Cols []Collection `json:"collections"`
@@ -78,7 +59,8 @@ DBMeta is the container for all db objects.
 
 
 
-## <a name="Field">type</a> [Field](/src/target/create.go?s=1517:1635#L59)
+
+## type Field
 ``` go
 type Field struct {
     Name      string `json:"name"`
@@ -97,7 +79,8 @@ Field is the container for a field definition.
 
 
 
-## <a name="Index">type</a> [Index](/src/target/create.go?s=1344:1465#L52)
+
+## type Index
 ``` go
 type Index struct {
     Name     string  `json:"name"`
@@ -106,6 +89,9 @@ type Index struct {
 }
 ```
 Index is the container for an index definition.
+
+
+
 
 
 

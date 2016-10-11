@@ -1,37 +1,11 @@
 
-
 # script
-`import "github.com/coralproject/shelf/internal/xenia/script"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/internal/xenia/script"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Delete(context interface{}, db *db.DB, name string) error](#Delete)
-* [func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error)](#GetAll)
-* [func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error)](#GetByNames)
-* [func GetNames(context interface{}, db *db.DB) ([]string, error)](#GetNames)
-* [func Upsert(context interface{}, db *db.DB, scr Script) error](#Upsert)
-* [type Script](#Script)
-  * [func GetByName(context interface{}, db *db.DB, name string) (Script, error)](#GetByName)
-  * [func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Script, error)](#GetLastHistoryByName)
-  * [func (scr Script) PrepareForInsert()](#Script.PrepareForInsert)
-  * [func (scr Script) PrepareForUse()](#Script.PrepareForUse)
-  * [func (scr Script) Validate() error](#Script.Validate)
 
-
-#### <a name="pkg-files">Package files</a>
-[model.go](/src/github.com/coralproject/shelf/internal/xenia/script/model.go) [prepare.go](/src/github.com/coralproject/shelf/internal/xenia/script/prepare.go) [script.go](/src/github.com/coralproject/shelf/internal/xenia/script/script.go) 
-
-
-## <a name="pkg-constants">Constants</a>
+## Constants
 ``` go
 const (
     Collection        = "query_scripts"
@@ -41,7 +15,7 @@ const (
 Contains the name of Mongo collections.
 
 
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var (
     ErrNotFound = errors.New("Script Not found")
@@ -50,40 +24,35 @@ var (
 Set of error variables.
 
 
-
-## <a name="Delete">func</a> [Delete](/src/target/script.go?s=9743:9805#L365)
+## func Delete
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
 Delete is used to remove an existing Set document.
 
 
-
-## <a name="GetAll">func</a> [GetAll](/src/target/script.go?s=4321:4397#L166)
+## func GetAll
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) ([]Script, error)
 ```
 GetAll retrieves a list of scripts.
 
 
-
-## <a name="GetByNames">func</a> [GetByNames](/src/target/script.go?s=6401:6482#L244)
+## func GetByNames
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Script, error)
 ```
 GetByNames retrieves the documents for the specified names.
 
 
-
-## <a name="GetNames">func</a> [GetNames](/src/target/script.go?s=3184:3247#L120)
+## func GetNames
 ``` go
 func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
 GetNames retrieves a list of script names.
 
 
-
-## <a name="Upsert">func</a> [Upsert](/src/target/script.go?s=1011:1072#L33)
+## func Upsert
 ``` go
 func Upsert(context interface{}, db *db.DB, scr Script) error
 ```
@@ -91,8 +60,7 @@ Upsert is used to create or update an existing Script document.
 
 
 
-
-## <a name="Script">type</a> [Script](/src/target/model.go?s=399:661#L9)
+## type Script
 ``` go
 type Script struct {
     Name     string                   `bson:"name" json:"name" validate:"required,min=3"` // Unique name per Script document
@@ -107,14 +75,16 @@ Script contain pre and post commands to use per set or per query.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/script.go?s=5425:5500#L208)
+
+
+### func GetByName
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (Script, error)
 ```
 GetByName retrieves the document for the specified name.
 
 
-### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/script.go?s=8208:8294#L313)
+### func GetLastHistoryByName
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Script, error)
 ```
@@ -123,8 +93,7 @@ GetLastHistoryByName gets the last written Script within the history.
 
 
 
-
-### <a name="Script.PrepareForInsert">func</a> (Script) [PrepareForInsert](/src/target/model.go?s=989:1025#L28)
+### func (Script) PrepareForInsert
 ``` go
 func (scr Script) PrepareForInsert()
 ```
@@ -132,8 +101,7 @@ PrepareForInsert replaces the `$` to `_$` when found in the front of field names
 
 
 
-
-### <a name="Script.PrepareForUse">func</a> (Script) [PrepareForUse](/src/target/model.go?s=1228:1261#L37)
+### func (Script) PrepareForUse
 ``` go
 func (scr Script) PrepareForUse()
 ```
@@ -141,12 +109,12 @@ PrepareForUse replaces the `_$` to `$` when found in the front of field names.
 
 
 
-
-### <a name="Script.Validate">func</a> (Script) [Validate](/src/target/model.go?s=715:749#L15)
+### func (Script) Validate
 ``` go
 func (scr Script) Validate() error
 ```
 Validate checks the query value for consistency.
+
 
 
 

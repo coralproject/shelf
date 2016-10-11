@@ -1,35 +1,19 @@
 
-
 # auth
-`import "github.com/coralproject/shelf/internal/platform/midware/auth"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/internal/platform/midware/auth"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Midware(publicKeyBase64Str string, config MidwareOpts) (web.Middleware, error)](#Midware)
-* [type MidwareOpts](#MidwareOpts)
 
 
-#### <a name="pkg-files">Package files</a>
-[midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/auth/midware.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var ErrInvalidToken = errors.New("invalid token")
 ```
 ErrInvalidToken is returned when the token provided is not valid.
 
 
-
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=636:719#L16)
+## func Midware
 ``` go
 func Midware(publicKeyBase64Str string, config MidwareOpts) (web.Middleware, error)
 ```
@@ -38,8 +22,7 @@ sources.
 
 
 
-
-## <a name="MidwareOpts">type</a> [MidwareOpts](/src/target/midware.go?s=385:554#L7)
+## type MidwareOpts
 ``` go
 type MidwareOpts struct {
 
@@ -49,6 +32,9 @@ type MidwareOpts struct {
 }
 ```
 MidwareOpts describes the options for configuring the Midware.
+
+
+
 
 
 

@@ -1,36 +1,21 @@
 
-
 # handlers
-`import "github.com/coralproject/shelf/cmd/corald/handlers"`
+    import "github.com/coralproject/shelf/cmd/corald/handlers"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
 Package handlers contains the handler logic for processing requests.
 
 
 
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler](#Proxy)
 
-
-#### <a name="pkg-files">Package files</a>
-[proxy.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/proxy.go) [version.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/version.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var Version verHandle
 ```
 Version fronts the access to the ver service functionality.
 
 
-
-## <a name="Proxy">func</a> [Proxy](/src/target/proxy.go?s=382:457#L2)
+## func Proxy
 ``` go
 func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler
 ```
@@ -38,6 +23,7 @@ Proxy will setup a direct proxy inbetween this service and the destination
 service using the rewrite function if specified. If the rewrite function is
 not specified, the path on the target will be set to the target path
 concatenated with the request path.
+
 
 
 
