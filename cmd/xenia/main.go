@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/cmd/xenia/cmddb"
 	"github.com/coralproject/shelf/cmd/xenia/cmdmask"
 	"github.com/coralproject/shelf/cmd/xenia/cmdquery"
@@ -13,11 +12,16 @@ import (
 	"github.com/coralproject/shelf/cmd/xenia/cmdrelationship"
 	"github.com/coralproject/shelf/cmd/xenia/cmdscript"
 	"github.com/coralproject/shelf/cmd/xenia/cmdview"
+	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/spf13/cobra"
 )
 
 const (
+
+	// Namespace is the key that is the prefix for configuration in the
+	// environment.
+	Namespace = "XENIA"
 
 	// cfgLoggingLevel is the key for the logging level.
 	cfgLoggingLevel = "LOGGING_LEVEL"
@@ -35,21 +39,7 @@ var xenia = &cobra.Command{
 }
 
 func main() {
-	if err := cfg.Init(cfg.EnvProvider{Namespace: "XENIA"}); err != nil {
-		xenia.Println("Unable to initialize configuration")
-		os.Exit(1)
-	}
-
-	logLevel := func() int {
-		ll, err := cfg.Int(cfgLoggingLevel)
-		if err != nil {
-			return log.NONE
-		}
-		return ll
-	}
-	log.Init(os.Stderr, logLevel, log.Ldefault)
-
-	xenia.Println("Using log level", logLevel())
+	app.Init(cfg.EnvProvider{Namespace: Namespace})
 
 	// Pull options from the config.
 	var conn *db.DB

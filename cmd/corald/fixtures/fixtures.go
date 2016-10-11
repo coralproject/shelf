@@ -1,4 +1,4 @@
-//go:generate go-bindata -pkg fixtures -o assets.go json/...
+//go:generate go-bindata -pkg json -ignore json/json.gen.go -o json/json.gen.go json/...
 
 package fixtures
 
@@ -8,6 +8,7 @@ import (
 	"net/http"
 
 	"github.com/ardanlabs/kit/web"
+	fixturesjson "github.com/coralproject/shelf/cmd/corald/fixtures/json"
 )
 
 // Load unmarshals the specified fixture into the provided
@@ -15,7 +16,7 @@ import (
 func Load(name string, v interface{}) error {
 
 	// Load the fixtures bytes into the byte slice.
-	fixtureBytes, err := Asset(fmt.Sprintf("json/%s.json", name))
+	fixtureBytes, err := fixturesjson.Asset(fmt.Sprintf("json/%s.json", name))
 	if err != nil {
 		return err
 	}

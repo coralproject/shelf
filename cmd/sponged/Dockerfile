@@ -1,0 +1,5 @@
+FROM scratch
+COPY sponged /
+ENV SPONGE_HOST 127.0.0.1:16181
+EXPOSE 16181
+CMD ["/sponged"]
