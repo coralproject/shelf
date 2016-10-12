@@ -125,19 +125,25 @@ func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item 
 // a type of item.
 func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interface{}) ([]QuadParam, error) {
 
-	// Parse the item.
-	item, err := itemParse(itemIn)
+	// Parse the item's type.
+	itemType, err := typeParse(itemIn)
 	if err != nil {
 		return nil, err
 	}
 
 	// Get the relevant pattern.
-	p, err := pattern.GetByType(context, db, item.itemType)
+	p, err := pattern.GetByType(context, db, itemType)
 	if err != nil {
 		if err != pattern.ErrNotFound {
 			return nil, err
 		}
 		return nil, nil
+	}
+
+	// Parse the item.
+	item, err := itemParse(itemIn, itemType)
+	if err != nil {
+		return nil, err
 	}
 
 	// Loop over inferences in the pattern.
@@ -180,6 +186,27 @@ func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interf
 	return qps, nil
 }
 
+// typeParse parses the type from the input item map.
+func typeParse(itemIn map[string]interface{}) (string, error) {
+
+	// Validate and extract the item type.
+	val, ok := itemIn["type"]
+	if !ok {
+		return "", ErrItemType
+	}
+
+	itemType, ok := val.(string)
+	if !ok {
+		return "", ErrItemType
+	}
+
+	if itemType == "" {
+		return "", ErrItemType
+	}
+
+	return itemType, nil
+}
+
 // parsedItem contains the structure of the item.
 type parsedItem struct {
 	itemID   string
@@ -189,25 +216,10 @@ type parsedItem struct {
 
 // itemParse parses a general map[string]interface{} into a parsedItem value,
 // validating the fields required for relationship inference.
-func itemParse(itemIn map[string]interface{}) (parsedItem, error) {
-
-	// Validate and extract the item type.
-	val, ok := itemIn["type"]
-	if !ok {
-		return parsedItem{}, ErrItemType
-	}
-
-	itemType, ok := val.(string)
-	if !ok {
-		return parsedItem{}, ErrItemType
-	}
-
-	if itemType == "" {
-		return parsedItem{}, ErrItemType
-	}
+func itemParse(itemIn map[string]interface{}, itemType string) (parsedItem, error) {
 
 	// Validate and extract the item ID.
-	val, ok = itemIn["item_id"]
+	val, ok := itemIn["item_id"]
 	if !ok {
 		return parsedItem{}, ErrItemID
 	}
