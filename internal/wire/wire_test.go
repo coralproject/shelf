@@ -94,6 +94,7 @@ func loadTestData(context interface{}, db *db.DB) error {
 	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
 	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
 	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"flagged", wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -130,6 +131,7 @@ func unloadTestData(context interface{}, db *db.DB) error {
 	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"d1dfa366-d2f7-4a4a-a64f-af89d4c97d82", ""))
 	quads = append(quads, quad.Make(wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", wirePrefix+"authored", wirePrefix+"6eaaa19f-da7a-4095-bbe3-cee7a7631dd4", ""))
 	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"authored", wirePrefix+"d16790f8-13e9-4cb4-b9ef-d82835589660", ""))
+	quads = append(quads, quad.Make(wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6", wirePrefix+"flagged", wirePrefix+"80aa936a-f618-4234-a7be-df59a14cf8de", ""))
 
 	tx := cayley.NewTransaction()
 	for _, quad := range quads {
@@ -213,7 +215,7 @@ func TestExecuteReturnRoot(t *testing.T) {
 	db, store := setup(t)
 	defer teardown(t, db)
 
-	t.Log("Given the need to generate a view.")
+	t.Log("Given the need to generate a view and return a root item.")
 	{
 		t.Log("\tWhen using the view, relationship, and item fixtures.")
 		{
@@ -237,6 +239,40 @@ func TestExecuteReturnRoot(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to get 3 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 3 items in the view.", tests.Success)
+		}
+	}
+}
+
+// TestExecuteSplitPath tests the generation of a view from a split path, opting
+// not to persist the view.
+func TestExecuteSplitPath(t *testing.T) {
+	db, store := setup(t)
+	defer teardown(t, db)
+
+	t.Log("Given the need to generate a view from a split path.")
+	{
+		t.Log("\tWhen using the view, relationship, and item fixtures.")
+		{
+
+			// Form the view parameters.
+			viewParams := wire.ViewParams{
+				ViewName: wirePrefix + "split_path",
+				ItemKey:  wirePrefix + "a63af637-58af-472b-98c7-f5c00743bac6",
+			}
+
+			// Generate the view.
+			result, err := wire.Execute(tests.Context, db, store, &viewParams)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
+
+			// Check the resulting items.
+			items, ok := result.Results.([]bson.M)
+			if !ok || len(items) != 2 {
+				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
 		}
 	}
 }
