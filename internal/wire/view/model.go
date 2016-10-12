@@ -55,7 +55,7 @@ func (slice PathSegments) Swap(i, j int) {
 // Path includes information defining one or multiple graph paths,
 // along with a boolean choice for whether or not the path is a strict graph path.
 type Path struct {
-	StrictPath bool         `bson:"strict_path,omitempty" json:"strict_path,omitempty"`
+	StrictPath bool         `bson:"strict_path" json:"strict_path"`
 	Segments   PathSegments `bson:"path_segments" json:"path_segments" validate:"required,min=1"`
 }
 
