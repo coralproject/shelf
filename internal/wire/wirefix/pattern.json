@@ -30,6 +30,12 @@
 				"predicate": "WTEST_has_role",
 				"direction": "out",
 				"required": true
+			},
+			{
+				"related_ID_field": "flagged_by",
+				"predicate": "WTEST_flagged",
+				"direction": "in",
+				"required": false
 			}
 		]
 	},
