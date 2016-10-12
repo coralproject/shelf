@@ -38,7 +38,8 @@
 			"first_name": "Bilbo",
 			"last_name": "Baggins",
 			"email": "ringbearer@bagend.com",
-			"role": "hobbit"
+			"role": "hobbit",
+			"flagged_by": "WTEST_a63af637-58af-472b-98c7-f5c00743bac6"
 		}
 	},
 	{

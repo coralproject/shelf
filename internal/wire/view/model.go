@@ -26,10 +26,7 @@ type PathSegment struct {
 	Tag       string `bson:"tag,omitempty" json:"tag,omitempty"`
 }
 
-// Path is a slice of PathSegment.
-type Path []PathSegment
-
-// Validate checks the PathSegment value for consistency.
+// Validate checks the pathsegment value for consistency.
 func (ps *PathSegment) Validate() error {
 	if err := validate.Struct(ps); err != nil {
 		return err
@@ -37,19 +34,37 @@ func (ps *PathSegment) Validate() error {
 	return nil
 }
 
+// PathSegments is a slice of PathSegment values.
+type PathSegments []PathSegment
+
 // Len is required to sort a slice of PathSegment.
-func (slice Path) Len() int {
+func (slice PathSegments) Len() int {
 	return len(slice)
 }
 
 // Less is required to sort a slice of PathSegment.
-func (slice Path) Less(i, j int) bool {
+func (slice PathSegments) Less(i, j int) bool {
 	return slice[i].Level < slice[j].Level
 }
 
 // Swap is required to sort a slice of PathSegment.
-func (slice Path) Swap(i, j int) {
+func (slice PathSegments) Swap(i, j int) {
 	slice[i], slice[j] = slice[j], slice[i]
+}
+
+// Path includes information defining one or multiple graph paths,
+// along with a boolean choice for whether or not the path is a strict graph path.
+type Path struct {
+	StrictPath bool         `bson:"strict_path" json:"strict_path"`
+	Segments   PathSegments `bson:"path_segments" json:"path_segments" validate:"required,min=1"`
+}
+
+// Validate checks the pathsegment value for consistency.
+func (path *Path) Validate() error {
+	if err := validate.Struct(path); err != nil {
+		return err
+	}
+	return nil
 }
 
 // View contains metadata about a view.
@@ -58,8 +73,7 @@ type View struct {
 	Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
 	StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
 	ReturnRoot bool   `bson:"return_root,omitempty" json:"return_root,omitempty"`
-	StrictPath bool   `bson:"strict_path,omitempty" json:"strict_path,omitempty"`
-	Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
+	Paths      []Path `bson:"paths" json:"paths" validate:"required,min=1"`
 }
 
 // Validate checks the View value for consistency.
@@ -70,21 +84,31 @@ func (v *View) Validate() error {
 		return err
 	}
 
-	// Validate each of the PathSegment values in the View.
-	for _, segment := range v.Path {
+	// Validate each Path in the Paths.
+	for _, path := range v.Paths {
 
-		// Validate the PathSegment using the validator.
-		if err := segment.Validate(); err != nil {
+		// Validate the Path using the validator.
+		if err := path.Validate(); err != nil {
 			return err
 		}
 
-		// Ensure that the Direction value is either "in" or "out."
-		switch segment.Direction {
-		case "in", "out":
-			continue
-		default:
-			return fmt.Errorf("Path segment includes undefined direction")
+		// Validate each of the PathSegment values in the Path.
+		for _, segment := range path.Segments {
+
+			// Validate the PathSegment using the validator.
+			if err := segment.Validate(); err != nil {
+				return err
+			}
+
+			// Ensure that the Direction value is either "in" or "out."
+			switch segment.Direction {
+			case "in", "out":
+				continue
+			default:
+				return fmt.Errorf("Path segment includes undefined direction")
+			}
 		}
 	}
+
 	return nil
 }

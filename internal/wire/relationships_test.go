@@ -152,7 +152,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap := map[string]interface{}{
 				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data": map[string]interface{}{
 					"author": "",
@@ -227,7 +227,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": "",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data": map[string]interface{}{
 					"author": "",
@@ -246,7 +246,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": 5,
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data": map[string]interface{}{
 					"author": "",
@@ -264,7 +264,7 @@ func TestAddToGraphFail(t *testing.T) {
 			// Infer missing item ID and handle error.
 
 			itMap = map[string]interface{}{
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data": map[string]interface{}{
 					"author": "",
@@ -283,7 +283,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data":    2,
 			}
@@ -298,7 +298,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 			}
 
@@ -312,7 +312,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data": map[int]interface{}{
 					1: 2,
@@ -330,7 +330,7 @@ func TestAddToGraphFail(t *testing.T) {
 
 			itMap = map[string]interface{}{
 				"item_id": "21292354-2a79-4705-9122-42724da5e68c",
-				"type":    "PTEST_comment",
+				"type":    "WTEST_comment",
 				"version": 2,
 				"data":    map[string]interface{}{},
 			}
