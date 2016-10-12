@@ -117,7 +117,7 @@ func runTest(m *testing.M) int {
 		fmt.Println("Could not load patterns")
 		return 1
 	}
-	defer patternfix.Remove("context", db, patternPrefix)
+	defer patternfix.Remove("context", db, "PTEST_")
 
 	if err := loadItems("context", db, store); err != nil {
 		fmt.Println("Could not import items")

@@ -30,6 +30,9 @@ const (
 	// cfgAuthPublicKey is the key for the public key used for verifying the
 	// inbound requests.
 	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
+
+	// cfgEnableCORS is set the key to the state for CORS on the service.
+	cfgEnableCORS = "ENABLE_CORS"
 )
 
 func init() {
@@ -79,11 +82,15 @@ func API() http.Handler {
 	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
 	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
+	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
+		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
+		w.Use(w.CORS())
+	} else {
+		log.Dev("startup", "Init", "CORS Disabled")
+	}
+
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(w)
-
-	log.Dev("startup", "Init", "Initalizing CORS")
-	w.CORS()
 
 	return w
 }
@@ -96,6 +103,11 @@ func routes(w *web.Web) {
 	w.Handle("PUT", "/v1/item", handlers.Item.Import)
 	w.Handle("POST", "/v1/item", handlers.Item.Import)
 	w.Handle("DELETE", "/v1/item/:id", handlers.Item.Remove)
+
+	w.Handle("GET", "/v1/pattern", handlers.Pattern.List)
+	w.Handle("PUT", "/v1/pattern", handlers.Pattern.Upsert)
+	w.Handle("GET", "/v1/pattern/:type", handlers.Pattern.Retrieve)
+	w.Handle("DELETE", "/v1/pattern/:type", handlers.Pattern.Delete)
 
 	w.Handle("POST", "/v1/data/:type", handlers.Data.Import)
 }

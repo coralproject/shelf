@@ -3,18 +3,23 @@
 		"name": "WTEST_thread",
 		"collection": "items",
 		"start_type": "WTEST_asset",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "in",
-				"predicate": "WTEST_on",
-				"tag": "comment"
-			},
-			{
-				"level": 2,
-				"direction": "in",
-				"predicate": "WTEST_authored",
-				"tag": "author"
+				"strict_path": false,
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "in",
+						"predicate": "WTEST_on",
+						"tag": "comment"
+					},
+					{
+						"level": 2,
+						"direction": "in",
+						"predicate": "WTEST_authored",
+						"tag": "author"
+					}
+				]
 			}
 		]
 	},
@@ -22,12 +27,16 @@
 		"name": "WTEST_user comments",
 		"start_type": "WTEST_user",
 		"collection": "items",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "out",
-				"predicate": "WTEST_authored",
-				"tag": "comment"
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					}
+				]
 			}
 		]
 	},
@@ -35,23 +44,27 @@
 		"name": "WTEST_comments from authors flagged by a user",
 		"start_type": "WTEST_invalid_type",
 		"collection": "items",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "out",
-				"predicate": "WTEST_flagged"
-			},
-			{
-				"level": 2,
-				"direction": "in",
-				"predicate": "WTEST_authored",
-				"tag": "author"
-			},
-			{
-				"level": 3,
-				"direction": "out",
-				"predicate": "WTEST_authored",
-				"tag": "comment"
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_flagged"
+					},
+					{
+						"level": 2,
+						"direction": "in",
+						"predicate": "WTEST_authored",
+						"tag": "author"
+					},
+					{
+						"level": 3,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					}
+				]
 			}
 		]
 	},
@@ -59,17 +72,21 @@
 		"name": "WTEST_has invalid starting relationship",
 		"start_type": "WTEST_user",
 		"collection": "items",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "out",
-				"predicate": "WTEST_invalid"
-			},
-			{
-				"level": 2,
-				"direction": "in",
-				"predicate": "WTEST_authored",
-				"tag": "author"
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_invalid"
+					},
+					{
+						"level": 2,
+						"direction": "in",
+						"predicate": "WTEST_authored",
+						"tag": "author"
+					}
+				]
 			}
 		]
 	},
@@ -77,18 +94,23 @@
 		"name": "WTEST_thread_backwards",
 		"collection": "items",
 		"start_type": "WTEST_user",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "out",
-				"predicate": "WTEST_authored",
-				"tag": "comment"
-			},
-			{
-				"level": 2,
-				"direction": "out",
-				"predicate": "WTEST_on",
-				"tag": "asset"
+				"strict_path": true,
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					},
+					{
+						"level": 2,
+						"direction": "out",
+						"predicate": "WTEST_on",
+						"tag": "asset"
+					}
+				]
 			}
 		]
 	},
@@ -97,12 +119,43 @@
 		"start_type": "WTEST_user",
 		"return_root": true,
 		"collection": "items",
-		"path": [
+		"paths": [
 			{
-				"level": 1,
-				"direction": "out",
-				"predicate": "WTEST_authored",
-				"tag": "comment"
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					}
+				]
+			}
+		]
+	},
+	{
+		"name": "WTEST_split_path",
+		"start_type": "WTEST_user",
+		"collection": "items",
+		"paths": [
+			{
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					}
+				]
+			},
+			{
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_flagged",
+						"tag": "flagged_item"
+					}
+				]
 			}
 		]
 	}
