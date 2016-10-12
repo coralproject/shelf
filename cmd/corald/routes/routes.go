@@ -147,9 +147,9 @@ func routes(w *web.Web) {
 	w.Handle("POST", "/v1/exec",
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
-	// Actions
-	w.Handle("POST", "/v1/action/:action/on/item/:item_key", handlers.Action.Create)
-	w.Handle("DELETE", "/v1/action/:action/on/item/:item_key", handlers.Action.Remove)
+	// Create or removes Actions.
+	w.Handle("POST", "/v1/action/:action/on/item/:item_key", fixtures.Handler("items/actionWFlag", http.StatusOK))    //handlers.Action.Create)
+	w.Handle("DELETE", "/v1/action/:action/on/item/:item_key", fixtures.Handler("items/actionWoFlag", http.StatusOK)) //handlers.Action.Remove)
 
 	// Save or Update Items
 	w.Handle("PUT", "/v1/item",
