@@ -131,5 +131,32 @@
 				]
 			}
 		]
+	},
+	{
+		"name": "WTEST_split_path",
+		"start_type": "WTEST_user",
+		"collection": "items",
+		"paths": [
+			{
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					}
+				]
+			},
+			{
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_flagged",
+						"tag": "flagged_item"
+					}
+				]
+			}
+		]
 	}
 ] 	
