@@ -113,8 +113,10 @@ func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item 
 
 	// Apply the transaction.
 	if err := store.ApplyTransaction(tx); err != nil {
-		log.Error(context, "RemoveFromGraph", err, "Completed")
-		return err
+		if !graph.IsQuadNotExist(err) {
+			log.Error(context, "RemoveFromGraph", err, "Completed")
+			return err
+		}
 	}
 
 	log.Dev(context, "RemoveFromGraph", "Completed")
