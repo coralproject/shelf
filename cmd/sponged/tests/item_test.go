@@ -4,6 +4,7 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"testing"
 
@@ -11,29 +12,19 @@ import (
 	"github.com/ardanlabs/kit/tests"
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/quad"
+	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 )
 
-const (
-	// itemPrefix is the base name for items.
-	itemPrefix = "ITEST_"
-
-	// patternPrefix is the base name for patterns.
-	patternPrefix = "PTEST_"
-)
+// itemPrefix is the base name for items.
+const itemPrefix = "ITEST_"
 
 // setup initializes for each indivdual test.
 func setup(t *testing.T) *cayley.Handle {
 	tests.ResetLog()
 
-	opts := map[string]interface{}{
-		"database_name": cfg.MustString("MONGO_DB"),
-		"username":      cfg.MustString("MONGO_USER"),
-		"password":      cfg.MustString("MONGO_PASS"),
-	}
-
-	store, err := cayley.NewGraph("mongo", cfg.MustString("MONGO_HOST"), opts)
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
 	}
@@ -54,16 +45,16 @@ func TestRetrieveItems(t *testing.T) {
 
 	t.Log("Given the need get a set of items by IDs.")
 	{
-		url := "/1.0/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4,ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660"
-		r := tests.NewRequest("GET", url, nil)
+		url := "/v1/item/ITEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4,ITEST_d16790f8-13e9-4cb4-b9ef-d82835589660"
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url : %s", url)
 		{
-			t.Log("\tWhen we use version 1.0 of the item endpoint.")
-			if w.Code != 200 {
+			t.Log("\tWhen we use version v1 of the item endpoint.")
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the items : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the items.", tests.Success)
@@ -114,15 +105,15 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Item.
 
-		url := "/1.0/item"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
+		url := "/v1/item"
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url to insert : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to insert the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to insert the item.", tests.Success)
@@ -150,15 +141,15 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the item.
 
-		url = "/1.0/item/" + items[0].ID
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/item/" + items[0].ID
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url to get : %s", url)
 		{
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the item.", tests.Success)
@@ -188,15 +179,15 @@ func TestUpsertItem(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
-		url = "/1.0/item"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
+		url = "/v1/item"
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(itemStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url to update : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to update the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to update the item.", tests.Success)
@@ -205,15 +196,15 @@ func TestUpsertItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Item.
 
-		url = "/1.0/item/" + items[0].ID
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/item/" + items[0].ID
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url to get : %s", url)
 		{
-			if w.Code != 200 {
+			if w.Code != http.StatusOK {
 				t.Fatalf("\t%s\tShould be able to retrieve the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to retrieve the item.", tests.Success)
@@ -243,15 +234,15 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Item.
 
-		url := "/1.0/item/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
-		r := tests.NewRequest("DELETE", url, nil)
+		url := "/v1/item/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
+		r := httptest.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
 
 		t.Logf("\tWhen calling url to delete : %s", url)
 		{
-			if w.Code != 204 {
+			if w.Code != http.StatusNoContent {
 				t.Fatalf("\t%s\tShould be able to delete the item : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to delete the item.", tests.Success)
@@ -260,8 +251,8 @@ func TestDeleteItem(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Item.
 
-		url = "/1.0/view/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/view/ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)

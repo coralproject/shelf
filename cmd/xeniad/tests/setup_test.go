@@ -3,13 +3,18 @@ package tests
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"testing"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/tests"
+	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/cmd/xeniad/routes"
+	"github.com/coralproject/shelf/internal/platform/db"
+	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
+	"github.com/coralproject/shelf/internal/sponge"
+	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
 	"github.com/coralproject/shelf/internal/wire/relationship/relationshipfix"
 	"github.com/coralproject/shelf/internal/wire/view/viewfix"
@@ -19,13 +24,7 @@ import (
 	"github.com/coralproject/shelf/tstdata"
 )
 
-var a *app.App
-
-func init() {
-	// The call to API will force the init() function to initialize
-	// cfg, log and mongodb.
-	a = routes.API(true).(*app.App)
-}
+var a http.Handler
 
 //==============================================================================
 
@@ -37,45 +36,94 @@ func TestMain(m *testing.M) {
 // runTest initializes the environment for the tests and allows for
 // the proper return code if the test fails or succeeds.
 func runTest(m *testing.M) int {
+	mongoURI := cfg.MustURL("MONGO_URI")
 
-	// In order to get a Mongo session we need the name of the database we
-	// are using. The web framework middleware is using this by convention.
-	dbName, err := cfg.String("MONGO_DB")
-	if err != nil {
-		fmt.Println("MongoDB is not configured")
+	// Initialize MongoDB using the `tests.TestSession` as the name of the
+	// master session.
+	if err := db.RegMasterSession(tests.Context, tests.TestSession, mongoURI.String(), 0); err != nil {
+		fmt.Println("Can't register master session: " + err.Error())
 		return 1
 	}
 
-	db, err := db.NewMGO("context", dbName)
+	// Setup the app for performing tests.
+	a = routes.API()
+
+	// Snatch the mongo session so we can create some test data.
+	db, err := db.NewMGO(tests.Context, tests.TestSession)
 	if err != nil {
 		fmt.Println("Unable to get Mongo session")
 		return 1
 	}
+	defer db.CloseMGO(tests.Context)
 
-	defer db.CloseMGO("context")
+	store, err := cayleyshelf.New(mongoURI.String())
+	if err != nil {
+		fmt.Println("Unable to get Cayley handle")
+		return 1
+	}
+	defer store.Close()
 
-	tstdata.Generate(db)
+	if err := tstdata.Generate(db); err != nil {
+		fmt.Println("Could not generate test data.")
+		return 1
+	}
 	defer tstdata.Drop(db)
 
-	loadQuery(db, "basic.json")
-	loadQuery(db, "basic_var.json")
+	// Load the queries.
+	if err := loadQuery(db, "basic.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
+
+	if err := loadQuery(db, "basic_view.json"); err != nil {
+		fmt.Println("Could not load queries in basic.json")
+		return 1
+	}
+	if err := loadQuery(db, "basic_var.json"); err != nil {
+		fmt.Println("Could not load queries in basic_var.json")
+		return 1
+	}
 	defer qfix.Remove(db, "QTEST_O")
 
-	loadScript(db, "basic_script_pre.json")
-	loadScript(db, "basic_script_pst.json")
+	if err := loadScript(db, "basic_script_pre.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pre.json")
+		return 1
+	}
+	if err := loadScript(db, "basic_script_pst.json"); err != nil {
+		fmt.Println("Could not load scripts in basic_script_pst.json")
+		return 1
+	}
 	defer sfix.Remove(db, "STEST_O")
 
-	loadMasks(db, "basic.json")
+	if err := loadMasks(db, "basic.json"); err != nil {
+		fmt.Println("Could not load masks.")
+		return 1
+	}
 	defer mfix.Remove(db, "test_xenia_data")
 
-	loadRelationships("context", db)
+	if err := loadRelationships("context", db); err != nil {
+		fmt.Println("Could not load relationships.")
+		return 1
+	}
 	defer relationshipfix.Remove("context", db, relPrefix)
 
-	loadViews("context", db)
+	if err := loadViews("context", db); err != nil {
+		fmt.Println("Could not load views.")
+		return 1
+	}
 	defer viewfix.Remove("context", db, viewPrefix)
 
-	loadPatterns("context", db)
-	defer patternfix.Remove("context", db, patternPrefix)
+	if err := loadPatterns("context", db); err != nil {
+		fmt.Println("Could not load patterns")
+		return 1
+	}
+	defer patternfix.Remove("context", db, "PTEST_")
+
+	if err := loadItems("context", db, store); err != nil {
+		fmt.Println("Could not import items")
+		return 1
+	}
+	defer unloadItems("context", db, store)
 
 	return m.Run()
 }
@@ -161,6 +209,38 @@ func loadPatterns(context interface{}, db *db.DB) error {
 
 	if err := patternfix.Add(context, db, ps[0:2]); err != nil {
 		return err
+	}
+
+	return nil
+}
+
+// loadItems adds items to run tests.
+func loadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Import(context, db, store, &itm); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// unloadItems removes items from the items collection and the graph.
+func unloadItems(context interface{}, db *db.DB, store *cayley.Handle) error {
+	items, err := itemfix.Get()
+	if err != nil {
+		return err
+	}
+
+	for _, itm := range items {
+		if err := sponge.Remove(context, db, store, itm.ID); err != nil {
+			return err
+		}
 	}
 
 	return nil

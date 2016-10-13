@@ -35,13 +35,13 @@ Collection is the Mongo collection containing relationship metadata.
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Relationship Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/relationship.go?s=2656:2723#L81)
+## <a name="Delete">func</a> [Delete](/src/target/relationship.go?s=2711:2778#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, predicate string) error
 ```
@@ -49,7 +49,7 @@ Delete removes a relationship from from Mongo.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/relationship.go?s=1304:1371#L36)
+## <a name="GetAll">func</a> [GetAll](/src/target/relationship.go?s=1359:1426#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]Relationship, error)
 ```
@@ -57,7 +57,7 @@ GetAll retrieves the current relationships from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/relationship.go?s=527:595#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/relationship.go?s=582:650#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, rel *Relationship) error
 ```
@@ -85,7 +85,7 @@ Note, predicate should be unique.
 
 
 
-### <a name="GetByPredicate">func</a> [GetByPredicate](/src/target/relationship.go?s=1926:2018#L58)
+### <a name="GetByPredicate">func</a> [GetByPredicate](/src/target/relationship.go?s=1981:2073#L58)
 ``` go
 func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error)
 ```

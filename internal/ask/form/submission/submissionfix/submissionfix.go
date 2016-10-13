@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
+	"github.com/coralproject/shelf/internal/platform/db"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -16,7 +16,7 @@ func init() {
 	path = os.Getenv("GOPATH") + "/src/github.com/coralproject/shelf/internal/ask/form/submission/submissionfix/"
 }
 
-// Get retrieves a submission document from the filesystem for testing.
+// GetMany retrieves a submission document from the filesystem for testing.
 func GetMany(fileName string) ([]submission.Submission, error) {
 	file, err := os.Open(path + fileName)
 	if err != nil {

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/query"
 	"github.com/coralproject/shelf/internal/xenia/regex"
 )

@@ -3,10 +3,11 @@ package item
 import (
 	"errors"
 	"fmt"
+	"time"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/platform/db/mongo"
 	"github.com/pborman/uuid"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,7 +17,7 @@ import (
 const Collection = "items"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Item(s) Not found")
 
 // Upsert upserts an item to the items collections.
 func Upsert(context interface{}, db *db.DB, item *Item) error {
@@ -26,6 +27,16 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 	if item.ID == "" {
 		item.ID = uuid.New()
 	}
+
+	// If CreatedAt is not set, set it. Usually, CreatedAt is joined with the setting of the ID.
+	// In our case, custom ids may be created outside this package for new items. For these
+	// cases we check that a CreatedAt is not yet set.
+	if item.CreatedAt.IsZero() {
+		item.CreatedAt = time.Now()
+	}
+
+	// Always update UpdatedAt.
+	item.UpdatedAt = time.Now()
 
 	// Validate the item.
 	if err := item.Validate(); err != nil {
@@ -47,6 +58,29 @@ func Upsert(context interface{}, db *db.DB, item *Item) error {
 
 	log.Dev(context, "Upsert", "Completed")
 	return nil
+}
+
+// GetByID retrieves a single item by ID from Mongo.
+func GetByID(context interface{}, db *db.DB, id string) (Item, error) {
+	log.Dev(context, "GetByID", "Started : ID[%s]", id)
+
+	// Get the items from Mongo.
+	var itm Item
+	f := func(c *mgo.Collection) error {
+		q := bson.M{"item_id": id}
+		log.Dev(context, "GetByID", "MGO : db.%s.find(%s)", c.Name, mongo.Query(q))
+		return c.Find(q).One(&itm)
+	}
+	if err := db.ExecuteMGO(context, Collection, f); err != nil {
+		if err == mgo.ErrNotFound {
+			err = ErrNotFound
+		}
+		log.Error(context, "GetByID", err, "Completed")
+		return itm, err
+	}
+
+	log.Dev(context, "GetByID", "Completed")
+	return itm, nil
 }
 
 // GetByIDs retrieves items by ID from Mongo.

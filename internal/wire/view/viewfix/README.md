@@ -23,7 +23,7 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/viewfix.go?s=652:717#L27)
+## <a name="Add">func</a> [Add](/src/target/viewfix.go?s=675:740#L27)
 ``` go
 func Add(context interface{}, db *db.DB, views []view.View) error
 ```
@@ -31,7 +31,7 @@ Add inserts views for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/viewfix.go?s=355:386#L10)
+## <a name="Get">func</a> [Get](/src/target/viewfix.go?s=378:409#L10)
 ``` go
 func Get() ([]view.View, error)
 ```
@@ -39,7 +39,7 @@ Get loads view data based on view.json.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/viewfix.go?s=900:965#L38)
+## <a name="Remove">func</a> [Remove](/src/target/viewfix.go?s=923:988#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```

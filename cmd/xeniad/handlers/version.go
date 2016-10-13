@@ -4,7 +4,7 @@ package handlers
 import (
 	"net/http"
 
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 )
 
 // verHandle maintains the set of handlers for the ver api.
@@ -22,7 +22,7 @@ var Version verHandle
 
 // List returns all the existing Set names in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (verHandle) List(c *app.Context) error {
+func (verHandle) List(c *web.Context) error {
 	c.Respond(Version, http.StatusOK)
 	return nil
 }

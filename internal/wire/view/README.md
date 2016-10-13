@@ -41,13 +41,13 @@ Collection is the Mongo collection containing view metadata.
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("View Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/view.go?s=2458:2520#L81)
+## <a name="Delete">func</a> [Delete](/src/target/view.go?s=2505:2567#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
@@ -55,7 +55,7 @@ Delete removes a view from from Mongo.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/view.go?s=1218:1277#L36)
+## <a name="GetAll">func</a> [GetAll](/src/target/view.go?s=1265:1324#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]View, error)
 ```
@@ -63,7 +63,7 @@ GetAll retrieves the current views from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/view.go?s=487:548#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/view.go?s=534:595#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, view *View) error
 ```
@@ -144,12 +144,13 @@ Validate checks the PathSegment value for consistency.
 
 
 
-## <a name="View">type</a> [View](/src/target/model.go?s=1485:1813#L46)
+## <a name="View">type</a> [View](/src/target/model.go?s=1485:1892#L46)
 ``` go
 type View struct {
     Name       string `bson:"name" json:"name" validate:"required,min=3"`
     Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
     StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
+    ReturnRoot bool   `bson:"return_root,omitempty" json:"return_root,omitempty"`
     Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
 }
 ```
@@ -161,7 +162,7 @@ View contains metadata about a view.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/view.go?s=1801:1875#L58)
+### <a name="GetByName">func</a> [GetByName](/src/target/view.go?s=1848:1922#L58)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (*View, error)
 ```
@@ -171,7 +172,7 @@ GetByName retrieves a view by name from Mongo.
 
 
 
-### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1866:1897#L54)
+### <a name="View.Validate">func</a> (\*View) [Validate](/src/target/model.go?s=1945:1976#L55)
 ``` go
 func (v *View) Validate() error
 ```

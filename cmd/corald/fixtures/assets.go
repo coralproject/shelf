@@ -91,7 +91,7 @@ func jsonFormsFormJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/forms/form.json", size: 1923, mode: os.FileMode(420), modTime: time.Unix(1474641035, 0)}
+	info := bindataFileInfo{name: "json/forms/form.json", size: 1923, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -111,7 +111,7 @@ func jsonFormsFormsJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/forms/forms.json", size: 391693, mode: os.FileMode(420), modTime: time.Unix(1474641050, 0)}
+	info := bindataFileInfo{name: "json/forms/forms.json", size: 391693, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -131,7 +131,7 @@ func jsonItemsItemJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/items/item.json", size: 300, mode: os.FileMode(420), modTime: time.Unix(1474631986, 0)}
+	info := bindataFileInfo{name: "json/items/item.json", size: 300, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -151,7 +151,7 @@ func jsonItemsItemidJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/items/itemid.json", size: 21, mode: os.FileMode(420), modTime: time.Unix(1474631986, 0)}
+	info := bindataFileInfo{name: "json/items/itemid.json", size: 21, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -171,7 +171,7 @@ func jsonItemsItemsJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/items/items.json", size: 651, mode: os.FileMode(420), modTime: time.Unix(1474631986, 0)}
+	info := bindataFileInfo{name: "json/items/items.json", size: 651, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -191,7 +191,7 @@ func jsonSetsComments_by_assetJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/sets/comments_by_asset.json", size: 475, mode: os.FileMode(420), modTime: time.Unix(1474631988, 0)}
+	info := bindataFileInfo{name: "json/sets/comments_by_asset.json", size: 475, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -211,7 +211,7 @@ func jsonSetsComments_by_asset_idJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/sets/comments_by_asset_id.json", size: 475, mode: os.FileMode(420), modTime: time.Unix(1474631988, 0)}
+	info := bindataFileInfo{name: "json/sets/comments_by_asset_id.json", size: 475, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -231,7 +231,7 @@ func jsonSetsComments_by_user_idJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/sets/comments_by_user_id.json", size: 635, mode: os.FileMode(420), modTime: time.Unix(1474631988, 0)}
+	info := bindataFileInfo{name: "json/sets/comments_by_user_id.json", size: 635, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -251,7 +251,7 @@ func jsonSetsTop_commenters_by_countJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "json/sets/top_commenters_by_count.json", size: 494, mode: os.FileMode(420), modTime: time.Unix(1474631988, 0)}
+	info := bindataFileInfo{name: "json/sets/top_commenters_by_count.json", size: 494, mode: os.FileMode(420), modTime: time.Unix(1474653519, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

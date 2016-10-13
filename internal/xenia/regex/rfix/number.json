@@ -1,0 +1,4 @@
+{
+	"name": "RTEST_number",
+	"expr": "^[0-9]+$"
+}

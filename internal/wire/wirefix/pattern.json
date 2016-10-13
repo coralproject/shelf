@@ -4,21 +4,27 @@
 		"inferences": [
 			{
 				"related_ID_field": "author",
-				"predicate": "authored",
+				"predicate": "WTEST_authored",
 				"direction": "in",
 				"required": true
 			},
 			{
 				"related_ID_field": "parent",
-				"predicate": "parented_by",
+				"predicate": "WTEST_parented_by",
 				"direction": "out",
 				"required": false
 			},
 			{
 				"related_ID_field": "asset",
-				"predicate": "on",
+				"predicate": "WTEST_on",
 				"direction": "out",
 				"required": true
+			},
+			{
+				"related_ID_field": "flagged_by",
+				"predicate": "WTEST_flagged",
+				"direction": "in",
+				"required": false
 			}
 		]
 	},
@@ -27,9 +33,15 @@
 		"inferences": [
 			{
 				"related_ID_field": "role",
-				"predicate": "has_role",
+				"predicate": "WTEST_has_role",
 				"direction": "out",
 				"required": true
+			},
+			{
+				"related_ID_field": "flagged_by",
+				"predicate": "WTEST_flagged",
+				"direction": "in",
+				"required": false
 			}
 		]
 	},
@@ -38,7 +50,7 @@
 		"inferences": [
 			{
 				"related_ID_field": "section",
-				"predicate": "part_of",
+				"predicate": "WTEST_part_of",
 				"direction": "out",
 				"required": false
 			}

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/spf13/cobra"
 	"gopkg.in/mgo.v2"
 )

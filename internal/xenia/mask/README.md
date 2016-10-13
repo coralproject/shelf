@@ -62,7 +62,7 @@ Set of error variables.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/mask.go?s=8238:8320#L286)
+## <a name="Delete">func</a> [Delete](/src/target/mask.go?s=8284:8366#L286)
 ``` go
 func Delete(context interface{}, db *db.DB, collection string, field string) error
 ```
@@ -70,7 +70,7 @@ Delete is used to remove an existing query mask document.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/mask.go?s=3312:3395#L119)
+## <a name="GetAll">func</a> [GetAll](/src/target/mask.go?s=3358:3441#L119)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) (map[string]Mask, error)
 ```
@@ -78,7 +78,7 @@ GetAll retrieves a list of query masks.
 
 
 
-## <a name="GetByCollection">func</a> [GetByCollection](/src/target/mask.go?s=4443:4539#L161)
+## <a name="GetByCollection">func</a> [GetByCollection](/src/target/mask.go?s=4489:4585#L161)
 ``` go
 func GetByCollection(context interface{}, db *db.DB, collection string) (map[string]Mask, error)
 ```
@@ -86,7 +86,7 @@ GetByCollection retrieves the masks for the specified collection.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/mask.go?s=1088:1148#L35)
+## <a name="Upsert">func</a> [Upsert](/src/target/mask.go?s=1134:1194#L35)
 ``` go
 func Upsert(context interface{}, db *db.DB, mask Mask) error
 ```
@@ -111,14 +111,14 @@ Mask contains information about what needs to be masked.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/mask.go?s=5729:5822#L204)
+### <a name="GetByName">func</a> [GetByName](/src/target/mask.go?s=5775:5868#L204)
 ``` go
 func GetByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)
 ```
 GetByName retrieves the document for the specified query mask.
 
 
-### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/mask.go?s=6729:6833#L237)
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/mask.go?s=6775:6879#L237)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, collection string, field string) (Mask, error)
 ```

@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/corald/service"
 )
 
@@ -9,9 +9,9 @@ import (
 // service using the rewrite function if specified. If the rewrite function is
 // not specified, the path on the target will be set to the target path
 // concatenated with the request path.
-func Proxy(targetURL string, rewrite func(*app.Context) string) app.Handler {
+func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler {
 
-	f := func(c *app.Context) error {
+	f := func(c *web.Context) error {
 
 		// If specified, the rewrite will rewrite the request path.
 		var targetPath string

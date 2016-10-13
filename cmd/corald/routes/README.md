@@ -11,19 +11,29 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func API(testing ...bool) http.Handler](#API)
+* [Constants](#pkg-constants)
+* [func API() http.Handler](#API)
 
 
 #### <a name="pkg-files">Package files</a>
 [routes.go](/src/github.com/coralproject/shelf/cmd/corald/routes/routes.go) 
 
 
-
-
-
-## <a name="API">func</a> [API](/src/target/routes.go?s=673:711#L20)
+## <a name="pkg-constants">Constants</a>
 ``` go
-func API(testing ...bool) http.Handler
+const (
+
+    // Namespace is the key that is the prefix for configuration in the
+    // environment.
+    Namespace = "CORAL"
+)
+```
+
+
+
+## <a name="API">func</a> [API](/src/target/routes.go?s=1398:1421#L38)
+``` go
+func API() http.Handler
 ```
 API returns a handler for a set of routes.
 

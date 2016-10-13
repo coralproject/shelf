@@ -6,8 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia"
 	"gopkg.in/mgo.v2"
 )

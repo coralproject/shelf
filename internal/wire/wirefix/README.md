@@ -11,8 +11,8 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Add(context interface{}, db *db.DB, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error](#Add)
-* [func Get() ([]relationship.Relationship, []view.View, []pattern.Pattern, error)](#Get)
+* [func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error](#Add)
+* [func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error)](#Get)
 * [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
 
 
@@ -23,23 +23,23 @@
 
 
 
-## <a name="Add">func</a> [Add](/src/target/wirefix.go?s=1376:1503#L53)
+## <a name="Add">func</a> [Add](/src/target/wirefix.go?s=1754:1900#L67)
 ``` go
-func Add(context interface{}, db *db.DB, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error
+func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error
 ```
 Add inserts relationships, views, and patterns for testing.
 
 
 
-## <a name="Get">func</a> [Get](/src/target/wirefix.go?s=495:574#L12)
+## <a name="Get">func</a> [Get](/src/target/wirefix.go?s=572:664#L13)
 ``` go
-func Get() ([]relationship.Relationship, []view.View, []pattern.Pattern, error)
+func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error)
 ```
 Get loads relationship, view, and pattern data based on *.json files.
 
 
 
-## <a name="Remove">func</a> [Remove](/src/target/wirefix.go?s=1946:2010#L76)
+## <a name="Remove">func</a> [Remove](/src/target/wirefix.go?s=2451:2515#L96)
 ``` go
 func Remove(context interface{}, db *db.DB, prefix string) error
 ```

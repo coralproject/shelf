@@ -6,15 +6,18 @@ import (
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
-	_ "github.com/cayleygraph/cayley/graph/mongo"
 	"github.com/coralproject/shelf/cmd/sponge/cmditem"
+	"github.com/coralproject/shelf/cmd/sponge/cmdpattern"
 	"github.com/spf13/cobra"
 )
 
-// Config environmental variables.
 const (
+
+	// cfgLoggingLevel is the key for the logging level.
 	cfgLoggingLevel = "LOGGING_LEVEL"
-	cfgWebHost      = "WEB_HOST"
+
+	// cfgWebHost is the key for the web host.
+	cfgWebHost = "WEB_HOST"
 )
 
 // wire includes information about the sponge cobra command.
@@ -44,7 +47,10 @@ func main() {
 	sponge.Println("Using log level", logLevel())
 
 	// Add the item commands to the CLI tool.
-	sponge.AddCommand(cmditem.GetCommands())
+	sponge.AddCommand(
+		cmditem.GetCommands(),
+		cmdpattern.GetCommands(),
+	)
 
 	// Execute the command.
 	sponge.Execute()

@@ -22,9 +22,9 @@ _testmain.go
 *.exe
 *.test
 *.prof
+.DS_Store
 
-# Config files
-*.cfg
+.DS_Store
 
 # Build files
 cmd/xenia/xenia
@@ -33,6 +33,3 @@ cmd/askd/askd
 cmd/corald/corald
 cmd/sponged/sponged
 cmd/wire/wire
-
-# Local development Config files
-config

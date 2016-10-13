@@ -4,7 +4,8 @@ import (
 	"encoding/json"
 	"os"
 
-	"github.com/ardanlabs/kit/db"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/sponge/item"
 	"github.com/coralproject/shelf/internal/wire/pattern"
 	"github.com/coralproject/shelf/internal/wire/relationship"
 	"github.com/coralproject/shelf/internal/wire/view"
@@ -19,48 +20,67 @@ func init() {
 }
 
 // Get loads relationship, view, and pattern data based on *.json files.
-func Get() ([]relationship.Relationship, []view.View, []pattern.Pattern, error) {
-	file, err := os.Open(path + "relationship.json")
+func Get() ([]item.Item, []relationship.Relationship, []view.View, []pattern.Pattern, error) {
+	file, err := os.Open(path + "items.json")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
+	}
+	defer file.Close()
+
+	var items []item.Item
+	err = json.NewDecoder(file).Decode(&items)
+	if err != nil {
+		return nil, nil, nil, nil, err
+	}
+	file.Close()
+
+	file, err = os.Open(path + "relationship.json")
+	if err != nil {
+		return nil, nil, nil, nil, err
 	}
 
 	var rels []relationship.Relationship
 	err = json.NewDecoder(file).Decode(&rels)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	file.Close()
 
 	file, err = os.Open(path + "view.json")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	var views []view.View
 	err = json.NewDecoder(file).Decode(&views)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	file.Close()
 
 	file, err = os.Open(path + "pattern.json")
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 
 	var patterns []pattern.Pattern
 	err = json.NewDecoder(file).Decode(&patterns)
 	if err != nil {
-		return nil, nil, nil, err
+		return nil, nil, nil, nil, err
 	}
 	file.Close()
 
-	return rels, views, patterns, nil
+	return items, rels, views, patterns, nil
 }
 
 // Add inserts relationships, views, and patterns for testing.
-func Add(context interface{}, db *db.DB, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error {
+func Add(context interface{}, db *db.DB, items []item.Item, rels []relationship.Relationship, views []view.View, patterns []pattern.Pattern) error {
+	for _, itm := range items {
+		if err := item.Upsert(context, db, &itm); err != nil {
+			return err
+		}
+	}
+
 	for _, rel := range rels {
 		if err := relationship.Upsert(context, db, &rel); err != nil {
 			return err
@@ -85,6 +105,16 @@ func Add(context interface{}, db *db.DB, rels []relationship.Relationship, views
 // Remove removes relationships, views, and patterns in Mongo that match a given pattern.
 func Remove(context interface{}, db *db.DB, prefix string) error {
 	f := func(c *mgo.Collection) error {
+		q := bson.M{"item_id": bson.RegEx{Pattern: prefix}}
+		_, err := c.RemoveAll(q)
+		return err
+	}
+
+	if err := db.ExecuteMGO(context, item.Collection, f); err != nil {
+		return err
+	}
+
+	f = func(c *mgo.Collection) error {
 		q := bson.M{"predicate": bson.RegEx{Pattern: prefix}}
 		_, err := c.RemoveAll(q)
 		return err

@@ -5,11 +5,10 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
-	"github.com/cayleygraph/cayley"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item"
-	"github.com/coralproject/shelf/internal/wire"
 )
 
 // dataHandle maintains the set of handlers for the data api, which is responsible
@@ -26,9 +25,9 @@ const defaultVersion = 1
 
 //==============================================================================
 
-// Upsert receives POSTed data, itemizes it then Upserts it via the item service
+// Import receives POSTed data, itemizes it then imports it via the item API.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal.
-func (dataHandle) Upsert(c *app.Context) error {
+func (dataHandle) Import(c *web.Context) error {
 
 	// Unmarshall the data packet from the Request Body.
 	var dat map[string]interface{}
@@ -37,36 +36,31 @@ func (dataHandle) Upsert(c *app.Context) error {
 	}
 
 	// Create a new item with known Type, Version and Data.
-	it := item.Item{
+	itm := item.Item{
 		Type:    c.Params["type"],
 		Version: defaultVersion,
 		Data:    dat,
 	}
 
 	// Item.ID must be inferred from the source_id in the data.
-	if err := it.InferIDFromData(); err != nil {
+	if err := itm.InferIDFromData(); err != nil {
 		return err
 	}
 
-	// Upsert the item.
-	if err := item.Upsert(c.SessionID, c.Ctx["DB"].(*db.DB), &it); err != nil {
+	db := c.Ctx["DB"].(*db.DB)
+
+	graphHandle, err := db.GraphHandle(c.SessionID)
+	if err != nil {
 		return err
 	}
 
-	// Prepare the generic item data map.
-	itMap := map[string]interface{}{
-		"item_id": it.ID,
-		"type":    it.Type,
-		"version": it.Version,
-		"data":    it.Data,
-	}
-
-	// Infer relationships and add them to the graph.
-	if err := wire.AddToGraph(c.SessionID, c.Ctx["DB"].(*db.DB), c.Ctx["Graph"].(*cayley.Handle), itMap); err != nil {
+	// Upsert the item into the items collection and add/remove necessary
+	// quads to/from the graph.
+	if err := sponge.Import(c.SessionID, db, graphHandle, &itm); err != nil {
 		return err
 	}
 
 	// Respond with no content success.
-	c.Respond(nil, http.StatusNoContent)
+	c.Respond(itm, http.StatusOK)
 	return nil
 }

@@ -52,7 +52,7 @@ Set of error variables.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/regex.go?s=9486:9548#L355)
+## <a name="Delete">func</a> [Delete](/src/target/regex.go?s=9532:9594#L355)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
@@ -60,7 +60,7 @@ Delete is used to remove an existing Regex document.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/regex.go?s=4289:4364#L165)
+## <a name="GetAll">func</a> [GetAll](/src/target/regex.go?s=4335:4410#L165)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) ([]Regex, error)
 ```
@@ -68,7 +68,7 @@ GetAll retrieves a list of regexs.
 
 
 
-## <a name="GetByNames">func</a> [GetByNames](/src/target/regex.go?s=6377:6457#L242)
+## <a name="GetByNames">func</a> [GetByNames](/src/target/regex.go?s=6423:6503#L242)
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error)
 ```
@@ -76,7 +76,7 @@ GetByNames retrieves the documents for the specified names.
 
 
 
-## <a name="GetNames">func</a> [GetNames](/src/target/regex.go?s=3159:3222#L119)
+## <a name="GetNames">func</a> [GetNames](/src/target/regex.go?s=3205:3268#L119)
 ``` go
 func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
@@ -84,7 +84,7 @@ GetNames retrieves a list of query regex names.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/regex.go?s=1061:1121#L36)
+## <a name="Upsert">func</a> [Upsert](/src/target/regex.go?s=1107:1167#L36)
 ``` go
 func Upsert(context interface{}, db *db.DB, rgx Regex) error
 ```
@@ -110,14 +110,14 @@ Regex contains a single regular expresion bound to a name.
 
 
 
-### <a name="GetByName">func</a> [GetByName](/src/target/regex.go?s=5276:5350#L202)
+### <a name="GetByName">func</a> [GetByName](/src/target/regex.go?s=5322:5396#L202)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```
 GetByName retrieves the document for the specified Regex.
 
 
-### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/regex.go?s=8054:8139#L306)
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/regex.go?s=8100:8185#L306)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```

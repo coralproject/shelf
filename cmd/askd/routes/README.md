@@ -11,6 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
 * [func API() http.Handler](#API)
 
 
@@ -18,10 +19,19 @@
 [routes.go](/src/github.com/coralproject/shelf/cmd/askd/routes/routes.go) 
 
 
+## <a name="pkg-constants">Constants</a>
+``` go
+const (
+
+    // Namespace is the key that is the prefix for configuration in the
+    // environment.
+    Namespace = "ASK"
+)
+```
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1686:1709#L48)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1420:1443#L40)
 ``` go
 func API() http.Handler
 ```

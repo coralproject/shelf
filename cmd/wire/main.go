@@ -5,23 +5,21 @@ import (
 	"os"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
-	_ "github.com/cayleygraph/cayley/graph/mongo"
 	"github.com/coralproject/shelf/cmd/wire/cmdview"
+	"github.com/coralproject/shelf/internal/platform/db"
+	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/spf13/cobra"
 )
 
-// Config environmental variables.
 const (
-	cfgLoggingLevel  = "LOGGING_LEVEL"
-	cfgMongoHost     = "MONGO_HOST"
-	cfgMongoAuthDB   = "MONGO_AUTHDB"
-	cfgMongoDB       = "MONGO_DB"
-	cfgMongoUser     = "MONGO_USER"
-	cfgMongoPassword = "MONGO_PASS"
+
+	// cfgLoggingLevel is the key for the logging level.
+	cfgLoggingLevel = "LOGGING_LEVEL"
+
+	// cfgMongoURI is the key for the URI to the MongoDB service.
+	cfgMongoURI = "MONGO_URI"
 )
 
 // wire includes information about the wire cobra command.
@@ -57,21 +55,15 @@ func main() {
 	// Configure MongoDB.
 	wire.Println("Configuring MongoDB")
 
-	mongoCfg := mongo.Config{
-		Host:     cfg.MustString(cfgMongoHost),
-		AuthDB:   cfg.MustString(cfgMongoAuthDB),
-		DB:       cfg.MustString(cfgMongoDB),
-		User:     cfg.MustString(cfgMongoUser),
-		Password: cfg.MustString(cfgMongoPassword),
-	}
+	mongoURI := cfg.MustURL(cfgMongoURI)
 
-	err := db.RegMasterSession("startup", mongoCfg.DB, mongoCfg)
+	err := db.RegMasterSession("startup", mongoURI.Path, mongoURI.String(), 0)
 	if err != nil {
 		wire.Println("Unable to initialize MongoDB")
 		os.Exit(1)
 	}
 
-	mgoDB, err = db.NewMGO("", mongoCfg.DB)
+	mgoDB, err = db.NewMGO("", mongoURI.Path)
 	if err != nil {
 		wire.Println("Unable to get MongoDB session")
 		os.Exit(1)
@@ -81,12 +73,7 @@ func main() {
 	// Configure Cayley.
 	wire.Println("Configuring Cayley")
 
-	opts := map[string]interface{}{
-		"database_name": cfg.MustString(cfgMongoDB),
-		"username":      cfg.MustString(cfgMongoUser),
-		"password":      cfg.MustString(cfgMongoPassword),
-	}
-	graphDB, err = cayley.NewGraph("mongo", cfg.MustString(cfgMongoHost), opts)
+	graphDB, err = cayleyshelf.New(mongoURI.String())
 	if err != nil {
 		wire.Println("Unable to get Cayley handle")
 		os.Exit(1)

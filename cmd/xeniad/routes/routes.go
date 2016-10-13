@@ -1,161 +1,144 @@
 package routes
 
 import (
-	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"time"
 
 	"github.com/ardanlabs/kit/cfg"
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/cmd/xeniad/handlers"
-	"github.com/coralproject/shelf/cmd/xeniad/midware"
+	"github.com/coralproject/shelf/internal/platform/app"
+	"github.com/coralproject/shelf/internal/platform/db"
+	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	"github.com/coralproject/shelf/internal/platform/midware/cayley"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
+	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
-// Environmental variables.
 const (
-	cfgMongoHost     = "MONGO_HOST"
-	cfgMongoAuthDB   = "MONGO_AUTHDB"
-	cfgMongoDB       = "MONGO_DB"
-	cfgMongoUser     = "MONGO_USER"
-	cfgMongoPassword = "MONGO_PASS"
-	cfgAnvilHost     = "ANVIL_HOST"
+
+	// Namespace is the key that is the prefix for configuration in the
+	// environment.
+	Namespace = "XENIA"
+
+	// cfgMongoURI is the key for the URI to the MongoDB service.
+	cfgMongoURI = "MONGO_URI"
+
+	// cfgAuthPublicKey is the key for the public key used for verifying the
+	// inbound requests.
+	cfgAuthPublicKey = "AUTH_PUBLIC_KEY"
+
+	// cfgEnableCORS is set the key to the state for CORS on the service.
+	cfgEnableCORS = "ENABLE_CORS"
 )
 
 func init() {
+
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	app.Init(cfg.EnvProvider{Namespace: "XENIA"})
-
-	// Initialize MongoDB.
-	if _, err := cfg.String(cfgMongoHost); err == nil {
-		cfg := mongo.Config{
-			Host:     cfg.MustString(cfgMongoHost),
-			AuthDB:   cfg.MustString(cfgMongoAuthDB),
-			DB:       cfg.MustString(cfgMongoDB),
-			User:     cfg.MustString(cfgMongoUser),
-			Password: cfg.MustString(cfgMongoPassword),
-			Timeout:  25 * time.Second,
-		}
-
-		// The web framework middleware for Mongo is using the name of the
-		// database as the name of the master session by convention. So use
-		// cfg.DB as the second argument when creating the master session.
-		if err := db.RegMasterSession("startup", cfg.DB, cfg); err != nil {
-			log.Error("startup", "Init", err, "Initializing MongoDB")
-			os.Exit(1)
-		}
-	}
+	app.Init(cfg.EnvProvider{Namespace: Namespace})
 }
 
 //==============================================================================
 
 // API returns a handler for a set of routes.
-func API(testing ...bool) http.Handler {
+func API() http.Handler {
+	mongoURI := cfg.MustURL(cfgMongoURI)
 
-	a := app.New(midware.Mongo, midware.Auth)
+	// The web framework middleware for Mongo is using the name of the
+	// database as the name of the master session by convention. So use
+	// cfg.DB as the second argument when creating the master session.
+	if err := db.RegMasterSession("startup", mongoURI.Path, mongoURI.String(), 25*time.Second); err != nil {
+		log.Error("startup", "Init", err, "Initializing MongoDB")
+		os.Exit(1)
+	}
+
+	w := web.New(logm.Midware, errorm.Midware)
+
+	publicKey, err := cfg.String(cfgAuthPublicKey)
+	if err != nil || publicKey == "" {
+		log.User("startup", "Init", "%s is missing, internal authentication is disabled", cfgAuthPublicKey)
+	}
+
+	// If the public key is provided then add the auth middleware or fail using
+	// the provided public key.
+	if publicKey != "" {
+		log.Dev("startup", "Init", "Initializing Auth")
+
+		authm, err := authm.Midware(publicKey, authm.MidwareOpts{})
+		if err != nil {
+			log.Error("startup", "Init", err, "Initializing Auth")
+			os.Exit(1)
+		}
+
+		// Apply the authentication middleware on top of the application as the
+		// first middleware.
+		w.Use(authm)
+	}
+
+	w.Use(mongo.Midware(mongoURI))
+
+	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
+		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
+		w.Use(w.CORS())
+	} else {
+		log.Dev("startup", "Init", "CORS Disabled")
+	}
 
 	log.Dev("startup", "Init", "Initalizing routes")
-	routes(a)
+	routes(w)
 
-	log.Dev("startup", "Init", "Initalizing CORS")
-	a.CORS()
-
-	// It has been decided the website is no longer required.
-	// if testing == nil {
-	// 	log.Dev("startup", "Init", "Initalizing website")
-	// 	website(a)
-	// }
-
-	return a
+	return w
 }
 
 // routes manages the handling of the API endpoints.
-func routes(a *app.App) {
-	a.Handle("GET", "/v1/version", handlers.Version.List)
+func routes(w *web.Web) {
+	w.Handle("GET", "/v1/version", handlers.Version.List)
 
-	a.Handle("GET", "/v1/script", handlers.Script.List)
-	a.Handle("PUT", "/v1/script", handlers.Script.Upsert)
-	a.Handle("GET", "/v1/script/:name", handlers.Script.Retrieve)
-	a.Handle("DELETE", "/v1/script/:name", handlers.Script.Delete)
+	w.Handle("GET", "/v1/script", handlers.Script.List)
+	w.Handle("PUT", "/v1/script", handlers.Script.Upsert)
+	w.Handle("GET", "/v1/script/:name", handlers.Script.Retrieve)
+	w.Handle("DELETE", "/v1/script/:name", handlers.Script.Delete)
 
-	a.Handle("GET", "/v1/query", handlers.Query.List)
-	a.Handle("PUT", "/v1/query", handlers.Query.Upsert)
-	a.Handle("GET", "/v1/query/:name", handlers.Query.Retrieve)
-	a.Handle("DELETE", "/v1/query/:name", handlers.Query.Delete)
+	w.Handle("GET", "/v1/query", handlers.Query.List)
+	w.Handle("PUT", "/v1/query", handlers.Query.Upsert)
+	w.Handle("GET", "/v1/query/:name", handlers.Query.Retrieve)
+	w.Handle("DELETE", "/v1/query/:name", handlers.Query.Delete)
 
-	a.Handle("PUT", "/v1/index/:name", handlers.Query.EnsureIndexes)
+	w.Handle("PUT", "/v1/index/:name", handlers.Query.EnsureIndexes)
 
-	a.Handle("GET", "/v1/regex", handlers.Regex.List)
-	a.Handle("PUT", "/v1/regex", handlers.Regex.Upsert)
-	a.Handle("GET", "/v1/regex/:name", handlers.Regex.Retrieve)
-	a.Handle("DELETE", "/v1/regex/:name", handlers.Regex.Delete)
+	w.Handle("GET", "/v1/regex", handlers.Regex.List)
+	w.Handle("PUT", "/v1/regex", handlers.Regex.Upsert)
+	w.Handle("GET", "/v1/regex/:name", handlers.Regex.Retrieve)
+	w.Handle("DELETE", "/v1/regex/:name", handlers.Regex.Delete)
 
-	a.Handle("GET", "/v1/mask", handlers.Mask.List)
-	a.Handle("PUT", "/v1/mask", handlers.Mask.Upsert)
-	a.Handle("GET", "/v1/mask/:collection/:field", handlers.Mask.Retrieve)
-	a.Handle("GET", "/v1/mask/:collection", handlers.Mask.Retrieve)
-	a.Handle("DELETE", "/v1/mask/:collection/:field", handlers.Mask.Delete)
+	w.Handle("GET", "/v1/mask", handlers.Mask.List)
+	w.Handle("PUT", "/v1/mask", handlers.Mask.Upsert)
+	w.Handle("GET", "/v1/mask/:collection/:field", handlers.Mask.Retrieve)
+	w.Handle("GET", "/v1/mask/:collection", handlers.Mask.Retrieve)
+	w.Handle("DELETE", "/v1/mask/:collection/:field", handlers.Mask.Delete)
 
-	a.Handle("POST", "/v1/exec", handlers.Exec.Custom)
-	a.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
+	w.Handle("POST", "/v1/exec", handlers.Exec.Custom)
+	w.Handle("GET", "/v1/exec/:name", handlers.Exec.Name)
 
-	a.Handle("GET", "/v1/relationship", handlers.Relationship.List)
-	a.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)
-	a.Handle("GET", "/v1/relationship/:predicate", handlers.Relationship.Retrieve)
-	a.Handle("DELETE", "/v1/relationship/:predicate", handlers.Relationship.Delete)
+	// Create the Cayley middleware which will only be binded to specific
+	// endpoints.
+	cayleym := cayley.Midware(cfg.MustURL(cfgMongoURI))
 
-	a.Handle("GET", "/v1/view", handlers.View.List)
-	a.Handle("PUT", "/v1/view", handlers.View.Upsert)
-	a.Handle("GET", "/v1/view/:name", handlers.View.Retrieve)
-	a.Handle("DELETE", "/v1/view/:name", handlers.View.Delete)
+	// These endpoints require Cayley, we will add the middleware onto the routes.
+	w.Handle("GET", "/v1/exec/:name/view/:view/:item", handlers.Exec.NameOnView, cayleym)
+	w.Handle("POST", "/v1/exec/view/:view/:item", handlers.Exec.CustomOnView, cayleym)
 
-	a.Handle("GET", "/v1/pattern", handlers.Pattern.List)
-	a.Handle("PUT", "/v1/pattern", handlers.Pattern.Upsert)
-	a.Handle("GET", "/v1/pattern/:type", handlers.Pattern.Retrieve)
-	a.Handle("DELETE", "/v1/pattern/:type", handlers.Pattern.Delete)
+	w.Handle("GET", "/v1/relationship", handlers.Relationship.List)
+	w.Handle("PUT", "/v1/relationship", handlers.Relationship.Upsert)
+	w.Handle("GET", "/v1/relationship/:predicate", handlers.Relationship.Retrieve)
+	w.Handle("DELETE", "/v1/relationship/:predicate", handlers.Relationship.Delete)
 
-}
-
-// website manages the serving of web files for the project.
-func website(a *app.App) {
-	fs := http.FileServer(http.Dir("static"))
-	h1 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
-		fs.ServeHTTP(rw, r)
-	}
-
-	a.TreeMux.Handle("GET", "/dist/*path", h1)
-	a.TreeMux.Handle("GET", "/img/*path", h1)
-	a.TreeMux.Handle("GET", "/", h1)
-
-	h2 := func(rw http.ResponseWriter, r *http.Request, p map[string]string) {
-		data, _ := ioutil.ReadFile("static/index.html")
-		io.WriteString(rw, string(data))
-	}
-
-	file, err := os.Open("static/routes.json")
-	if err != nil {
-		log.Error("startup", "Init", err, "Initializing website")
-		os.Exit(1)
-	}
-
-	defer file.Close()
-
-	var routes []struct {
-		URL string
-	}
-
-	if err := json.NewDecoder(file).Decode(&routes); err != nil {
-		log.Error("startup", "Init", err, "Initializing website")
-		os.Exit(1)
-	}
-
-	for _, route := range routes {
-		a.TreeMux.Handle("GET", route.URL, h2)
-	}
+	w.Handle("GET", "/v1/view", handlers.View.List)
+	w.Handle("PUT", "/v1/view", handlers.View.Upsert)
+	w.Handle("GET", "/v1/view/:name", handlers.View.Retrieve)
+	w.Handle("DELETE", "/v1/view/:name", handlers.View.Delete)
 }

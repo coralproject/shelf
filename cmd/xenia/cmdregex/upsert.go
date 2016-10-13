@@ -99,7 +99,7 @@ func runUpsert(cmd *cobra.Command, args []string) {
 // runUpsertWeb issues the command talking to the web service.
 func runUpsertWeb(cmd *cobra.Command, rgx regex.Regex) error {
 	verb := "PUT"
-	url := "/1.0/regex"
+	url := "/v1/regex"
 
 	data, err := json.Marshal(rgx)
 	if err != nil {

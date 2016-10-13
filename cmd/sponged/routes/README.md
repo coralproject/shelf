@@ -11,6 +11,7 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
 * [func API() http.Handler](#API)
 
 
@@ -18,10 +19,19 @@
 [routes.go](/src/github.com/coralproject/shelf/cmd/sponged/routes/routes.go) 
 
 
+## <a name="pkg-constants">Constants</a>
+``` go
+const (
+
+    // Namespace is the key that is the prefix for configuration in the
+    // environment.
+    Namespace = "SPONGE"
+)
+```
 
 
 
-## <a name="API">func</a> [API](/src/target/routes.go?s=1577:1600#L46)
+## <a name="API">func</a> [API](/src/target/routes.go?s=1298:1321#L35)
 ``` go
 func API() http.Handler
 ```

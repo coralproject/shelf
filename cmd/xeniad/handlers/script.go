@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/web/app"
+	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/xenia/script"
 )
 
@@ -19,11 +19,11 @@ var Script scriptHandle
 
 // List returns all the existing scripts in the system.
 // 200 Success, 404 Not Found, 500 Internal
-func (scriptHandle) List(c *app.Context) error {
+func (scriptHandle) List(c *web.Context) error {
 	scrs, err := script.GetAll(c.SessionID, c.Ctx["DB"].(*db.DB), nil)
 	if err != nil {
 		if err == script.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -34,11 +34,11 @@ func (scriptHandle) List(c *app.Context) error {
 
 // Retrieve returns the specified script from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (scriptHandle) Retrieve(c *app.Context) error {
+func (scriptHandle) Retrieve(c *web.Context) error {
 	scr, err := script.GetByName(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"])
 	if err != nil {
 		if err == script.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}
@@ -51,7 +51,7 @@ func (scriptHandle) Retrieve(c *app.Context) error {
 
 // Upsert inserts or updates the posted Script document into the database.
 // 204 SuccessNoContent, 400 Bad Request, 404 Not Found, 500 Internal
-func (scriptHandle) Upsert(c *app.Context) error {
+func (scriptHandle) Upsert(c *web.Context) error {
 	var scr script.Script
 	if err := json.NewDecoder(c.Request.Body).Decode(&scr); err != nil {
 		return err
@@ -69,10 +69,10 @@ func (scriptHandle) Upsert(c *app.Context) error {
 
 // Delete removes the specified Script from the system.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
-func (scriptHandle) Delete(c *app.Context) error {
+func (scriptHandle) Delete(c *web.Context) error {
 	if err := script.Delete(c.SessionID, c.Ctx["DB"].(*db.DB), c.Params["name"]); err != nil {
 		if err == script.ErrNotFound {
-			err = app.ErrNotFound
+			err = web.ErrNotFound
 		}
 		return err
 	}

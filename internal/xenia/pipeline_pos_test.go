@@ -27,6 +27,8 @@ func getPosExecSet() []execSet {
 		withAdjTime(),
 		fieldReplace(),
 		explain(),
+		basicView(),
+		basicViewData(),
 	}
 }
 
@@ -297,7 +299,7 @@ func basicVarRegex() execSet {
 			Name:    "Basic Var Regex",
 			Enabled: true,
 			Params: []query.Param{
-				{Name: "station_id", RegexName: "number"},
+				{Name: "station_id", RegexName: "RTEST_number"},
 			},
 			Queries: []query.Query{
 				{
@@ -628,6 +630,74 @@ func explain() execSet {
 		},
 		results: []string{
 			`#find:queryPlanner`,
+		},
+	}
+}
+
+// basicView performs simple query on a view.
+func basicView() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{
+			"view":             "VTEST_thread",
+			"item":             "ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+			"item_of_interest": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
+		},
+		set: &query.Set{
+			Name:    "Basic View",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "item_of_interest"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "ViewVars",
+					Type:       "pipeline",
+					Collection: "view",
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
+						{"$project": map[string]interface{}{"_id": 0, "item_id": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"ViewVars","Docs":[{"item_id":"ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"}]}]}`,
+		},
+	}
+}
+
+// basicViewData performs simple query on data in a view.
+func basicViewData() execSet {
+	return execSet{
+		fail: false,
+		vars: map[string]string{
+			"view":             "VTEST_user comments",
+			"item":             "ITEST_80aa936a-f618-4234-a7be-df59a14cf8de",
+			"item_of_interest": "ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82",
+		},
+		set: &query.Set{
+			Name:    "Basic View",
+			Enabled: true,
+			Params: []query.Param{
+				{Name: "item_of_interest"},
+			},
+			Queries: []query.Query{
+				{
+					Name:       "ViewVars",
+					Type:       "pipeline",
+					Collection: "view",
+					Return:     true,
+					Commands: []map[string]interface{}{
+						{"$match": map[string]interface{}{"item_id": "#string:item_of_interest"}},
+						{"$project": map[string]interface{}{"_id": 0, "data.body": 1}},
+					},
+				},
+			},
+		},
+		results: []string{
+			`{"results":[{"Name":"ViewVars","Docs":[{"data":{"body":"Computer, belay that order."}}]}]}`,
 		},
 	}
 }

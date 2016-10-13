@@ -3,9 +3,9 @@ package pattern
 import (
 	"errors"
 
-	"github.com/ardanlabs/kit/db"
-	"github.com/ardanlabs/kit/db/mongo"
 	"github.com/ardanlabs/kit/log"
+	"github.com/coralproject/shelf/internal/platform/db"
+	"github.com/coralproject/shelf/internal/platform/db/mongo"
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -14,7 +14,7 @@ import (
 const Collection = "patterns"
 
 // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Pattern Not found")
 
 // Upsert upserts a pattern to the collection of currently utilized patterns.
 func Upsert(context interface{}, db *db.DB, pattern *Pattern) error {

@@ -37,13 +37,13 @@ Collection is the Mongo collection containing pattern metadata.
 
 ## <a name="pkg-variables">Variables</a>
 ``` go
-var ErrNotFound = errors.New("Set Not found")
+var ErrNotFound = errors.New("Pattern Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
 
-## <a name="Delete">func</a> [Delete](/src/target/pattern.go?s=2565:2631#L81)
+## <a name="Delete">func</a> [Delete](/src/target/pattern.go?s=2615:2681#L81)
 ``` go
 func Delete(context interface{}, db *db.DB, itemType string) error
 ```
@@ -51,7 +51,7 @@ Delete removes a pattern from from Mongo.
 
 
 
-## <a name="GetAll">func</a> [GetAll](/src/target/pattern.go?s=1263:1325#L36)
+## <a name="GetAll">func</a> [GetAll](/src/target/pattern.go?s=1313:1375#L36)
 ``` go
 func GetAll(context interface{}, db *db.DB) ([]Pattern, error)
 ```
@@ -59,7 +59,7 @@ GetAll retrieves the current patterns from Mongo.
 
 
 
-## <a name="Upsert">func</a> [Upsert](/src/target/pattern.go?s=502:569#L10)
+## <a name="Upsert">func</a> [Upsert](/src/target/pattern.go?s=552:619#L10)
 ``` go
 func Upsert(context interface{}, db *db.DB, pattern *Pattern) error
 ```
@@ -68,11 +68,11 @@ Upsert upserts a pattern to the collection of currently utilized patterns.
 
 
 
-## <a name="Inference">type</a> [Inference](/src/target/model.go?s=500:896#L8)
+## <a name="Inference">type</a> [Inference](/src/target/model.go?s=500:916#L8)
 ``` go
 type Inference struct {
     RelIDField string `bson:"related_ID_field" json:"related_ID_field" validate:"required,min=2"`
-    RelType    string `bson:"related_type" json:"related_type"`
+    RelType    string `bson:"related_type,omitempty" json:"related_type,omitempty"`
     Predicate  string `bson:"predicate" json:"predicate" validate:"required,min=2"`
     Direction  string `bson:"direction" json:"direction" validate:"required,min=2"`
     Required   bool   `bson:"required" json:"required"`
@@ -90,7 +90,7 @@ within an item.
 
 
 
-### <a name="Inference.Validate">func</a> (\*Inference) [Validate](/src/target/model.go?s=954:992#L17)
+### <a name="Inference.Validate">func</a> (\*Inference) [Validate](/src/target/model.go?s=974:1012#L17)
 ``` go
 func (inf *Inference) Validate() error
 ```
@@ -99,7 +99,7 @@ Validate checks the Inference value for consistency.
 
 
 
-## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1169:1356#L26)
+## <a name="Pattern">type</a> [Pattern](/src/target/model.go?s=1189:1376#L26)
 ``` go
 type Pattern struct {
     Type       string      `bson:"type" json:"type" validate:"required,min=2"`
@@ -115,7 +115,7 @@ item of an certain type.
 
 
 
-### <a name="GetByType">func</a> [GetByType](/src/target/pattern.go?s=1872:1953#L58)
+### <a name="GetByType">func</a> [GetByType](/src/target/pattern.go?s=1922:2003#L58)
 ``` go
 func GetByType(context interface{}, db *db.DB, itemType string) (*Pattern, error)
 ```
@@ -125,7 +125,7 @@ GetByType retrieves a pattern by type from Mongo.
 
 
 
-### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1412:1446#L32)
+### <a name="Pattern.Validate">func</a> (\*Pattern) [Validate](/src/target/model.go?s=1432:1466#L32)
 ``` go
 func (p *Pattern) Validate() error
 ```

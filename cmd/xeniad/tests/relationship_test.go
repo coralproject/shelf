@@ -23,8 +23,8 @@ func TestListRelationships(t *testing.T) {
 
 	t.Log("Given the need get a set of relationships.")
 	{
-		url := "/1.0/relationship"
-		r := tests.NewRequest("GET", url, nil)
+		url := "/v1/relationship"
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -65,8 +65,8 @@ func TestRetrieveRelationship(t *testing.T) {
 
 	t.Log("Given the need to get a specific relationship.")
 	{
-		url := "/1.0/relationship/" + relPrefix + "authored"
-		r := tests.NewRequest("GET", url, nil)
+		url := "/v1/relationship/" + relPrefix + "authored"
+		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -117,8 +117,8 @@ func TestUpsertRelationship(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Insert the Relationship.
 
-		url := "/1.0/relationship"
-		r := tests.NewRequest("PUT", url, bytes.NewBuffer(relStrData))
+		url := "/v1/relationship"
+		r := httptest.NewRequest("PUT", url, bytes.NewBuffer(relStrData))
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -134,8 +134,8 @@ func TestUpsertRelationship(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Relationship.
 
-		url = "/1.0/relationship/" + relPrefix + "flagged"
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/relationship/" + relPrefix + "flagged"
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -172,8 +172,8 @@ func TestUpsertRelationship(t *testing.T) {
 		}
 		t.Logf("\t%s\tShould be able to marshal the changed fixture.", tests.Success)
 
-		url = "/1.0/relationship"
-		r = tests.NewRequest("PUT", url, bytes.NewBuffer(relStrData))
+		url = "/v1/relationship"
+		r = httptest.NewRequest("PUT", url, bytes.NewBuffer(relStrData))
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -189,8 +189,8 @@ func TestUpsertRelationship(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Relationship.
 
-		url = "/1.0/relationship/" + relPrefix + "flagged"
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/relationship/" + relPrefix + "flagged"
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -227,8 +227,8 @@ func TestDeleteRelationship(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Delete the Relationship.
 
-		url := "/1.0/relationship/" + relPrefix + "on"
-		r := tests.NewRequest("DELETE", url, nil)
+		url := "/v1/relationship/" + relPrefix + "on"
+		r := httptest.NewRequest("DELETE", url, nil)
 		w := httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
@@ -244,8 +244,8 @@ func TestDeleteRelationship(t *testing.T) {
 		//----------------------------------------------------------------------
 		// Retrieve the Relationship.
 
-		url = "/1.0/relationship/" + relPrefix + "on"
-		r = tests.NewRequest("GET", url, nil)
+		url = "/v1/relationship/" + relPrefix + "on"
+		r = httptest.NewRequest("GET", url, nil)
 		w = httptest.NewRecorder()
 
 		a.ServeHTTP(w, r)
