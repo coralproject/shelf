@@ -68,13 +68,16 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the relationship quads from the graph.
 
-			p := cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("flagged"))
+			p := cayley.StartPath(store, quad.String("WTEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("WTEST_flagged"))
 			it, _ := p.BuildIterator().Optimize()
 			defer it.Close()
+
+			var count int
 			for it.Next() {
+				count++
 				token := it.Result()
 				value := store.NameOf(token)
-				if quad.NativeOf(value) != "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82" {
+				if quad.NativeOf(value) != "WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82" {
 					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
@@ -83,13 +86,14 @@ func TestAddRemoveGraph(t *testing.T) {
 			}
 			it.Close()
 
-			p = cayley.StartPath(store, quad.String("d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("on"))
+			p = cayley.StartPath(store, quad.String("WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("WTEST_on"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
+				count++
 				token := it.Result()
 				value := store.NameOf(token)
-				if quad.NativeOf(value) != "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a" {
+				if quad.NativeOf(value) != "WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a" {
 					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
@@ -97,6 +101,10 @@ func TestAddRemoveGraph(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to get the relationships from the graph : %s", tests.Failed, err)
 			}
 			it.Close()
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould be able to get relationships from the graph", tests.Failed)
+			}
 			t.Logf("\t%s\tShould be able to get relationships from the graph.", tests.Success)
 
 			//----------------------------------------------------------------------
@@ -118,8 +126,8 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Try to get the relationships.
 
-			var count int
-			p = cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+			count = 0
+			p = cayley.StartPath(store, quad.String("WTEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("WTEST_authored"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
@@ -130,7 +138,7 @@ func TestAddRemoveGraph(t *testing.T) {
 			}
 			it.Close()
 
-			p = cayley.StartPath(store, quad.String("d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("on"))
+			p = cayley.StartPath(store, quad.String("WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("WTEST_on"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
