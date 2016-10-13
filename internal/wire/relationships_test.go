@@ -8,14 +8,14 @@ import (
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/wire"
-	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
+	"github.com/coralproject/shelf/internal/wire/wirefix"
 )
 
 // setupGraph initializes an in-memory Cayley graph and logging for an individual test.
 func setupGraph(t *testing.T) (*db.DB, *cayley.Handle, []map[string]interface{}) {
 	tests.ResetLog()
 
-	_, items, err := patternfix.Get()
+	items, _, _, _, err := wirefix.Get()
 	if err != nil {
 		t.Fatalf("%s\tShould load item records from the fixture file : %v", tests.Failed, err)
 	}
@@ -32,7 +32,19 @@ func setupGraph(t *testing.T) (*db.DB, *cayley.Handle, []map[string]interface{})
 	}
 	t.Logf("\t%s\tShould be able to create a new Cayley graph.", tests.Success)
 
-	return db, store, items
+	// Convert the items to maps.
+	var itemMaps []map[string]interface{}
+	for _, itm := range items {
+		itemMap := map[string]interface{}{
+			"type":    itm.Type,
+			"item_id": itm.ID,
+			"version": itm.Version,
+			"data":    itm.Data,
+		}
+		itemMaps = append(itemMaps, itemMap)
+	}
+
+	return db, store, itemMaps
 }
 
 // TestAddRemoveGraph tests if we can add/remove relationship quads to/from cayley.
@@ -56,13 +68,16 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the relationship quads from the graph.
 
-			p := cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+			p := cayley.StartPath(store, quad.String("WTEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("WTEST_flagged"))
 			it, _ := p.BuildIterator().Optimize()
 			defer it.Close()
+
+			var count int
 			for it.Next() {
+				count++
 				token := it.Result()
 				value := store.NameOf(token)
-				if quad.NativeOf(value) != "d1dfa366-d2f7-4a4a-a64f-af89d4c97d82" {
+				if quad.NativeOf(value) != "WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82" {
 					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
@@ -71,13 +86,14 @@ func TestAddRemoveGraph(t *testing.T) {
 			}
 			it.Close()
 
-			p = cayley.StartPath(store, quad.String("d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("on"))
+			p = cayley.StartPath(store, quad.String("WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("WTEST_on"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
+				count++
 				token := it.Result()
 				value := store.NameOf(token)
-				if quad.NativeOf(value) != "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a" {
+				if quad.NativeOf(value) != "WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a" {
 					t.Fatalf("\t%s\tShould be able to get the relationships from the graph", tests.Failed)
 				}
 			}
@@ -85,6 +101,10 @@ func TestAddRemoveGraph(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to get the relationships from the graph : %s", tests.Failed, err)
 			}
 			it.Close()
+
+			if count != 2 {
+				t.Fatalf("\t%s\tShould be able to get relationships from the graph", tests.Failed)
+			}
 			t.Logf("\t%s\tShould be able to get relationships from the graph.", tests.Success)
 
 			//----------------------------------------------------------------------
@@ -106,8 +126,8 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Try to get the relationships.
 
-			var count int
-			p = cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+			count = 0
+			p = cayley.StartPath(store, quad.String("WTEST_80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("WTEST_authored"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
@@ -118,7 +138,7 @@ func TestAddRemoveGraph(t *testing.T) {
 			}
 			it.Close()
 
-			p = cayley.StartPath(store, quad.String("d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("on"))
+			p = cayley.StartPath(store, quad.String("WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82")).Out(quad.String("WTEST_on"))
 			it, _ = p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {

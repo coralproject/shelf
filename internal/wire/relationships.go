@@ -3,6 +3,7 @@ package wire
 import (
 	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/cayleygraph/cayley"
@@ -153,34 +154,41 @@ func inferRelationships(context interface{}, db *db.DB, itemIn map[string]interf
 	for _, inf := range p.Inferences {
 
 		// Check for the relevant field in the item.
-		if relID, ok := item.itemData[inf.RelIDField]; ok {
+		if relIDs, ok := item.itemData[inf.RelIDField]; ok {
 
 			// If the rel field is empty, do not create the quad.
-			if relID == "" {
+			if relIDs == "" {
 				continue
 			}
 
-			// If we are using source ids and rel types, compose the id.
-			if inf.RelType != "" {
-				relID = fmt.Sprintf("%s_%v", inf.RelType, relID)
-			}
+			// Split the IDs to infer multiple relationships, if present.
+			splitRelIDs := strings.Split(relIDs, ",")
 
-			// Add the relationship parameters.
-			switch inf.Direction {
-			case inString:
-				qp := QuadParam{
-					Subject:   relID,
-					Predicate: inf.Predicate,
-					Object:    item.itemID,
+			// Add the appropriate relationship for each ID.
+			for _, relID := range splitRelIDs {
+
+				// If we are using source ids and rel types, compose the id.
+				if inf.RelType != "" {
+					relID = fmt.Sprintf("%s_%v", inf.RelType, relID)
 				}
-				qps = append(qps, qp)
-			case outString:
-				qp := QuadParam{
-					Subject:   item.itemID,
-					Predicate: inf.Predicate,
-					Object:    relID,
+
+				// Add the relationship parameters.
+				switch inf.Direction {
+				case inString:
+					qp := QuadParam{
+						Subject:   relID,
+						Predicate: inf.Predicate,
+						Object:    item.itemID,
+					}
+					qps = append(qps, qp)
+				case outString:
+					qp := QuadParam{
+						Subject:   item.itemID,
+						Predicate: inf.Predicate,
+						Object:    relID,
+					}
+					qps = append(qps, qp)
 				}
-				qps = append(qps, qp)
 			}
 		}
 	}
@@ -249,8 +257,29 @@ func itemParse(itemIn map[string]interface{}, itemType string) (parsedItem, erro
 	itemData := make(map[string]string)
 	for k, v := range dataMap {
 
+		var vString string
 		vString, ok := v.(string)
-		if !ok || vString == "" {
+		if !ok {
+
+			vs, ok := v.([]interface{})
+			if !ok {
+				continue
+			}
+
+			var vStrings []string
+			for _, vid := range vs {
+				val, ok := vid.(string)
+				if !ok {
+					continue
+				}
+				vStrings = append(vStrings, val)
+			}
+
+			if len(vStrings) > 0 {
+				vString = strings.Join(vStrings, ",")
+			}
+		}
+		if vString == "" {
 			continue
 		}
 		itemData[k] = vString
