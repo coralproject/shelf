@@ -1,7 +1,10 @@
 package error
 
 import (
+	"fmt"
 	"net/http"
+	"runtime"
+	"runtime/debug"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/ardanlabs/kit/web"
@@ -24,7 +27,18 @@ func Midware(next web.Handler) web.Handler {
 				c.RespondError("internal server error", http.StatusInternalServerError)
 
 				// Log out that we caught the error.
-				log.Dev(c.SessionID, "error : Midware", "Completed : Panic Caught : %v", err)
+				switch err := err.(type) {
+				case error:
+					log.Error(c.SessionID, "error : Midware", err, "Panic Caught")
+				default:
+					log.Error(c.SessionID, "error : Midware", fmt.Errorf("%v", err), "Panic Caught")
+				}
+
+				// Print out the stack.
+				log.Dev(c.SessionID, "error : Midware", "Panic Stacktrace:\n%s", debug.Stack())
+
+				_, filePath, line, _ := runtime.Caller(4)
+				log.Dev(c.SessionID, "error : Midware", "Panic Traced to %s:%d", filePath, line)
 			}
 		}()
 
