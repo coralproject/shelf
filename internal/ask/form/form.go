@@ -283,3 +283,102 @@ func Delete(context interface{}, db *db.DB, id string) error {
 	log.Dev(context, "Delete", "Completed")
 	return nil
 }
+
+// Aggregate calculates statistics on all multiple choice questions across submission
+// on a form
+func Aggregate(context interface{}, db *db.DB, id string) (map[string]map[string]int, error) {
+
+	log.Dev(context, "Aggregate", "Started : Submission[%s]", id)
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "Aggregate", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	// Create a container for the aggregations: [question][option]count.
+	agg := make(map[string]map[string]int)
+
+	// Get the form in question.
+	form, err := Retrieve(context, db, id)
+	if err != nil {
+		return nil, err
+	}
+
+	// Find the MultipleChoice widgets
+	for _, step := range form.Steps {
+		for _, widget := range step.Widgets {
+			if widget.Component == "MultipleChoice" {
+				agg[widget.Title] = make(map[string]int)
+			}
+		}
+	}
+
+	// Get the submissions for the form.Collection
+	subs, err := submission.Search(context, db, id, 0, 0, submission.SearchOpts{})
+	if err != nil {
+		return nil, err
+	}
+
+	for _, sub := range subs.Submissions {
+
+		for _, ans := range sub.Answers {
+
+			if ans.Answer == nil {
+				continue
+			}
+
+			a := ans.Answer.(bson.M)
+
+			options := a["options"]
+
+			if options == nil {
+				continue
+			}
+
+			o := options.([]interface{})
+
+			if o[0] == nil {
+				continue
+			}
+
+			ob := o[0].(bson.M)
+
+			selection := ob["title"].(string)
+
+			if agg[ans.Question] == nil {
+				continue
+			}
+
+			agg[ans.Question][selection]++
+		}
+
+	}
+
+	/*
+
+		f := func(c *mgo.Collection) error {
+			u := bson.M{
+				"$pull": bson.M{
+					"flags": flag,
+				},
+			}
+			log.Dev(context, "Aggregate", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
+			return c.UpdateId(objectID, u)
+		}
+
+		if err := db.ExecuteMGO(context, Collection, f); err != nil {
+			log.Error(context, "Aggregate", err, "Completed")
+			return nil, err
+		}
+
+		submission, err := Retrieve(context, db, id)
+		if err != nil {
+			log.Error(context, "Aggregate", err, "Completed")
+			return nil, err
+		}
+
+		log.Dev(context, "Aggregate", "Completed")
+
+	*/
+	return agg, nil
+}
