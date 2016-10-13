@@ -8,14 +8,14 @@ import (
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/platform/db"
 	"github.com/coralproject/shelf/internal/wire"
-	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
+	"github.com/coralproject/shelf/internal/wire/wirefix"
 )
 
 // setupGraph initializes an in-memory Cayley graph and logging for an individual test.
 func setupGraph(t *testing.T) (*db.DB, *cayley.Handle, []map[string]interface{}) {
 	tests.ResetLog()
 
-	_, items, err := patternfix.Get()
+	items, _, _, _, err := wirefix.Get()
 	if err != nil {
 		t.Fatalf("%s\tShould load item records from the fixture file : %v", tests.Failed, err)
 	}
@@ -32,7 +32,19 @@ func setupGraph(t *testing.T) (*db.DB, *cayley.Handle, []map[string]interface{})
 	}
 	t.Logf("\t%s\tShould be able to create a new Cayley graph.", tests.Success)
 
-	return db, store, items
+	// Convert the items to maps.
+	var itemMaps []map[string]interface{}
+	for _, itm := range items {
+		itemMap := map[string]interface{}{
+			"type":    itm.Type,
+			"item_id": itm.ID,
+			"version": itm.Version,
+			"data":    itm.Data,
+		}
+		itemMaps = append(itemMaps, itemMap)
+	}
+
+	return db, store, itemMaps
 }
 
 // TestAddRemoveGraph tests if we can add/remove relationship quads to/from cayley.
@@ -56,7 +68,7 @@ func TestAddRemoveGraph(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Get the relationship quads from the graph.
 
-			p := cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("authored"))
+			p := cayley.StartPath(store, quad.String("80aa936a-f618-4234-a7be-df59a14cf8de")).Out(quad.String("flagged"))
 			it, _ := p.BuildIterator().Optimize()
 			defer it.Close()
 			for it.Next() {
