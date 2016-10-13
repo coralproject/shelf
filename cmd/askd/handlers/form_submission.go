@@ -22,6 +22,47 @@ import (
 // is not valid on the request.
 var ErrInvalidCaptcha = errors.New("captcha invalid")
 
+// ValidateReacaptchaResponse will compare the response provided by the request
+// and check with the Google Recaptcha Web Service if it's valid.
+func ValidateReacaptchaResponse(c *web.Context, recaptchaSecret, response string) error {
+	body := url.Values{
+		"secret":   []string{recaptchaSecret},
+		"response": []string{response},
+	}
+
+	// FIXME: ensure that we can trust the proxy?
+
+	// If there is a header on the incoming request of X-Real-IP then we know
+	// that there is a proxy in place providing the real ip. Otherwise, just
+	// grab the up address from the request payload.
+	if ip := c.Request.Header.Get("X-Real-IP"); ip != "" {
+		body["remoteip"] = []string{ip}
+	} else if ip, _, err := net.SplitHostPort(c.Request.RemoteAddr); err == nil {
+		body["remoteip"] = []string{ip}
+	}
+
+	resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	var rr struct {
+		Success    bool          `json:"success"`
+		Hostname   string        `json:"hostname"`
+		ErrorCodes []interface{} `json:"error-codes"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
+		return err
+	}
+
+	if !rr.Success {
+		return fmt.Errorf("recaptcha is invalid as per the google service")
+	}
+
+	return nil
+}
+
 // formSubmissionHandle maintains the set of handlers for the form submission api.
 type formSubmissionHandle struct{}
 
@@ -42,63 +83,33 @@ func (formSubmissionHandle) Create(c *web.Context) error {
 
 	formID := c.Params["form_id"]
 
-	{
-		// We should check to see if the form has a recaptcha property.
-		f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
-		if err != nil {
-			return err
+	// We should check to see if the form has a recaptcha property.
+	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
+	if err != nil {
+		return err
+	}
+
+	// If the recaptcha is enabled on the form, then we should check that the
+	// response contains the data we need and if it's valid.
+	if enabled, ok := f.Settings["recaptcha"].(bool); ok && enabled {
+		if len(payload.Recaptcha) <= 0 {
+			log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Payload empty")
+			return ErrInvalidCaptcha
 		}
 
-		// If the recaptcha is enabled on the form, then we should check that the
-		// response contains the data we need and if it's valid.
-		if f.Settings["recaptcha"].(bool) {
-			if len(payload.Recaptcha) <= 0 {
-				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Payload empty")
+		// Check to see if Recaptcha has been enabled on the server.
+		if recaptchaSecret, ok := c.Web.Ctx["recaptcha"].(string); ok {
+
+			// Communicate with the Google Recaptcha Web Service to validate the
+			// request.
+			if err := ValidateReacaptchaResponse(c, recaptchaSecret, payload.Recaptcha); err != nil {
+				log.Error(c.SessionID, "FormSubmission : Create", err, "Recaptcha validation failed")
 				return ErrInvalidCaptcha
 			}
-
-			body := url.Values{
-				"secret":   []string{c.Web.Ctx["recaptcha"].(string)},
-				"response": []string{payload.Recaptcha},
-			}
-
-			// FIXME: ensure that we can trust the proxy?
-
-			// If there is a header on the incoming request of X-Real-IP then we know
-			// that there is a proxy in place providing the real ip. Otherwise, just
-			// grab the up address from the request payload.
-			if ip := c.Request.Header.Get("X-Real-IP"); ip != "" {
-				body["remoteip"] = []string{ip}
-			} else if ip, _, err := net.SplitHostPort(c.Request.RemoteAddr); err == nil {
-				body["remoteip"] = []string{ip}
-			}
-
-			log.Dev(c.SessionID, "FormSubmission : Create", "Checking Recaptcha : %s", body.Encode())
-
-			resp, err := http.PostForm("https://www.google.com/recaptcha/api/siteverify", body)
-			if err != nil {
-				log.Error(c.SessionID, "FormSubmission : Create", err, "Error posting to the google service")
-				return err
-			}
-			defer resp.Body.Close()
-
-			var rr struct {
-				Success    bool          `json:"success"`
-				Hostname   string        `json:"hostname"`
-				ErrorCodes []interface{} `json:"error-codes"`
-			}
-			if err := json.NewDecoder(resp.Body).Decode(&rr); err != nil {
-				log.Error(c.SessionID, "FormSubmission : Create", err, "Error decoding the google service response")
-				return err
-			}
-
-			log.Dev(c.SessionID, "FormSubmission : Create", "Recaptcha Response : %#v", rr)
-
-			if !rr.Success {
-				log.Error(c.SessionID, "FormSubmission : Create", ErrInvalidCaptcha, "Recaptcha is invalid as per the google service")
-				return ErrInvalidCaptcha
-			}
+		} else {
+			log.Dev(c.SessionID, "FormSubmission : Create", "Recaptcha disabled, will not check")
 		}
+
 	}
 
 	s, err := ask.CreateSubmission(c.SessionID, c.Ctx["DB"].(*db.DB), formID, payload.Answers)
