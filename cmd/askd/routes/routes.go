@@ -71,11 +71,11 @@ func API() http.Handler {
 	w := web.New(logm.Midware, errorm.Midware, mongo.Midware(mongoURI))
 
 	// Load in the recaptcha secret from the config.
-	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil {
+	if recaptcha, err := cfg.String(cfgRecaptchaSecret); err == nil && recaptcha != "" {
 		w.Ctx["recaptcha"] = recaptcha
 		log.Dev("startup", "Init", "Recaptcha Enabled")
 	} else {
-		log.Dev("startup", "Init", "Recaptcha Disabled")
+		log.Dev("startup", "Init", "%s is missing, recaptcha is disabled", cfgRecaptchaSecret)
 	}
 
 	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
