@@ -2,6 +2,8 @@ package form
 
 import (
 	"errors"
+	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/ardanlabs/kit/log"
@@ -25,7 +27,10 @@ func init() {
 //==============================================================================
 
 // ErrInvalidID occurs when an ID is not in a valid form.
-var ErrInvalidID = errors.New("ID is not in it's proper form")
+var (
+	ErrInvalidID            = errors.New("ID is not in it's proper form")
+	ErrUpdatingAggregations = errors.New("Could not aggregate Form statistics.")
+)
 
 //==============================================================================
 
@@ -52,9 +57,24 @@ type Step struct {
 	Widgets []Widget `json:"widgets" bson:"widgets"`
 }
 
+// AnswerAggregation holds the count for selections of a single multiple
+// choice answer.
+type AnswerAggregation struct {
+	Title string `json:"title" bson:"title"`
+	Count int    `json:"count" bson:"count"`
+}
+
+// Aggregation holds a multiple choice question and a map aggregated counts for
+// each answer.
+type Aggregation struct {
+	Question Widget                       `json:"question" bson:"question"`
+	Answers  map[string]AnswerAggregation `json:"answers" bson:"answers"`
+}
+
 // Stats describes the statistics being recorded by a specific Form.
 type Stats struct {
-	Responses int `json:"responses" bson:"responses"`
+	Responses    int                    `json:"responses" bson:"responses"`
+	Aggregations map[string]Aggregation `json:"aggregations" bson:"aggregations"`
 }
 
 //==============================================================================
@@ -146,15 +166,25 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 
 	objectID := bson.ObjectIdHex(id)
 
+	// Find the number of submissions on this form
 	count, err := submission.Count(context, db, id)
 	if err != nil {
 		log.Error(context, "UpdateStats", ErrInvalidID, "Completed")
 		return nil, err
 	}
 
-	stats := Stats{
-		Responses: count,
+	// Calculate the aggregations
+	agg, err := Aggregate(context, db, id)
+	if err != nil {
+		log.Error(context, "UpdateStats", ErrUpdatingAggregations, "Completed")
+		return nil, err
 	}
+
+	stats := Stats{
+		Responses:    count,
+		Aggregations: agg,
+	}
+
 	f := func(c *mgo.Collection) error {
 		u := bson.M{
 			"$set": bson.M{
@@ -285,9 +315,10 @@ func Delete(context interface{}, db *db.DB, id string) error {
 }
 
 // Aggregate calculates statistics on all multiple choice questions across submission
-// on a form
-func Aggregate(context interface{}, db *db.DB, id string) (map[string]map[string]int, error) {
-
+// on a form. It only considers qustions in the current form as currently there is no
+// way to track how questions and answers change if the admin updates the form mid flight.
+// Aggregate returns a map[_question_]map[_choice_]int_count datastructure.
+func Aggregate(context interface{}, db *db.DB, id string) (map[string]Aggregation, error) {
 	log.Dev(context, "Aggregate", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
@@ -295,20 +326,22 @@ func Aggregate(context interface{}, db *db.DB, id string) (map[string]map[string
 		return nil, ErrInvalidID
 	}
 
-	// Create a container for the aggregations: [question][option]count.
-	agg := make(map[string]map[string]int)
-
 	// Get the form in question.
 	form, err := Retrieve(context, db, id)
 	if err != nil {
 		return nil, err
 	}
 
-	// Find the MultipleChoice widgets
+	// Create a container for the aggregations: [question][option]count.
+	aggs := make(map[string]Aggregation)
+
+	// Find the MultipleChoice widgets and add them to the aggs map
 	for _, step := range form.Steps {
 		for _, widget := range step.Widgets {
 			if widget.Component == "MultipleChoice" {
-				agg[widget.Title] = make(map[string]int)
+				aggs[widget.ID] = Aggregation{
+					Question: widget,
+				}
 			}
 		}
 	}
@@ -319,66 +352,71 @@ func Aggregate(context interface{}, db *db.DB, id string) (map[string]map[string
 		return nil, err
 	}
 
+	// In this section we are looking through all submissions for answers to multiple choice
+	// questions that are still active in the form and counting question/answer pairs.
+
+	// Look at all submisisons.
 	for _, sub := range subs.Submissions {
 
+		// Then at every anwer.
 		for _, ans := range sub.Answers {
 
+			// Skip nil answers.
 			if ans.Answer == nil {
 				continue
 			}
 
+			// The following section points to the need to refactor form submissions / introduce
+			// stronger typing.
+
+			// Unpack the answer object.
 			a := ans.Answer.(bson.M)
 
 			options := a["options"]
 
+			// Options == nil points to a non MultipleChoice answer.
 			if options == nil {
 				continue
 			}
 
-			o := options.([]interface{})
+			// This map of interfaces represent each checkbox the user clicked.
+			opts := options.([]interface{})
+			for optKey, opt := range opts {
 
-			if o[0] == nil {
-				continue
+				// use string keys for consistency
+				optKeyStr := strconv.Itoa(optKey)
+
+				// Unpack the option.
+				op := opt.(bson.M)
+
+				// Use the title of the option as the map key.
+				selection := op["title"].(string)
+
+				// If this question is not in the map then we can skip as it is not a current answer.
+				if _, ok := aggs[ans.WidgetID]; !ok {
+					continue
+				}
+
+				// If this is the first time we've seen this answer, init the agg struct for it.
+				if _, ok := aggs[ans.WidgetID].Answers[optKeyStr]; !ok {
+					aggs[ans.WidgetID].Answers[optKeyStr] = AnswerAggregation{
+						Title: selection,
+						Count: 0,
+					}
+				}
+
+				// Get a pointer to the struct we want to update
+				ansPtr := *aggs[ans.WidgetID].Answers[optKeyStr]
+
+				fmt.Println("\n\n%#v\n\n%#v", ansPtr, selection)
+
+				// Increment the counter for this question/answer pair.
+				aggs[ans.WidgetID].Answers[optKeyStr].Count++
+
 			}
-
-			ob := o[0].(bson.M)
-
-			selection := ob["title"].(string)
-
-			if agg[ans.Question] == nil {
-				continue
-			}
-
-			agg[ans.Question][selection]++
 		}
-
 	}
 
-	/*
-
-		f := func(c *mgo.Collection) error {
-			u := bson.M{
-				"$pull": bson.M{
-					"flags": flag,
-				},
-			}
-			log.Dev(context, "Aggregate", "MGO : db.%s.update(%s, %s)", c.Name, mongo.Query(objectID), mongo.Query(u))
-			return c.UpdateId(objectID, u)
-		}
-
-		if err := db.ExecuteMGO(context, Collection, f); err != nil {
-			log.Error(context, "Aggregate", err, "Completed")
-			return nil, err
-		}
-
-		submission, err := Retrieve(context, db, id)
-		if err != nil {
-			log.Error(context, "Aggregate", err, "Completed")
-			return nil, err
-		}
-
-		log.Dev(context, "Aggregate", "Completed")
-
-	*/
-	return agg, nil
+	log.Dev(context, "Aggregate", "Completed : Submission[%s]", id)
+	return aggs, nil
 }

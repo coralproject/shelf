@@ -107,7 +107,7 @@ func (formHandle) Delete(c *web.Context) error {
 func (formHandle) Aggregation(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	a, err := form.Aggregate(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	a, err := form.UpdateStats(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
