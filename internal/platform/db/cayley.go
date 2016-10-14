@@ -57,11 +57,11 @@ func RegMasterHandle(context interface{}, name string, url string) error {
 func (db *DB) NewCayley(context interface{}, name string) error {
 	var exists bool
 	var handle cayleyDB
-	masterCayley.Lock()
+	masterCayley.RLock()
 	{
 		handle, exists = masterCayley.qs[name]
 	}
-	masterCayley.Unlock()
+	masterCayley.RUnlock()
 
 	if !exists {
 		return fmt.Errorf("Master sesssion %q does not exist", name)

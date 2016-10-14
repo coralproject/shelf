@@ -65,11 +65,11 @@ func RegMasterSession(context interface{}, name string, url string, timeout time
 func NewMGO(context interface{}, name string) (*DB, error) {
 	var db mgoDB
 	var exists bool
-	masterMGO.Lock()
+	masterMGO.RLock()
 	{
 		db, exists = masterMGO.ses[name]
 	}
-	masterMGO.Unlock()
+	masterMGO.RUnlock()
 
 	if !exists {
 		return nil, fmt.Errorf("Master sesssion %q does not exist", name)
