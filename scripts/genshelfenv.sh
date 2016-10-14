@@ -36,7 +36,7 @@
 ## settings ##
 ##############
 
-CONFIG_FILE=${CONFIG_FILE:-.shelfenv}
+CONFIG_FILE=.shelfenv
 LOGGING_LEVEL=${LOGGING_LEVEL:-1}
 MONGO_URI=${MONGO_URI:-mongodb://localhost/test}
 
@@ -121,3 +121,8 @@ ${EXPORT}SPONGE_AUTH_PUBLIC_KEY=$PLATFORM_PUBLIC_KEY
 ${EXPORT}SPONGE_MONGO_URI=$MONGO_URI
 
 EOF
+
+if [ "$DISABLE_SHELL_EXPORT" != "TRUE" ]
+then
+  chmod +x $CONFIG_FILE
+fi
