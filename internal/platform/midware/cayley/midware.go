@@ -22,7 +22,7 @@ func Midware(mongoURI *url.URL) web.Middleware {
 
 			// Create the new cayley session based on the mongo connection credentials
 			// which will add it to the db object itself.
-			if err := db.OpenCayley(c.SessionID, mongoURI.String()); err != nil {
+			if err := db.NewCayley(c.SessionID, "Cayley"); err != nil {
 				return web.ErrDBNotConfigured
 			}
 

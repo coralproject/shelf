@@ -56,6 +56,13 @@ func API() http.Handler {
 		os.Exit(1)
 	}
 
+	// The web framework middleware for Cayley is using the name "Cayley"
+	// as the name of the master session by convention.
+	if err := db.RegMasterHandle("startup", "Cayley", mongoURI.String()); err != nil {
+		log.Error("startup", "Init", err, "Initializing Cayley")
+		os.Exit(1)
+	}
+
 	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
