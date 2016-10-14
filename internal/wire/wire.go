@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -272,6 +273,9 @@ type EmbeddedRel struct {
 // EmbeddedRels is a slice of EmbeddedRel.
 type EmbeddedRels []EmbeddedRel
 
+// relList contains one or more related IDs.
+type relList []string
+
 // viewIDs retrieves the item IDs associated with the view.
 func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) ([]string, error) {
 
@@ -303,7 +307,7 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 		it.TagResults(resultTags)
 
 		// Extract the tagged item IDs.
-		taggedIDs := make(map[string]string)
+		taggedIDs := make(map[string]relList)
 		for _, tag := range viewTags {
 			if t, ok := resultTags[tag]; ok {
 
@@ -312,9 +316,13 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 
 				// Add the tagged ID to the tagged map for embedded
 				// relationship extraction.
-				taggedIDs[quad.NativeOf(graphDB.NameOf(t)).(string)] = tag
-				embed, err := extractEmbeddedRels(v, taggedIDs)
-				embeds = append(embeds, embed...)
+				current, ok := taggedIDs[tag]
+				if !ok {
+					taggedIDs[tag] = []string{quad.NativeOf(graphDB.NameOf(t)).(string)}
+					continue
+				}
+				new = append(current, quad.NativeOf(graphDB.NameOf(t)).(string))
+				taggedIDs[tag] = new
 			}
 		}
 
@@ -350,13 +358,18 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 func extractEmbeddedRels(v *view.View, taggedIDs map[string]string, key string) (EmbeddedRels, error) {
 
 	// Extract the ordering of the tagged view items.
-	tagOrder := make(map[string]int)
-	orderTag := make(map[int]string)
-	for _, segment := range v.Path {
+	tagOrder := make(map[string]string)
+	orderTag := make(map[string]string)
+
+	// Give each path an alias and extract the ordering.
+	alias := 1
+	for _, path := range v.Paths {
+		aliasString := strconv.Itoa(alias)
 		if segment.Tag != "" {
-			tagOrder[segment.Tag] = segment.Level
-			orderTag[segment.Level] = segment.Tag
+			tagOrder[segment.Tag] = aliasString + "." + strconv.Itoa(segment.Level)
+			orderTag[aliasString+"."+strconv.Itoa(segment.Level)] = segment.Tag
 		}
+		alias++
 	}
 
 	// Loop over the taggedIDs determining the embedding based on the ordering
