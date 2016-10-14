@@ -1,9 +1,9 @@
 package form
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
-	"fmt"
-	"strconv"
 	"time"
 
 	"github.com/ardanlabs/kit/log"
@@ -65,7 +65,7 @@ type AnswerAggregation struct {
 }
 
 // Aggregation holds a multiple choice question and a map aggregated counts for
-// each answer.
+// each answer. The Answers map is keyed off an md5 of the answer as not better keys exist
 type Aggregation struct {
 	Question Widget                       `json:"question" bson:"question"`
 	Answers  map[string]AnswerAggregation `json:"answers" bson:"answers"`
@@ -381,10 +381,7 @@ func Aggregate(context interface{}, db *db.DB, id string) (map[string]Aggregatio
 
 			// This map of interfaces represent each checkbox the user clicked.
 			opts := options.([]interface{})
-			for optKey, opt := range opts {
-
-				// use string keys for consistency
-				optKeyStr := strconv.Itoa(optKey)
+			for _, opt := range opts {
 
 				// Unpack the option.
 				op := opt.(bson.M)
@@ -392,9 +389,21 @@ func Aggregate(context interface{}, db *db.DB, id string) (map[string]Aggregatio
 				// Use the title of the option as the map key.
 				selection := op["title"].(string)
 
+				// Hash the ansewr text for a unique key, as no actual key exists.
+				hasher := md5.New()
+				hasher.Write([]byte(op["title"].(string)))
+				optKeyStr := hex.EncodeToString(hasher.Sum(nil))
+
 				// If this question is not in the map then we can skip as it is not a current answer.
 				if _, ok := aggs[ans.WidgetID]; !ok {
 					continue
+				}
+
+				// If this is the first answer for this question, make a map for it.
+				if aggs[ans.WidgetID].Answers == nil {
+					tmp := aggs[ans.WidgetID]
+					tmp.Answers = make(map[string]AnswerAggregation)
+					aggs[ans.WidgetID] = tmp
 				}
 
 				// If this is the first time we've seen this answer, init the agg struct for it.
@@ -405,13 +414,10 @@ func Aggregate(context interface{}, db *db.DB, id string) (map[string]Aggregatio
 					}
 				}
 
-				// Get a pointer to the struct we want to update
-				ansPtr := *aggs[ans.WidgetID].Answers[optKeyStr]
-
-				fmt.Println("\n\n%#v\n\n%#v", ansPtr, selection)
-
 				// Increment the counter for this question/answer pair.
-				aggs[ans.WidgetID].Answers[optKeyStr].Count++
+				tmp := aggs[ans.WidgetID].Answers[optKeyStr]
+				tmp.Count++
+				aggs[ans.WidgetID].Answers[optKeyStr] = tmp
 
 			}
 		}
