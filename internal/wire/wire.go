@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	mgo "gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -83,7 +84,7 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 	}
 
 	// Retrieve the item IDs for the view.
-	ids, err := viewIDs(v, graphPath, viewParams.ItemKey, graphDB)
+	ids, embeds, err := viewIDs(v, graphPath, viewParams.ItemKey, graphDB)
 	if err != nil {
 		log.Error(context, "Execute", err, "Completed")
 		return errResult(err), err
@@ -102,7 +103,7 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 	}
 
 	// Otherwise, gather the items in the view.
-	items, err := viewItems(context, mgoDB, v, ids)
+	items, err := viewItems(context, mgoDB, v, ids, embeds)
 	if err != nil {
 		log.Error(context, "Execute", err, "Completed")
 		return errResult(err), err
@@ -173,7 +174,11 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 	var outputPath *path.Path
 
 	// Loop over the paths in the view translating the metadata.
-	for _, pth := range v.Paths {
+	for idx, pth := range v.Paths {
+
+		// We create an alias prefix for tags, so we can track which
+		// path a tag is in.
+		alias := strconv.Itoa(idx+1) + "_"
 
 		// Sort the view Path value.
 		sort.Sort(pth.Segments)
@@ -209,7 +214,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 
 				// Add the tag, if present.
 				if segment.Tag != "" {
-					graphPath = graphPath.Clone().Tag(segment.Tag)
+					graphPath = graphPath.Clone().Tag(alias + segment.Tag)
 				}
 
 				// Track this as a subpath.
@@ -229,7 +234,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 
 			// Add the tag, if present.
 			if segment.Tag != "" {
-				graphPath = graphPath.Clone().Tag(segment.Tag)
+				graphPath = graphPath.Clone().Tag(alias + segment.Tag)
 			}
 
 			// Add this as a subpath.
@@ -262,44 +267,50 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 	return outputPath, nil
 }
 
-// EmbeddedRel includes information needed to embed an indication of a relationship
+// embeddedRel includes information needed to embed an indication of a relationship
 // into an item in a view.
-type EmbeddedRel struct {
-	ItemID     string
-	Predicate  string
-	EmbeddedID string
+type embeddedRel struct {
+	itemID     string
+	predicate  string
+	embeddedID string
 }
 
-// EmbeddedRels is a slice of EmbeddedRel.
-type EmbeddedRels []EmbeddedRel
+// embeddedRels is a slice of EmbeddedRel.
+type embeddedRels []embeddedRel
 
 // relList contains one or more related IDs.
 type relList []string
 
 // viewIDs retrieves the item IDs associated with the view.
-func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) ([]string, error) {
+func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) ([]string, embeddedRels, error) {
 
 	// Build the Cayley iterator.
 	it := path.BuildIterator()
-	it, err = it.Optimize()
-	if err != nil {
-		return nil, err
-	}
+	it, _ = it.Optimize()
 	defer it.Close()
 
-	// Extract any tags in the View value.
+	// tagOrder and orderTag are two maps that will allow us to look up
+	// the ordering of a tag or the tag corresponding to an order on demand.
+	tagOrder := make(map[string]string)
+	orderTag := make(map[string]string)
+
+	// Extract any tags and the ordering in the View value.
 	var viewTags []string
-	for _, pth := range v.Paths {
+	for idx, pth := range v.Paths {
+		alias := strconv.Itoa(idx+1) + "_"
 		for _, segment := range pth.Segments {
 			if segment.Tag != "" {
-				viewTags = append(viewTags, segment.Tag)
+				viewTags = append(viewTags, alias+segment.Tag)
+				tagOrder[alias+segment.Tag] = alias + strconv.Itoa(segment.Level)
+				orderTag[alias+strconv.Itoa(segment.Level)] = alias + segment.Tag
+
 			}
 		}
 	}
 
 	// Retrieve the end path and tagged item IDs.
 	var ids []string
-	var embeds EmbeddedRels
+	var embeds embeddedRels
 	for it.Next() {
 
 		// Tag the results.
@@ -321,17 +332,20 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 					taggedIDs[tag] = []string{quad.NativeOf(graphDB.NameOf(t)).(string)}
 					continue
 				}
-				new = append(current, quad.NativeOf(graphDB.NameOf(t)).(string))
-				taggedIDs[tag] = new
+				updated := append(current, quad.NativeOf(graphDB.NameOf(t)).(string))
+				taggedIDs[tag] = updated
 			}
 		}
 
 		// Extract any IDs that need to be embedded in view items.
-		embed, err := extractEmbeddedRels(v, taggedIDs)
+		embed, err := extractEmbeddedRels(v, taggedIDs, tagOrder, orderTag, key)
+		if err != nil {
+			return ids, embeds, err
+		}
 		embeds = append(embeds, embed...)
 	}
 	if it.Err() != nil {
-		return ids, it.Err()
+		return ids, embeds, it.Err()
 	}
 
 	// Remove duplicates.
@@ -351,38 +365,80 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 		ids = append(ids, key)
 	}
 
-	return ids, nil
+	return ids, embeds, nil
 }
 
 // extractEmbeddedRel extracts a relationship that needs to be embedded on a view item.
-func extractEmbeddedRels(v *view.View, taggedIDs map[string]string, key string) (EmbeddedRels, error) {
+func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder, orderTag map[string]string, key string) (embeddedRels, error) {
 
-	// Extract the ordering of the tagged view items.
-	tagOrder := make(map[string]string)
-	orderTag := make(map[string]string)
-
-	// Give each path an alias and extract the ordering.
-	alias := 1
-	for _, path := range v.Paths {
-		aliasString := strconv.Itoa(alias)
-		if segment.Tag != "" {
-			tagOrder[segment.Tag] = aliasString + "." + strconv.Itoa(segment.Level)
-			orderTag[aliasString+"."+strconv.Itoa(segment.Level)] = segment.Tag
-		}
-		alias++
-	}
+	// embeds will contain the indication of the embedded relationships.
+	var embeds embeddedRels
 
 	// Loop over the taggedIDs determining the embedding based on the ordering
 	// of the view path.
-	for id, tag := range taggedIDs {
+	for tag, rels := range taggedIDs {
 
 		// Get the order of the tagged ID.
-		order := tagOrder[tag]
+		a := tagOrder[tag]
+		aliasOrder := strings.Split(a, "_")
+		order, err := strconv.Atoi(aliasOrder[len(aliasOrder)-1])
+		if err != nil {
+			return nil, err
+		}
 
-		// If the order is greater than 1, we should embed one level up.
+		// If the order is greater than 1, we should embed at the next tagged
+		// level up from the item.
+		var embedTag string
+		var ok bool
 		if order > 1 {
+
+			// Get the tag of the item in which the embed should be placed.
+			for order > 1 {
+				alias := aliasOrder[0] + "_" + strconv.Itoa(order-1)
+				embedTag, ok = orderTag[alias]
+				if ok {
+					break
+				}
+			}
+		}
+
+		// Extract the non-alias tag.
+		aliasTag := strings.Split(tag, "_")
+		nonAliasTag := aliasTag[len(aliasTag)-1]
+
+		// If we are embedding in a non-root item, get that item ID and form
+		// the EmbeddedRel value.
+		if embedTag != "" {
+			for tagCandidate, embedItem := range taggedIDs {
+				if tagCandidate == embedTag {
+					if len(rels) != 0 {
+						return nil, fmt.Errorf("Unexpected number of IDs")
+					}
+					for _, rel := range rels {
+						embed := embeddedRel{
+							itemID:     embedItem[0],
+							predicate:  nonAliasTag,
+							embeddedID: rel,
+						}
+						embeds = append(embeds, embed)
+					}
+				}
+			}
+			continue
+		}
+
+		// Otherwise, embed in the root item.
+		for _, rel := range rels {
+			embed := embeddedRel{
+				itemID:     key,
+				predicate:  nonAliasTag,
+				embeddedID: rel,
+			}
+			embeds = append(embeds, embed)
 		}
 	}
+
+	return embeds, nil
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
@@ -441,7 +497,7 @@ func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewP
 }
 
 // viewItems retrieves the items corresponding to the provided list of item IDs.
-func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bson.M, error) {
+func viewItems(context interface{}, db *db.DB, v *view.View, ids []string, embeds embeddedRels) ([]bson.M, error) {
 
 	// Form the query.
 	var results []bson.M
@@ -457,5 +513,77 @@ func viewItems(context interface{}, db *db.DB, v *view.View, ids []string) ([]bs
 		return nil, err
 	}
 
+	// Group the embedded relationships by item and predicate/tag.
+	embedByItem, err := groupEmbeds(embeds)
+	if err != nil {
+		return results, err
+	}
+
+	// Embed any related item IDs in the returned items.
+	if len(embedByItem) > 0 {
+		for _, result := range results {
+
+			// Get the item ID.
+			itemIDOrig, ok := result["item_id"]
+			if !ok {
+				continue
+			}
+			itemID, ok := itemIDOrig.(string)
+			if !ok {
+				continue
+			}
+
+			// Get the respective IDs to embed.
+			itemEmbeds, ok := embedByItem[itemID]
+			if !ok {
+				continue
+			}
+
+			// Embed the IDs.
+			for pred, ids := range itemEmbeds {
+
+				// Initialize the embedded relationships if they don't
+				// yet exist.
+				_, ok := result[pred]
+				if !ok {
+					result[pred] = ids
+					continue
+				}
+			}
+		}
+	}
+
 	return results, nil
+}
+
+// predicateEmbeds includes slices of related item IDs grouped by predicate/tag.
+type predicateEmbeds map[string]relList
+
+// groupEmbeds groups embeddedRel values by item.
+func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
+	embedsOut := make(map[string]predicateEmbeds)
+
+	for _, embed := range embeds {
+
+		predMap, ok := embedsOut[embed.itemID]
+		if !ok {
+			pe := map[string]relList{
+				embed.predicate: relList{embed.embeddedID},
+			}
+			embedsOut[embed.itemID] = pe
+			continue
+		}
+
+		current, ok := predMap[embed.predicate]
+		if !ok {
+			rl := relList{embed.embeddedID}
+			embedsOut[embed.itemID][embed.predicate] = rl
+			continue
+		}
+
+		updated := append(current, embed.embeddedID)
+		embedsOut[embed.itemID][embed.predicate] = updated
+	}
+
+	return embedsOut, nil
 }

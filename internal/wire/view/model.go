@@ -24,7 +24,6 @@ type PathSegment struct {
 	Direction string `bson:"direction" json:"direction" validate:"required,min=2"`
 	Predicate string `bson:"predicate" json:"predicate" validate:"required,min=1"`
 	Tag       string `bson:"tag,omitempty" json:"tag,omitempty"`
-	EmbedIn   int    `bson:"embed_in,omitempty" json:"embed_in,omitempty"`
 }
 
 // Validate checks the pathsegment value for consistency.
