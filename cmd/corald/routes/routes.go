@@ -3,6 +3,7 @@ package routes
 import (
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/log"
@@ -11,9 +12,12 @@ import (
 	"github.com/coralproject/shelf/cmd/corald/handlers"
 	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/auth"
+	"github.com/coralproject/shelf/internal/platform/db"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	"github.com/coralproject/shelf/internal/platform/midware/cayley"
 	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
 	logm "github.com/coralproject/shelf/internal/platform/midware/log"
+	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
 const (
@@ -21,6 +25,9 @@ const (
 	// Namespace is the key that is the prefix for configuration in the
 	// environment.
 	Namespace = "CORAL"
+
+	// cfgMongoURI is the key for the URI to the MongoDB service.
+	cfgMongoURI = "MONGO_URI"
 
 	// cfgSpongdURL is the config key for the url to the sponged service.
 	cfgSpongdURL = "SPONGED_URL"
@@ -49,6 +56,16 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
+	mongoURI := cfg.MustURL(cfgMongoURI)
+
+	// The web framework middleware for Mongo is using the name of the
+	// database as the name of the master session by convention. So use
+	// cfg.DB as the second argument when creating the master session.
+	if err := db.RegMasterSession("startup", mongoURI.Path, mongoURI.String(), 25*time.Second); err != nil {
+		log.Error("startup", "Init", err, "Initializing MongoDB")
+		os.Exit(1)
+	}
+
 	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
@@ -94,6 +111,9 @@ func API() http.Handler {
 		// header using the signer function here.
 		w.Ctx["signer"] = signer
 	}
+
+	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
+	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
 	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
 		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
@@ -148,8 +168,9 @@ func routes(w *web.Web) {
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
 	// Create or removes Actions.
-	w.Handle("POST", "/v1/action/:action/on/item/:item_key", fixtures.Handler("items/actionWFlag", http.StatusOK))    //handlers.Action.Create)
-	w.Handle("DELETE", "/v1/action/:action/on/item/:item_key", fixtures.Handler("items/actionWoFlag", http.StatusOK)) //handlers.Action.Remove)
+	w.Handle("POST", "/v1/action/:action/on/item/:item_key", handlers.Action.Create)
+
+	w.Handle("DELETE", "/v1/action/:action/on/item/:item_key", handlers.Action.Remove)
 
 	// Save or Update Items
 	w.Handle("PUT", "/v1/item",
