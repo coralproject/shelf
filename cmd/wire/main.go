@@ -9,7 +9,6 @@ import (
 	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/cmd/wire/cmdview"
 	"github.com/coralproject/shelf/internal/platform/db"
-	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/spf13/cobra"
 )
 
@@ -63,7 +62,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	mgoDB, err = db.NewMGO("", mongoURI.Path)
+	mgoDB, err = db.NewMGO("startup", mongoURI.Path)
 	if err != nil {
 		wire.Println("Unable to get MongoDB session")
 		os.Exit(1)
@@ -72,8 +71,11 @@ func main() {
 
 	// Configure Cayley.
 	wire.Println("Configuring Cayley")
+	if err := mgoDB.NewCayley("startup", mongoURI.Path); err != nil {
+		wire.Println("Unable to get Cayley support")
+	}
 
-	graphDB, err = cayleyshelf.New(mongoURI.String(), nil)
+	graphDB, err = mgoDB.GraphHandle("startup")
 	if err != nil {
 		wire.Println("Unable to get Cayley handle")
 		os.Exit(1)

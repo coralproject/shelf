@@ -12,7 +12,6 @@ import (
 	"github.com/cayleygraph/cayley"
 	"github.com/coralproject/shelf/cmd/xeniad/routes"
 	"github.com/coralproject/shelf/internal/platform/db"
-	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
@@ -56,7 +55,11 @@ func runTest(m *testing.M) int {
 	}
 	defer db.CloseMGO(tests.Context)
 
-	store, err := cayleyshelf.New(mongoURI.String(), nil)
+	if err := db.NewCayley(tests.Context, tests.TestSession); err != nil {
+		fmt.Println("Unable to get Cayley support")
+	}
+
+	store, err := db.GraphHandle(tests.Context)
 	if err != nil {
 		fmt.Println("Unable to get Cayley handle")
 		return 1
