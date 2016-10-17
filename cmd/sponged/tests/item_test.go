@@ -24,7 +24,7 @@ const itemPrefix = "ITEST_"
 func setup(t *testing.T) *cayley.Handle {
 	tests.ResetLog()
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String(), nil)
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to connect to the cayley graph : %s", tests.Failed, err)
 	}

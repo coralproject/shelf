@@ -101,10 +101,11 @@ func loadTestData(context interface{}, db *db.DB) error {
 		tx.AddQuad(quad)
 	}
 
-	store, err := cayleyshelf.New(mongoURI.String())
+	store, err := cayleyshelf.New(mongoURI.String(), nil)
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 
 	if err := store.ApplyTransaction(tx); err != nil {
 		return err
@@ -138,10 +139,11 @@ func unloadTestData(context interface{}, db *db.DB) error {
 		tx.RemoveQuad(quad)
 	}
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String(), nil)
 	if err != nil {
 		return err
 	}
+	defer store.Close()
 
 	if err := store.ApplyTransaction(tx); err != nil {
 		return err
@@ -160,7 +162,7 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String(), nil)
 	if err != nil {
 		t.Fatalf("\t%s\tShould be able to get a Cayley handle : %v", tests.Failed, err)
 	}
@@ -169,8 +171,9 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 }
 
 // teardown deinitializes for each indivdual test.
-func teardown(t *testing.T, db *db.DB) {
+func teardown(t *testing.T, db *db.DB, store *cayley.Handle) {
 	db.CloseMGO(tests.Context)
+	store.Close()
 	tests.DisplayLog()
 }
 
@@ -179,7 +182,7 @@ func teardown(t *testing.T, db *db.DB) {
 // TestExecuteView tests the generation of a view, opting not to persist the view.
 func TestExecuteView(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to generate a view.")
 	{
@@ -213,7 +216,7 @@ func TestExecuteView(t *testing.T) {
 // but returning a root item.
 func TestExecuteReturnRoot(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to generate a view and return a root item.")
 	{
@@ -247,7 +250,7 @@ func TestExecuteReturnRoot(t *testing.T) {
 // not to persist the view.
 func TestExecuteSplitPath(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to generate a view from a split path.")
 	{
@@ -281,7 +284,7 @@ func TestExecuteSplitPath(t *testing.T) {
 // out direction relationships, opting not to persist the view.
 func TestExecuteBackwardsView(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to generate a view with multiple backwards direction relationships.")
 	{
@@ -314,7 +317,7 @@ func TestExecuteBackwardsView(t *testing.T) {
 // TestPersistView tests the generation of a view, opting to persist the view.
 func TestPersistView(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to generate and persist a view.")
 	{
@@ -374,7 +377,7 @@ func TestPersistView(t *testing.T) {
 // TestPersistViewWithBuffer tests the buffered saving of a view.
 func TestPersistViewWithBuffer(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to perform a buffered save of a view.")
 	{
@@ -436,7 +439,7 @@ func TestPersistViewWithBuffer(t *testing.T) {
 // an invalid view name is provided.
 func TestExecuteNameFail(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to catch an invalid view name.")
 	{
@@ -470,7 +473,7 @@ func TestExecuteNameFail(t *testing.T) {
 // an invalid start type is defined in view metadata.
 func TestExecuteTypeFail(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to catch an invalid start type.")
 	{
@@ -504,7 +507,7 @@ func TestExecuteTypeFail(t *testing.T) {
 // an invalid relationship is defined in view metadata.
 func TestExecuteRelationshipFail(t *testing.T) {
 	db, store := setup(t)
-	defer teardown(t, db)
+	defer teardown(t, db, store)
 
 	t.Log("Given the need to catch an invalid relationship.")
 	{

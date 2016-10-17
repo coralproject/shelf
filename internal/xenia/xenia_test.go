@@ -56,7 +56,7 @@ func setup(t *testing.T) *db.DB {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	if err := db.OpenCayley(tests.Context, cfg.MustURL("MONGO_URI").String()); err != nil {
+	if err := db.NewCayley(tests.Context, tests.TestSession); err != nil {
 		t.Fatalf("%s\tShould be able to get a Cayley connection : %v", tests.Failed, err)
 	}
 

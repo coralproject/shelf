@@ -35,74 +35,74 @@
 		{
 			"checksumSHA1": "8qMh8K1d2CZ6ISaQOkmt/01euXU=",
 			"path": "github.com/cayleygraph/cayley",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "lGV9Ancv4KwwoYtv8MIVHA2BUHQ=",
 			"path": "github.com/cayleygraph/cayley/clog",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "vJhC1NKPcJXIV+uSRoe+EBrwOxo=",
 			"path": "github.com/cayleygraph/cayley/graph",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "Keo+6K87QCiQPZUntErLiQahobc=",
 			"path": "github.com/cayleygraph/cayley/graph/iterator",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "6buxLCRwxAPWgdrMO8fXJGSn9so=",
 			"path": "github.com/cayleygraph/cayley/graph/memstore",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "YpWqEROYKp8ESoCZup3cIqH4MXQ=",
 			"path": "github.com/cayleygraph/cayley/graph/memstore/b",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
-			"checksumSHA1": "3hAliMUWNx4T1C1dEdXTM3xfIRM=",
+			"checksumSHA1": "oOz4pll19Xt2/oQcUUrIuyG/6EE=",
 			"path": "github.com/cayleygraph/cayley/graph/mongo",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "lTv0hhlfVdHnr8YKznkE5YeNNbA=",
 			"path": "github.com/cayleygraph/cayley/graph/path",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "py8ajkdfrgMPgMzdIHh23mAo9h8=",
 			"path": "github.com/cayleygraph/cayley/graph/proto",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "MhYdv0WCcXahLXEfWRGADP2rWpY=",
 			"path": "github.com/cayleygraph/cayley/internal/lru",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "LzLQwUTptZs9YmKkuoQaNuuKfqI=",
 			"path": "github.com/cayleygraph/cayley/quad",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "aM5YAgWyIm+kgH3whZzP6VvHOVE=",
 			"path": "github.com/cayleygraph/cayley/writer",
-			"revision": "943126815d008a39f2dca594cc8194a34898de9a",
-			"revisionTime": "2016-10-12T08:26:48Z"
+			"revision": "cdef407082a13c916630a8e7ec7346e86f9c5630",
+			"revisionTime": "2016-10-14T20:00:30Z"
 		},
 		{
 			"checksumSHA1": "0XJF0yZgAZB47NorNns2rB+NSmA=",

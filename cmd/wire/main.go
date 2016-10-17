@@ -73,7 +73,7 @@ func main() {
 	// Configure Cayley.
 	wire.Println("Configuring Cayley")
 
-	graphDB, err = cayleyshelf.New(mongoURI.String())
+	graphDB, err = cayleyshelf.New(mongoURI.String(), nil)
 	if err != nil {
 		wire.Println("Unable to get Cayley handle")
 		os.Exit(1)

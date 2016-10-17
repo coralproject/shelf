@@ -56,7 +56,7 @@ func runTest(m *testing.M) int {
 	}
 	defer db.CloseMGO(tests.Context)
 
-	store, err := cayleyshelf.New(mongoURI.String())
+	store, err := cayleyshelf.New(mongoURI.String(), nil)
 	if err != nil {
 		fmt.Println("Unable to get Cayley handle")
 		return 1

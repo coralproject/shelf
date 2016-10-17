@@ -86,7 +86,7 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
+	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String(), nil)
 	if err != nil {
 		t.Fatalf("%s\tShould be able to get a cayley handle : %v", tests.Failed, err)
 	}
