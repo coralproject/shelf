@@ -119,78 +119,111 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 // validateStartType verifies the start type of a view path.
 func validateStartType(context interface{}, db *db.DB, v *view.View) error {
 
-	// Declare variables to track the first level relationship predicate.
-	var firstRel string
-	var firstDir string
+	// Loop over paths to validate the start type for each.
+PathLoop:
+	for _, path := range v.Paths {
 
-	// Extract the first level relationship predicate.
-	for _, segment := range v.Path {
-		if segment.Level == 1 {
-			firstRel = segment.Predicate
-			firstDir = segment.Direction
+		// Declare variables to track the first level relationship predicate.
+		var firstRel string
+		var firstDir string
+
+		// Extract the first level relationship predicate.
+		for _, segment := range path.Segments {
+			if segment.Level == 1 {
+				firstRel = segment.Predicate
+				firstDir = segment.Direction
+			}
 		}
-	}
 
-	// Get the relationship metadata.
-	rel, err := relationship.GetByPredicate(context, db, firstRel)
-	if err != nil {
-		return err
-	}
-
-	// Get the relevant item types based on the direction of the
-	// first relationship in the path.
-	var itemTypes []string
-	switch firstDir {
-	case outString:
-		itemTypes = rel.SubjectTypes
-	case inString:
-		itemTypes = rel.ObjectTypes
-	}
-
-	// Validate the starting type provided in the view.
-	for _, itemType := range itemTypes {
-		if itemType == v.StartType {
-			return nil
+		// Get the relationship metadata.
+		rel, err := relationship.GetByPredicate(context, db, firstRel)
+		if err != nil {
+			return err
 		}
+
+		// Get the relevant item types based on the direction of the
+		// first relationship in the path.
+		var itemTypes []string
+		switch firstDir {
+		case outString:
+			itemTypes = rel.SubjectTypes
+		case inString:
+			itemTypes = rel.ObjectTypes
+		}
+
+		// Validate the starting type provided in the view.
+		for _, itemType := range itemTypes {
+			if itemType == v.StartType {
+				continue PathLoop
+			}
+		}
+
+		return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, itemTypes)
 	}
 
-	return fmt.Errorf("Start type %s does not match relationship subject types %v", v.StartType, itemTypes)
+	return nil
 }
 
 // viewPathToGraphPath translates the path in a view into a "path"
 // utilized in graph queries.
 func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*path.Path, error) {
 
-	// Sort the view Path value.
-	sort.Sort(v.Path)
+	// outputPath is the final tranlated graph path.
+	var outputPath *path.Path
 
-	// graphPath will contain the entire strict graph path.
-	var graphPath *path.Path
+	// Loop over the paths in the view translating the metadata.
+	for _, pth := range v.Paths {
 
-	// subPaths will contain each sub path of the full graph path,
-	// as a separate graph path.
-	var subPaths []path.Path
+		// Sort the view Path value.
+		sort.Sort(pth.Segments)
 
-	// Loop over the path segments translating the path.
-	level := 1
-	for _, segment := range v.Path {
+		// graphPath will contain the entire strict graph path.
+		var graphPath *path.Path
 
-		// Check that the level is the level we expect (i.e., that the levels
-		// are in order)
-		if level != segment.Level {
-			err := fmt.Errorf("Invalid view path level, expected %d but seeing %d", level, segment.Level)
-			return graphPath, err
-		}
+		// subPaths will contain each sub path of the full graph path,
+		// as a separate graph path.
+		var subPaths []path.Path
 
-		// Initialize the path, if we are on level 1.
-		if level == 1 {
+		// Loop over the path segments translating the path.
+		level := 1
+		for _, segment := range pth.Segments {
 
-			// Add the first level relationship.
+			// Check that the level is the level we expect (i.e., that the levels
+			// are in order)
+			if level != segment.Level {
+				err := fmt.Errorf("Invalid view path level, expected %d but seeing %d", level, segment.Level)
+				return graphPath, err
+			}
+
+			// Initialize the path, if we are on level 1.
+			if level == 1 {
+
+				// Add the first level relationship.
+				switch segment.Direction {
+				case inString:
+					graphPath = cayley.StartPath(graphDB, quad.String(key)).In(quad.String(segment.Predicate))
+				case outString:
+					graphPath = cayley.StartPath(graphDB, quad.String(key)).Out(quad.String(segment.Predicate))
+				}
+
+				// Add the tag, if present.
+				if segment.Tag != "" {
+					graphPath = graphPath.Clone().Tag(segment.Tag)
+				}
+
+				// Track this as a subpath.
+				subPaths = append(subPaths, *graphPath)
+
+				level++
+				continue
+			}
+
+			// Add the relationship.
 			switch segment.Direction {
 			case inString:
-				graphPath = cayley.StartPath(graphDB, quad.String(key)).In(quad.String(segment.Predicate))
+				graphPath = graphPath.Clone().In(quad.String(segment.Predicate))
 			case outString:
-				graphPath = cayley.StartPath(graphDB, quad.String(key)).Out(quad.String(segment.Predicate))
+				graphPath = graphPath.Clone().Out(quad.String(segment.Predicate))
 			}
 
 			// Add the tag, if present.
@@ -198,44 +231,30 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 				graphPath = graphPath.Clone().Tag(segment.Tag)
 			}
 
-			// Track this as a subpath.
+			// Add this as a subpath.
 			subPaths = append(subPaths, *graphPath)
 
 			level++
+		}
+
+		// If we are forcing a strict path, return only the resulting or
+		// tagged items along the full path.
+		if pth.StrictPath {
+			if outputPath == nil {
+				outputPath = graphPath
+				continue
+			}
+			outputPath = outputPath.Clone().Or(graphPath)
 			continue
 		}
 
-		// Add the relationship.
-		switch segment.Direction {
-		case inString:
-			graphPath = graphPath.Clone().In(quad.String(segment.Predicate))
-		case outString:
-			graphPath = graphPath.Clone().Out(quad.String(segment.Predicate))
-		}
-
-		// Add the tag, if present.
-		if segment.Tag != "" {
-			graphPath = graphPath.Clone().Tag(segment.Tag)
-		}
-
-		// Add this as a subpath.
-		subPaths = append(subPaths, *graphPath)
-
-		level++
-	}
-
-	// If we are forcing a strict path, return only the resulting or
-	// tagged items along the full path.
-	if v.StrictPath {
-		return graphPath, nil
-	}
-
-	// Build the outputPath.
-	var outputPath *path.Path
-	outputPath = &subPaths[0]
-	if len(subPaths) > 1 {
-		for _, subPath := range subPaths[1:] {
-			outputPath = outputPath.Or(&subPath)
+		// Otherwise add all the subpaths to the output path.
+		for _, subPath := range subPaths {
+			if outputPath == nil {
+				outputPath = &subPath
+				continue
+			}
+			outputPath = outputPath.Clone().Or(&subPath)
 		}
 	}
 
@@ -252,9 +271,11 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 
 	// Extract any tags in the View value.
 	var viewTags []string
-	for _, segment := range v.Path {
-		if segment.Tag != "" {
-			viewTags = append(viewTags, segment.Tag)
+	for _, pth := range v.Paths {
+		for _, segment := range pth.Segments {
+			if segment.Tag != "" {
+				viewTags = append(viewTags, segment.Tag)
+			}
 		}
 	}
 

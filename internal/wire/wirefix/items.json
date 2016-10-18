@@ -6,7 +6,11 @@
 		"data": {
 			"body": "Computer, belay that order.",
 			"author": "WTEST_80aa936a-f618-4234-a7be-df59a14cf8de",
-			"asset": "WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"
+			"asset": "WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
+			"flagged_by": [
+				"WTEST_80aa936a-f618-4234-a7be-df59a14cf8de", 
+				"WTEST_a63af637-58af-472b-98c7-f5c00743bac6"
+			]
 		}
 	},
 	{
@@ -38,7 +42,8 @@
 			"first_name": "Bilbo",
 			"last_name": "Baggins",
 			"email": "ringbearer@bagend.com",
-			"role": "hobbit"
+			"role": "hobbit",
+			"flagged_by": "WTEST_a63af637-58af-472b-98c7-f5c00743bac6"
 		}
 	},
 	{
