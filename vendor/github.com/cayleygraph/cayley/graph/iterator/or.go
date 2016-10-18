@@ -36,12 +36,16 @@ type Or struct {
 	err               error
 }
 
-func NewOr() *Or {
-	return &Or{
+func NewOr(sub ...graph.Iterator) *Or {
+	it := &Or{
 		uid:               NextUID(),
 		internalIterators: make([]graph.Iterator, 0, 20),
 		currentIterator:   -1,
 	}
+	for _, s := range sub {
+		it.AddSubIterator(s)
+	}
+	return it
 }
 
 func NewShortCircuitOr() *Or {
@@ -289,6 +293,7 @@ func (it *Or) Stats() graph.IteratorStats {
 	ContainsCost := int64(0)
 	NextCost := int64(0)
 	Size := int64(0)
+	Exact := true
 	for _, sub := range it.internalIterators {
 		stats := sub.Stats()
 		NextCost += stats.NextCost
@@ -296,15 +301,18 @@ func (it *Or) Stats() graph.IteratorStats {
 		if it.isShortCircuiting {
 			if Size < stats.Size {
 				Size = stats.Size
+				Exact = stats.ExactSize
 			}
 		} else {
 			Size += stats.Size
+			Exact = Exact && stats.ExactSize
 		}
 	}
 	return graph.IteratorStats{
 		ContainsCost: ContainsCost,
 		NextCost:     NextCost,
 		Size:         Size,
+		ExactSize:    Exact,
 	}
 
 }
