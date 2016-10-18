@@ -1,6 +1,8 @@
 package handlers
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -104,6 +106,7 @@ func (formHandle) Delete(c *web.Context) error {
 }
 
 type Aggregation struct {
+	Group form.Group                      `json:"group"`
 	Count int                             `json:"count" bson:"count"`
 	MC    map[string]form.MCAggregation   `json:"mc" bson:"mc"`
 	Text  map[string]form.TextAggregation `json:"text" bson:"text"`
@@ -139,12 +142,18 @@ func (formHandle) Aggregation(c *web.Context) error {
 		}
 
 		agg := Aggregation{
+			Group: group,
 			Count: len(submissions),
 			MC:    mcAggregations,
 			Text:  textAggregations,
 		}
 
-		groups.Aggregations[group.Answer] = agg
+		// Hash the ansewr text for a unique key, as no actual key exists.
+		hasher := md5.New()
+		hasher.Write([]byte(group.Answer))
+		groupKey := hex.EncodeToString(hasher.Sum(nil))
+
+		groups.Aggregations[groupKey] = agg
 
 	}
 
