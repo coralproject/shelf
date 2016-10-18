@@ -1,11 +1,13 @@
 package talk_test
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
@@ -43,19 +45,24 @@ func setup(t *testing.T) *httptest.Server {
 		case "/v1/item/33":
 			itm = item.Item{ID: "33", Type: "comment", Data: map[string]interface{}{"body": "Something."}}
 			itm.Data["flagged_by"] = []string{"11"}
+			b, _ := json.Marshal([]item.Item{itm})
+			w.Write(b)
+		case "/v1/item/notfoundtarget":
+			b, _ := json.Marshal([]item.Item{})
+			w.Write(b)
 		default:
-			err = errors.New("Bad request")
+			err = errors.New("Bad Request")
 		}
 
 		if err != nil {
 			w.WriteHeader(http.StatusBadRequest)
-			fmt.Fprintln(w, err)
 		}
 		if err == nil {
 			w.WriteHeader(http.StatusOK)
-			fmt.Fprintln(w, itm)
 		}
 		w.Header().Set("Content-Type", "application/json")
+
+		fmt.Fprintln(w, err)
 
 	}))
 
@@ -76,7 +83,7 @@ func TestAddAction(t *testing.T) {
 
 	usr := item.Item{ID: "11", Type: "user", Data: map[string]interface{}{"name": "Maria"}}
 	itm := item.Item{ID: "33", Type: "comment", Data: map[string]interface{}{"body": "Something."}}
-	itm.Data["flagged_by"] = []string{"11"}
+	itm.Data["flagged_by"] = []interface{}{"11"}
 
 	// Build our table of the different test sets.
 	actionSets := []struct {
@@ -87,7 +94,7 @@ func TestAddAction(t *testing.T) {
 		expectedTarget item.Item
 		expectedError  error
 	}{
-		{url: server.URL, user: item.Item{}, action: "liked_by", targetID: "wrong target", expectedTarget: item.Item{}, expectedError: talk.ErrItemNotFound},
+		{url: server.URL, user: item.Item{}, action: "liked_by", targetID: "notfoundtarget", expectedTarget: item.Item{}, expectedError: talk.ErrItemNotFound},
 		{url: server.URL, user: item.Item{}, action: "wrong action", targetID: "33", expectedTarget: item.Item{}, expectedError: talk.ErrActionNotAllowed},
 		{url: server.URL, user: usr, action: "flagged_by", targetID: "33", expectedTarget: itm, expectedError: nil},
 	}
@@ -104,14 +111,14 @@ func TestAddAction(t *testing.T) {
 				t.Errorf("\t%s\tShould be able to return error %v but got : %v.", tests.Failed, actionSet.expectedError, err)
 				return
 			}
-			t.Logf("\t%s\tShould be able to return error: %s", tests.Success, actionSet.expectedError)
+			t.Logf("\t%s\tShould be able to return error: %v", tests.Success, actionSet.expectedError)
 
-			for f := range a.Data {
-				if a.Data[f] != actionSet.expectedTarget.Data[f] {
-					t.Errorf("\t%s\tShould be able to return target %s but got :  %s.", tests.Failed, actionSet.expectedTarget, a)
+			for f, p := range a.Data {
+				if !reflect.DeepEqual(p, actionSet.expectedTarget.Data[f]) {
+					t.Errorf("\t%s\tShould be able to return target '%v' but got : '%v'", tests.Failed, actionSet.expectedTarget.Data[f], a.Data[f])
 					return
 				}
-				t.Logf("\t%s\tShould be able to return target: %s", tests.Success, actionSet.expectedTarget)
+				t.Logf("\t%s\tShould be able to return target: %v", tests.Success, actionSet.expectedTarget)
 			}
 		}
 	}
