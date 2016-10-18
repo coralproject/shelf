@@ -87,8 +87,9 @@ type Stats struct {
 
 // Group defines a key for a multiple choice question / answer combo.
 type Group struct {
-	Question string
-	Answer   string
+	QuestionID string `json:"question_id"`
+	Question   string `json:"question"`
+	Answer     string `json:"answer"`
 }
 
 //==============================================================================
@@ -531,8 +532,9 @@ func GroupSubmissions(context interface{}, db *db.DB, id string) (map[Group][]su
 
 				// Add the submission to this subgroup
 				group := Group{
-					Question: ans.WidgetID,
-					Answer:   selection,
+					QuestionID: ans.WidgetID,
+					Question:   ans.Question,
+					Answer:     selection,
 				}
 				tmp := groups[group]
 				tmp = append(tmp, sub)
