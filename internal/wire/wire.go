@@ -92,7 +92,7 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 
 	// Persist the items in the view, if an output Collection is provided.
 	if viewParams.ResultsCollection != "" {
-		if err := viewSave(context, mgoDB, v, viewParams, ids); err != nil {
+		if err := viewSave(context, mgoDB, v, viewParams, ids, embeds); err != nil {
 			log.Error(context, "Execute", err, "Completed")
 			return errResult(err), err
 		}
@@ -404,14 +404,14 @@ func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder, o
 
 		// Extract the non-alias tag.
 		aliasTag := strings.Split(tag, "_")
-		nonAliasTag := aliasTag[len(aliasTag)-1]
+		nonAliasTag := strings.Join(aliasTag[1:], "_")
 
 		// If we are embedding in a non-root item, get that item ID and form
 		// the EmbeddedRel value.
 		if embedTag != "" {
 			for tagCandidate, embedItem := range taggedIDs {
 				if tagCandidate == embedTag {
-					if len(rels) != 0 {
+					if len(embedItem) != 1 {
 						return nil, fmt.Errorf("Unexpected number of IDs")
 					}
 					for _, rel := range rels {
@@ -442,7 +442,7 @@ func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder, o
 }
 
 // viewSave retrieve items for a view and saves those items to a new collection.
-func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewParams, ids []string) error {
+func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewParams, ids []string, embeds embeddedRels) error {
 
 	// Determine the buffer limit that will be used for saving this view.
 	if viewParams.BufferLimit != 0 {
@@ -462,10 +462,28 @@ func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewP
 		return err
 	}
 
+	// Group the embedded relationships by item and predicate/tag.
+	embedByItem, err := groupEmbeds(embeds)
+	if err != nil {
+		return err
+	}
+
 	// Iterate over the view items.
 	var queuedDocs int
 	var result item.Item
 	for results.Next(&result) {
+
+		// Get the related IDs to embed.
+		itemEmbeds, ok := embedByItem[result.ID]
+		if ok {
+
+			// Put the related IDs in the item.
+			relMap := make(map[string]interface{})
+			for k, v := range itemEmbeds {
+				relMap[k] = v
+			}
+			result.Related = relMap
+		}
 
 		// Queue the upsert of the result.
 		tx.Upsert(bson.M{"item_id": result.ID}, result)
@@ -500,7 +518,7 @@ func viewSave(context interface{}, mgoDB *db.DB, v *view.View, viewParams *ViewP
 func viewItems(context interface{}, db *db.DB, v *view.View, ids []string, embeds embeddedRels) ([]bson.M, error) {
 
 	// Form the query.
-	var results []bson.M
+	var results []item.Item
 	f := func(c *mgo.Collection) error {
 		return c.Find(bson.M{"item_id": bson.M{"$in": ids}}).All(&results)
 	}
@@ -516,44 +534,38 @@ func viewItems(context interface{}, db *db.DB, v *view.View, ids []string, embed
 	// Group the embedded relationships by item and predicate/tag.
 	embedByItem, err := groupEmbeds(embeds)
 	if err != nil {
-		return results, err
+		return nil, err
 	}
 
 	// Embed any related item IDs in the returned items.
+	var output []bson.M
 	if len(embedByItem) > 0 {
 		for _, result := range results {
 
-			// Get the item ID.
-			itemIDOrig, ok := result["item_id"]
-			if !ok {
-				continue
-			}
-			itemID, ok := itemIDOrig.(string)
-			if !ok {
-				continue
-			}
-
 			// Get the respective IDs to embed.
-			itemEmbeds, ok := embedByItem[itemID]
-			if !ok {
-				continue
-			}
-
-			// Embed the IDs.
-			for pred, ids := range itemEmbeds {
-
-				// Initialize the embedded relationships if they don't
-				// yet exist.
-				_, ok := result[pred]
-				if !ok {
-					result[pred] = ids
-					continue
+			itemEmbeds, ok := embedByItem[result.ID]
+			if ok {
+				relMap := make(map[string]interface{})
+				for k, v := range itemEmbeds {
+					relMap[k] = v
 				}
+				result.Related = relMap
 			}
+
+			// Convert to bson.M for output.
+			itemBSON := bson.M{
+				"type":       result.Type,
+				"version":    result.Version,
+				"data":       result.Data,
+				"created_at": result.CreatedAt,
+				"updated_at": result.UpdatedAt,
+				"related":    result.Related,
+			}
+			output = append(output, itemBSON)
 		}
 	}
 
-	return results, nil
+	return output, nil
 }
 
 // predicateEmbeds includes slices of related item IDs grouped by predicate/tag.
@@ -582,6 +594,18 @@ func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
 		}
 
 		updated := append(current, embed.embeddedID)
+
+		found := make(map[string]bool)
+		j := 0
+		for i, x := range updated {
+			if !found[x] {
+				found[x] = true
+				updated[j] = updated[i]
+				j++
+			}
+		}
+		updated = updated[:j]
+
 		embedsOut[embed.itemID][embed.predicate] = updated
 	}
 

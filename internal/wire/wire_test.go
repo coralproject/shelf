@@ -243,9 +243,9 @@ func TestExecuteReturnRoot(t *testing.T) {
 	}
 }
 
-// TestExecuteSplitPath tests the generation of a view from a split path, opting
+// TestExecuteSplitPathEmbeds tests the generation of a view from a split path, opting
 // not to persist the view.
-func TestExecuteSplitPath(t *testing.T) {
+func TestExecuteSplitPathEmbeds(t *testing.T) {
 	db, store := setup(t)
 	defer teardown(t, db)
 
@@ -269,7 +269,7 @@ func TestExecuteSplitPath(t *testing.T) {
 
 			// Check the resulting items.
 			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 2 {
+			if !ok || len(items) != 3 {
 				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
