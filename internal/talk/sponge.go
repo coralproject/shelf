@@ -12,6 +12,9 @@ import (
 var (
 	// ErrItemNotFound is when the item is not found.
 	ErrItemNotFound = errors.New("Item not found")
+
+	// ErrNotAnItem is returned when the interface{} is not an Item{}
+	ErrNotAnItem = errors.New("Not an item")
 )
 
 func getItemByID(spongedURL string, targetID string) (item.Item, error) {
@@ -35,6 +38,10 @@ func getItemByID(spongedURL string, targetID string) (item.Item, error) {
 	var items []item.Item
 	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
 		return itm, err
+	}
+
+	if len(items) == 0 {
+		return itm, ErrItemNotFound
 	}
 
 	// We are only retrieving one item.
