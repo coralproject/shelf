@@ -5,6 +5,7 @@
 #
 # - DISABLE_GENERATE_PLATFORM_KEYS (defaults to `FALSE`)
 # - DISABLE_SHELL_EXPORT (defaults to `FALSE`)
+# - ENABLE_EXPORT_STDOUT (defaults to `FALSE`)
 # - LOGGING_LEVEL (defaults to `1`)
 # - RECAPTCHA_SECRET
 # - AUTH_PUBLIC_KEY
@@ -35,6 +36,8 @@
 # - PLATFORM_PRIVATE_KEY
 # - PLATFORM_PUBLIC_KEY
 #
+# If you have ENABLE_EXPORT_STDOUT, then the outputted config will not be
+# written to disk and instead will be written out to stdout.
 
 ##############
 ## settings ##
@@ -79,7 +82,7 @@ then
   PLATFORM_PRIVATE_KEY=$(openssl ecparam -genkey -name secp384r1 -noout | openssl base64 -e | tr -d '\n')
 
   # generate public key
-  PLATFORM_PUBLIC_KEY=$(echo $PLATFORM_PRIVATE_KEY | openssl base64 -d -A | openssl ec -pubout | openssl base64 -e | tr -d '\n')
+  PLATFORM_PUBLIC_KEY=$(echo $PLATFORM_PRIVATE_KEY | openssl base64 -d -A | openssl ec -pubout 2>/dev/null | openssl base64 -e | tr -d '\n')
 
 fi
 
@@ -87,7 +90,7 @@ fi
 ## create the $CONFIG_FILE ##
 #############################
 
-cat > $CONFIG_FILE <<EOF
+read CONFIG_OUTPUT <<EOF
 ${SHEBANG}## CONFIG
 
 # CORAL
@@ -134,7 +137,19 @@ ${EXPORT}SPONGE_MONGO_URI=$MONGO_URI
 
 EOF
 
-if [ "$DISABLE_SHELL_EXPORT" != "TRUE" ]
+if [ "$ENABLE_EXPORT_STDOUT" == "TRUE" ]
 then
-  chmod +x $CONFIG_FILE
+
+  echo "$CONFIG_OUTPUT"
+
+else
+
+  echo $CONFIG_OUTPUT > $CONFIG_FILE
+
+  if [ "$DISABLE_SHELL_EXPORT" != "TRUE" ]
+  then
+    chmod +x $CONFIG_FILE
+  fi
+
+  echo "Wrote config to ${CONFIG_FILE}"
 fi
