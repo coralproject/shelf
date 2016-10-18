@@ -12,8 +12,6 @@ import (
 	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/auth"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
-	"github.com/coralproject/shelf/internal/platform/midware/cayley"
-	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
 const (
@@ -49,6 +47,7 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
+	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
 	if err != nil || publicKey == "" {
@@ -93,9 +92,6 @@ func API() http.Handler {
 		// header using the signer function here.
 		w.Ctx["signer"] = signer
 	}
-
-	// Add the Mongo and Cayley middlewares possibly after the auth middleware.
-	w.Use(mongo.Midware(mongoURI), cayley.Midware(mongoURI))
 
 	if cors, err := cfg.Bool(cfgEnableCORS); err == nil && cors {
 		log.Dev("startup", "Init", "Initializing CORS : CORS Enabled")
