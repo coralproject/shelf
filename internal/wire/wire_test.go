@@ -101,7 +101,11 @@ func loadTestData(context interface{}, db *db.DB) error {
 		tx.AddQuad(quad)
 	}
 
-	store, err := cayleyshelf.New(mongoURI.String(), nil)
+	if err := db.NewCayley(tests.Context, tests.TestSession); err != nil {
+		return err
+	}
+
+	store, err := db.GraphHandle(tests.Context)
 	if err != nil {
 		return err
 	}
@@ -139,7 +143,11 @@ func unloadTestData(context interface{}, db *db.DB) error {
 		tx.RemoveQuad(quad)
 	}
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String(), nil)
+	if err := db.NewCayley(tests.Context, tests.TestSession); err != nil {
+		return err
+	}
+
+	store, err := db.GraphHandle(tests.Context)
 	if err != nil {
 		return err
 	}
