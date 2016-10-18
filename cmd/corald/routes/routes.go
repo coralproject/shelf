@@ -12,6 +12,8 @@ import (
 	"github.com/coralproject/shelf/internal/platform/app"
 	"github.com/coralproject/shelf/internal/platform/auth"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
+	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
+	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 )
 
 const (
