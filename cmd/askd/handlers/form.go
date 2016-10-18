@@ -103,16 +103,52 @@ func (formHandle) Delete(c *web.Context) error {
 	return nil
 }
 
-//
+type Aggregation struct {
+	Count int                             `json:"count" bson:"count"`
+	MC    map[string]form.MCAggregation   `json:"mc" bson:"mc"`
+	Text  map[string]form.TextAggregation `json:"text" bson:"text"`
+}
+
+type Groups struct {
+	Aggregations map[string]Aggregation `json:"aggregations"`
+}
+
+// Aggregation does all of the aggregations.
 func (formHandle) Aggregation(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	a, err := form.UpdateStats(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	groupedSubmissions, err := form.GroupSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
 
-	c.Respond(a, http.StatusOK)
+	groups := Groups{
+		Aggregations: make(map[string]Aggregation),
+	}
+
+	for group, submissions := range groupedSubmissions {
+
+		textAggregations, err := form.TextAggregate(c.SessionID, submissions)
+		if err != nil {
+			return err
+		}
+
+		mcAggregations, err := form.MCAggregate(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissions)
+		if err != nil {
+			return err
+		}
+
+		agg := Aggregation{
+			Count: len(submissions),
+			MC:    mcAggregations,
+			Text:  textAggregations,
+		}
+
+		groups.Aggregations[group.Answer] = agg
+
+	}
+
+	c.Respond(groups, http.StatusOK)
 
 	return nil
 }

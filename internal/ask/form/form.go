@@ -4,6 +4,7 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/ardanlabs/kit/log"
@@ -60,7 +61,7 @@ type Step struct {
 // MCAnswerAggregation holds the count for selections of a single multiple
 // choice answer.
 type MCAnswerAggregation struct {
-	Title string `json:"title" bson:"title"`
+	Title string `json:"answer" bson:"answer"`
 	Count int    `json:"count" bson:"count"`
 }
 
@@ -68,7 +69,7 @@ type MCAnswerAggregation struct {
 // each answer. The Answers map is keyed off an md5 of the answer as not better keys exist
 type MCAggregation struct {
 	Question  string                         `json:"question" bson:"question"`
-	MCAnswers map[string]MCAnswerAggregation `json:"mc_answers" bson:"mc_answers"`
+	MCAnswers map[string]MCAnswerAggregation `json:"answers" bson:"answers"`
 }
 
 // TextAggregation holds the aggregated text based answers for a single question.
@@ -82,6 +83,12 @@ type Stats struct {
 	Responses        int                        `json:"responses" bson:"responses"`
 	MCAggregations   map[string]MCAggregation   `json:"mc_aggregations" bson:"mc_aggregations"`
 	TextAggregations map[string]TextAggregation `json:"text_aggregations" bson:"text_aggregations"`
+}
+
+// Group defines a key for a multiple choice question / answer combo.
+type Group struct {
+	Question string
+	Answer   string
 }
 
 //==============================================================================
@@ -180,24 +187,8 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 		return nil, err
 	}
 
-	// Calculate the Multiple Choice aggregations
-	mcagg, err := MCAggregate(context, db, id)
-	if err != nil {
-		log.Error(context, "UpdateStats", ErrUpdatingAggregations, "Completed")
-		return nil, err
-	}
-
-	// Calculate the Text aggregations
-	textagg, err := TextAggregate(context, db, id)
-	if err != nil {
-		log.Error(context, "UpdateStats", ErrUpdatingAggregations, "Completed")
-		return nil, err
-	}
-
 	stats := Stats{
-		Responses:        count,
-		MCAggregations:   mcagg,
-		TextAggregations: textagg,
+		Responses: count,
 	}
 
 	f := func(c *mgo.Collection) error {
@@ -333,7 +324,7 @@ func Delete(context interface{}, db *db.DB, id string) error {
 // on a form. It only considers qustions in the current form as currently there is no
 // way to track how questions and answers change if the admin updates the form mid flight.
 // Aggregate returns a map[_question_]map[_choice_]int_count datastructure.
-func MCAggregate(context interface{}, db *db.DB, id string) (map[string]MCAggregation, error) {
+func MCAggregate(context interface{}, db *db.DB, id string, subs []submission.Submission) (map[string]MCAggregation, error) {
 	log.Dev(context, "Aggregate", "Started : Submission[%s]", id)
 
 	if !bson.IsObjectIdHex(id) {
@@ -361,17 +352,11 @@ func MCAggregate(context interface{}, db *db.DB, id string) (map[string]MCAggreg
 		}
 	}
 
-	// Get the submissions for the form.Collection
-	subs, err := submission.Search(context, db, id, 0, 0, submission.SearchOpts{})
-	if err != nil {
-		return nil, err
-	}
-
 	// In this section we are looking through all submissions for answers to multiple choice
 	// questions that are still active in the form and counting question/answer pairs.
 
 	// Look at all submisisons.
-	for _, sub := range subs.Submissions {
+	for _, sub := range subs {
 
 		// Then at every anwer.
 		for _, ans := range sub.Answers {
@@ -443,25 +428,13 @@ func MCAggregate(context interface{}, db *db.DB, id string) (map[string]MCAggreg
 }
 
 // TextAggregate returns all text answers flagged with includeInGroup.
-func TextAggregate(context interface{}, db *db.DB, id string) (map[string]TextAggregation, error) {
-	log.Dev(context, "TextAggregate", "Started : Submission[%s]", id)
-
-	if !bson.IsObjectIdHex(id) {
-		log.Error(context, "TextAggregate", ErrInvalidID, "Completed")
-		return nil, ErrInvalidID
-	}
+func TextAggregate(context interface{}, subs []submission.Submission) (map[string]TextAggregation, error) {
 
 	// Create a container for the aggregations: [question][option]count.
 	aggs := make(map[string]TextAggregation)
 
-	// Get the submissions for the form.Collection
-	subs, err := submission.Search(context, db, id, 0, 0, submission.SearchOpts{})
-	if err != nil {
-		return nil, err
-	}
-
 	// Scan all the submissions and answers.
-	for _, sub := range subs.Submissions {
+	for _, sub := range subs {
 		for _, ans := range sub.Answers {
 
 			// Skip nil answers.
@@ -486,6 +459,89 @@ func TextAggregate(context interface{}, db *db.DB, id string) (map[string]TextAg
 		}
 	}
 
-	log.Dev(context, "Text Aggregate", "Completed : Submission[%s]", id)
+	log.Dev(context, "Text Aggregate", "Completed : Submission")
 	return aggs, nil
+}
+
+// GroupSubmissions organizes submissions by Group. It looks for questions with the group by flag
+// and creates Group structs.
+func GroupSubmissions(context interface{}, db *db.DB, id string) (map[Group][]submission.Submission, error) {
+
+	if !bson.IsObjectIdHex(id) {
+		log.Error(context, "TextAggregate", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	// Get the submissions for the form.Collection
+	subs, err := submission.Search(context, db, id, 0, 0, submission.SearchOpts{})
+	if err != nil {
+		return nil, err
+	}
+
+	groups := make(map[Group][]submission.Submission)
+
+	// Scan all the submissions and answers.
+	for _, sub := range subs.Submissions {
+
+		// Add all submissions to the [all,all] group
+		group := Group{
+			Question: "all",
+			Answer:   "all",
+		}
+		tmp := groups[group]
+		tmp = append(tmp, sub)
+		groups[group] = tmp
+
+		// Look for answers that may contain sub groups.
+		for _, ans := range sub.Answers {
+
+			// Skip nil answers.
+			if ans.Answer == nil {
+				continue
+			}
+
+			// Only include answers of questions flagged with "includeInGroups".
+			props := ans.Props.(bson.M)
+			include, ok := props["groupSubmissions"]
+			if include == nil || !ok || include == false {
+				continue
+			}
+
+			fmt.Printf("\n\n%#v", props["groupSubmissions"])
+
+			// Unpack the answer object.
+			a := ans.Answer.(bson.M)
+
+			options := a["options"]
+
+			// Options == nil points to a non MultipleChoice answer.
+			if options == nil {
+				continue
+			}
+
+			// This map of interfaces represent each checkbox the user clicked.
+			opts := options.([]interface{})
+			for _, opt := range opts {
+
+				// Unpack the option.
+				op := opt.(bson.M)
+
+				// Use the title of the option as the map key.
+				selection := op["title"].(string)
+
+				// Add the submission to this subgroup
+				group := Group{
+					Question: ans.WidgetID,
+					Answer:   selection,
+				}
+				tmp := groups[group]
+				tmp = append(tmp, sub)
+				groups[group] = tmp
+
+			}
+
+		}
+	}
+
+	return groups, nil
 }
