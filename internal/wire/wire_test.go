@@ -284,8 +284,7 @@ func TestExecuteSplitPathEmbeds(t *testing.T) {
 					continue
 				}
 				if itemID == wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6" {
-					_, ok := itm["related"]
-					if !ok {
+					if _, ok := itm["related"]; !ok {
 						t.Fatalf("\t%s\tShould be able to get related items.", tests.Failed)
 					}
 				}

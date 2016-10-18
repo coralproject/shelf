@@ -384,6 +384,9 @@ func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder ma
 		if err != nil {
 			return nil, err
 		}
+		if len(aliasOrder) <= 1 {
+			return nil, fmt.Errorf("Unexpected aliased tag order")
+		}
 
 		// If the order is greater than 1, we should embed at the next tagged
 		// level up from the item.
