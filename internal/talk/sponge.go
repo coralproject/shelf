@@ -3,9 +3,15 @@ package talk
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"net/http"
 
 	"github.com/coralproject/shelf/internal/sponge/item"
+)
+
+var (
+	// ErrItemNotFound is when the item is not found.
+	ErrItemNotFound = errors.New("Item not found")
 )
 
 func getItemByID(spongedURL string, targetID string) (item.Item, error) {
@@ -27,7 +33,6 @@ func getItemByID(spongedURL string, targetID string) (item.Item, error) {
 	defer resp.Body.Close()
 
 	var items []item.Item
-
 	if err := json.NewDecoder(resp.Body).Decode(&items); err != nil {
 		return itm, err
 	}
