@@ -13,8 +13,6 @@ import (
 	"github.com/coralproject/shelf/internal/platform/auth"
 	authm "github.com/coralproject/shelf/internal/platform/midware/auth"
 	"github.com/coralproject/shelf/internal/platform/midware/cayley"
-	errorm "github.com/coralproject/shelf/internal/platform/midware/error"
-	logm "github.com/coralproject/shelf/internal/platform/midware/log"
 	"github.com/coralproject/shelf/internal/platform/midware/mongo"
 )
 
@@ -51,9 +49,6 @@ func init() {
 
 // API returns a handler for a set of routes.
 func API() http.Handler {
-	mongoURI := cfg.MustURL(cfgMongoURI)
-
-	w := web.New(logm.Midware, errorm.Midware)
 
 	publicKey, err := cfg.String(cfgAuthPublicKey)
 	if err != nil || publicKey == "" {
