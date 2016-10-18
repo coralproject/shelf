@@ -1,31 +1,18 @@
 
-
 # cmditem
-`import "github.com/coralproject/shelf/cmd/sponge/cmditem"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func GetCommands() *cobra.Command](#GetCommands)
-
-
-#### <a name="pkg-files">Package files</a>
-[commands.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/get.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/upsert.go) 
+    import "github.com/coralproject/shelf/cmd/sponge/cmditem"
 
 
 
 
 
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=259:292#L2)
+
+## func GetCommands
 ``` go
 func GetCommands() *cobra.Command
 ```
 GetCommands returns the item commands.
+
 
 
 

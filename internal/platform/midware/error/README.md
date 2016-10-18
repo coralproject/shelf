@@ -1,31 +1,18 @@
 
-
 # error
-`import "github.com/coralproject/shelf/internal/platform/midware/error"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Midware(next web.Handler) web.Handler](#Midware)
-
-
-#### <a name="pkg-files">Package files</a>
-[midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/error/midware.go) 
+    import "github.com/coralproject/shelf/internal/platform/midware/error"
 
 
 
 
 
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=136:178#L1)
+
+## func Midware
 ``` go
 func Midware(next web.Handler) web.Handler
 ```
 Midware for catching errors.
+
 
 
 

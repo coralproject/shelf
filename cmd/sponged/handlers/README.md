@@ -1,31 +1,20 @@
 
-
 # handlers
-`import "github.com/coralproject/shelf/cmd/sponged/handlers"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-Package handlers contains the handler logic for processing requests.
+    import "github.com/coralproject/shelf/cmd/sponged/handlers"
 
 Package handlers contains the handler logic for processing requests.
 
 Package handlers contains the handler logic for processing requests.
 
+Package handlers contains the handler logic for processing requests.
+
+Package handlers contains the handler logic for processing requests.
 
 
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
 
 
-#### <a name="pkg-files">Package files</a>
-[data.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/data.go) [item.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/item.go) [version.go](/src/github.com/coralproject/shelf/cmd/sponged/handlers/version.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var Data dataHandle
 ```
@@ -37,9 +26,15 @@ var Item itemHandle
 Item fronts the access to the item service functionality.
 
 ``` go
+var Pattern patternHandle
+```
+Pattern fronts the access to the pattern service functionality.
+
+``` go
 var Version verHandle
 ```
 Version fronts the access to the ver service functionality.
+
 
 
 
