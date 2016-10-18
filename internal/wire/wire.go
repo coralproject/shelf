@@ -574,8 +574,11 @@ type predicateEmbeds map[string]relList
 func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
 	embedsOut := make(map[string]predicateEmbeds)
 
+	// Loop over embeds to group embeds.
 	for _, embed := range embeds {
 
+		// Get the map of embededed ID for a particular item ID,
+		// if it exists.  If it does not exist create the map.
 		predMap, ok := embedsOut[embed.itemID]
 		if !ok {
 			pe := map[string]relList{
@@ -585,6 +588,7 @@ func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
 			continue
 		}
 
+		// Get the current IDs corresponding to this predicate/tag.
 		current, ok := predMap[embed.predicate]
 		if !ok {
 			rl := relList{embed.embeddedID}
@@ -592,8 +596,10 @@ func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
 			continue
 		}
 
+		// Update the current IDs.
 		updated := append(current, embed.embeddedID)
 
+		// Remove duplicates.
 		found := make(map[string]bool)
 		j := 0
 		for i, x := range updated {
@@ -605,6 +611,7 @@ func groupEmbeds(embeds embeddedRels) (map[string]predicateEmbeds, error) {
 		}
 		updated = updated[:j]
 
+		// Update the output.
 		embedsOut[embed.itemID][embed.predicate] = updated
 	}
 
