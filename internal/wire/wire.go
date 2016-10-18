@@ -289,10 +289,9 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 	it, _ = it.Optimize()
 	defer it.Close()
 
-	// tagOrder and orderTag are two maps that will allow us to look up
-	// the ordering of a tag or the tag corresponding to an order on demand.
+	// tagOrder will allow us to look up the ordering of a tag or
+	// the tag corresponding to an order on demand.
 	tagOrder := make(map[string]string)
-	orderTag := make(map[string]string)
 
 	// Extract any tags and the ordering in the View value.
 	var viewTags []string
@@ -302,7 +301,7 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 			if segment.Tag != "" {
 				viewTags = append(viewTags, alias+segment.Tag)
 				tagOrder[alias+segment.Tag] = alias + strconv.Itoa(segment.Level)
-				orderTag[alias+strconv.Itoa(segment.Level)] = alias + segment.Tag
+				tagOrder[alias+strconv.Itoa(segment.Level)] = alias + segment.Tag
 
 			}
 		}
@@ -338,7 +337,7 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 		}
 
 		// Extract any IDs that need to be embedded in view items.
-		embed, err := extractEmbeddedRels(v, taggedIDs, tagOrder, orderTag, key)
+		embed, err := extractEmbeddedRels(v, taggedIDs, tagOrder, key)
 		if err != nil {
 			return ids, embeds, err
 		}
@@ -369,7 +368,7 @@ func viewIDs(v *view.View, path *path.Path, key string, graphDB *cayley.Handle) 
 }
 
 // extractEmbeddedRel extracts a relationship that needs to be embedded on a view item.
-func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder, orderTag map[string]string, key string) (embeddedRels, error) {
+func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder map[string]string, key string) (embeddedRels, error) {
 
 	// embeds will contain the indication of the embedded relationships.
 	var embeds embeddedRels
@@ -395,7 +394,7 @@ func extractEmbeddedRels(v *view.View, taggedIDs map[string]relList, tagOrder, o
 			// Get the tag of the item in which the embed should be placed.
 			for order > 1 {
 				alias := aliasOrder[0] + "_" + strconv.Itoa(order-1)
-				embedTag, ok = orderTag[alias]
+				embedTag, ok = tagOrder[alias]
 				if ok {
 					break
 				}
