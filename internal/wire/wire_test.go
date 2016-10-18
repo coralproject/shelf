@@ -273,6 +273,24 @@ func TestExecuteSplitPathEmbeds(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
+
+			for _, itm := range items {
+				itemField, ok := itm["item_id"]
+				if !ok {
+					continue
+				}
+				itemID, ok := itemField.(string)
+				if !ok {
+					continue
+				}
+				if itemID == wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6" {
+					_, ok := itm["related"]
+					if !ok {
+						t.Fatalf("\t%s\tShould be able to get related items.", tests.Failed)
+					}
+				}
+			}
+			t.Logf("\t%s\tShould be able to get related items.", tests.Success)
 		}
 	}
 }
