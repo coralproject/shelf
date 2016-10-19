@@ -1,25 +1,11 @@
 
-
 # routes
-`import "github.com/coralproject/shelf/cmd/sponged/routes"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
+    import "github.com/coralproject/shelf/cmd/sponged/routes"
 
 
 
-## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [func API() http.Handler](#API)
 
-
-#### <a name="pkg-files">Package files</a>
-[routes.go](/src/github.com/coralproject/shelf/cmd/sponged/routes/routes.go) 
-
-
-## <a name="pkg-constants">Constants</a>
+## Constants
 ``` go
 const (
 
@@ -30,12 +16,12 @@ const (
 ```
 
 
-
-## <a name="API">func</a> [API](/src/target/routes.go?s=1298:1321#L35)
+## func API
 ``` go
 func API() http.Handler
 ```
 API returns a handler for a set of routes.
+
 
 
 

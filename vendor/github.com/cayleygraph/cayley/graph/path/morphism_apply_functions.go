@@ -16,6 +16,7 @@ package path
 
 import (
 	"fmt"
+	"regexp"
 
 	"github.com/cayleygraph/cayley/graph"
 	"github.com/cayleygraph/cayley/graph/iterator"
@@ -58,6 +59,18 @@ func isMorphism(nodes ...quad.Value) morphism {
 			// Anything with fixedIterators will usually have a much
 			// smaller result set, so join isNodes first here.
 			return join(qs, isNodes, in), ctx
+		},
+	}
+}
+
+func regexMorphism(pattern *regexp.Regexp, refs bool) morphism {
+	return morphism{
+		Name:     "regex",
+		Reversal: func(ctx *pathContext) (morphism, *pathContext) { return regexMorphism(pattern, refs), ctx },
+		Apply: func(qs graph.QuadStore, in graph.Iterator, ctx *pathContext) (graph.Iterator, *pathContext) {
+			it := iterator.NewRegex(in, pattern, qs)
+			it.AllowRefs(refs)
+			return it, ctx
 		},
 	}
 }
@@ -143,9 +156,7 @@ func bothMorphism(tags []string, via ...interface{}) morphism {
 			path := buildViaPath(qs, via...)
 			inSide := inOutIterator(path, in, true, tags, ctx)
 			outSide := inOutIterator(path, in.Clone(), false, tags, ctx)
-			or := iterator.NewOr()
-			or.AddSubIterator(inSide)
-			or.AddSubIterator(outSide)
+			or := iterator.NewOr(inSide, outSide)
 			return or, ctx
 		},
 		tags: tags,
@@ -231,10 +242,7 @@ func orMorphism(p *Path) morphism {
 		Reversal: func(ctx *pathContext) (morphism, *pathContext) { return orMorphism(p), ctx },
 		Apply: func(qs graph.QuadStore, in graph.Iterator, ctx *pathContext) (graph.Iterator, *pathContext) {
 			itR := p.BuildIteratorOn(qs)
-
-			or := iterator.NewOr()
-			or.AddSubIterator(in)
-			or.AddSubIterator(itR)
+			or := iterator.NewOr(in, itR)
 			return or, ctx
 		},
 	}
@@ -261,6 +269,17 @@ func exceptMorphism(p *Path) morphism {
 			notIn := iterator.NewNot(subIt, allNodes)
 
 			return join(qs, in, notIn), ctx
+		},
+	}
+}
+
+// uniqueMorphism removes duplicate values from current path.
+func uniqueMorphism() morphism {
+	return morphism{
+		Name:     "unique",
+		Reversal: func(ctx *pathContext) (morphism, *pathContext) { return uniqueMorphism(), ctx },
+		Apply: func(qs graph.QuadStore, in graph.Iterator, ctx *pathContext) (graph.Iterator, *pathContext) {
+			return iterator.NewUnique(in), ctx
 		},
 	}
 }
@@ -461,6 +480,17 @@ func limitMorphism(v int64) morphism {
 				return in, ctx
 			}
 			return iterator.NewLimit(in, v), ctx
+		},
+	}
+}
+
+// countMorphism will return count of values.
+func countMorphism() morphism {
+	return morphism{
+		Name:     "count",
+		Reversal: func(ctx *pathContext) (morphism, *pathContext) { return countMorphism(), ctx },
+		Apply: func(qs graph.QuadStore, in graph.Iterator, ctx *pathContext) (graph.Iterator, *pathContext) {
+			return iterator.NewCount(in, qs), ctx
 		},
 	}
 }

@@ -4,7 +4,6 @@ package tests
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -55,10 +54,6 @@ func TestNamedOnView(t *testing.T) {
 	t.Log("Given the need to execute a specific query.")
 	{
 		url := "/v1/exec/" + qPrefix + "_basic_view/view/VTEST_thread/ITEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a?item_of_interest=ITEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"
-
-		fmt.Println("")
-		fmt.Println(url)
-		fmt.Println("")
 
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()

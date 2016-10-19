@@ -1,31 +1,18 @@
 
-
 # log
-`import "github.com/coralproject/shelf/internal/platform/midware/log"`
-
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-
-## <a name="pkg-overview">Overview</a>
-
-
-
-## <a name="pkg-index">Index</a>
-* [func Midware(next web.Handler) web.Handler](#Midware)
-
-
-#### <a name="pkg-files">Package files</a>
-[midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/log/midware.go) 
+    import "github.com/coralproject/shelf/internal/platform/midware/log"
 
 
 
 
 
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=138:180#L1)
+
+## func Midware
 ``` go
 func Midware(next web.Handler) web.Handler
 ```
 Midware handles the request logging.
+
 
 
 

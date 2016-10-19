@@ -1,41 +1,14 @@
 
-
 # db
-`import "github.com/coralproject/shelf/internal/platform/db"`
+    import "github.com/coralproject/shelf/internal/platform/db"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
-
-## <a name="pkg-overview">Overview</a>
 Package db abstracts different database systems we can use.
 
 
 
 
-## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
-* [func RegMasterSession(context interface{}, name string, url string, timeout time.Duration) error](#RegMasterSession)
-* [type DB](#DB)
-  * [func NewMGO(context interface{}, name string) (*DB, error)](#NewMGO)
-  * [func (db *DB) BatchedQueryMGO(context interface{}, colName string, q bson.M) (*mgo.Iter, error)](#DB.BatchedQueryMGO)
-  * [func (db *DB) BulkOperationMGO(context interface{}, colName string) (*mgo.Bulk, error)](#DB.BulkOperationMGO)
-  * [func (db *DB) CloseCayley(context interface{})](#DB.CloseCayley)
-  * [func (db *DB) CloseMGO(context interface{})](#DB.CloseMGO)
-  * [func (db *DB) CollectionMGO(context interface{}, colName string) (*mgo.Collection, error)](#DB.CollectionMGO)
-  * [func (db *DB) CollectionMGOTimeout(context interface{}, timeout time.Duration, colName string) (*mgo.Collection, error)](#DB.CollectionMGOTimeout)
-  * [func (db *DB) ExecuteMGO(context interface{}, colName string, f func(*mgo.Collection) error) error](#DB.ExecuteMGO)
-  * [func (db *DB) ExecuteMGOTimeout(context interface{}, timeout time.Duration, colName string, f func(*mgo.Collection) error) error](#DB.ExecuteMGOTimeout)
-  * [func (db *DB) GraphHandle(context interface{}) (*cayley.Handle, error)](#DB.GraphHandle)
-  * [func (db *DB) OpenCayley(context interface{}, mongoURL string) error](#DB.OpenCayley)
 
-
-#### <a name="pkg-files">Package files</a>
-[cayley.go](/src/github.com/coralproject/shelf/internal/platform/db/cayley.go) [db.go](/src/github.com/coralproject/shelf/internal/platform/db/db.go) [mongo.go](/src/github.com/coralproject/shelf/internal/platform/db/mongo.go) 
-
-
-
-## <a name="pkg-variables">Variables</a>
+## Variables
 ``` go
 var ErrGraphHandle = errors.New("Graph handle not initialized.")
 ```
@@ -48,8 +21,7 @@ ErrInvalidDBProvided is returned in the event that an uninitialized db is
 used to perform actions against.
 
 
-
-## <a name="RegMasterSession">func</a> [RegMasterSession](/src/target/mongo.go?s=1022:1118#L30)
+## func RegMasterSession
 ``` go
 func RegMasterSession(context interface{}, name string, url string, timeout time.Duration) error
 ```
@@ -58,8 +30,7 @@ it will default to localhost:27017.
 
 
 
-
-## <a name="DB">type</a> [DB](/src/target/db.go?s=391:525#L3)
+## type DB
 ``` go
 type DB struct {
     // contains filtered or unexported fields
@@ -76,7 +47,9 @@ database is too different.
 
 
 
-### <a name="NewMGO">func</a> [NewMGO](/src/target/mongo.go?s=1634:1692#L55)
+
+
+### func NewMGO
 ``` go
 func NewMGO(context interface{}, name string) (*DB, error)
 ```
@@ -86,8 +59,7 @@ master session.
 
 
 
-
-### <a name="DB.BatchedQueryMGO">func</a> (\*DB) [BatchedQueryMGO](/src/target/mongo.go?s=3183:3278#L113)
+### func (\*DB) BatchedQueryMGO
 ``` go
 func (db *DB) BatchedQueryMGO(context interface{}, colName string, q bson.M) (*mgo.Iter, error)
 ```
@@ -96,8 +68,7 @@ all the results of a query in batches.
 
 
 
-
-### <a name="DB.BulkOperationMGO">func</a> (\*DB) [BulkOperationMGO](/src/target/mongo.go?s=3535:3621#L125)
+### func (\*DB) BulkOperationMGO
 ``` go
 func (db *DB) BulkOperationMGO(context interface{}, colName string) (*mgo.Bulk, error)
 ```
@@ -106,8 +77,7 @@ changes to be delivered to the server.
 
 
 
-
-### <a name="DB.CloseCayley">func</a> (\*DB) [CloseCayley](/src/target/cayley.go?s=968:1014#L28)
+### func (\*DB) CloseCayley
 ``` go
 func (db *DB) CloseCayley(context interface{})
 ```
@@ -115,8 +85,7 @@ CloseCayley closes a graph handle value.
 
 
 
-
-### <a name="DB.CloseMGO">func</a> (\*DB) [CloseMGO](/src/target/mongo.go?s=2396:2439#L87)
+### func (\*DB) CloseMGO
 ``` go
 func (db *DB) CloseMGO(context interface{})
 ```
@@ -124,8 +93,7 @@ CloseMGO closes a DB value being used with MongoDB.
 
 
 
-
-### <a name="DB.CollectionMGO">func</a> (\*DB) [CollectionMGO](/src/target/mongo.go?s=3833:3922#L138)
+### func (\*DB) CollectionMGO
 ``` go
 func (db *DB) CollectionMGO(context interface{}, colName string) (*mgo.Collection, error)
 ```
@@ -133,8 +101,7 @@ CollectionMGO is used to get a collection value.
 
 
 
-
-### <a name="DB.CollectionMGOTimeout">func</a> (\*DB) [CollectionMGOTimeout](/src/target/mongo.go?s=4114:4233#L147)
+### func (\*DB) CollectionMGOTimeout
 ``` go
 func (db *DB) CollectionMGOTimeout(context interface{}, timeout time.Duration, colName string) (*mgo.Collection, error)
 ```
@@ -142,8 +109,7 @@ CollectionMGOTimeout is used to get a collection value with a timeout.
 
 
 
-
-### <a name="DB.ExecuteMGO">func</a> (\*DB) [ExecuteMGO](/src/target/mongo.go?s=2516:2614#L92)
+### func (\*DB) ExecuteMGO
 ``` go
 func (db *DB) ExecuteMGO(context interface{}, colName string, f func(*mgo.Collection) error) error
 ```
@@ -151,8 +117,7 @@ ExecuteMGO is used to execute MongoDB commands.
 
 
 
-
-### <a name="DB.ExecuteMGOTimeout">func</a> (\*DB) [ExecuteMGOTimeout](/src/target/mongo.go?s=2798:2926#L101)
+### func (\*DB) ExecuteMGOTimeout
 ``` go
 func (db *DB) ExecuteMGOTimeout(context interface{}, timeout time.Duration, colName string, f func(*mgo.Collection) error) error
 ```
@@ -160,8 +125,7 @@ ExecuteMGOTimeout is used to execute MongoDB commands with a timeout.
 
 
 
-
-### <a name="DB.GraphHandle">func</a> (\*DB) [GraphHandle](/src/target/cayley.go?s=759:829#L19)
+### func (\*DB) GraphHandle
 ``` go
 func (db *DB) GraphHandle(context interface{}) (*cayley.Handle, error)
 ```
@@ -169,13 +133,13 @@ GraphHandle returns the Cayley graph handle for graph interactions.
 
 
 
-
-### <a name="DB.OpenCayley">func</a> (\*DB) [OpenCayley](/src/target/cayley.go?s=503:571#L8)
+### func (\*DB) OpenCayley
 ``` go
 func (db *DB) OpenCayley(context interface{}, mongoURL string) error
 ```
 OpenCayley opens a connection to Cayley and adds that support to the
 database value.
+
 
 
 
