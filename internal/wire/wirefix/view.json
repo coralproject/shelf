@@ -136,6 +136,7 @@
 		"name": "WTEST_split_path",
 		"start_type": "WTEST_user",
 		"collection": "items",
+		"return_root": true,
 		"paths": [
 			{
 				"path_segments": [
