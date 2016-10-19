@@ -1,45 +1,29 @@
 
-
 # xenia
-`import "github.com/coralproject/shelf/internal/xenia"`
+    import "github.com/coralproject/shelf/internal/xenia"
 
-* [Overview](#pkg-overview)
-* [Index](#pkg-index)
-* [Subdirectories](#pkg-subdirectories)
-
-## <a name="pkg-overview">Overview</a>
 Package xenia provides support for executing Sets and their different types
 of commands.
 
 
 
 
-## <a name="pkg-index">Index</a>
-* [func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result](#Exec)
-* [func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error](#ProcessVariables)
 
 
-#### <a name="pkg-files">Package files</a>
-[masks.go](/src/github.com/coralproject/shelf/internal/xenia/masks.go) [params.go](/src/github.com/coralproject/shelf/internal/xenia/params.go) [pipeline.go](/src/github.com/coralproject/shelf/internal/xenia/pipeline.go) [variables.go](/src/github.com/coralproject/shelf/internal/xenia/variables.go) [xenia.go](/src/github.com/coralproject/shelf/internal/xenia/xenia.go) 
-
-
-
-
-
-## <a name="Exec">func</a> [Exec](/src/target/xenia.go?s=693:788#L19)
+## func Exec
 ``` go
 func Exec(context interface{}, db *db.DB, set *query.Set, vars map[string]string) *query.Result
 ```
 Exec executes the specified query set by name.
 
 
-
-## <a name="ProcessVariables">func</a> [ProcessVariables](/src/target/variables.go?s=281:418#L6)
+## func ProcessVariables
 ``` go
 func ProcessVariables(context interface{}, commands map[string]interface{}, vars map[string]string, results map[string]interface{}) error
 ```
 ProcessVariables walks the document performing variable substitutions.
 This function is exported because it is accessed by the tstdata package.
+
 
 
 

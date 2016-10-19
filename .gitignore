@@ -33,3 +33,6 @@ cmd/askd/askd
 cmd/corald/corald
 cmd/sponged/sponged
 cmd/wire/wire
+
+# Local configuration files
+.shelfenv
