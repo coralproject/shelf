@@ -11,7 +11,6 @@ import (
 	"github.com/cayleygraph/cayley"
 	"github.com/cayleygraph/cayley/quad"
 	"github.com/coralproject/shelf/internal/platform/db"
-	cayleyshelf "github.com/coralproject/shelf/internal/platform/db/cayley"
 	"github.com/coralproject/shelf/internal/sponge"
 	"github.com/coralproject/shelf/internal/sponge/item/itemfix"
 	"github.com/coralproject/shelf/internal/wire/pattern/patternfix"
@@ -86,7 +85,11 @@ func setup(t *testing.T) (*db.DB, *cayley.Handle) {
 		t.Fatalf("%s\tShould be able to get a Mongo session : %v", tests.Failed, err)
 	}
 
-	store, err := cayleyshelf.New(cfg.MustURL("MONGO_URI").String())
+	if err := db.NewCayley(tests.Context, tests.TestSession); err != nil {
+		t.Fatalf("%s\tShould be able to get Cayley Support : %v", tests.Failed, err)
+	}
+
+	store, err := db.GraphHandle(tests.Context)
 	if err != nil {
 		t.Fatalf("%s\tShould be able to get a cayley handle : %v", tests.Failed, err)
 	}
