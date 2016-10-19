@@ -83,7 +83,8 @@ func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewPara
 		return errResult(err), err
 	}
 
-	// Retrieve the item IDs for the view.
+	// Retrieve the item IDs for the view along with any related item IDs
+	// that should be embedded in view items (i.e., "embeds").
 	ids, embeds, err := viewIDs(v, graphPath, viewParams.ItemKey, graphDB)
 	if err != nil {
 		log.Error(context, "Execute", err, "Completed")
