@@ -86,11 +86,12 @@ then
 
 fi
 
+
 #############################
 ## create the $CONFIG_FILE ##
 #############################
 
-read CONFIG_OUTPUT <<EOF
+CONFIG_OUTPUT="$(cat <<EOF
 ${SHEBANG}## CONFIG
 
 # CORAL
@@ -136,6 +137,7 @@ ${EXPORT}SPONGE_AUTH_PUBLIC_KEY=$PLATFORM_PUBLIC_KEY
 ${EXPORT}SPONGE_MONGO_URI=$MONGO_URI
 
 EOF
+)"
 
 if [ "$ENABLE_EXPORT_STDOUT" == "TRUE" ]
 then
@@ -143,8 +145,7 @@ then
   echo "$CONFIG_OUTPUT"
 
 else
-
-  echo $CONFIG_OUTPUT > $CONFIG_FILE
+  echo "${CONFIG_OUTPUT[*]}" > $CONFIG_FILE
 
   if [ "$DISABLE_SHELL_EXPORT" != "TRUE" ]
   then
