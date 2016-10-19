@@ -31,7 +31,7 @@ func runTest(m *testing.M) int {
 
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
-	tests.Init("WIRE")
+	tests.Init("XENIA")
 
 	// Initialize MongoDB using the `tests.TestSession` as the name of the
 	// master session.
