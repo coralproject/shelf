@@ -128,15 +128,15 @@ func removeAction(c *web.Context, userID string, action string, targetID string)
 	}
 
 	// Get the actions that the target already has.
-	var actions []string
-	actions, ok := target.Data[action].([]string)
+	var actions []interface{}
+	actions, ok := target.Data[action].([]interface{})
 	if !ok {
 		return ErrActionNotFound
 	}
 
 	// Remove the action in the target's action array.
-	for i, u := range actions {
-		if u == userID {
+	for i, usrID := range actions {
+		if usrID.(string) == userID {
 			target.Data[action] = append(actions[:i], actions[i+1:]...)
 			break
 		}
