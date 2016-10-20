@@ -22,8 +22,8 @@ const (
 	// environment.
 	Namespace = "CORAL"
 
-	// cfgSpongdURL is the config key for the url to the sponged service.
-	cfgSpongdURL = "SPONGED_URL"
+	// cfgSpongedURL is the config key for the url to the sponged service.
+	cfgSpongedURL = "SPONGED_URL"
 
 	// cfgXeniadURL is the config key for the url to the xeniad service.
 	cfgXeniadURL = "XENIAD_URL"
@@ -40,8 +40,12 @@ const (
 	cfgEnableCORS = "ENABLE_CORS"
 )
 
-func init() {
+var (
+	spongedURL string
+	xeniadURL  string
+)
 
+func init() {
 	// Initialize the configuration and logging systems. Plus anything
 	// else the web app layer needs.
 	app.Init(cfg.EnvProvider{Namespace: Namespace})
@@ -102,6 +106,21 @@ func API() http.Handler {
 		log.Dev("startup", "Init", "CORS Disabled")
 	}
 
+	// We need the URL for the services Sponged and Xeniad that needs to be running.
+	spongedURL, err = cfg.String(cfgSpongedURL)
+	if err != nil || spongedURL == "" {
+		log.Error("startup", "Init", err, "Service Sponged needs to be setup.")
+		os.Exit(1)
+	}
+	w.Ctx["spongedURL"] = cfg.MustURL(cfgSpongedURL).String()
+
+	xeniadURL, err = cfg.String(cfgXeniadURL)
+	if err != nil || xeniadURL == "" {
+		log.Error("startup", "Init", err, "Service Xeniad needs to be setup.")
+		os.Exit(1)
+	}
+	w.Ctx["xeniadURL "] = cfg.MustURL(cfgXeniadURL).String()
+
 	log.Dev("startup", "Init", "Initalizing routes")
 	routes(w)
 
@@ -111,9 +130,6 @@ func API() http.Handler {
 // routes manages the handling of the API endpoints.
 func routes(w *web.Web) {
 	w.Handle("GET", "/v1/version", handlers.Version.List)
-
-	spongedURL := cfg.MustURL(cfgSpongdURL).String()
-	xeniadURL := cfg.MustURL(cfgXeniadURL).String()
 
 	// CRU- for forms
 	w.Handle("GET", "/v1/form", fixtures.Handler("forms/forms", http.StatusOK))
@@ -148,9 +164,9 @@ func routes(w *web.Web) {
 		handlers.Proxy(xeniadURL, func(c *web.Context) string { return "/v1/exec" }))
 
 	// Create or removes Actions.
-	w.Handle("POST", "/v1/action/:action/on/item/:item_key", handlers.Action.Create)
+	w.Handle("POST", "/v1/action/:action/user/:user_key/on/item/:item_key", handlers.Action.Add)
 
-	w.Handle("DELETE", "/v1/action/:action/on/item/:item_key", handlers.Action.Remove)
+	w.Handle("DELETE", "/v1/action/:action/user/:user_key/on/item/:item_key", handlers.Action.Remove)
 
 	// Save or Update Items
 	w.Handle("PUT", "/v1/item",
