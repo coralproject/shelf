@@ -193,110 +193,6 @@ func teardown(t *testing.T, db *db.DB, store *cayley.Handle) {
 
 //==============================================================================
 
-// TestExecuteNameFail tests that the correct result is returned when
-// an invalid view name is provided.
-func TestExecuteNameFail(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to catch an invalid view name.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "this view name does not exist",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err == nil {
-				t.Fatalf("\t%s\tShould return an error for an invalid view name: %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return an error for an invalid view name", tests.Success)
-
-			// Check the resulting items.
-			errDoc, ok := result.Results.(bson.M)
-			if !ok || len(errDoc["error"].(string)) == 0 {
-				t.Fatalf("\t%s\tShould return a single error document : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return a single error document.", tests.Success)
-		}
-	}
-}
-
-// TestExecuteTypeFail tests that the correct result is returned when
-// an invalid start type is defined in view metadata.
-func TestExecuteTypeFail(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to catch an invalid start type.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "comments from authors flagged by a user",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err == nil {
-				t.Fatalf("\t%s\tShould return an error for an invalid start type: %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return an error for an invalid start type", tests.Success)
-
-			// Check the resulting items.
-			errDoc, ok := result.Results.(bson.M)
-			if !ok || len(errDoc["error"].(string)) == 0 {
-				t.Fatalf("\t%s\tShould return a single error document : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return a single error document.", tests.Success)
-		}
-	}
-}
-
-// TestExecuteRelationshipFail tests that the correct result is returned when
-// an invalid relationship is defined in view metadata.
-func TestExecuteRelationshipFail(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to catch an invalid relationship.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "has invalid starting relationship",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err == nil {
-				t.Fatalf("\t%s\tShould return an error for an invalid relationship: %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return an error for an invalid relationship", tests.Success)
-
-			// Check the resulting items.
-			errDoc, ok := result.Results.(bson.M)
-			if !ok || len(errDoc["error"].(string)) == 0 {
-				t.Fatalf("\t%s\tShould return a single error document : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould return a single error document.", tests.Success)
-		}
-	}
-}
-
-//==============================================================================
-
 // TestExecuteViews tests the execution of different views.
 func TestExecuteViews(t *testing.T) {
 	db, store := setup(t)
@@ -308,6 +204,7 @@ func TestExecuteViews(t *testing.T) {
 		views []execView
 	}{
 		{typ: "Positive", views: getPosViews()},
+		{typ: "Negative", views: getNegViews()},
 	}
 
 	// Iterate over all the different test view.
@@ -331,6 +228,18 @@ func TestExecuteViews(t *testing.T) {
 
 						// Generate the view.
 						result, err := wire.Execute(tests.Context, db, store, &viewParams)
+						if err != nil && !vw.fail {
+							t.Fatalf("\t%s\tShould be able to execute the view", tests.Failed)
+						}
+						t.Logf("\t%s\tShould be able to execute the view.", tests.Success)
+						if err != nil && vw.fail {
+							errDoc, ok := result.Results.(bson.M)
+							if !ok || len(errDoc["error"].(string)) == 0 {
+								t.Fatalf("\t%s\tShould return a single error document : %s", tests.Failed, err)
+							}
+							t.Logf("\t%s\tShould return a single error document.", tests.Success)
+							return
+						}
 
 						// Process the results in mongo if the view is persisted.
 						var viewItems []bson.M
