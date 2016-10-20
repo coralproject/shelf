@@ -24,13 +24,13 @@ var (
 	//ErrActionNotAllowed is an error when the action is not allowed.
 	ErrActionNotAllowed = errors.New("Action not allowed")
 
-	//ErrTypeNotExpected comes when the type asserted was not expected
+	//ErrTypeNotExpected comes when the type asserted was not expected.
 	ErrTypeNotExpected = errors.New("Type not expected")
 )
 
 //==============================================================================
 
-// Create an action (flag, like, etc) on an Item.
+// Add an action (flag, like, etc) on an Item.
 // 200 Success, 404 Not Found, 500 Internal
 func (actionHandle) Add(c *web.Context) error {
 
@@ -44,8 +44,7 @@ func (actionHandle) Add(c *web.Context) error {
 	itemID := c.Params["user_key"]
 
 	// Add the action by itm to the target targetID
-	err := addAction(c, itemID, action, targetID)
-	if err != nil {
+	if err := addAction(c, itemID, action, targetID); err != nil {
 		return err
 	}
 
@@ -66,9 +65,8 @@ func (actionHandle) Remove(c *web.Context) error {
 	// Item that is performing the action.
 	itemID := c.Params["user_key"]
 
-	// Add the action to the target
-	err := removeAction(c, itemID, action, targetID)
-	if err != nil {
+	// Add the action to the target.
+	if err := removeAction(c, itemID, action, targetID); err != nil {
 		return err
 	}
 
@@ -90,7 +88,11 @@ func addAction(c *web.Context, userID string, action string, targetID string) er
 	// Get the actions that the target already has.
 	// If it has no action 'action' then create the field to store the new one.
 	var actions []interface{}
-	actions, ok := target.Data[action].([]interface{})
+	act, ok := target.Data[action]
+	if !ok {
+		target.Data[action] = make([]interface{}, 0)
+	}
+	actions, ok = act.([]interface{})
 	if !ok {
 		target.Data[action] = make([]interface{}, 0)
 	}
@@ -104,7 +106,6 @@ func addAction(c *web.Context, userID string, action string, targetID string) er
 		}
 	}
 
-	// If we did not find the user in the actions
 	// If the user did not add that action before, then add the action for the user to the target.
 	if !found {
 		target.Data[action] = append(actions, userID)
@@ -129,7 +130,11 @@ func removeAction(c *web.Context, userID string, action string, targetID string)
 
 	// Get the actions that the target already has.
 	var actions []interface{}
-	actions, ok := target.Data[action].([]interface{})
+	act, ok := target.Data[action]
+	if !ok {
+		return ErrActionNotFound
+	}
+	actions, ok = act.([]interface{})
 	if !ok {
 		return ErrActionNotFound
 	}

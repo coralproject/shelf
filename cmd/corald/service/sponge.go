@@ -15,14 +15,14 @@ var (
 	// ErrItemNotFound is when the item is not found.
 	ErrItemNotFound = errors.New("Item not found")
 
-	// ErrNotAnItem is returned when the interface{} is not an Item{}
+	// ErrNotAnItem is returned when the interface{} is not an Item{}.
 	ErrNotAnItem = errors.New("Not an item")
 
-	// ErrServiceNotSet is returned when the URL for the service is not setup
+	// ErrServiceNotSet is returned when the URL for the service is not setup.
 	ErrServiceNotSet = errors.New("Service Sponged not found")
 )
 
-// GetItemByID returns an item based on its item_id
+// GetItemByID returns an item based on its item_id.
 func GetItemByID(c *web.Context, itemID string) (*item.Item, error) {
 	spongedURL, ok := c.Web.Ctx["spongedURL"].(string)
 	if !ok {
