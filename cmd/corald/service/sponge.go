@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/ardanlabs/kit/web"
+	"github.com/coralproject/shelf/internal/platform/auth"
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
@@ -83,6 +84,14 @@ func requestSponge(c *web.Context, verb string, url string, payload []byte) (*ht
 	req, err := http.NewRequest(verb, url, bytes.NewBuffer(payload))
 	if err != nil {
 		return nil, err
+	}
+
+	// Extract the signer from the application context.
+	if signer, ok := c.Web.Ctx["signer"].(auth.Signer); ok {
+		// Sign the service request with the signer.
+		if err = SignServiceRequest(c.SessionID, signer, req); err != nil {
+			return nil, err
+		}
 	}
 
 	resp, err := http.DefaultClient.Do(req)
