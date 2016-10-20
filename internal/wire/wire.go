@@ -557,6 +557,7 @@ func viewItems(context interface{}, db *db.DB, v *view.View, ids []string, embed
 
 			// Convert to bson.M for output.
 			itemBSON := bson.M{
+				"item_id":    result.ID,
 				"type":       result.Type,
 				"version":    result.Version,
 				"data":       result.Data,

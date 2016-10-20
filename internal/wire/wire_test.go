@@ -1,8 +1,10 @@
 package wire_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
+	"strings"
 	"testing"
 
 	mgo "gopkg.in/mgo.v2"
@@ -191,279 +193,6 @@ func teardown(t *testing.T, db *db.DB, store *cayley.Handle) {
 
 //==============================================================================
 
-// TestExecuteView tests the generation of a view, opting not to persist the view.
-func TestExecuteView(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to generate a view.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "user comments",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the resulting items.
-			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 2 {
-				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
-		}
-	}
-}
-
-// TestExecuteReturnRoot tests the generation of a view, opting not to persist the view
-// but returning a root item.
-func TestExecuteReturnRoot(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to generate a view and return a root item.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "user comments return root",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the resulting items.
-			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 3 {
-				t.Fatalf("\t%s\tShould be able to get 3 items in the view.", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 3 items in the view.", tests.Success)
-		}
-	}
-}
-
-// TestExecuteSplitPathEmbeds tests the generation of a view from a split path, opting
-// not to persist the view.
-func TestExecuteSplitPathEmbeds(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to generate a view from a split path.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "split_path",
-				ItemKey:  wirePrefix + "a63af637-58af-472b-98c7-f5c00743bac6",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the resulting items.
-			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 3 {
-				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
-
-			for _, itm := range items {
-				itemField, ok := itm["item_id"]
-				if !ok {
-					continue
-				}
-				itemID, ok := itemField.(string)
-				if !ok {
-					continue
-				}
-				if itemID == wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6" {
-					if _, ok := itm["related"]; !ok {
-						t.Fatalf("\t%s\tShould be able to get related items.", tests.Failed)
-					}
-				}
-			}
-			t.Logf("\t%s\tShould be able to get related items.", tests.Success)
-		}
-	}
-}
-
-// TestExecuteBackwardsView tests the generation of a view with multiple
-// out direction relationships, opting not to persist the view.
-func TestExecuteBackwardsView(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to generate a view with multiple backwards direction relationships.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName: wirePrefix + "thread_backwards",
-				ItemKey:  wirePrefix + "80aa936a-f618-4234-a7be-df59a14cf8de",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the backwards view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the backwards view", tests.Success)
-
-			// Check the resulting items.
-			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 3 {
-				t.Fatalf("\t%s\tShould be able to get e items in the view", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 3 items in the view.", tests.Success)
-		}
-	}
-}
-
-// TestPersistView tests the generation of a view, opting to persist the view.
-func TestPersistView(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to generate and persist a view.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName:          wirePrefix + "thread",
-				ItemKey:           wirePrefix + "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-				ResultsCollection: "testcollection",
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the result message.
-			msg, ok := result.Results.(bson.M)
-			if !ok || msg["number_of_results"] != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
-
-			// Verify that the output collection exists.
-			var viewItems []bson.M
-			f := func(c *mgo.Collection) error {
-				return c.Find(nil).All(&viewItems)
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
-
-			if len(viewItems) != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
-
-			// Delete the persisted collection to clean up.
-			f = func(c *mgo.Collection) error {
-				return c.DropCollection()
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
-		}
-	}
-}
-
-// TestPersistViewWithBuffer tests the buffered saving of a view.
-func TestPersistViewWithBuffer(t *testing.T) {
-	db, store := setup(t)
-	defer teardown(t, db, store)
-
-	t.Log("Given the need to perform a buffered save of a view.")
-	{
-		t.Log("\tWhen using the view, relationship, and item fixtures.")
-		{
-
-			// Form the view parameters.
-			viewParams := wire.ViewParams{
-				ViewName:          wirePrefix + "thread",
-				ItemKey:           wirePrefix + "c1b2bbfe-af9f-4903-8777-bd47c4d5b20a",
-				ResultsCollection: "testcollection",
-				BufferLimit:       2,
-			}
-
-			// Generate the view.
-			result, err := wire.Execute(tests.Context, db, store, &viewParams)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to generate the view : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to generate the view", tests.Success)
-
-			// Check the result message.
-			msg, ok := result.Results.(bson.M)
-			if !ok || msg["number_of_results"] != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items in the view.", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items in the view.", tests.Success)
-
-			// Verify that the output collection exists.
-			var viewItems []bson.M
-			f := func(c *mgo.Collection) error {
-				return c.Find(nil).All(&viewItems)
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
-
-			if len(viewItems) != 5 {
-				t.Fatalf("\t%s\tShould be able to get 5 items from the output collection.", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to get 5 items from the output collection.", tests.Success)
-
-			// Delete the persisted collection to clean up.
-			f = func(c *mgo.Collection) error {
-				return c.DropCollection()
-			}
-
-			if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
-				t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
-			}
-			t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
-		}
-	}
-}
-
 // TestExecuteNameFail tests that the correct result is returned when
 // an invalid view name is provided.
 func TestExecuteNameFail(t *testing.T) {
@@ -564,4 +293,137 @@ func TestExecuteRelationshipFail(t *testing.T) {
 			t.Logf("\t%s\tShould return a single error document.", tests.Success)
 		}
 	}
+}
+
+//==============================================================================
+
+// TestExecuteViews tests the execution of different views.
+func TestExecuteViews(t *testing.T) {
+	db, store := setup(t)
+	defer teardown(t, db, store)
+
+	// Build our table of the different test sets.
+	execViews := []struct {
+		typ   string
+		views []execView
+	}{
+		{typ: "Positive", views: getPosViews()},
+	}
+
+	// Iterate over all the different test view.
+	for _, ev := range execViews {
+
+		t.Logf("Given the need to execute %s view tests.", ev.typ)
+		{
+			for _, vw := range ev.views {
+
+				// Setup a sub-test for each test view.
+				tf := func(t *testing.T) {
+					t.Logf("\tWhen using the view named %s", vw.viewName)
+					{
+						// Form the view parameters.
+						viewParams := wire.ViewParams{
+							ViewName:          wirePrefix + vw.viewName,
+							ItemKey:           wirePrefix + vw.itemKey,
+							ResultsCollection: vw.collection,
+							BufferLimit:       vw.bufferLimit,
+						}
+
+						// Generate the view.
+						result, err := wire.Execute(tests.Context, db, store, &viewParams)
+
+						// Process the results in mongo if the view is persisted.
+						var viewItems []bson.M
+						if len(vw.collection) > 0 {
+
+							// Check the result message.
+							msg, ok := result.Results.(bson.M)
+							if !ok || msg["number_of_results"] != vw.number {
+								t.Fatalf("\t%s\tShould be able to get %d items in the view", tests.Failed, vw.number)
+							}
+							t.Logf("\t%s\tShould be able to get %d items in the view.", tests.Success, vw.number)
+
+							// Query the output collection.
+							f := func(c *mgo.Collection) error {
+								return c.Find(nil).All(&viewItems)
+							}
+
+							if err := db.ExecuteMGO(tests.Context, "testcollection", f); err != nil {
+								t.Fatalf("\t%s\tShould be able to query the output collection : %s", tests.Failed, err)
+							}
+							t.Logf("\t%s\tShould be able to query the output collection.", tests.Success)
+
+							// Verify that we get the same number of items back.
+							if len(viewItems) != vw.number {
+								t.Fatalf("\t%s\tShould be able to get %d items from the output collection", tests.Failed, vw.number)
+							}
+							t.Logf("\t%s\tShould be able to get %d items from the output collection.", tests.Success, vw.number)
+
+							// Delete the persisted collection to clean up.
+							f = func(c *mgo.Collection) error {
+								return c.DropCollection()
+							}
+
+							if err := db.ExecuteMGO(tests.Context, vw.collection, f); err != nil {
+								t.Fatalf("\t%s\tShould be able to drop the output collection : %s", tests.Failed, err)
+							}
+							t.Logf("\t%s\tShould be able to drop the output collection.", tests.Success)
+
+						}
+
+						// Otherwise, get the items directly from the result.
+						var ok bool
+						if vw.collection == "" {
+							viewItems, ok = result.Results.([]bson.M)
+							if !ok || len(viewItems) != vw.number {
+								t.Fatalf("\t%s\tShould be able to get %d items in the view", tests.Failed, vw.number)
+							}
+							t.Logf("\t%s\tShould be able to get %d items in the view.", tests.Success, vw.number)
+						}
+
+						// Check the content of the items returned.
+						commonData := wire.Result{
+							Results: viewItems,
+						}
+						data, err := json.Marshal(commonData)
+						if err != nil {
+							t.Errorf("\t%s\tShould be able to marshal the result : %s", tests.Failed, err)
+							return
+						}
+						t.Logf("\t%s\tShould be able to marshal the result.", tests.Success)
+
+						for _, rslt := range vw.results {
+
+							// We just need to find the string inside the result.
+							if !strings.Contains(string(data), rslt) {
+								t.Log("\t\tRsl:", string(data))
+								for _, rslt := range vw.results {
+									t.Log("\t\tExp:", rslt)
+								}
+								t.Errorf("\t%s\tShould have the correct result.", tests.Failed)
+								return
+							}
+						}
+						t.Logf("\t%s\tShould have the correct result", tests.Success)
+						return
+					}
+				}
+
+				t.Run(vw.viewName, tf)
+			}
+		}
+	}
+}
+
+//==============================================================================
+
+// execView represents the table of view execution tests.
+type execView struct {
+	fail        bool
+	viewName    string
+	itemKey     string
+	number      int
+	collection  string
+	bufferLimit int
+	results     []string
 }
