@@ -1,8 +1,6 @@
 package handlers
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"encoding/json"
 	"net/http"
 	"strconv"
@@ -105,59 +103,17 @@ func (formHandle) Delete(c *web.Context) error {
 	return nil
 }
 
-type Aggregation struct {
-	Group form.Group                      `json:"group"`
-	Count int                             `json:"count" bson:"count"`
-	MC    map[string]form.MCAggregation   `json:"mc" bson:"mc"`
-	Text  map[string]form.TextAggregation `json:"text" bson:"text"`
-}
-
-type Groups struct {
-	Aggregations map[string]Aggregation `json:"aggregations"`
-}
-
-// Aggregation does all of the aggregations.
-func (formHandle) Aggregation(c *web.Context) error {
+// Aggregate performs all aggregations across a form's submissions.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (formHandle) Aggregate(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	groupedSubmissions, err := form.GroupSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
 	if err != nil {
 		return err
 	}
 
-	groups := Groups{
-		Aggregations: make(map[string]Aggregation),
-	}
-
-	for group, submissions := range groupedSubmissions {
-
-		textAggregations, err := form.TextAggregate(c.SessionID, submissions)
-		if err != nil {
-			return err
-		}
-
-		mcAggregations, err := form.MCAggregate(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissions)
-		if err != nil {
-			return err
-		}
-
-		agg := Aggregation{
-			Group: group,
-			Count: len(submissions),
-			MC:    mcAggregations,
-			Text:  textAggregations,
-		}
-
-		// Hash the ansewr text for a unique key, as no actual key exists.
-		hasher := md5.New()
-		hasher.Write([]byte(group.Answer))
-		groupKey := hex.EncodeToString(hasher.Sum(nil))
-
-		groups.Aggregations[groupKey] = agg
-
-	}
-
-	c.Respond(groups, http.StatusOK)
+	c.Respond(aggregations, http.StatusOK)
 
 	return nil
 }
