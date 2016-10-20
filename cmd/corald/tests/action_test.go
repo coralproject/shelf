@@ -12,47 +12,6 @@ import (
 	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
-// // setup initializes for each indivdual test.
-// func setup(t *testing.T) *httptest.Server {
-// 	tests.ResetLog()
-//
-// 	// Initialization of stub server
-// 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-//
-// 		var err error
-// 		var itm item.Item
-//
-// 		// check that the row is what we want it to be
-// 		switch r.RequestURI {
-// 		case "/v1/item/33":
-// 			itm = item.Item{ID: "33", Type: "comment", Data: map[string]interface{}{"body": "Something."}}
-// 			itm.Data["flagged_by"] = []string{"11"}
-// 			b, _ := json.Marshal([]item.Item{itm})
-// 			w.Write(b)
-// 		case "/v1/item/notfoundtarget":
-// 			b, _ := json.Marshal([]item.Item{})
-// 			w.Write(b)
-// 		default:
-// 			err = errors.New("Bad Request")
-// 		}
-//
-// 		if err != nil {
-// 			w.WriteHeader(http.StatusBadRequest)
-// 		}
-// 		if err == nil {
-// 			w.WriteHeader(http.StatusOK)
-// 		}
-// 		w.Header().Set("Content-Type", "application/json")
-//
-// 		fmt.Fprintln(w, err)
-//
-// 	}))
-//
-// 	return server
-// }
-
-//==============================================================================
-
 // TestActionsPOST sample test for the POST call.
 func TestActionsPOST(t *testing.T) {
 	tests.ResetLog()
