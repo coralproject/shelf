@@ -1,9 +1,14 @@
 package handlers
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strconv"
+
+	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/ask"
@@ -103,6 +108,14 @@ func (formHandle) Delete(c *web.Context) error {
 	return nil
 }
 
+//==============================================================================
+
+// AggregationKeys is a transport type that describes the json format for return value of the
+// aggregate endpoint including a key lookup structure allowing consumers to easily find group keys.
+type AggregationKeys struct {
+	Aggregations map[string]form.Aggregation `json:"aggregations"`
+}
+
 // Aggregate performs all aggregations across a form's submissions.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formHandle) Aggregate(c *web.Context) error {
@@ -113,7 +126,131 @@ func (formHandle) Aggregate(c *web.Context) error {
 		return err
 	}
 
-	c.Respond(aggregations, http.StatusOK)
+	ak := AggregationKeys{
+		Aggregations: aggregations,
+	}
+
+	c.Respond(ak, http.StatusOK)
+
+	return nil
+}
+
+// Aggregate performs all aggregations across a form's submissions.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (formHandle) AggregateGroup(c *web.Context) error {
+	id := c.Params["form_id"]
+
+	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	if err != nil {
+		return err
+	}
+
+	aggregation, ok := aggregations[c.Params["group_id"]]
+	if !ok {
+		c.Respond(nil, http.StatusNotFound)
+	}
+
+	c.Respond(aggregation, http.StatusOK)
+
+	return nil
+}
+
+//==============================================================================
+
+// Form Digests: this section contains transport/bluprints for sending digests of form/question
+// information to clients that do not need/won't understand full, vebose feeds.
+
+// FormQuestionOptionDigest is the blueprint for a single multiple choice option.
+type FormQuestionOptionDigest struct {
+	ID    string `json:"id" bson:"id"`
+	Value string `json:"value" bson:"value"`
+}
+
+// FormQuestionDigest is the bluprint for a question in a form group.
+type FormQuestionDigest struct {
+	ID      string                     `json:"id" bson:"id"`
+	Type    string                     `json:"type" bson:"type"`
+	Title   string                     `json:"title" bson:"title"`
+	GroupBy bool                       `json:"group_by" bson:"group_by"`
+	Options []FormQuestionOptionDigest `json:"options,omitempty" bson:"options,omitempty"`
+}
+
+// FormDigest is the blueprint for how we send form digests to clients.
+type FormDigest struct {
+	Questions map[string]FormQuestionDigest `json:"questions" bson:"questions"`
+}
+
+// Digest returns a form digest.
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (formHandle) Digest(c *web.Context) error {
+	id := c.Params["form_id"]
+
+	// Load the form requested.
+	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	if err != nil {
+		return err
+	}
+
+	// Create a container for the question digests.
+	questions := make(map[string]FormQuestionDigest)
+
+	// Loop through to form's steps/widgets to find the questions.
+	for _, step := range f.Steps {
+		for _, widget := range step.Widgets {
+
+			// Unpack the question properties.
+			props := widget.Props.(bson.M)
+
+			// We are looking to only include submissions with includeInGroups or groupSubmissions.
+			gs, gsok := props["groupSubmissions"]
+			iig, iigok := props["includeInGroups"]
+
+			// Skip other questions, and do it verbosely to protect against messy data.
+			if (gs == nil || !gsok || gs == false) && (iig == nil || !iigok || iig == false) {
+				continue
+			}
+
+			// Include options for MultipleChoice questions.
+			options := []FormQuestionOptionDigest{}
+			if widget.Component == "MultipleChoice" {
+
+				// Step outside the safety of the type system...
+				opts := props["options"].([]interface{})
+
+				for _, opt := range opts {
+					option := opt.(bson.M)
+					fmt.Printf("\n\n%#v", option)
+
+					// Hash the ansewr text for a unique key, as no actual key exists.
+					hasher := md5.New()
+					hasher.Write([]byte(option["title"].(string)))
+					optKeyStr := hex.EncodeToString(hasher.Sum(nil))
+
+					// Add this option to the array.
+					options = append(options, FormQuestionOptionDigest{
+						ID:    optKeyStr,
+						Value: option["title"].(string),
+					})
+				}
+			}
+
+			// Add the question to the digest.
+			questions[widget.ID] = FormQuestionDigest{
+				ID:      widget.ID,
+				Type:    widget.Component,
+				Title:   widget.Title,
+				GroupBy: gsok,
+				Options: options,
+			}
+
+		}
+	}
+
+	digest := FormDigest{
+		Questions: questions,
+	}
+
+	c.Respond(digest, http.StatusOK)
 
 	return nil
 }

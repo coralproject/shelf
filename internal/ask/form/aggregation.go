@@ -26,18 +26,16 @@ type MCAggregation struct {
 	MCAnswers map[string]MCAnswerAggregation `json:"answers" bson:"answers"`
 }
 
-// TextAggregation holds the aggregated text based answers for a single question.
-type TextAggregation struct {
-	Question string   `json:"question" bson:"question"`
-	Answers  []string `json:"answers" bson:"ansewrs"`
-}
+// TextAggregation holds the aggregated text based answers for a single question
+// marked with the Incude in Aggregations tag, orderd by [question_id][answer].
+type TextAggregation map[string]string
 
 // Aggregation holds the various aggregations and stats collected.
 type Aggregation struct {
-	Group Group                      `json:"group" bson:"group"`
-	Count int                        `json:"count" bson:"count"`
-	MC    map[string]MCAggregation   `json:"mc" bson:"mc"`
-	Text  map[string]TextAggregation `json:"text" bson:"text"`
+	Group   Group                    `json:"group" bson:"group"`
+	Count   int                      `json:"count" bson:"count"`
+	MC      map[string]MCAggregation `json:"mc" bson:"mc"`
+	Answers []TextAggregation        `json:"answers" bson:"answers"`
 }
 
 // Group defines a key for a multiple choice question / answer combo to be used
@@ -80,17 +78,25 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 
 		// Pack them in an aggregation along with the submission count and group.
 		agg := Aggregation{
-			Group: group,
-			Count: len(submissions),
-			MC:    mcAggregations,
-			Text:  textAggregations,
+			Group:   group,
+			Count:   len(submissions),
+			MC:      mcAggregations,
+			Answers: textAggregations,
+		}
+
+		// If this is the "all" group, set the key to all as it is not an answer.
+		groupKey := ""
+		if group.Question == "all" {
+			groupKey = "all"
 		}
 
 		// Groups are ultimately based on a chosen answer. We do not have any keys for answers
 		// so hash the answer text for a unique key.
-		hasher := md5.New()
-		hasher.Write([]byte(group.Answer))
-		groupKey := hex.EncodeToString(hasher.Sum(nil))
+		if group.Question != "all" {
+			hasher := md5.New()
+			hasher.Write([]byte(group.Answer))
+			groupKey = hex.EncodeToString(hasher.Sum(nil))
+		}
 
 		// Add the aggregation to the map.
 		groupAggregations[groupKey] = agg
@@ -298,13 +304,16 @@ func MCAggregate(context interface{}, db *db.DB, id string, subs []submission.Su
 }
 
 // TextAggregate returns all text answers flagged with includeInGroup.
-func TextAggregate(context interface{}, subs []submission.Submission) (map[string]TextAggregation, error) {
+func TextAggregate(context interface{}, subs []submission.Submission) ([]TextAggregation, error) {
 
 	// Create a container for the aggregations: [question][option]count.
-	aggs := make(map[string]TextAggregation)
+	textAggregations := []TextAggregation{}
 
 	// Scan all the submissions and answers.
 	for _, sub := range subs {
+
+		textAggregation := TextAggregation{}
+
 		for _, ans := range sub.Answers {
 
 			// Skip nil answers.
@@ -319,16 +328,36 @@ func TextAggregate(context interface{}, subs []submission.Submission) (map[strin
 				continue
 			}
 
-			// Unpack the answer and append it to the aggregation slice for that WidgetId.
+			var answer string
+
+			// Options == nil points to a non MultipleChoice answer.
 			a := ans.Answer.(bson.M)
-			tmp := aggs[ans.WidgetID]
-			tmp.Question = ans.Question
-			tmp.Answers = append(tmp.Answers, a["text"].(string))
-			aggs[ans.WidgetID] = tmp
+			options := a["options"]
+			if options == nil {
+				// Unpack the answer and add it to the map at the widgetID
+				a := ans.Answer.(bson.M)
+				answer = a["text"].(string)
+			}
+
+			// If we have multiple choice, use the first selection.
+			if options != nil {
+				opts := options.([]interface{})
+
+				// Unpack the option.
+				op := opts[0].(bson.M)
+
+				// Use the title of the option as the map key.
+				answer = op["title"].(string)
+
+			}
+
+			textAggregation[ans.WidgetID] = answer
 
 		}
+
+		textAggregations = append(textAggregations, textAggregation)
 	}
 
 	log.Dev(context, "Text Aggregate", "Completed : Submission")
-	return aggs, nil
+	return textAggregations, nil
 }
