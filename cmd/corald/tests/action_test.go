@@ -7,9 +7,6 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
-
-	"github.com/coralproject/shelf/internal/platform/db"
-	"github.com/coralproject/shelf/internal/sponge/item"
 )
 
 // TestActionsPOST sample test for the POST call.
@@ -36,33 +33,6 @@ func TestActionsPOST(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to add the action : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to add the action.", tests.Success)
-
-			// Snatch the mongo session so we can check on data upserted.
-			db, err := db.NewMGO(tests.Context, tests.TestSession)
-			if err != nil {
-				t.Fatalf("\t%s\t Error when getting Mongo session: %v", tests.Failed, err)
-			}
-			defer db.CloseMGO(tests.Context)
-
-			// Get the item.
-			item, err := item.GetByID(tests.Context, db, itemID)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to find the item", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to find the item", tests.Success)
-
-			// Check that the user was added to the action flagged_by.
-			var found bool
-			for _, u := range item.Data[action].([]interface{}) {
-				if u == userID {
-					found = true
-					t.Logf("\t%s\tShould have the user %s in the action %s slice.", tests.Success, userID, action)
-					break
-				}
-			}
-			if !found {
-				t.Fatalf("\t%s\tShould have the user %s in the action %s slice.", tests.Failed, userID, action)
-			}
 		}
 	}
 
@@ -115,34 +85,6 @@ func TestActionsDELETE(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to remove the action : %v", tests.Failed, w.Code)
 			}
 			t.Logf("\t%s\tShould be able to remove the action.", tests.Success)
-
-			//Snatch the mongo session so we can check on data upserted.
-			db, err := db.NewMGO(tests.Context, tests.TestSession)
-			if err != nil {
-				t.Fatalf("\t%s\t Error when getting Mongo session: %v", tests.Failed, err)
-			}
-			defer db.CloseMGO(tests.Context)
-
-			// Get the item.
-			item, err := item.GetByID(tests.Context, db, itemID)
-			if err != nil {
-				t.Fatalf("\t%s\tShould be able to find the item", tests.Failed)
-			}
-			t.Logf("\t%s\tShould be able to find the item", tests.Success)
-
-			// Check that the user was removed to the action flagged_by.
-			var found bool
-			for _, u := range item.Data[action].([]interface{}) {
-				if u == userID {
-					found = true
-					t.Fatalf("\t%s\tShould have the user %s removed from the action %s slice.", tests.Failed, userID, action)
-					break
-				}
-			}
-			if !found {
-				t.Logf("\t%s\tShould have the user %s removed from the action %s slice.", tests.Success, userID, action)
-			}
-
 		}
 	}
 }
