@@ -142,6 +142,10 @@ func setup() string {
 		case "/v1/item/wrongitem":
 			b, _ := json.Marshal([]item.Item{})
 			w.Write(b)
+
+		case "/v1/item":
+			// Decode the item.
+			err = json.NewDecoder(r.Body).Decode(&itm)
 		default:
 			err = errors.New("Bad Request")
 		}
