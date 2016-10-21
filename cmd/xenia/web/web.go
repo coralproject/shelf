@@ -1,15 +1,13 @@
 package web
 
 import (
-	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
-	"net/http"
 	"os"
 
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/coralproject/shelf/internal/platform/auth"
+	"github.com/coralproject/shelf/internal/platform/request"
 	"github.com/spf13/cobra"
 )
 
@@ -23,15 +21,17 @@ const (
 	cfgPlatformPrivateKey = "PLATFORM_PRIVATE_KEY"
 )
 
-// authSigner is the signing function that is used when the downstream
-// authentication is enabled.
-var authSigner auth.Signer
+// DefaultClient is the default client to perform downstream requests to.
+var DefaultClient request.Client
 
 func init() {
 	if err := cfg.Init(cfg.EnvProvider{Namespace: "XENIA"}); err != nil {
 		log.Println("Unable to initialize configuration")
 		os.Exit(1)
 	}
+
+	// Insert the base url for requests by this client.
+	DefaultClient.BaseURL = cfg.MustURL(cfgWebHost).String()
 
 	platformPrivateKey, err := cfg.String(cfgPlatformPrivateKey)
 	if err != nil || platformPrivateKey == "" {
@@ -56,54 +56,23 @@ func init() {
 	// save on the application wide context. In the event that a function
 	// requires a call down to a downstream platform, we will include a signed
 	// header using the signer function here.
-	authSigner = signer
+	DefaultClient.Signer = signer
+
 	log.Println("Downstream Auth : Enabled")
 }
 
 // Request provides support for executing commands against the
 // web service.
-func Request(cmd *cobra.Command, verb, path string, post io.Reader) (string, error) {
-	url, err := cfg.URL(cfgWebHost)
+func Request(cmd *cobra.Command, verb, path string, body io.Reader) (string, error) {
+	req, err := DefaultClient.New("", verb, path, body)
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
-	// We're using the url from the environment to load in the details of the web
-	// host, but we will include the path passed in.
-	url.Path = path
-
-	cmd.Printf("%s : %s\n", verb, url.String())
-	req, err := http.NewRequest(verb, url.String(), post)
+	resp, err := DefaultClient.Do(req)
 	if err != nil {
-		return "", err
+		return "", nil
 	}
 
-	// If the authSigner is defined, it means that we can now sign the request
-	// with the authentication token.
-	if authSigner != nil {
-
-		// Perform the signing here without any additional claims attached.
-		if err := auth.SignRequest("", authSigner, nil, req); err != nil {
-			return "", err
-		}
-	}
-
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-
-	// If the error returned by the endpoint is a non ok return, then we should
-	// return this as an error.
-	if resp.StatusCode >= http.StatusBadRequest {
-		return "", fmt.Errorf("Status : %d", resp.StatusCode)
-	}
-
-	contents, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return "", err
-	}
-
-	return string(contents), nil
+	return string(resp), err
 }
