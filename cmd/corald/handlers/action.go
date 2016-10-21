@@ -88,11 +88,7 @@ func addAction(c *web.Context, userID string, action string, targetID string) er
 	// Get the actions that the target already has.
 	// If it has no action 'action' then create the field to store the new one.
 	var actions []interface{}
-	act, ok := target.Data[action]
-	if !ok {
-		target.Data[action] = make([]interface{}, 0)
-	}
-	actions, ok = act.([]interface{})
+	actions, ok := target.Data[action].([]interface{})
 	if !ok {
 		target.Data[action] = make([]interface{}, 0)
 	}
@@ -100,7 +96,11 @@ func addAction(c *web.Context, userID string, action string, targetID string) er
 	// Store the action in the target's action array.
 	var found bool
 	for _, usrID := range actions {
-		if usrID.(string) == userID {
+		u, ok := usrID.(string)
+		if !ok {
+			continue
+		}
+		if u == userID {
 			found = true
 			break
 		}
@@ -130,18 +130,18 @@ func removeAction(c *web.Context, userID string, action string, targetID string)
 
 	// Get the actions that the target already has.
 	var actions []interface{}
-	act, ok := target.Data[action]
-	if !ok {
-		return ErrActionNotFound
-	}
-	actions, ok = act.([]interface{})
+	actions, ok := target.Data[action].([]interface{})
 	if !ok {
 		return ErrActionNotFound
 	}
 
 	// Remove the action in the target's action array.
 	for i, usrID := range actions {
-		if usrID.(string) == userID {
+		u, ok := usrID.(string)
+		if !ok {
+			continue
+		}
+		if u == userID {
 			target.Data[action] = append(actions[:i], actions[i+1:]...)
 			break
 		}
