@@ -43,9 +43,13 @@ Upsert upserts a view to the collection of currently utilized views.
 
 ## type Path
 ``` go
-type Path []PathSegment
+type Path struct {
+    StrictPath bool         `bson:"strict_path" json:"strict_path"`
+    Segments   PathSegments `bson:"path_segments" json:"path_segments" validate:"required,min=1"`
+}
 ```
-Path is a slice of PathSegment.
+Path includes information defining one or multiple graph paths,
+along with a boolean choice for whether or not the path is a strict graph path.
 
 
 
@@ -57,27 +61,11 @@ Path is a slice of PathSegment.
 
 
 
-### func (Path) Len
+### func (\*Path) Validate
 ``` go
-func (slice Path) Len() int
+func (path *Path) Validate() error
 ```
-Len is required to sort a slice of PathSegment.
-
-
-
-### func (Path) Less
-``` go
-func (slice Path) Less(i, j int) bool
-```
-Less is required to sort a slice of PathSegment.
-
-
-
-### func (Path) Swap
-``` go
-func (slice Path) Swap(i, j int)
-```
-Swap is required to sort a slice of PathSegment.
+Validate checks the pathsegment value for consistency.
 
 
 
@@ -107,7 +95,47 @@ which path partially defines a View.
 ``` go
 func (ps *PathSegment) Validate() error
 ```
-Validate checks the PathSegment value for consistency.
+Validate checks the pathsegment value for consistency.
+
+
+
+## type PathSegments
+``` go
+type PathSegments []PathSegment
+```
+PathSegments is a slice of PathSegment values.
+
+
+
+
+
+
+
+
+
+
+
+### func (PathSegments) Len
+``` go
+func (slice PathSegments) Len() int
+```
+Len is required to sort a slice of PathSegment.
+
+
+
+### func (PathSegments) Less
+``` go
+func (slice PathSegments) Less(i, j int) bool
+```
+Less is required to sort a slice of PathSegment.
+
+
+
+### func (PathSegments) Swap
+``` go
+func (slice PathSegments) Swap(i, j int)
+```
+Swap is required to sort a slice of PathSegment.
 
 
 
@@ -118,8 +146,7 @@ type View struct {
     Collection string `bson:"collection" json:"collection" validate:"required,min=2"`
     StartType  string `bson:"start_type" json:"start_type" validate:"required,min=3"`
     ReturnRoot bool   `bson:"return_root,omitempty" json:"return_root,omitempty"`
-    StrictPath bool   `bson:"strict_path,omitempty" json:"strict_path,omitempty"`
-    Path       Path   `bson:"path" json:"path" validate:"required,min=1"`
+    Paths      []Path `bson:"paths" json:"paths" validate:"required,min=1"`
 }
 ```
 View contains metadata about a view.

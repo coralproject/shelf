@@ -36,6 +36,14 @@ var Version verHandle
 Version fronts the access to the ver service functionality.
 
 
+## func ValidateReacaptchaResponse
+``` go
+func ValidateReacaptchaResponse(c *web.Context, recaptchaSecret, response string) error
+```
+ValidateReacaptchaResponse will compare the response provided by the request
+and check with the Google Recaptcha Web Service if it's valid.
+
+
 
 
 

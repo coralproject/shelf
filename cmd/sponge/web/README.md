@@ -6,10 +6,16 @@
 
 
 
+## Variables
+``` go
+var DefaultClient request.Client
+```
+DefaultClient is the default client to perform downstream requests to.
+
 
 ## func Request
 ``` go
-func Request(cmd *cobra.Command, verb string, url string, post io.Reader) (string, error)
+func Request(cmd *cobra.Command, verb, path string, body io.Reader) (string, error)
 ```
 Request provides support for executing commands against the
 web service.

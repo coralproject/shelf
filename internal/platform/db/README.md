@@ -133,12 +133,12 @@ GraphHandle returns the Cayley graph handle for graph interactions.
 
 
 
-### func (\*DB) OpenCayley
+### func (\*DB) NewCayley
 ``` go
-func (db *DB) OpenCayley(context interface{}, mongoURL string) error
+func (db *DB) NewCayley(context interface{}, name string) error
 ```
-OpenCayley opens a connection to Cayley and adds that support to the
-database value.
+NewCayley adds support to a DB value for cayley based on a registered
+master cayley handle.
 
 
 
