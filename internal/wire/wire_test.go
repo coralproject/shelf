@@ -258,9 +258,9 @@ func TestExecuteReturnRoot(t *testing.T) {
 	}
 }
 
-// TestExecuteSplitPath tests the generation of a view from a split path, opting
+// TestExecuteSplitPathEmbeds tests the generation of a view from a split path, opting
 // not to persist the view.
-func TestExecuteSplitPath(t *testing.T) {
+func TestExecuteSplitPathEmbeds(t *testing.T) {
 	db, store := setup(t)
 	defer teardown(t, db, store)
 
@@ -284,10 +284,27 @@ func TestExecuteSplitPath(t *testing.T) {
 
 			// Check the resulting items.
 			items, ok := result.Results.([]bson.M)
-			if !ok || len(items) != 2 {
+			if !ok || len(items) != 3 {
 				t.Fatalf("\t%s\tShould be able to get 2 items in the view.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to get 2 items in the view.", tests.Success)
+
+			for _, itm := range items {
+				itemField, ok := itm["item_id"]
+				if !ok {
+					continue
+				}
+				itemID, ok := itemField.(string)
+				if !ok {
+					continue
+				}
+				if itemID == wirePrefix+"a63af637-58af-472b-98c7-f5c00743bac6" {
+					if _, ok := itm["related"]; !ok {
+						t.Fatalf("\t%s\tShould be able to get related items.", tests.Failed)
+					}
+				}
+			}
+			t.Logf("\t%s\tShould be able to get related items.", tests.Success)
 		}
 	}
 }

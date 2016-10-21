@@ -34,6 +34,7 @@ type Item struct {
 	Data      map[string]interface{} `bson:"data" json:"data"`
 	CreatedAt time.Time              `bson:"created_at" json:"created_at"`
 	UpdatedAt time.Time              `bson:"updated_at" json:"updated_at"`
+	Related   map[string]interface{} `bson:"related,omitempty" json:"related,omitempty"`
 }
 
 // Validate validates an Item value with the validator.
