@@ -222,7 +222,7 @@ func (formHandle) Digest(c *web.Context) error {
 					option := opt.(bson.M)
 					fmt.Printf("\n\n%#v", option)
 
-					// Hash the ansewr text for a unique key, as no actual key exists.
+					// Hash the answer text for a unique key, as no actual key exists.
 					hasher := md5.New()
 					hasher.Write([]byte(option["title"].(string)))
 					optKeyStr := hex.EncodeToString(hasher.Sum(nil))
@@ -301,7 +301,7 @@ func (formHandle) SubmissionGroup(c *web.Context) error {
 
 	for group, submissions := range groups {
 
-		if group.QuestionID == groupKey {
+		if group.ID == groupKey {
 
 			ta, err = form.TextAggregate(c.SessionID, submissions)
 			if err != nil {

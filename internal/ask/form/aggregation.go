@@ -40,9 +40,9 @@ type Aggregation struct {
 // Group defines a key for a multiple choice question / answer combo to be used
 // to define slices of submissions to be aggregated.
 type Group struct {
-	QuestionID string `json:"question_id" bson:"question_id"`
-	Question   string `json:"question" bson:"question"`
-	Answer     string `json:"answer" bson:"answer"`
+	ID       string `json:"group_id" bson:"group_id"`
+	Question string `json:"question" bson:"question"`
+	Answer   string `json:"answer" bson:"answer"`
 }
 
 //==============================================================================
@@ -127,9 +127,9 @@ func GroupSubmissions(context interface{}, db *db.DB, id string, limit int, skip
 
 		// Add all submissions to the [all,all] group
 		group := Group{
-			QuestionID: "all",
-			Question:   "all",
-			Answer:     "all",
+			ID:       "all",
+			Question: "all",
+			Answer:   "all",
 		}
 		tmp := groups[group]
 		tmp = append(tmp, sub)
@@ -170,12 +170,18 @@ func GroupSubmissions(context interface{}, db *db.DB, id string, limit int, skip
 				// Use the title of the option as the map key.
 				selection := op["title"].(string)
 
+				// Hash the answer text for a unique key, as no actual key exists.
+				hasher := md5.New()
+				hasher.Write([]byte(selection))
+				optKeyStr := hex.EncodeToString(hasher.Sum(nil))
+
 				// Add the submission to this subgroup
 				group := Group{
-					QuestionID: ans.WidgetID,
-					Question:   ans.Question,
-					Answer:     selection,
+					ID:       optKeyStr,
+					Question: ans.Question,
+					Answer:   selection,
 				}
+
 				tmp := groups[group]
 				tmp = append(tmp, sub)
 				groups[group] = tmp
