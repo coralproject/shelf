@@ -53,7 +53,7 @@ type Group struct {
 func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[string]Aggregation, error) {
 
 	// Group the submissions.
-	groupedSubmissions, err := GroupSubmissions(context, db, id)
+	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, submission.SearchOpts{})
 	if err != nil {
 		return nil, err
 	}
@@ -108,9 +108,14 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 
 //==============================================================================
 
+// SubmissionGroup is a transport that defines the transport structure for a submission group.
+type SubmissionGroup struct {
+	Submissions map[Group][]submission.Submission `json:"submissions" bson:"submissions"`
+}
+
 // GroupSubmissions organizes submissions by Group. It looks for questions with the group by flag
 // and creates Group structs.
-func GroupSubmissions(context interface{}, db *db.DB, id string) (map[Group][]submission.Submission, error) {
+func GroupSubmissions(context interface{}, db *db.DB, id string, limit int, skip int, opts submission.SearchOpts) (map[Group][]submission.Submission, error) {
 
 	if !bson.IsObjectIdHex(id) {
 		log.Error(context, "TextAggregate", ErrInvalidID, "Completed")
@@ -118,7 +123,7 @@ func GroupSubmissions(context interface{}, db *db.DB, id string) (map[Group][]su
 	}
 
 	// Get the submissions for the form.Collection
-	subs, err := submission.Search(context, db, id, 0, 0, submission.SearchOpts{})
+	subs, err := submission.Search(context, db, id, limit, skip, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -130,8 +135,9 @@ func GroupSubmissions(context interface{}, db *db.DB, id string) (map[Group][]su
 
 		// Add all submissions to the [all,all] group
 		group := Group{
-			Question: "all",
-			Answer:   "all",
+			QuestionID: "all",
+			Question:   "all",
+			Answer:     "all",
 		}
 		tmp := groups[group]
 		tmp = append(tmp, sub)

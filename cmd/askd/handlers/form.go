@@ -13,6 +13,7 @@ import (
 	"github.com/ardanlabs/kit/web"
 	"github.com/coralproject/shelf/internal/ask"
 	"github.com/coralproject/shelf/internal/ask/form"
+	"github.com/coralproject/shelf/internal/ask/form/submission"
 	"github.com/coralproject/shelf/internal/platform/db"
 )
 
@@ -135,7 +136,7 @@ func (formHandle) Aggregate(c *web.Context) error {
 	return nil
 }
 
-// Aggregate performs all aggregations across a form's submissions.
+// AggregateGroup performs all aggregations across a form's submissions and returns a single group.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (formHandle) AggregateGroup(c *web.Context) error {
 	id := c.Params["form_id"]
@@ -251,6 +252,67 @@ func (formHandle) Digest(c *web.Context) error {
 	}
 
 	c.Respond(digest, http.StatusOK)
+
+	return nil
+}
+
+//==============================================================================
+
+// Submission Groups: The submission answers marked with includeInGroups from
+// the given groups, or all.
+
+//
+// 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
+func (formHandle) SubmissionGroup(c *web.Context) error {
+	id := c.Params["form_id"]
+
+	// unpack the search headers and create a SearchOpts for Group Submissions
+
+	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
+	if err != nil {
+		limit = 0
+	}
+
+	skip, err := strconv.Atoi(c.Request.URL.Query().Get("skip"))
+	if err != nil {
+		skip = 0
+	}
+
+	opts := submission.SearchOpts{
+		Query:    c.Request.URL.Query().Get("search"),
+		FilterBy: c.Request.URL.Query().Get("filterby"),
+	}
+
+	if c.Request.URL.Query().Get("orderby") == "dsc" {
+		opts.DscOrder = true
+	}
+
+	groups, err := form.GroupSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id, limit, skip, opts)
+	if err != nil {
+		return err
+	}
+
+	groupKey, ok := c.Params["group_id"]
+	if !ok {
+		c.Respond(nil, http.StatusNotFound)
+	}
+
+	ta := []form.TextAggregation{}
+
+	for group, submissions := range groups {
+
+		if group.QuestionID == groupKey {
+
+			ta, err = form.TextAggregate(c.SessionID, submissions)
+			if err != nil {
+				return err
+			}
+
+			fmt.Printf("\n\n%#v", ta)
+		}
+	}
+
+	c.Respond(ta, http.StatusOK)
 
 	return nil
 }
