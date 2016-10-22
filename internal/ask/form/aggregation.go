@@ -32,10 +32,9 @@ type TextAggregation map[string]string
 
 // Aggregation holds the various aggregations and stats collected.
 type Aggregation struct {
-	Group   Group                    `json:"group" bson:"group"`
-	Count   int                      `json:"count" bson:"count"`
-	MC      map[string]MCAggregation `json:"mc" bson:"mc"`
-	Answers []TextAggregation        `json:"answers" bson:"answers"`
+	Group Group                    `json:"group" bson:"group"`
+	Count int                      `json:"count" bson:"count"`
+	MC    map[string]MCAggregation `json:"mc" bson:"mc"`
 }
 
 // Group defines a key for a multiple choice question / answer combo to be used
@@ -64,12 +63,6 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 	// Loop through the groups of submissions.
 	for group, submissions := range groupedSubmissions {
 
-		// Perform the text aggregations.
-		textAggregations, err := TextAggregate(context, submissions)
-		if err != nil {
-			return nil, err
-		}
-
 		// Perform the multiple choice aggregations.
 		mcAggregations, err := MCAggregate(context, db, id, submissions)
 		if err != nil {
@@ -78,10 +71,9 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 
 		// Pack them in an aggregation along with the submission count and group.
 		agg := Aggregation{
-			Group:   group,
-			Count:   len(submissions),
-			MC:      mcAggregations,
-			Answers: textAggregations,
+			Group: group,
+			Count: len(submissions),
+			MC:    mcAggregations,
 		}
 
 		// If this is the "all" group, set the key to all as it is not an answer.
