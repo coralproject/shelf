@@ -3,8 +3,8 @@ package cmdmask
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/coralproject/shelf/cmd/xenia/disk"
 	"github.com/coralproject/shelf/cmd/xenia/web"
@@ -32,7 +32,7 @@ func addUpsert() {
 		Use:   "upsert",
 		Short: "Upsert adds or updates a mask from a file or directory.",
 		Long:  upsertLong,
-		Run:   runUpsert,
+		RunE:  runUpsert,
 	}
 
 	cmd.Flags().StringVarP(&upsert.path, "path", "p", "", "Path of mask file or directory.")
@@ -41,42 +41,32 @@ func addUpsert() {
 }
 
 // runUpsert is the code that implements the upsert command.
-func runUpsert(cmd *cobra.Command, args []string) {
+func runUpsert(cmd *cobra.Command, args []string) error {
 	cmd.Printf("Upserting Mask : Path[%s]\n", upsert.path)
 
 	if upsert.path == "" {
-		cmd.Help()
-		return
+		return fmt.Errorf("path must be provided")
 	}
 
-	pwd, err := os.Getwd()
-	if err != nil {
-		cmd.Println("Upserting Mask : ", err)
-		return
-	}
-
-	file := filepath.Join(pwd, upsert.path)
+	file := upsert.path
 
 	stat, err := os.Stat(file)
 	if err != nil {
-		cmd.Println("Upserting Mask : ", err)
-		return
+		return err
 	}
 
 	if !stat.IsDir() {
 		msk, err := disk.LoadMask("", file)
 		if err != nil {
-			cmd.Println("Upserting Mask : ", err)
-			return
+			return err
 		}
 
 		if err := runUpsertWeb(cmd, msk); err != nil {
-			cmd.Println("Upserting Mask : ", err)
-			return
+			return err
 		}
 
 		cmd.Println("\n", "Upserting Mask : Upserted")
-		return
+		return nil
 	}
 
 	f := func(path string) error {
@@ -89,11 +79,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {
-		cmd.Println("Upserting Mask : ", err)
-		return
+		return err
 	}
 
 	cmd.Println("\n", "Upserting Mask : Upserted")
+	return nil
 }
 
 // runUpsertWeb issues the command talking to the web service.

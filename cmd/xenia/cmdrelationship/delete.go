@@ -22,7 +22,7 @@ func addDel() {
 		Use:   "delete",
 		Short: "Removes a Relationship record by predicate.",
 		Long:  deleteLong,
-		Run:   runDelete,
+		RunE:  runDelete,
 	}
 
 	cmd.Flags().StringVarP(&delete.predicate, "predicate", "p", "", "Preciate of the Relationship.")
@@ -31,13 +31,14 @@ func addDel() {
 }
 
 // runDelete issues the command talking to the web service.
-func runDelete(cmd *cobra.Command, args []string) {
+func runDelete(cmd *cobra.Command, args []string) error {
 	verb := "DELETE"
 	url := "/v1/relationship/" + delete.predicate
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
-		cmd.Println("Deleting Relationship : ", err)
+		return err
 	}
 
 	cmd.Println("Deleting Relationship : Deleted")
+	return nil
 }

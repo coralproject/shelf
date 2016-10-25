@@ -9,7 +9,7 @@ var getLong = `Retrieves relationships record from the system with the optional 
 
 Example:
 	relationship get
-	
+
 	relationship get -p predicate
 `
 
@@ -24,7 +24,7 @@ func addGet() {
 		Use:   "get",
 		Short: "Retrieves all relationship records, or those matching an optional predicate.",
 		Long:  getLong,
-		Run:   runGet,
+		RunE:  runGet,
 	}
 
 	cmd.Flags().StringVarP(&get.predicate, "predicate", "p", "", "Relationship predicate.")
@@ -33,7 +33,7 @@ func addGet() {
 }
 
 // runGet issues the command talking to the web service.
-func runGet(cmd *cobra.Command, args []string) {
+func runGet(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/relationship"
 
@@ -43,8 +43,9 @@ func runGet(cmd *cobra.Command, args []string) {
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Relationship : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

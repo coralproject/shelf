@@ -2,6 +2,7 @@ package cmdview
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/coralproject/shelf/internal/wire"
 	"github.com/spf13/cobra"
@@ -27,7 +28,7 @@ func addExecute() {
 		Use:   "execute",
 		Short: "Execute executes a view based on input parameters.",
 		Long:  executeLong,
-		Run:   runExecute,
+		RunE:  runExecute,
 	}
 
 	cmd.Flags().StringVarP(&execute.viewName, "name", "n", "", "View name")
@@ -39,13 +40,12 @@ func addExecute() {
 }
 
 // runExecute is the code that implements the execute command.
-func runExecute(cmd *cobra.Command, args []string) {
+func runExecute(cmd *cobra.Command, args []string) error {
 	cmd.Printf("Executing View : Name[%s]\n", execute.viewName)
 
 	// Validate the input parameters.
 	if execute.viewName == "" || execute.itemKey == "" {
-		cmd.Help()
-		return
+		return fmt.Errorf("view name and item key must be specified")
 	}
 
 	// Ready the view parameters.
@@ -59,17 +59,16 @@ func runExecute(cmd *cobra.Command, args []string) {
 	// Execute the view.
 	results, err := wire.Execute("", mgoDB, graphDB, &viewParams)
 	if err != nil {
-		cmd.Println("Executing View : ", err)
-		return
+		return err
 	}
 
 	// Prepare the results for printing.
 	data, err := json.MarshalIndent(results, "", "    ")
 	if err != nil {
-		cmd.Println("Executing View : ", err)
-		return
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", string(data))
 	cmd.Println("\n", "Executing View : Executed")
+	return nil
 }

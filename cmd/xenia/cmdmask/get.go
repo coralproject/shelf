@@ -23,7 +23,7 @@ func addGet() {
 		Use:   "get",
 		Short: "Retrieves a Mask record by collection/field.",
 		Long:  getLong,
-		Run:   runGet,
+		RunE:  runGet,
 	}
 
 	cmd.Flags().StringVarP(&get.collection, "collection", "c", "", "Name of the Collection.")
@@ -33,7 +33,7 @@ func addGet() {
 }
 
 // runGet issues the command talking to the web service.
-func runGet(cmd *cobra.Command, args []string) {
+func runGet(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/mask"
 
@@ -47,8 +47,9 @@ func runGet(cmd *cobra.Command, args []string) {
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Mask : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }
