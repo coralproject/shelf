@@ -69,6 +69,13 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 			return nil, err
 		}
 
+		// Including the aggregation of the group that is being aggregated is redundant, remove.
+		for key, agg := range mcAggregations {
+			if agg.Question == group.Question {
+				delete(mcAggregations, key)
+			}
+		}
+
 		// Pack them in an aggregation along with the submission count and group.
 		agg := Aggregation{
 			Group: group,
@@ -238,7 +245,7 @@ func MCAggregate(context interface{}, db *db.DB, id string, subs []submission.Su
 	// Look at all submisisons.
 	for _, sub := range subs {
 
-		// Then at every anwer.
+		// Then at every anwer, where an answer is to a question.
 		for _, ans := range sub.Answers {
 
 			// Skip nil answers.
