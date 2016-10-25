@@ -22,7 +22,7 @@ func addDel() {
 		Use:   "delete",
 		Short: "Removes an Item record by ID.",
 		Long:  deleteLong,
-		Run:   runDelete,
+		RunE:  runDelete,
 	}
 
 	cmd.Flags().StringVarP(&delete.ID, "ID", "i", "", "Item ID.")
@@ -31,13 +31,14 @@ func addDel() {
 }
 
 // runDelete issues the command talking to the web service.
-func runDelete(cmd *cobra.Command, args []string) {
+func runDelete(cmd *cobra.Command, args []string) error {
 	verb := "DELETE"
 	url := "/v1/item/" + delete.ID
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
-		cmd.Println("Deleting Item : ", err)
+		return err
 	}
 
 	cmd.Println("Deleting Item : Deleted")
+	return nil
 }

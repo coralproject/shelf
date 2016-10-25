@@ -17,20 +17,21 @@ func addList() {
 		Use:   "list",
 		Short: "Retrieves a list of all available Regex names.",
 		Long:  listLong,
-		Run:   runList,
+		RunE:  runList,
 	}
 	regexCmd.AddCommand(cmd)
 }
 
 // runList issues the command talking to the web service.
-func runList(cmd *cobra.Command, args []string) {
+func runList(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/regex"
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Regex List : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

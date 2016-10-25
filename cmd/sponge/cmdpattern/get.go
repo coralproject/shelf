@@ -9,7 +9,7 @@ var getLong = `Retrieves pattern records from the system with the optional suppl
 
 Example:
 	pattern get
-	
+
 	pattern get -t type
 `
 
@@ -24,7 +24,7 @@ func addGet() {
 		Use:   "get",
 		Short: "Retrieves all pattern records, or those matching an optional type.",
 		Long:  getLong,
-		Run:   runGet,
+		RunE:  runGet,
 	}
 
 	cmd.Flags().StringVarP(&get.ptype, "type", "t", "", "Pattern type.")
@@ -33,7 +33,7 @@ func addGet() {
 }
 
 // runGet issues the command talking to the web service.
-func runGet(cmd *cobra.Command, args []string) {
+func runGet(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/pattern"
 
@@ -43,8 +43,9 @@ func runGet(cmd *cobra.Command, args []string) {
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Pattern : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

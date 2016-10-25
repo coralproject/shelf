@@ -31,7 +31,7 @@ func addCreate() {
 		Use:   "create [-f file]",
 		Short: "Creates a new database from a script file",
 		Long:  createLong,
-		Run:   runCreate,
+		RunE:  runCreate,
 	}
 
 	cmd.Flags().StringVarP(&create.file, "file", "f", "", "file path of script json file")
@@ -73,20 +73,20 @@ type Field struct {
 }
 
 // runCreate is the code that implements the create command.
-func runCreate(cmd *cobra.Command, args []string) {
+func runCreate(cmd *cobra.Command, args []string) error {
 	dbMeta, err := retrieveDatabaseMetadata(create.file)
 	if err != nil {
-		dbCmd.Printf("Error reading collections : %s : ERROR : %v\n", create.file, err)
-		return
+		return err
 	}
 
 	for _, col := range dbMeta.Cols {
 		cmd.Println("Creating collection", col.Name)
 		if err := createCollection(conn, dbMeta, &col, true); err != nil && err != ErrCollectionExists {
-			cmd.Println("ERROR:", err)
-			return
+			return err
 		}
 	}
+
+	return nil
 }
 
 // retrieveDatabaseMetadata reads the specified file and returns the database

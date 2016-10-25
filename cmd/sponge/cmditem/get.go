@@ -1,6 +1,8 @@
 package cmditem
 
 import (
+	"fmt"
+
 	"github.com/coralproject/shelf/cmd/sponge/web"
 	"github.com/spf13/cobra"
 )
@@ -22,7 +24,7 @@ func addGet() {
 		Use:   "get",
 		Short: "Retrieves all item records matching the supplied IDs.",
 		Long:  getLong,
-		Run:   runGet,
+		RunE:  runGet,
 	}
 
 	cmd.Flags().StringVarP(&get.IDs, "IDs", "i", "", "Item IDs.")
@@ -31,20 +33,20 @@ func addGet() {
 }
 
 // runGet issues the command talking to the web service.
-func runGet(cmd *cobra.Command, args []string) {
+func runGet(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/item"
 
 	if get.IDs == "" {
-		cmd.Help()
-		return
+		return fmt.Errorf("at least one id required")
 	}
 
 	url += "/" + get.IDs
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Items : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

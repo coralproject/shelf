@@ -24,7 +24,7 @@ func addGet() {
 		Use:   "get",
 		Short: "Retrieves all view records, or those matching an optional name.",
 		Long:  getLong,
-		Run:   runGet,
+		RunE:  runGet,
 	}
 
 	cmd.Flags().StringVarP(&get.name, "name", "n", "", "View name.")
@@ -33,7 +33,7 @@ func addGet() {
 }
 
 // runGet issues the command talking to the web service.
-func runGet(cmd *cobra.Command, args []string) {
+func runGet(cmd *cobra.Command, args []string) error {
 	verb := "GET"
 	url := "/v1/view"
 
@@ -43,8 +43,9 @@ func runGet(cmd *cobra.Command, args []string) {
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting View : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

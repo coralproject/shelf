@@ -27,7 +27,7 @@ func addIndex() {
 		Use:   "index",
 		Short: "Index adds or updates a Set from a file or directory.",
 		Long:  indexLong,
-		Run:   runIndex,
+		RunE:  runIndex,
 	}
 
 	cmd.Flags().StringVarP(&index.name, "name", "n", "", "Name of the Set.")
@@ -36,13 +36,12 @@ func addIndex() {
 }
 
 // runIndex issues the command talking to the web service.
-func runIndex(cmd *cobra.Command, args []string) {
+func runIndex(cmd *cobra.Command, args []string) error {
 	cmd.Printf("Ensure Indexes : Name[%s]\n", index.name)
 
 	set, err := runGetSet(cmd, index.name)
 	if err != nil {
-		cmd.Println("Ensure Indexes : ", err)
-		return
+		return err
 	}
 
 	verb := "PUT"
@@ -50,19 +49,17 @@ func runIndex(cmd *cobra.Command, args []string) {
 
 	data, err := json.Marshal(set)
 	if err != nil {
-		cmd.Println("Ensure Indexes : ", err)
-		return
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", string(data))
 
 	if _, err := web.Request(cmd, verb, url, bytes.NewBuffer(data)); err != nil {
-		cmd.Println("Ensure Indexes : ", err)
-		return
+		return err
 	}
 
 	cmd.Println("\n", "Ensure Indexes : Ensured")
-	return
+	return nil
 }
 
 // runGetSet get a query set by name.

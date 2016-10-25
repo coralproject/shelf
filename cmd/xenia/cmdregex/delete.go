@@ -22,7 +22,7 @@ func addDel() {
 		Use:   "delete",
 		Short: "Removes a Regex record by name.",
 		Long:  deleteLong,
-		Run:   runDelete,
+		RunE:  runDelete,
 	}
 
 	cmd.Flags().StringVarP(&delete.name, "name", "n", "", "Name of the Regex record.")
@@ -31,13 +31,14 @@ func addDel() {
 }
 
 // runDelete issues the command talking to the web service.
-func runDelete(cmd *cobra.Command, args []string) {
+func runDelete(cmd *cobra.Command, args []string) error {
 	verb := "DELETE"
 	url := "/v1/regex/" + get.name
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
-		cmd.Println("Deleting Regex : ", err)
+		return err
 	}
 
 	cmd.Println("Deleting Regex : Deleted")
+	return nil
 }
