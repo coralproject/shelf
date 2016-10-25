@@ -18,7 +18,7 @@ InitQuadStore initializes the quadstore.
 
 ## func New
 ``` go
-func New(mongoURL string) (*cayley.Handle, error)
+func New(mongoURL string, ses *mgo.Session) (*cayley.Handle, error)
 ```
 New creates a new cayley handle.
 
