@@ -23,7 +23,7 @@ func addDel() {
 		Use:   "delete",
 		Short: "Removes a Mask record by collection/field.",
 		Long:  deleteLong,
-		Run:   runDelete,
+		RunE:  runDelete,
 	}
 
 	cmd.Flags().StringVarP(&get.collection, "collection", "c", "", "Name of the Collection.")
@@ -33,13 +33,14 @@ func addDel() {
 }
 
 // runDelete issues the command talking to the web service.
-func runDelete(cmd *cobra.Command, args []string) {
+func runDelete(cmd *cobra.Command, args []string) error {
 	verb := "DELETE"
 	url := "/v1/mask/" + delete.collection + "/" + delete.field
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
-		cmd.Println("Deleting Mask : ", err)
+		return err
 	}
 
 	cmd.Println("Deleting Mask : Deleted")
+	return nil
 }

@@ -27,7 +27,7 @@ func addExec() {
 		Use:   "exec",
 		Short: "Executes a Set by name.",
 		Long:  execLong,
-		Run:   runExec,
+		RunE:  runExec,
 	}
 
 	cmd.Flags().StringVarP(&exe.name, "name", "n", "", "Name of Set.")
@@ -37,7 +37,7 @@ func addExec() {
 }
 
 // runExec is the code that implements the execute command.
-func runExec(cmd *cobra.Command, args []string) {
+func runExec(cmd *cobra.Command, args []string) error {
 	vars := make(map[string]string)
 	if exe.vars != "" {
 		vs := strings.Split(exe.vars, ",")
@@ -50,11 +50,11 @@ func runExec(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	runExecWeb(cmd, vars)
+	return runExecWeb(cmd, vars)
 }
 
 // runExecWeb issues the command talking to the web service.
-func runExecWeb(cmd *cobra.Command, vars map[string]string) {
+func runExecWeb(cmd *cobra.Command, vars map[string]string) error {
 	verb := "GET"
 	url := "/v1/exec/" + exe.name
 
@@ -74,8 +74,9 @@ func runExecWeb(cmd *cobra.Command, vars map[string]string) {
 
 	resp, err := web.Request(cmd, verb, url, nil)
 	if err != nil {
-		cmd.Println("Getting Set List : ", err)
+		return err
 	}
 
 	cmd.Printf("\n%s\n\n", resp)
+	return nil
 }

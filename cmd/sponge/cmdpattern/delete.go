@@ -22,7 +22,7 @@ func addDel() {
 		Use:   "delete",
 		Short: "Removes a Pattern record by type.",
 		Long:  deleteLong,
-		Run:   runDelete,
+		RunE:  runDelete,
 	}
 
 	cmd.Flags().StringVarP(&delete.ptype, "type", "t", "", "Type of the Pattern.")
@@ -31,13 +31,14 @@ func addDel() {
 }
 
 // runDelete issues the command talking to the web service.
-func runDelete(cmd *cobra.Command, args []string) {
+func runDelete(cmd *cobra.Command, args []string) error {
 	verb := "DELETE"
 	url := "/v1/pattern/" + delete.ptype
 
 	if _, err := web.Request(cmd, verb, url, nil); err != nil {
-		cmd.Println("Deleting Pattern : ", err)
+		return err
 	}
 
 	cmd.Println("Deleting Pattern : Deleted")
+	return nil
 }

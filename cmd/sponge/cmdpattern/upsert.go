@@ -3,8 +3,8 @@ package cmdpattern
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"os"
-	"path/filepath"
 
 	"github.com/coralproject/shelf/cmd/sponge/disk"
 	"github.com/coralproject/shelf/cmd/sponge/web"
@@ -31,7 +31,7 @@ func addUpsert() {
 		Use:   "upsert",
 		Short: "Upsert adds or updates a pattern from a file or directory.",
 		Long:  upsertLong,
-		Run:   runUpsert,
+		RunE:  runUpsert,
 	}
 
 	cmd.Flags().StringVarP(&upsert.path, "path", "p", "", "Path of pattern file or directory.")
@@ -40,42 +40,32 @@ func addUpsert() {
 }
 
 // runUpsert is the code that implements the upsert command.
-func runUpsert(cmd *cobra.Command, args []string) {
+func runUpsert(cmd *cobra.Command, args []string) error {
 	cmd.Printf("Upserting Pattern : Path[%s]\n", upsert.path)
 
 	if upsert.path == "" {
-		cmd.Help()
-		return
+		return fmt.Errorf("path must be provided")
 	}
 
-	pwd, err := os.Getwd()
-	if err != nil {
-		cmd.Println("Upserting Pattern : ", err)
-		return
-	}
-
-	file := filepath.Join(pwd, upsert.path)
+	file := upsert.path
 
 	stat, err := os.Stat(file)
 	if err != nil {
-		cmd.Println("Upserting Pattern : ", err)
-		return
+		return err
 	}
 
 	if !stat.IsDir() {
 		p, err := disk.LoadPattern("", file)
 		if err != nil {
-			cmd.Println("Upserting Pattern : ", err)
-			return
+			return err
 		}
 
 		if err := runUpsertWeb(cmd, p); err != nil {
-			cmd.Println("Upserting Pattern : ", err)
-			return
+			return err
 		}
 
 		cmd.Println("\n", "Upserting Pattern : Upserted")
-		return
+		return nil
 	}
 
 	f := func(path string) error {
@@ -88,11 +78,11 @@ func runUpsert(cmd *cobra.Command, args []string) {
 	}
 
 	if err := disk.LoadDir(file, f); err != nil {
-		cmd.Println("Upserting Pattern : ", err)
-		return
+		return err
 	}
 
 	cmd.Println("\n", "Upserting Pattern : Upserted")
+	return nil
 }
 
 // runUpsertWeb issues the command talking to the web service.
