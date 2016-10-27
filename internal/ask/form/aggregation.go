@@ -34,7 +34,7 @@ type TextAggregation map[string]string
 type Aggregation struct {
 	Group Group                    `json:"group" bson:"group"`
 	Count int                      `json:"count" bson:"count"`
-	MC    map[string]MCAggregation `json:"mc" bson:"mc"`
+	MC    map[string]MCAggregation `json:"MultipleChoice" bson:"MultipleChoice"` // Capitalization matches widget type MultipleChoice
 }
 
 // Group defines a key for a multiple choice question / answer combo to be used
