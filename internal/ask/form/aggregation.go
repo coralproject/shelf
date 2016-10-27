@@ -207,20 +207,20 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 // types based on the parameters embedded in the form.
 
 // MCAggregate calculates statistics on all multiple choice questions.
-func MCAggregate(context interface{}, db *db.DB, id string, subs []submission.Submission) (map[string]MCAggregation, error) {
-	log.Dev(context, "Aggregate", "Started : Submission[%s]", id)
+func MCAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) (map[string]MCAggregation, error) {
+	log.Dev(context, "Aggregate", "Started : Submission[%s]", formID)
 
 	// We load the form so that only the multiple choice questions currently in the form
 	// will be included in the aggregation.
 
 	// Ensure that the id passed is a valid bson IdHex.
-	if !bson.IsObjectIdHex(id) {
+	if !bson.IsObjectIdHex(formID) {
 		log.Error(context, "Aggregate", ErrInvalidID, "Completed")
 		return nil, ErrInvalidID
 	}
 
 	// Get the form in question.
-	form, err := Retrieve(context, db, id)
+	form, err := Retrieve(context, db, formID)
 	if err != nil {
 		return nil, err
 	}
@@ -310,7 +310,7 @@ func MCAggregate(context interface{}, db *db.DB, id string, subs []submission.Su
 		}
 	}
 
-	log.Dev(context, "Aggregate", "Completed : Submission[%s]", id)
+	log.Dev(context, "Aggregate", "Completed : Submission[%s]", formID)
 	return aggs, nil
 }
 
