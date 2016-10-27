@@ -41,6 +41,29 @@
 		]
 	},
 	{
+		"name": "WTEST_user comments with unfulfilled full path",
+		"start_type": "WTEST_user",
+		"collection": "items",
+		"paths": [
+			{
+				"path_segments": [
+					{
+						"level": 1,
+						"direction": "out",
+						"predicate": "WTEST_authored",
+						"tag": "comment"
+					},
+					{
+						"level": 2,
+						"direction": "out",
+						"predicate": "blah",
+						"tag": "double_blah"
+					}
+				]
+			}
+		]
+	},
+	{
 		"name": "WTEST_comments from authors flagged by a user",
 		"start_type": "WTEST_invalid_type",
 		"collection": "items",
