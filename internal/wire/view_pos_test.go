@@ -9,6 +9,7 @@ func getPosViews() []execView {
 		returnRoot(),
 		splitPath(),
 		backwards(),
+		unfulfilledFullPath(),
 	}
 }
 
@@ -117,6 +118,23 @@ func backwards() execView {
 			`"item_id":"WTEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4"`,
 			`"item_id":"WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"`,
 			`"related":{"asset":["WTEST_c1b2bbfe-af9f-4903-8777-bd47c4d5b20a"]}`,
+		},
+	}
+}
+
+// unfulfilledFullPath includes no items satisfying the full path, only some items
+// satisfying partial paths.  Because we have strict_path = false, we should still return
+// these partial path items.
+func unfulfilledFullPath() execView {
+	return execView{
+		fail:       false,
+		viewName:   "user comments with unfulfilled full path",
+		itemKey:    "80aa936a-f618-4234-a7be-df59a14cf8de",
+		number:     2,
+		collection: "",
+		results: []string{
+			`"item_id":"WTEST_6eaaa19f-da7a-4095-bbe3-cee7a7631dd4"`,
+			`"item_id":"WTEST_d1dfa366-d2f7-4a4a-a64f-af89d4c97d82"`,
 		},
 	}
 }
