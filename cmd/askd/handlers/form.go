@@ -174,6 +174,7 @@ type FormQuestionDigest struct {
 	Title   string                     `json:"title" bson:"title"`
 	GroupBy bool                       `json:"group_by" bson:"group_by"`
 	Options []FormQuestionOptionDigest `json:"options,omitempty" bson:"options,omitempty"`
+	Order   int                        `json:"order" bson:"order"`
 }
 
 // FormDigest is the blueprint for how we send form digests to clients.
@@ -194,6 +195,9 @@ func (formHandle) Digest(c *web.Context) error {
 
 	// Create a container for the question digests.
 	questions := make(map[string]FormQuestionDigest)
+
+	// Order is a counter to set the order questions in the form.
+	order := 1
 
 	// Loop through to form's steps/widgets to find the questions.
 	for _, step := range f.Steps {
@@ -242,7 +246,11 @@ func (formHandle) Digest(c *web.Context) error {
 				Title:   widget.Title,
 				GroupBy: gsok,
 				Options: options,
+				Order:   order,
 			}
+
+			// Increment the order counter.
+			order = order + 1
 
 		}
 	}
