@@ -116,9 +116,33 @@ type SubmissionGroup struct {
 // and creates Group structs.
 func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, skip int, opts submission.SearchOpts) (map[Group][]submission.Submission, error) {
 
+	// Validate the formID.
 	if !bson.IsObjectIdHex(formID) {
 		log.Error(context, "TextAggregate", ErrInvalidID, "Completed")
 		return nil, ErrInvalidID
+	}
+
+	// Load the form so that we can find which questions are flagged groupBy.
+	form, err := Retrieve(context, db, formID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a container for questions flagged as groupSubmissions.
+	groupBys := make(map[string]bool)
+
+	// Find the widgets to groupBy and add them to the map.
+	for _, step := range form.Steps {
+		for _, widget := range step.Widgets {
+
+			// Type the props value.
+			props := widget.Props.(bson.M)
+
+			// If groupSubmissions is set, add the ID to the map of questions to include.
+			if props["groupSubmissions"] == true {
+				groupBys[widget.ID] = true
+			}
+		}
 	}
 
 	// Get the submissions for the form.Collection
@@ -151,9 +175,8 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 			}
 
 			// Only include answers of questions flagged with "includeInGroups".
-			props := ans.Props.(bson.M)
-			include, ok := props["groupSubmissions"]
-			if include == nil || !ok || include == false {
+			_, ok := groupBys[ans.WidgetID]
+			if !ok {
 				continue
 			}
 
@@ -315,7 +338,39 @@ func MCAggregate(context interface{}, db *db.DB, formID string, subs []submissio
 }
 
 // TextAggregate returns all text answers flagged with includeInGroup.
-func TextAggregate(context interface{}, subs []submission.Submission) ([]TextAggregation, error) {
+func TextAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) ([]TextAggregation, error) {
+
+	// We load the form to look up wich fields to includeInGroups.
+
+	// Ensure that the id passed is a valid bson IdHex.
+	if !bson.IsObjectIdHex(formID) {
+		log.Error(context, "Aggregate", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	// Load the form so that we can find which questions are flagged to include
+	// in the submission groups.
+	form, err := Retrieve(context, db, formID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a container for questions to include in the groups.
+	includes := make(map[string]bool)
+
+	// Find the widgets to includeInGroups and add them to the map.
+	for _, step := range form.Steps {
+		for _, widget := range step.Widgets {
+
+			// Type the props value.
+			props := widget.Props.(bson.M)
+
+			// If includeInGroups is set, add the ID to the map of questions to include.
+			if props["includeInGroups"] == true {
+				includes[widget.ID] = true
+			}
+		}
+	}
 
 	// Create a container for the aggregations: [question][option]count.
 	textAggregations := []TextAggregation{}
@@ -332,10 +387,10 @@ func TextAggregate(context interface{}, subs []submission.Submission) ([]TextAgg
 				continue
 			}
 
-			// Only include answers of questions flagged with "includeInGroups".
-			props := ans.Props.(bson.M)
-			include, ok := props["includeInGroups"]
-			if include == nil || !ok {
+			// Only include answers of questions flagged with "includeInGroups" that
+			// we added to the includes map above.
+			_, ok := includes[ans.WidgetID]
+			if !ok {
 				continue
 			}
 

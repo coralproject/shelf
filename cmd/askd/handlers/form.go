@@ -4,7 +4,6 @@ import (
 	"crypto/md5"
 	"encoding/hex"
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -224,7 +223,6 @@ func (formHandle) Digest(c *web.Context) error {
 
 				for _, opt := range opts {
 					option := opt.(bson.M)
-					fmt.Printf("\n\n%#v", option)
 
 					// Hash the answer text for a unique key, as no actual key exists.
 					hasher := md5.New()
@@ -311,12 +309,10 @@ func (formHandle) SubmissionGroup(c *web.Context) error {
 
 		if group.ID == groupKey {
 
-			ta, err = form.TextAggregate(c.SessionID, submissions)
+			ta, err = form.TextAggregate(c.SessionID, c.Ctx["DB"].(*db.DB), id, submissions)
 			if err != nil {
 				return err
 			}
-
-			fmt.Printf("\n\n%#v", ta)
 		}
 	}
 
