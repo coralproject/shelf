@@ -114,15 +114,15 @@ type SubmissionGroup struct {
 
 // GroupSubmissions organizes submissions by Group. It looks for questions with the group by flag
 // and creates Group structs.
-func GroupSubmissions(context interface{}, db *db.DB, id string, limit int, skip int, opts submission.SearchOpts) (map[Group][]submission.Submission, error) {
+func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, skip int, opts submission.SearchOpts) (map[Group][]submission.Submission, error) {
 
-	if !bson.IsObjectIdHex(id) {
+	if !bson.IsObjectIdHex(formID) {
 		log.Error(context, "TextAggregate", ErrInvalidID, "Completed")
 		return nil, ErrInvalidID
 	}
 
 	// Get the submissions for the form.Collection
-	subs, err := submission.Search(context, db, id, limit, skip, opts)
+	subs, err := submission.Search(context, db, formID, limit, skip, opts)
 	if err != nil {
 		return nil, err
 	}
