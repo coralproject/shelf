@@ -3,6 +3,7 @@ package form
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"fmt"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
@@ -239,6 +240,116 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 // Aggregation functions take arrays of submissions and aggregate certain field
 // types based on the parameters embedded in the form.
 
+// TextAggregate returns all text answers flagged with includeInGroup.
+func TextAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) ([]TextAggregation, error) {
+
+	// We load the form to look up wich fields to includeInGroups.
+
+	// Ensure that the id passed is a valid bson IdHex.
+	if !bson.IsObjectIdHex(formID) {
+		log.Error(context, "Aggregate", ErrInvalidID, "Completed")
+		return nil, ErrInvalidID
+	}
+
+	// Load the form so that we can find which questions are flagged to include
+	// in the submission groups.
+	form, err := Retrieve(context, db, formID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Create a container for questions to include in the groups.
+	includes := make(map[string]bool)
+
+	// Find the widgets to includeInGroups and add them to the map.
+	for _, step := range form.Steps {
+		for _, widget := range step.Widgets {
+
+			// Type the props value.
+			props := widget.Props.(bson.M)
+
+			// If includeInGroups is set, add the ID to the map of questions to include.
+			if props["includeInGroups"] == true {
+				includes[widget.ID] = true
+			}
+		}
+	}
+
+	// Create a container for the aggregations: [question][option]count.
+	var textAggregations []TextAggregation
+
+	// Scan all the submissions and answers.
+	for _, sub := range subs {
+
+		// Create an aggregation and set the ID.
+		textAggregation := TextAggregation{}
+		textAggregation["id"] = sub.ID.Hex()
+
+		for _, ans := range sub.Answers {
+
+			// Skip nil answers.
+			if ans.Answer == nil {
+				continue
+			}
+
+			// Only include answers of questions flagged with "includeInGroups" that
+			// we added to the includes map above.
+			_, ok := includes[ans.WidgetID]
+			if !ok {
+				continue
+			}
+
+			// Get the answer and options.
+			a, ok := ans.Answer.(bson.M)
+			if !ok {
+				return nil, fmt.Errorf("Could not parse answer")
+			}
+
+			options, ok := a["options"]
+			if !ok {
+				return nil, fmt.Errorf("Could not parse options from answer")
+			}
+
+			// Options == nil points to a non MultipleChoice answer.
+			var answer string
+			if options == nil {
+				// Unpack the answer and add it to the map at the widgetID
+				a := ans.Answer.(bson.M)
+				answer = a["text"].(string)
+			}
+
+			// If we have multiple choice, use the first selection.
+			if options != nil {
+				opts, ok := options.([]interface{})
+				if !ok || opts == nil {
+					continue
+				}
+
+				// Unpack the first answer (only one supported).
+				op, ok := opts[0].(bson.M)
+				if !ok {
+					continue
+				}
+
+				// Use the title of the option as the map key.
+				answer, ok = op["title"].(string)
+				if !ok {
+					continue
+				}
+			}
+
+			// Key the answer by the WidgetID.
+			textAggregation[ans.WidgetID] = answer
+		}
+
+		// Append the aggregation to the slice.
+		textAggregations = append(textAggregations, textAggregation)
+	}
+
+	log.Dev(context, "Text Aggregate", "Completed : Submission")
+	return textAggregations, nil
+}
+
 // MCAggregate calculates statistics on all multiple choice questions.
 func mcAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) (map[string]MCAggregation, error) {
 	log.Dev(context, "Aggregate", "Started : Submission[%s]", formID)
@@ -358,105 +469,4 @@ func mcAggregate(context interface{}, db *db.DB, formID string, subs []submissio
 
 	log.Dev(context, "Aggregate", "Completed : Submission[%s]", formID)
 	return aggs, nil
-}
-
-// TextAggregate returns all text answers flagged with includeInGroup.
-func TextAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) ([]TextAggregation, error) {
-
-	// We load the form to look up wich fields to includeInGroups.
-
-	// Ensure that the id passed is a valid bson IdHex.
-	if !bson.IsObjectIdHex(formID) {
-		log.Error(context, "Aggregate", ErrInvalidID, "Completed")
-		return nil, ErrInvalidID
-	}
-
-	// Load the form so that we can find which questions are flagged to include
-	// in the submission groups.
-	form, err := Retrieve(context, db, formID)
-	if err != nil {
-		return nil, err
-	}
-
-	// Create a container for questions to include in the groups.
-	includes := make(map[string]bool)
-
-	// Find the widgets to includeInGroups and add them to the map.
-	for _, step := range form.Steps {
-		for _, widget := range step.Widgets {
-
-			// Type the props value.
-			props := widget.Props.(bson.M)
-
-			// If includeInGroups is set, add the ID to the map of questions to include.
-			if props["includeInGroups"] == true {
-				includes[widget.ID] = true
-			}
-		}
-	}
-
-	// Create a container for the aggregations: [question][option]count.
-	var textAggregations []TextAggregation
-
-	// Scan all the submissions and answers.
-	for _, sub := range subs {
-
-		// Create an aggregation and set the ID.
-		textAggregation := TextAggregation{}
-		textAggregation["id"] = sub.ID.Hex()
-
-		for _, ans := range sub.Answers {
-
-			// Skip nil answers.
-			if ans.Answer == nil {
-				continue
-			}
-
-			// Only include answers of questions flagged with "includeInGroups" that
-			// we added to the includes map above.
-			_, ok := includes[ans.WidgetID]
-			if !ok {
-				continue
-			}
-
-			// Options == nil points to a non MultipleChoice answer.
-			var answer string
-			a := ans.Answer.(bson.M)
-			options := a["options"]
-			if options == nil {
-				// Unpack the answer and add it to the map at the widgetID
-				a := ans.Answer.(bson.M)
-				answer = a["text"].(string)
-			}
-
-			// If we have multiple choice, use the first selection.
-			if options != nil {
-				opts, ok := options.([]interface{})
-				if !ok || opts == nil {
-					continue
-				}
-
-				// Unpack the first answer (only one supported).
-				op, ok := opts[0].(bson.M)
-				if !ok {
-					continue
-				}
-
-				// Use the title of the option as the map key.
-				answer, ok = op["title"].(string)
-				if !ok {
-					continue
-				}
-			}
-
-			// Key the answer by the WidgetID.
-			textAggregation[ans.WidgetID] = answer
-		}
-
-		// Append the aggregation to the slice.
-		textAggregations = append(textAggregations, textAggregation)
-	}
-
-	log.Dev(context, "Text Aggregate", "Completed : Submission")
-	return textAggregations, nil
 }
