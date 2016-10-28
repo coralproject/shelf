@@ -10,6 +10,7 @@ import (
 	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
 	"github.com/coralproject/shelf/internal/platform/db"
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -33,6 +34,9 @@ func (aggregationHandle) Aggregate(c *web.Context) error {
 	id := c.Params["form_id"]
 
 	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	if err == mgo.ErrNotFound {
+		c.Respond(nil, http.StatusBadRequest)
+	}
 	if err != nil {
 		return err
 	}
@@ -95,10 +99,10 @@ type FormDigest struct {
 // Digest returns a form digest.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (aggregationHandle) Digest(c *web.Context) error {
-	id := c.Params["form_id"]
+	formID := c.Params["form_id"]
 
 	// Load the form requested.
-	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
 	if err != nil {
 		return err
 	}
