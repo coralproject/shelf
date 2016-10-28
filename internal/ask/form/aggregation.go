@@ -300,22 +300,25 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 			}
 
 			// Get the answer and options.
-			a, ok := ans.Answer.(bson.M)
+			a, ok := ans.Answer.(map[string]interface{})
 			if !ok {
 				return nil, fmt.Errorf("Could not parse answer")
 			}
 
-			options, ok := a["options"]
-			if !ok {
-				return nil, fmt.Errorf("Could not parse options from answer")
-			}
-
-			// Options == nil points to a non MultipleChoice answer.
 			var answer string
-			if options == nil {
+			options, ok := a["options"]
+			if !ok || options == nil {
+
 				// Unpack the answer and add it to the map at the widgetID
-				a := ans.Answer.(bson.M)
-				answer = a["text"].(string)
+				answerVal, ok := a["text"]
+				if !ok {
+					return nil, fmt.Errorf("Could not get text key")
+				}
+
+				answer, ok = answerVal.(string)
+				if !ok {
+					return nil, fmt.Errorf("Non-string answer")
+				}
 			}
 
 			// If we have multiple choice, use the first selection.

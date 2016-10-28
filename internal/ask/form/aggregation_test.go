@@ -91,7 +91,7 @@ func TestTextAggregate(t *testing.T) {
 			//----------------------------------------------------------------------
 			// Check the aggregations.
 
-			if len(aggs) != 11 {
+			if len(aggs) != 10 {
 				t.Fatalf("\t%s\tShould be able to get 11 aggregations : %s", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to get 11 aggregations.", tests.Success)
