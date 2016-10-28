@@ -12,6 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/cmd/askd/handlers"
 )
 
 // subPrefix is the base name for everything.
@@ -104,3 +105,43 @@ func TestDownloadCSV(t *testing.T) {
 		}
 	}
 }
+
+// TestAggregate tests the aggregation across a form's submissions
+func TestAggregate(t *testing.T) {
+
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need aggregate across a form's submissions.")
+	{
+		url := "/v1/form/576017c53bc37e000554567d/aggregate"
+		r := httptest.NewRequest("GET", url, nil)
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling aggregate endpoint: %s", url)
+		{
+			t.Log("\tWhen we user version v1 of the aggregate endpoint.")
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to get the aggregation keys : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to get the aggregation keys .", tests.Success)
+
+			var ak handlers.AggregationKeys
+			if err := json.Unmarshal(w.Body.Bytes(), &ak); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+
+			if ak.Aggregations["all"].Count != 5 {
+				t.Fatalf("\t%s\tShould be able to return 5 in Count.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to return 5 in Count.", tests.Success)
+
+		}
+	}
+}
+
+// func TestAggregateGroup(t *testing.T) {}
+// func TestAggregateGroupSubmission(t *testing.T) {}

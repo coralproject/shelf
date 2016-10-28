@@ -377,7 +377,7 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 
 		// Create an aggregation and set the ID.
 		textAggregation := TextAggregation{}
-		TextAggregation["id"] = sub.ID
+		textAggregation["id"] = sub.ID.Hex()
 
 		for _, ans := range sub.Answers {
 
