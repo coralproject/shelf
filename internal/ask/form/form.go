@@ -35,7 +35,7 @@ const Collection = "forms"
 // Widget describes a specific question being asked by the Form which is
 // contained within a Step.
 type Widget struct {
-	ID          string      `json:"id" bson:"_id"`
+	ID          string      `json:"_id" bson:"_id"`
 	Type        string      `json:"type" bson:"type"`
 	Identity    bool        `json:"identity" bson:"identity"`
 	Component   string      `json:"component" bson:"component"`
@@ -47,7 +47,7 @@ type Widget struct {
 
 // Step is a collection of Widget's.
 type Step struct {
-	ID      string   `json:"id" bson:"_id"`
+	ID      string   `json:"_id" bson:"_id"`
 	Name    string   `json:"name" bson:"name"`
 	Widgets []Widget `json:"widgets" bson:"widgets"`
 }
@@ -146,6 +146,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 
 	objectID := bson.ObjectIdHex(id)
 
+	// Find the number of submissions on this form
 	count, err := submission.Count(context, db, id)
 	if err != nil {
 		log.Error(context, "UpdateStats", ErrInvalidID, "Completed")
@@ -155,6 +156,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 	stats := Stats{
 		Responses: count,
 	}
+
 	f := func(c *mgo.Collection) error {
 		u := bson.M{
 			"$set": bson.M{

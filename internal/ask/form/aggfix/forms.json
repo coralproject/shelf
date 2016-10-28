@@ -1,0 +1,178 @@
+{
+  "id": "580627b42600e2035218509f",
+  "status": "open",
+  "theme": {
+    "submitButtonText": "#FFFFFF",
+    "formBackground": "#FFFFFF",
+    "inputText": "#222222",
+    "footerText": "#222222",
+    "requiredAsterisk": "#939393",
+    "headerText": "#222222",
+    "progressBar": "#44AA44",
+    "selectedItemText": "#FAFAFA",
+    "footerBackground": "#FFFFFF",
+    "headerBackground": "#FFFFFF",
+    "inputBackground": "#FFFFFF",
+    "progressBarBackground": "#CCCCCC",
+    "selectedItemBackground": "#2E343B",
+    "submitButtonBackground": "#F67D6E",
+    "fieldTitleText": "#222222",
+    "headerIntroText": "#444444"
+  },
+  "settings": {
+    "saveDestination": "http:\/\/localhost:16183\/v1\/form\/580627b42600e2035218509f\/submission",
+    "showFieldNumbers": true,
+    "baseUrl": "http:\/\/localhost:4444\/widgets\/",
+    "inactiveMessage": "We are not currently accepting submissions. Thank you.",
+    "recaptcha": false
+  },
+  "header": {
+    "description": "What would you like to say?",
+    "heading": "Letter to the incoming president",
+    "title": "ATEST_The election spectacular"
+  },
+  "footer": {
+    "conditions": ""
+  },
+  "finishedScreen": {
+    "description": "Thank you for helping us with our journalism. We read all submissions, and will be in touch if we have any more questions.",
+    "title": "Thanks."
+  },
+  "steps": [
+    {
+      "_id": "c685f7ff-82ef-44b2-8df8-b331f7977f87",
+      "name": "first_step",
+      "widgets": [
+        {
+          "_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+          "type": "field",
+          "identity": false,
+          "component": "MultipleChoice",
+          "title": "How do you feel about the incumbent?",
+          "description": "",
+          "wrapper": {
+            "required": true
+          },
+          "props": {
+            "groupSubmissions": true,
+            "includeInGroups": true,
+            "multipleChoice": false,
+            "options": [
+              {
+                "title": "\ud83d\ude33",
+                "placeholder": false
+              },
+              {
+                "placeholder": false,
+                "title": "\ud83d\ude03"
+              },
+              {
+                "placeholder": false,
+                "title": "\ud83d\ude12"
+              },
+              {
+                "placeholder": false,
+                "title": "\ud83d\ude38"
+              },
+              {
+                "placeholder": false,
+                "title": "\ud83d\ude01"
+              },
+              {
+                "placeholder": false,
+                "title": "\ud83d\ude2a"
+              },
+              {
+                "title": "\ud83c\uddfa\ud83c\uddf8",
+                "placeholder": false
+              }
+            ],
+            "otherAllowed": false
+          }
+        },
+        {
+          "_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+          "type": "field",
+          "identity": false,
+          "component": "MultipleChoice",
+          "title": "What should the new president focus on first?",
+          "description": "",
+          "wrapper": {
+            "required": true
+          },
+          "props": {
+            "groupSubmissions": true,
+            "includeInGroups": true,
+            "multipleChoice": false,
+            "options": [
+              {
+                "placeholder": false,
+                "title": "Economy"
+              },
+              {
+                "placeholder": false,
+                "title": "Justice"
+              },
+              {
+                "placeholder": false,
+                "title": "War"
+              }
+            ],
+            "otherAllowed": true
+          }
+        },
+        {
+          "_id": "d452b94d-e650-41c6-80af-c56091315c90",
+          "type": "field",
+          "identity": false,
+          "component": "TextArea",
+          "title": "What do you want to say?",
+          "description": "",
+          "wrapper": {
+            "required": true
+          },
+          "props": {
+            "includeInGroups": true
+          }
+        },
+        {
+          "_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+          "type": "field",
+          "identity": true,
+          "component": "TextField",
+          "title": "What is your name?",
+          "description": "",
+          "wrapper": {
+            "required": true
+          },
+          "props": {
+            "includeInGroups": true
+          }
+        },
+        {
+          "_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+          "type": "field",
+          "identity": true,
+          "component": "TextField",
+          "title": "Where are you?",
+          "description": "",
+          "wrapper": {
+            "required": true
+          },
+          "props": {
+            "includeInGroups": true
+          }
+        }
+      ]
+    }
+  ],
+  "stats": {
+    "responses": 9
+  },
+  "created_by": null,
+  "updated_by": null,
+  "deleted_by": null,
+  "date_created": "2016-10-18T13:46:28+00:00",
+  "date_updated": "2016-10-28T13:25:40+00:00"
+}
+

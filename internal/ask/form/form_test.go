@@ -1,12 +1,9 @@
 package form_test
 
 import (
-	"fmt"
-	"os"
 	"testing"
 	"time"
 
-	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/formfix"
@@ -16,29 +13,7 @@ import (
 // prefix is what we are looking to delete after the test.
 const prefix = "FTEST"
 
-func TestMain(m *testing.M) {
-	os.Exit(runTest(m))
-}
-
-// runTest initializes the environment for the tests and allows for
-// the proper return code if the test fails or succeeds.
-func runTest(m *testing.M) int {
-
-	// Initialize the configuration and logging systems. Plus anything
-	// else the web app layer needs.
-	tests.Init("ASK")
-
-	// Initialize MongoDB using the `tests.TestSession` as the name of the
-	// master session.
-	if err := db.RegMasterSession(tests.Context, tests.TestSession, cfg.MustURL("MONGO_URI").String(), 0); err != nil {
-		fmt.Println("Can't register master session: " + err.Error())
-		return 1
-	}
-
-	return m.Run()
-}
-
-func setup(t *testing.T, fixture string) ([]form.Form, *db.DB) {
+func setupForms(t *testing.T, fixture string) ([]form.Form, *db.DB) {
 	tests.ResetLog()
 
 	fms, err := formfix.Get("form")
@@ -55,7 +30,7 @@ func setup(t *testing.T, fixture string) ([]form.Form, *db.DB) {
 	return fms, db
 }
 
-func teardown(t *testing.T, db *db.DB) {
+func teardownForms(t *testing.T, db *db.DB) {
 	if err := formfix.Remove(tests.Context, db, prefix); err != nil {
 		t.Fatalf("%s\tShould be able to remove the forms : %v", tests.Failed, err)
 	}
@@ -65,9 +40,9 @@ func teardown(t *testing.T, db *db.DB) {
 	tests.DisplayLog()
 }
 
-func Test_UpsertDelete(t *testing.T) {
-	fms, db := setup(t, "form")
-	defer teardown(t, db)
+func TestUpsertDelete(t *testing.T) {
+	fms, db := setupForms(t, "form")
+	defer teardownForms(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{
@@ -170,9 +145,9 @@ func Test_UpsertDelete(t *testing.T) {
 	}
 }
 
-func Test_List(t *testing.T) {
-	fms, db := setup(t, "form")
-	defer teardown(t, db)
+func TestList(t *testing.T) {
+	fms, db := setupForms(t, "form")
+	defer teardownForms(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{
@@ -240,9 +215,9 @@ func Test_List(t *testing.T) {
 	}
 }
 
-func Test_UpdateStatus(t *testing.T) {
-	fms, db := setup(t, "form")
-	defer teardown(t, db)
+func TestUpdateStatus(t *testing.T) {
+	fms, db := setupForms(t, "form")
+	defer teardownForms(t, db)
 
 	t.Log("Given the need to upsert and delete forms.")
 	{

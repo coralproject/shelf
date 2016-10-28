@@ -9,9 +9,8 @@ import (
 	"strings"
 	"testing"
 
-	"gopkg.in/mgo.v2/bson"
-
 	"github.com/ardanlabs/kit/tests"
+	"gopkg.in/mgo.v2/bson"
 )
 
 // subPrefix is the base name for everything.
@@ -24,7 +23,7 @@ func TextExport(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000002/submission/export"
+		url := "/v1/form/5810cc8b2600e2092e6a3fba/submission/export"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -62,7 +61,7 @@ func TestDownloadCSV(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000002/submission/export?download=true"
+		url := "/v1/form/5810cc8b2600e2092e6a3fba/submission/export?download=true"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -95,7 +94,7 @@ func TestDownloadCSV(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			expectedCount := 3
+			expectedCount := 2
 			if len(records) != expectedCount {
 				t.Fatalf("\t%s\tShould have exactly %d rows but it has %d.", tests.Failed, expectedCount, len(records))
 			}

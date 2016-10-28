@@ -36,7 +36,7 @@
 
             },
             "type": "field",
-            "id": "95701",
+            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb6",
             "identity": true
           },
           {
@@ -51,7 +51,7 @@
               "validationMessage": "Please type a valid e-mail."
             },
             "type": "field",
-            "id": "91839",
+            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb7",
             "identity": true
           },
           {
@@ -65,7 +65,7 @@
 
             },
             "type": "field",
-            "id": "21932",
+            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb8",
             "identity": false
           }
         ],
@@ -142,7 +142,7 @@
               "otherAllowed": false
             },
             "type": "field",
-            "id": "03cfa9b2-7181-4997-83b5-8e41588c8bf4",
+            "_id": "03cfa9b2-7181-4997-83b5-8e41588c8bf4",
             "identity": false
           },
           {
@@ -168,7 +168,7 @@
               "otherAllowed": true
             },
             "type": "field",
-            "id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb5",
+            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb5",
             "identity": false
           },
           {
@@ -197,7 +197,7 @@
               "otherAllowed": false
             },
             "type": "field",
-            "id": "43570565-9c92-4e88-a77b-41e5c57c54f5",
+            "_id": "43570565-9c92-4e88-a77b-41e5c57c54f5",
             "identity": false
           },
           {
@@ -211,7 +211,7 @@
 
             },
             "type": "field",
-            "id": "779cb8a2-99e8-44db-9098-5cd5c3674d3f",
+            "_id": "779cb8a2-99e8-44db-9098-5cd5c3674d3f",
             "identity": false
           }
         ],
