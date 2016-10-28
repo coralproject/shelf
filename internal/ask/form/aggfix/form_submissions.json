@@ -1,0 +1,1347 @@
+[
+  {
+    "_id": "5811511a8c9f7805b4ec7555",
+    "form_id": "5810cc8b2600e2092e6a3fba",
+    "number": 1,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "fd8d7b0e-8176-41b1-ae19-e749ac2a2501",
+        "identity": false,
+        "answer": {
+          "text": "?????"
+        },
+        "edited": null,
+        "question": "work?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "139c1fcc-2d2e-4803-b78e-278a4721fd69",
+        "identity": false,
+        "answer": {
+          "text": "!!!!!"
+        },
+        "edited": null,
+        "question": "please!",
+        "props": {
+          
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "",
+      "heading": "New form",
+      "title": "ATEST_new!"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-26T15:33:00+00:00",
+    "date_updated": "2016-10-26T15:33:00+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec7556",
+    "form_id": "580627b42600e2035218509f",
+    "number": 3,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "\ud83d\ude33"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "groupSubmissions": true,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "title": "\ud83d\ude03",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "title": "\ud83d\ude01",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Economy"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "groupSubmissions": false,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "title": "Justice",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "Economy is too good.  Let's scale it back a bit."
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Putin"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Russia"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:14:20+00:00",
+    "date_updated": "2016-10-22T00:14:20+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec7559",
+    "form_id": "580627b42600e2035218509f",
+    "number": 2,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "\ud83d\ude33"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "title": "\ud83d\ude01",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true,
+          "groupSubmissions": true,
+          "multipleChoice": false
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Economy"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "Jobs jobs jobs Jobs jobs jobs Jobs jobs jobs Jobs jobs jobs Jobs jobs jobs "
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Steve"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "California"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-21T23:44:49+00:00",
+    "date_updated": "2016-10-21T23:44:49+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec755b",
+    "form_id": "580627b42600e2035218509f",
+    "number": 4,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 5,
+              "title": "\ud83d\ude2a"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true,
+          "groupSubmissions": true,
+          "multipleChoice": false
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "title": "Conscience",
+              "index": 3
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "groupSubmissions": false,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "Look deep into your soul every day and question what you have done, what you are doing and what you have left to accomplish."
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Francis"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Asisi"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:15:00+00:00",
+    "date_updated": "2016-10-22T00:15:00+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec755c",
+    "form_id": "580627b42600e2035218509f",
+    "number": 5,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 2,
+              "title": "\ud83d\ude12"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "includeInGroups": true,
+          "groupSubmissions": true,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "title": "\ud83d\ude2a",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Economy"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "title": "Justice",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ]
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "hihi"
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Sally"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Florida"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:18:46+00:00",
+    "date_updated": "2016-10-22T00:18:46+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec755d",
+    "form_id": "580627b42600e2035218509f",
+    "number": 6,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 6,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "groupSubmissions": true,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "title": "\ud83d\ude12",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "title": "Salutin'",
+              "index": 3
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "title": "War",
+              "placeholder": false
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "God bless"
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Compatriot"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Around"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:19:09+00:00",
+    "date_updated": "2016-10-22T00:19:09+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec755e",
+    "form_id": "580627b42600e2035218509f",
+    "number": 7,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 5,
+              "title": "\ud83d\ude2a"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true,
+          "groupSubmissions": true,
+          "multipleChoice": false
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 2,
+              "title": "War"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "End war!"
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Sanity"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Scarce"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:19:28+00:00",
+    "date_updated": "2016-10-22T00:19:28+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec755f",
+    "form_id": "580627b42600e2035218509f",
+    "number": 8,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 5,
+              "title": "\ud83d\ude2a"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "title": "\ud83d\ude12",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true,
+          "groupSubmissions": true
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "title": "Justice",
+              "index": 1
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "title": "War",
+              "placeholder": false
+            }
+          ]
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "Stop filling for profit prisons with non-violent offenders of petty laws."
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "David"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "NJ"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:19:56+00:00",
+    "date_updated": "2016-10-22T00:19:56+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec7560",
+    "form_id": "580627b42600e2035218509f",
+    "number": 9,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "title": "\ud83d\ude33",
+              "index": 0
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false,
+          "includeInGroups": true,
+          "groupSubmissions": true
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 1,
+              "title": "Justice"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "Economy"
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "title": "War",
+              "placeholder": false
+            }
+          ],
+          "otherAllowed": true,
+          "includeInGroups": true,
+          "groupSubmissions": false
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "Justice for all.  Law and order (franchises) must return."
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Tom Wolfe"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Maine"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:20:28+00:00",
+    "date_updated": "2016-10-22T00:20:28+00:00"
+  },
+  {
+    "_id": "5811511a8c9f7805b4ec7561",
+    "form_id": "580627b42600e2035218509f",
+    "number": 10,
+    "status": "",
+    "replies": [
+      {
+        "widget_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 4,
+              "title": "\ud83d\ude01"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "How do you feel about the incumbent?",
+        "props": {
+          "includeInGroups": true,
+          "groupSubmissions": true,
+          "multipleChoice": false,
+          "options": [
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude33"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude03"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude12"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude38"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude01"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83d\ude2a"
+            },
+            {
+              "placeholder": false,
+              "title": "\ud83c\uddfa\ud83c\uddf8"
+            }
+          ],
+          "otherAllowed": false
+        }
+      },
+      {
+        "widget_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+        "identity": false,
+        "answer": {
+          "options": [
+            {
+              "index": 0,
+              "title": "Economy"
+            }
+          ]
+        },
+        "edited": null,
+        "question": "What should the new president focus on first?",
+        "props": {
+          "includeInGroups": true,
+          "groupSubmissions": false,
+          "multipleChoice": false,
+          "options": [
+            {
+              "title": "Economy",
+              "placeholder": false
+            },
+            {
+              "placeholder": false,
+              "title": "Justice"
+            },
+            {
+              "placeholder": false,
+              "title": "War"
+            }
+          ],
+          "otherAllowed": true
+        }
+      },
+      {
+        "widget_id": "d452b94d-e650-41c6-80af-c56091315c90",
+        "identity": false,
+        "answer": {
+          "text": "More cash please!"
+        },
+        "edited": null,
+        "question": "What do you want to say?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+        "identity": true,
+        "answer": {
+          "text": "Edward A. Most Folk"
+        },
+        "edited": null,
+        "question": "What is your name?",
+        "props": {
+          "includeInGroups": true
+        }
+      },
+      {
+        "widget_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+        "identity": true,
+        "answer": {
+          "text": "Heartland"
+        },
+        "edited": null,
+        "question": "Where are you?",
+        "props": {
+          "includeInGroups": true
+        }
+      }
+    ],
+    "flags": [
+      "bookmarked"
+    ],
+    "header": {
+      "description": "What would you like to say?",
+      "heading": "Letter to the incoming president",
+      "title": "ATEST_The election spectacular"
+    },
+    "footer": {
+      "conditions": ""
+    },
+    "finishedScreen": null,
+    "created_by": null,
+    "updated_by": null,
+    "date_created": "2016-10-22T00:21:02+00:00",
+    "date_updated": "2016-10-22T00:21:02+00:00"
+  }
+]
+
