@@ -77,7 +77,6 @@ func TestAggregate(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to return 9 in Count.", tests.Failed)
 			}
 			t.Logf("\t%s\tShould be able to return 9 in Count.", tests.Success)
-
 		}
 	}
 }
@@ -107,6 +106,11 @@ func TestAggregateGroup(t *testing.T) {
 				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+
+			if ag.Count != 1 {
+				t.Fatalf("\t%s\tShould have only one aggregation instead of %v.", tests.Failed, ag.Count)
+			}
+			t.Logf("\t%s\tShould have only one aggregation.", tests.Success)
 		}
 	}
 }
