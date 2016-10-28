@@ -5,14 +5,13 @@ import (
 
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/internal/ask/form/aggfix"
-	"github.com/coralproject/shelf/internal/ask/form/formfix"
 	"github.com/coralproject/shelf/internal/platform/db"
 )
 
 // aggPrefix is what we are looking to delete after the test.
 const aggPrefix = "ATEST_"
 
-func setupAgg(t *testing.T, fixture string) *db.DB {
+func setupAgg(t *testing.T) *db.DB {
 	tests.ResetLog()
 
 	fms, subs, err := aggfix.Get()
@@ -33,7 +32,7 @@ func setupAgg(t *testing.T, fixture string) *db.DB {
 }
 
 func teardownAgg(t *testing.T, db *db.DB) {
-	if err := formfix.Remove(tests.Context, db, aggPrefix); err != nil {
+	if err := aggfix.Remove(tests.Context, db, aggPrefix); err != nil {
 		t.Fatalf("%s\tShould be able to remove the forms and submissions : %v", tests.Failed, err)
 	}
 	t.Logf("%s\tShould be able to remove the forms and submissions.", tests.Success)
@@ -43,5 +42,6 @@ func teardownAgg(t *testing.T, db *db.DB) {
 }
 
 func TestAggregation(t *testing.T) {
-	setupAgg(t, "form")
+	db := setupAgg(t)
+	defer teardownAgg(t, db)
 }

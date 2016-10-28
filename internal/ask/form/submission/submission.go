@@ -115,7 +115,7 @@ type Answer struct {
 // as any other details about the Form that were present at the time of the Form
 // submission.
 type Submission struct {
-	ID             bson.ObjectId `json:"id" bson:"_id"`
+	ID             bson.ObjectId `json:"_id" bson:"_id"`
 	FormID         bson.ObjectId `json:"form_id" bson:"form_id"`
 	Number         int           `json:"number" bson:"number"`
 	Status         string        `json:"status" bson:"status"`
