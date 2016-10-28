@@ -13,6 +13,7 @@ import (
 
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/cmd/askd/handlers"
+	"github.com/coralproject/shelf/internal/ask/form"
 )
 
 // subPrefix is the base name for everything.
@@ -25,7 +26,7 @@ func TextExport(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000002/submission/export"
+		url := "/v1/form/5810cc8b2600e2092e6a3fba/submission/export"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -63,7 +64,7 @@ func TestDownloadCSV(t *testing.T) {
 
 	t.Log("Given the need download submissions in a CSV format.")
 	{
-		url := "/v1/form/57be0437e65ada0851000002/submission/export?download=true"
+		url := "/v1/form/5810cc8b2600e2092e6a3fba/submission/export?download=true"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -96,7 +97,7 @@ func TestDownloadCSV(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			expectedCount := 3
+			expectedCount := 2
 			if len(records) != expectedCount {
 				t.Fatalf("\t%s\tShould have exactly %d rows but it has %d.", tests.Failed, expectedCount, len(records))
 			}
@@ -106,15 +107,49 @@ func TestDownloadCSV(t *testing.T) {
 	}
 }
 
-// TestAggregate tests the aggregation across a form's submissions
-func TestAggregate(t *testing.T) {
-
+// TestDigest tests the returning a form's digest
+func TestDigest(t *testing.T) {
 	tests.ResetLog()
 	defer tests.DisplayLog()
 
 	t.Log("Given the need aggregate across a form's submissions.")
 	{
-		url := "/v1/form/576017c53bc37e000554567d/aggregate"
+		url := "/v1/form/580627b42600e2035218509f/digest"
+		r := httptest.NewRequest("GET", url, nil)
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling aggregate endpoint: %s", url)
+		{
+			t.Log("\tWhen we user version v1 of the aggregate endpoint.")
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to get the aggregation keys : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to get the aggregation keys .", tests.Success)
+
+			var fm handlers.FormDigest
+			if err := json.Unmarshal(w.Body.Bytes(), &fm); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+
+			if len(fm.Questions) != 5 {
+				t.Fatalf("\t%s\tShould be able to return 5 questions.", tests.Failed)
+			}
+			t.Logf("\t%s\tShould be able to return 5 questions.", tests.Success)
+		}
+	}
+}
+
+// TestAggregate tests the aggregation across a form's submissions
+func TestAggregate(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need aggregate across a form's submissions.")
+	{
+		url := "/v1/form/580627b42600e2035218509f/aggregate"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -134,14 +169,69 @@ func TestAggregate(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if ak.Aggregations["all"].Count != 5 {
-				t.Fatalf("\t%s\tShould be able to return 5 in Count.", tests.Failed)
+			if ak.Aggregations["all"].Count != 9 {
+				t.Fatalf("\t%s\tShould be able to return 9 in Count.", tests.Failed)
 			}
-			t.Logf("\t%s\tShould be able to return 5 in Count.", tests.Success)
+			t.Logf("\t%s\tShould be able to return 9 in Count.", tests.Success)
 
 		}
 	}
 }
 
-// func TestAggregateGroup(t *testing.T) {}
-// func TestAggregateGroupSubmission(t *testing.T) {}
+func TestAggregateGroup(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need aggregate across a form's submissions.")
+	{
+		url := "/v1/form/580627b42600e2035218509f/aggregate/d452b94d-e650-41c6-80af-c56091315c90"
+		r := httptest.NewRequest("GET", url, nil)
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling aggregate endpoint: %s", url)
+		{
+			t.Log("\tWhen we user version v1 of the aggregate endpoint.")
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to get the aggregation keys : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to get the aggregation keys .", tests.Success)
+
+			var ag form.Aggregation
+			if err := json.Unmarshal(w.Body.Bytes(), &ag); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+		}
+	}
+}
+
+func TestAggregateGroupSubmission(t *testing.T) {
+	tests.ResetLog()
+	defer tests.DisplayLog()
+
+	t.Log("Given the need aggregate across a form's submissions.")
+	{
+		url := "/v1/form/580627b42600e2035218509f/aggregate/d452b94d-e650-41c6-80af-c56091315c90/submission"
+		r := httptest.NewRequest("GET", url, nil)
+		w := httptest.NewRecorder()
+
+		a.ServeHTTP(w, r)
+
+		t.Logf("\tWhen calling aggregate endpoint: %s", url)
+		{
+			t.Log("\tWhen we user version v1 of the aggregate endpoint.")
+			if w.Code != 200 {
+				t.Fatalf("\t%s\tShould be able to get the aggregation keys : %v", tests.Failed, w.Code)
+			}
+			t.Logf("\t%s\tShould be able to get the aggregation keys .", tests.Success)
+
+			var ta []form.TextAggregation
+			if err := json.Unmarshal(w.Body.Bytes(), &ta); err != nil {
+				t.Fatalf("\t%s\tShould be able to unmarshal the results : %v", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
+		}
+	}
+}

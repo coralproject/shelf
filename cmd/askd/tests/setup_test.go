@@ -56,7 +56,7 @@ func runTest(m *testing.M) int {
 	if err = loadSubmissions(db); err != nil {
 		fmt.Println("Unable to load submissions: ", err)
 	}
-	defer aggfix.Remove(tests.Context, db, subPrefix)
+	defer aggfix.Remove(tests.Context, db, "")
 
 	return m.Run()
 }
