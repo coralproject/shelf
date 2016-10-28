@@ -88,7 +88,7 @@ func TestAggregateGroup(t *testing.T) {
 
 	t.Log("Given the need aggregate across a form's submissions.")
 	{
-		url := "/v1/form/580627b42600e2035218509f/aggregate/d452b94d-e650-41c6-80af-c56091315c90"
+		url := "/v1/form/580627b42600e2035218509f/aggregate/34d4637c0412f2df0030332922d07885"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
