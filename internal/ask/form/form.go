@@ -25,10 +25,7 @@ func init() {
 //==============================================================================
 
 // ErrInvalidID occurs when an ID is not in a valid form.
-var (
-	ErrInvalidID            = errors.New("ID is not in it's proper form")
-	ErrUpdatingAggregations = errors.New("Could not aggregate Form statistics.")
-)
+var ErrInvalidID = errors.New("ID is not in it's proper form")
 
 //==============================================================================
 

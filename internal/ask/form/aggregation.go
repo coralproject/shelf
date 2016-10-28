@@ -64,7 +64,7 @@ func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[st
 	for group, submissions := range groupedSubmissions {
 
 		// Perform the multiple choice aggregations.
-		mcAggregations, err := MCAggregate(context, db, id, submissions)
+		mcAggregations, err := mcAggregate(context, db, id, submissions)
 		if err != nil {
 			return nil, err
 		}
@@ -136,7 +136,10 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 		for _, widget := range step.Widgets {
 
 			// Type the props value.
-			props := widget.Props.(bson.M)
+			props, ok := widget.Props.(bson.M)
+			if !ok {
+				continue
+			}
 
 			// If groupSubmissions is set, add the ID to the map of questions to include.
 			if props["groupSubmissions"] == true {
@@ -181,24 +184,34 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 			}
 
 			// Unpack the answer object.
-			a := ans.Answer.(bson.M)
+			a, ok := ans.Answer.(bson.M)
+			if !ok {
+				continue
+			}
 
-			options := a["options"]
+			// Retrieve the options param from the answer.
+			options, ok := a["options"]
 
 			// Options == nil points to a non MultipleChoice answer.
-			if options == nil {
+			if !ok || options == nil {
 				continue
 			}
 
 			// This map of interfaces represent each checkbox the user clicked.
-			opts := options.([]interface{})
+			opts, ok := options.([]interface{})
+			if !ok {
+				continue
+			}
 			for _, opt := range opts {
 
 				// Unpack the option.
 				op := opt.(bson.M)
 
 				// Use the title of the option as the map key.
-				selection := op["title"].(string)
+				selection, ok := op["title"].(string)
+				if !ok {
+					continue
+				}
 
 				// Hash the answer text for a unique key, as no actual key exists.
 				hasher := md5.New()
@@ -227,7 +240,7 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 // types based on the parameters embedded in the form.
 
 // MCAggregate calculates statistics on all multiple choice questions.
-func MCAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) (map[string]MCAggregation, error) {
+func mcAggregate(context interface{}, db *db.DB, formID string, subs []submission.Submission) (map[string]MCAggregation, error) {
 	log.Dev(context, "Aggregate", "Started : Submission[%s]", formID)
 
 	// We load the form so that only the multiple choice questions currently in the form
@@ -277,24 +290,37 @@ func MCAggregate(context interface{}, db *db.DB, formID string, subs []submissio
 			// stronger typing.
 
 			// Unpack the answer object.
-			a := ans.Answer.(bson.M)
+			a, ok := ans.Answer.(bson.M)
+			if !ok {
+				continue
+			}
 
-			options := a["options"]
+			// Retrieve the options param from the answer.
+			options, ok := a["options"]
 
 			// Options == nil points to a non MultipleChoice answer.
-			if options == nil {
+			if !ok || options == nil {
 				continue
 			}
 
 			// This map of interfaces represent each checkbox the user clicked.
-			opts := options.([]interface{})
+			opts, ok := options.([]interface{})
+			if !ok {
+				continue
+			}
 			for _, opt := range opts {
 
 				// Unpack the option.
-				op := opt.(bson.M)
+				op, ok := opt.(bson.M)
+				if !ok {
+					continue
+				}
 
 				// Use the title of the option as the map key.
-				selection := op["title"].(string)
+				selection, ok := op["title"].(string)
+				if !ok {
+					continue
+				}
 
 				// Hash the ansewr text for a unique key, as no actual key exists.
 				hasher := md5.New()
@@ -370,7 +396,7 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 	}
 
 	// Create a container for the aggregations: [question][option]count.
-	textAggregations := []TextAggregation{}
+	var textAggregations []TextAggregation
 
 	// Scan all the submissions and answers.
 	for _, sub := range subs {
@@ -405,20 +431,29 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 
 			// If we have multiple choice, use the first selection.
 			if options != nil {
-				opts := options.([]interface{})
+				opts, ok := options.([]interface{})
+				if !ok || opts == nil {
+					continue
+				}
 
-				// Unpack the option.
-				op := opts[0].(bson.M)
+				// Unpack the first answer (only one supported).
+				op, ok := opts[0].(bson.M)
+				if !ok {
+					continue
+				}
 
 				// Use the title of the option as the map key.
-				answer = op["title"].(string)
-
+				answer, ok = op["title"].(string)
+				if !ok {
+					continue
+				}
 			}
 
+			// Key the answer by the WidgetID.
 			textAggregation[ans.WidgetID] = answer
-
 		}
 
+		// Append the aggregation to the slice.
 		textAggregations = append(textAggregations, textAggregation)
 	}
 
