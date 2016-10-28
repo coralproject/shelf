@@ -70,3 +70,31 @@ func TestAggregation(t *testing.T) {
 		}
 	}
 }
+
+func TestTextAggregate(t *testing.T) {
+	fm, subs, db := setupAgg(t)
+	defer teardownAgg(t, db)
+
+	t.Log("Given the need to aggregate text.")
+	{
+		t.Log("\tWhen starting from a form and submission fixtures")
+		{
+			//----------------------------------------------------------------------
+			// Aggregate the submissions.
+
+			aggs, err := form.TextAggregate(tests.Context, db, fm.ID.Hex(), subs)
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to aggregate submissions : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to aggregate submissions.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check the aggregations.
+
+			if len(aggs) != 11 {
+				t.Fatalf("\t%s\tShould be able to get 11 aggregations : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 11 aggregations.", tests.Success)
+		}
+	}
+}
