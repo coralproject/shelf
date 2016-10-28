@@ -145,7 +145,7 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 		}
 	}
 
-	// Get the submissions for the form.Collection
+	// Get the submissions for the form.Collection.
 	subs, err := submission.Search(context, db, formID, limit, skip, opts)
 	if err != nil {
 		return nil, err
@@ -156,7 +156,7 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 	// Scan all the submissions and answers.
 	for _, sub := range subs.Submissions {
 
-		// Add all submissions to the [all,all] group
+		// Add all submissions to the [all,all] group.
 		group := Group{
 			ID:       "all",
 			Question: "all",
@@ -205,19 +205,16 @@ func GroupSubmissions(context interface{}, db *db.DB, formID string, limit int, 
 				hasher.Write([]byte(selection))
 				optKeyStr := hex.EncodeToString(hasher.Sum(nil))
 
-				// Add the submission to this subgroup
+				// Add the submission to this subgroup.
 				group := Group{
 					ID:       optKeyStr,
 					Question: ans.Question,
 					Answer:   selection,
 				}
-
 				tmp := groups[group]
 				tmp = append(tmp, sub)
 				groups[group] = tmp
-
 			}
-
 		}
 	}
 
@@ -378,7 +375,9 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 	// Scan all the submissions and answers.
 	for _, sub := range subs {
 
+		// Create an aggregation and set the ID.
 		textAggregation := TextAggregation{}
+		TextAggregation["id"] = sub.ID
 
 		for _, ans := range sub.Answers {
 
@@ -394,9 +393,8 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 				continue
 			}
 
-			var answer string
-
 			// Options == nil points to a non MultipleChoice answer.
+			var answer string
 			a := ans.Answer.(bson.M)
 			options := a["options"]
 			if options == nil {

@@ -178,13 +178,13 @@ func (aggregationHandle) Digest(c *web.Context) error {
 // Submission Groups: The submission answers marked with includeInGroups from
 // the given groups, or all.
 
-//
+// SubmissionGroup retrieves submissions on a form by search criteria,
+// groups them then returns text aggregations.
 // 200 Success, 400 Bad Request, 404 Not Found, 500 Internal
 func (aggregationHandle) SubmissionGroup(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	// unpack the search headers and create a SearchOpts for Group Submissions
-
+	// Unpack the search headers and create a SearchOpts for Group Submissions.
 	limit, err := strconv.Atoi(c.Request.URL.Query().Get("limit"))
 	if err != nil {
 		limit = 0
