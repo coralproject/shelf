@@ -103,6 +103,9 @@ func (aggregationHandle) Digest(c *web.Context) error {
 
 	// Load the form requested.
 	f, err := form.Retrieve(c.SessionID, c.Ctx["DB"].(*db.DB), formID)
+	if err == mgo.ErrNotFound {
+		c.Respond(nil, http.StatusBadRequest)
+	}
 	if err != nil {
 		return err
 	}
