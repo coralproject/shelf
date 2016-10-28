@@ -79,7 +79,7 @@
       "title": "Thanks."
     },
     "date_created": "2016-06-16T12:47:21.102Z",
-    "_id": "57bfafc0f48614d3b8000001"
+    "id": "57bfafc0f48614d3b8000001"
   },
   {
     "status": "closed",
@@ -225,6 +225,6 @@
       "title": "Thanks."
     },
     "date_created": "2016-07-21T16:10:45.433Z",
-    "_id": "57bfafaf784bfe0ec2000001"
+    "id": "57bfafaf784bfe0ec2000001"
   }
 ]

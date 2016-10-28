@@ -62,7 +62,7 @@ type Stats struct {
 // Form contains the conatical representation of a Form, containing all the
 // Steps, and help text relating to completing the Form.
 type Form struct {
-	ID             bson.ObjectId          `json:"_id" bson:"_id" validate:"required"`
+	ID             bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
 	Status         string                 `json:"status" bson:"status"`
 	Theme          interface{}            `json:"theme" bson:"theme"`
 	Settings       map[string]interface{} `json:"settings" bson:"settings"`
