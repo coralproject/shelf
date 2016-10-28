@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/ardanlabs/kit/tests"
+	"github.com/coralproject/shelf/internal/ask/form"
 	"github.com/coralproject/shelf/internal/ask/form/aggfix"
 	"github.com/coralproject/shelf/internal/platform/db"
 )
@@ -11,10 +12,10 @@ import (
 // aggPrefix is what we are looking to delete after the test.
 const aggPrefix = "ATEST_"
 
-func setupAgg(t *testing.T) *db.DB {
+func setupAgg(t *testing.T) (*form.Form, *db.DB) {
 	tests.ResetLog()
 
-	fms, subs, err := aggfix.Get()
+	fm, subs, err := aggfix.Get()
 	if err != nil {
 		t.Fatalf("%s\tShould be able retrieve form and submission fixture : %s", tests.Failed, err)
 	}
@@ -24,11 +25,11 @@ func setupAgg(t *testing.T) *db.DB {
 		t.Fatalf("Should be able to get a Mongo session : %v", err)
 	}
 
-	if err := aggfix.Add(tests.Context, db, fms, subs); err != nil {
+	if err := aggfix.Add(tests.Context, db, fm, subs); err != nil {
 		t.Fatalf("Should be able to add forms and submissions to the database : %v", err)
 	}
 
-	return db
+	return fm, db
 }
 
 func teardownAgg(t *testing.T, db *db.DB) {
@@ -42,6 +43,30 @@ func teardownAgg(t *testing.T, db *db.DB) {
 }
 
 func TestAggregation(t *testing.T) {
-	db := setupAgg(t)
+	fm, db := setupAgg(t)
 	defer teardownAgg(t, db)
+
+	t.Log("Given the need to aggregate submissions.")
+	{
+		t.Log("\tWhen starting from a form and submission fixtures")
+		{
+			//----------------------------------------------------------------------
+			// Aggregate the submissions.
+
+			aggs, err := form.AggregateFormSubmissions(tests.Context, db, fm.ID.Hex())
+			if err != nil {
+				t.Fatalf("\t%s\tShould be able to aggregate submissions : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to aggregate submissions.", tests.Success)
+
+			//----------------------------------------------------------------------
+			// Check the aggregations.
+
+			if len(aggs) != 11 {
+				t.Fatalf("\t%s\tShould be able to get 11 aggregations : %s", tests.Failed, err)
+			}
+			t.Logf("\t%s\tShould be able to get 11 aggregations.", tests.Success)
+		}
+	}
+
 }
