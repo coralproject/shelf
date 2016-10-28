@@ -10,7 +10,7 @@ import (
 	"github.com/ardanlabs/kit/cfg"
 	"github.com/ardanlabs/kit/tests"
 	"github.com/coralproject/shelf/cmd/askd/routes"
-	"github.com/coralproject/shelf/internal/ask/form/submission/submissionfix"
+	"github.com/coralproject/shelf/internal/ask/form/aggfix"
 	"github.com/coralproject/shelf/internal/platform/db"
 
 	"github.com/coralproject/shelf/tstdata"
@@ -53,22 +53,22 @@ func runTest(m *testing.M) int {
 	defer tstdata.Drop(db)
 
 	// Load in the submissions from the fixture.
-	if err = loadSubmissions(db, "submission.json"); err != nil {
+	if err = loadSubmissions(db); err != nil {
 		fmt.Println("Unable to load submissions: ", err)
 	}
-	defer submissionfix.Remove(tests.Context, db, subPrefix)
+	defer aggfix.Remove(tests.Context, db, subPrefix)
 
 	return m.Run()
 }
 
 // loadSubmissions adds submissions to run tests.
-func loadSubmissions(db *db.DB, file string) error {
-	submissions, err := submissionfix.GetMany(file)
+func loadSubmissions(db *db.DB) error {
+	f, submissions, err := aggfix.Get()
 	if err != nil {
 		return err
 	}
 
-	if err := submissionfix.Add(tests.Context, db, submissions); err != nil {
+	if err := aggfix.Add(tests.Context, db, f, submissions); err != nil {
 		return err
 	}
 
