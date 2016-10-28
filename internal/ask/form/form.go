@@ -35,7 +35,7 @@ const Collection = "forms"
 // Widget describes a specific question being asked by the Form which is
 // contained within a Step.
 type Widget struct {
-	ID          string      `json:"id" bson:"_id"`
+	ID          string      `json:"_id" bson:"_id"`
 	Type        string      `json:"type" bson:"type"`
 	Identity    bool        `json:"identity" bson:"identity"`
 	Component   string      `json:"component" bson:"component"`
@@ -47,7 +47,7 @@ type Widget struct {
 
 // Step is a collection of Widget's.
 type Step struct {
-	ID      string   `json:"id" bson:"_id"`
+	ID      string   `json:"_id" bson:"_id"`
 	Name    string   `json:"name" bson:"name"`
 	Widgets []Widget `json:"widgets" bson:"widgets"`
 }
@@ -62,7 +62,7 @@ type Stats struct {
 // Form contains the conatical representation of a Form, containing all the
 // Steps, and help text relating to completing the Form.
 type Form struct {
-	ID             bson.ObjectId          `json:"id" bson:"_id" validate:"required"`
+	ID             bson.ObjectId          `json:"_id" bson:"_id" validate:"required"`
 	Status         string                 `json:"status" bson:"status"`
 	Theme          interface{}            `json:"theme" bson:"theme"`
 	Settings       map[string]interface{} `json:"settings" bson:"settings"`
