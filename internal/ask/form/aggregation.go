@@ -3,7 +3,6 @@ package form
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"fmt"
 
 	"github.com/ardanlabs/kit/log"
 	"github.com/coralproject/shelf/internal/ask/form/submission"
@@ -276,7 +275,7 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 	}
 
 	// Create a container for the aggregations: [question][option]count.
-	var textAggregations []TextAggregation
+	textAggregations := []TextAggregation{}
 
 	// Scan all the submissions and answers.
 	for _, sub := range subs {
@@ -299,53 +298,32 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 				continue
 			}
 
-			// Get the answer and options.
-			a, ok := ans.Answer.(map[string]interface{})
-			if !ok {
-				return nil, fmt.Errorf("Could not parse answer")
-			}
-
+			// Options == nil points to a non MultipleChoice answer.
 			var answer string
-			options, ok := a["options"]
-			if !ok || options == nil {
-
+			a := ans.Answer.(bson.M)
+			options := a["options"]
+			if options == nil {
 				// Unpack the answer and add it to the map at the widgetID
-				answerVal, ok := a["text"]
-				if !ok {
-					return nil, fmt.Errorf("Could not get text key")
-				}
-
-				answer, ok = answerVal.(string)
-				if !ok {
-					return nil, fmt.Errorf("Non-string answer")
-				}
+				a := ans.Answer.(bson.M)
+				answer = a["text"].(string)
 			}
 
 			// If we have multiple choice, use the first selection.
 			if options != nil {
-				opts, ok := options.([]interface{})
-				if !ok || opts == nil {
-					continue
-				}
+				opts := options.([]interface{})
 
-				// Unpack the first answer (only one supported).
-				op, ok := opts[0].(bson.M)
-				if !ok {
-					continue
-				}
+				// Unpack the option.
+				op := opts[0].(bson.M)
 
 				// Use the title of the option as the map key.
-				answer, ok = op["title"].(string)
-				if !ok {
-					continue
-				}
+				answer = op["title"].(string)
+
 			}
 
-			// Key the answer by the WidgetID.
 			textAggregation[ans.WidgetID] = answer
+
 		}
 
-		// Append the aggregation to the slice.
 		textAggregations = append(textAggregations, textAggregation)
 	}
 
