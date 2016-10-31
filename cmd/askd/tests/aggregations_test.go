@@ -38,7 +38,7 @@ func TestDigest(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if len(fm.Questions) != 1 {
+			if len(fm.Questions) != 5 {
 				t.Fatalf("\t%s\tShould be able to return 1 question instead of %v.", tests.Failed, len(fm.Questions))
 			}
 			t.Logf("\t%s\tShould be able to return 1 question.", tests.Success)
