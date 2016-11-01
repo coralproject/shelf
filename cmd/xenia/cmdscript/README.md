@@ -1,18 +1,31 @@
 
+
 # cmdscript
-    import "github.com/coralproject/shelf/cmd/xenia/cmdscript"
+`import "github.com/coralproject/shelf/cmd/xenia/cmdscript"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func GetCommands() *cobra.Command](#GetCommands)
+
+
+#### <a name="pkg-files">Package files</a>
+[commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdscript/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdscript/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdscript/get.go) [lists.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdscript/lists.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdscript/upsert.go) 
 
 
 
 
 
-
-## func GetCommands
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=274:307#L2)
 ``` go
 func GetCommands() *cobra.Command
 ```
 GetCommands returns the script commands.
-
 
 
 

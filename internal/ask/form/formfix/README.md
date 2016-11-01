@@ -1,32 +1,49 @@
 
+
 # formfix
-    import "github.com/coralproject/shelf/internal/ask/form/formfix"
+`import "github.com/coralproject/shelf/internal/ask/form/formfix"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, fms []form.Form) error](#Add)
+* [func Get(fixture string) ([]form.Form, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
+
+
+#### <a name="pkg-files">Package files</a>
+[formfix.go](/src/github.com/coralproject/shelf/internal/ask/form/formfix/formfix.go) 
 
 
 
 
 
-
-## func Add
+## <a name="Add">func</a> [Add](/src/target/formfix.go?s=688:751#L27)
 ``` go
 func Add(context interface{}, db *db.DB, fms []form.Form) error
 ```
 Add inserts forms for testing.
 
 
-## func Get
+
+## <a name="Get">func</a> [Get](/src/target/formfix.go?s=377:422#L10)
 ``` go
 func Get(fixture string) ([]form.Form, error)
 ```
 Get loads form data based on forms.json.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/formfix.go?s=934:999#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes forms in Mongo that match a given pattern.
-
 
 
 

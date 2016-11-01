@@ -1,32 +1,49 @@
 
+
 # viewfix
-    import "github.com/coralproject/shelf/internal/wire/view/viewfix"
+`import "github.com/coralproject/shelf/internal/wire/view/viewfix"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, views []view.View) error](#Add)
+* [func Get() ([]view.View, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
+
+
+#### <a name="pkg-files">Package files</a>
+[viewfix.go](/src/github.com/coralproject/shelf/internal/wire/view/viewfix/viewfix.go) 
 
 
 
 
 
-
-## func Add
+## <a name="Add">func</a> [Add](/src/target/viewfix.go?s=675:740#L27)
 ``` go
 func Add(context interface{}, db *db.DB, views []view.View) error
 ```
 Add inserts views for testing.
 
 
-## func Get
+
+## <a name="Get">func</a> [Get](/src/target/viewfix.go?s=378:409#L10)
 ``` go
 func Get() ([]view.View, error)
 ```
 Get loads view data based on view.json.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/viewfix.go?s=923:988#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes views in Mongo that match a given pattern.
-
 
 
 

@@ -1,18 +1,31 @@
 
+
 # cmdrelationship
-    import "github.com/coralproject/shelf/cmd/xenia/cmdrelationship"
+`import "github.com/coralproject/shelf/cmd/xenia/cmdrelationship"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func GetCommands() *cobra.Command](#GetCommands)
+
+
+#### <a name="pkg-files">Package files</a>
+[commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/get.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/upsert.go) 
 
 
 
 
 
-
-## func GetCommands
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=330:363#L2)
 ``` go
 func GetCommands() *cobra.Command
 ```
 GetCommands returns the relationship commands.
-
 
 
 
