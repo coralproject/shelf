@@ -1,19 +1,37 @@
 
+
 # ask
-    import "github.com/coralproject/shelf/internal/ask"
+`import "github.com/coralproject/shelf/internal/ask"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func CreateSubmission(context interface{}, db *db.DB, formID string, answers []submission.AnswerInput) (*submission.Submission, error)](#CreateSubmission)
+* [func DeleteSubmission(context interface{}, db *db.DB, id, formID string) error](#DeleteSubmission)
+* [func UpsertForm(context interface{}, db *db.DB, f *form.Form) error](#UpsertForm)
 
 
-## Variables
+#### <a name="pkg-files">Package files</a>
+[ask.go](/src/github.com/coralproject/shelf/internal/ask/ask.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrInvalidID = errors.New("ID is not in it's proper form")
 ```
 ErrInvalidID occurs when an ID is not in a valid form.
 
 
-## func CreateSubmission
+
+## <a name="CreateSubmission">func</a> [CreateSubmission](/src/target/ask.go?s=1961:2095#L61)
 ``` go
 func CreateSubmission(context interface{}, db *db.DB, formID string, answers []submission.AnswerInput) (*submission.Submission, error)
 ```
@@ -21,20 +39,21 @@ CreateSubmission creates a form submission based on a given form with a set
 of answers related to it.
 
 
-## func DeleteSubmission
+
+## <a name="DeleteSubmission">func</a> [DeleteSubmission](/src/target/ask.go?s=3923:4001#L140)
 ``` go
 func DeleteSubmission(context interface{}, db *db.DB, id, formID string) error
 ```
 DeleteSubmission deletes a submission as well as updating a form's stats.
 
 
-## func UpsertForm
+
+## <a name="UpsertForm">func</a> [UpsertForm](/src/target/ask.go?s=1029:1096#L25)
 ``` go
 func UpsertForm(context interface{}, db *db.DB, f *form.Form) error
 ```
 UpsertForm upserts the provided form into the MongoDB database collection and
 creates a gallery based on it.
-
 
 
 

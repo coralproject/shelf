@@ -1,14 +1,30 @@
 
+
 # request
-    import "github.com/coralproject/shelf/internal/platform/request"
+`import "github.com/coralproject/shelf/internal/platform/request"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [type Client](#Client)
+  * [func (c *Client) Do(req *http.Request) ([]byte, error)](#Client.Do)
+  * [func (c *Client) New(context interface{}, verb, path string, body io.Reader) (*http.Request, error)](#Client.New)
+
+
+#### <a name="pkg-files">Package files</a>
+[request.go](/src/github.com/coralproject/shelf/internal/platform/request/request.go) 
 
 
 
 
 
 
-
-## type Client
+## <a name="Client">type</a> [Client](/src/target/request.go?s=280:339#L6)
 ``` go
 type Client struct {
     BaseURL string
@@ -27,8 +43,7 @@ layer that has platform authentication enabled.
 
 
 
-
-### func (\*Client) Do
+### <a name="Client.Do">func</a> (\*Client) [Do](/src/target/request.go?s=1325:1379#L44)
 ``` go
 func (c *Client) Do(req *http.Request) ([]byte, error)
 ```
@@ -37,13 +52,13 @@ in the event that the response code was < 400.
 
 
 
-### func (\*Client) New
+
+### <a name="Client.New">func</a> (\*Client) [New](/src/target/request.go?s=475:574#L13)
 ``` go
 func (c *Client) New(context interface{}, verb, path string, body io.Reader) (*http.Request, error)
 ```
 New creates a new request sourced from the client. If a signer is present on
 the client, requests will automatically be signed.
-
 
 
 

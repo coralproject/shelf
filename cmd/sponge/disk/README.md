@@ -1,13 +1,29 @@
 
+
 # disk
-    import "github.com/coralproject/shelf/cmd/sponge/disk"
+`import "github.com/coralproject/shelf/cmd/sponge/disk"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func LoadDir(dir string, loader func(string) error) error](#LoadDir)
+* [func LoadItem(context interface{}, path string) (*item.Item, error)](#LoadItem)
+* [func LoadPattern(context interface{}, path string) (pattern.Pattern, error)](#LoadPattern)
+
+
+#### <a name="pkg-files">Package files</a>
+[disk.go](/src/github.com/coralproject/shelf/cmd/sponge/disk/disk.go) 
 
 
 
 
 
-
-## func LoadDir
+## <a name="LoadDir">func</a> [LoadDir](/src/target/disk.go?s=1573:1630#L50)
 ``` go
 func LoadDir(dir string, loader func(string) error) error
 ```
@@ -15,7 +31,8 @@ LoadDir loadsup a given directory, calling a load function for each valid
 json file found.
 
 
-## func LoadItem
+
+## <a name="LoadItem">func</a> [LoadItem](/src/target/disk.go?s=339:406#L6)
 ``` go
 func LoadItem(context interface{}, path string) (*item.Item, error)
 ```
@@ -23,13 +40,13 @@ LoadItem serializes the content of Items from a file using the
 given file path. Returns the serialized Item value.
 
 
-## func LoadPattern
+
+## <a name="LoadPattern">func</a> [LoadPattern](/src/target/disk.go?s=948:1023#L28)
 ``` go
 func LoadPattern(context interface{}, path string) (pattern.Pattern, error)
 ```
 LoadPattern serializes the content of a Pattern from a file using the
 given file path. Returns the serialized Pattern value.
-
 
 
 

@@ -1,11 +1,25 @@
 
+
 # routes
-    import "github.com/coralproject/shelf/cmd/xeniad/routes"
+`import "github.com/coralproject/shelf/cmd/xeniad/routes"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [func API() http.Handler](#API)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[routes.go](/src/github.com/coralproject/shelf/cmd/xeniad/routes/routes.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const (
 
@@ -16,12 +30,12 @@ const (
 ```
 
 
-## func API
+
+## <a name="API">func</a> [API](/src/target/routes.go?s=1399:1422#L38)
 ``` go
 func API() http.Handler
 ```
 API returns a handler for a set of routes.
-
 
 
 

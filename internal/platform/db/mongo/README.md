@@ -1,15 +1,30 @@
 
-# mongo
-    import "github.com/coralproject/shelf/internal/platform/db/mongo"
 
+# mongo
+`import "github.com/coralproject/shelf/internal/platform/db/mongo"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 Package mongo provides support for using MongoDB.
 
 
 
 
+## <a name="pkg-index">Index</a>
+* [func New(url string, timeout time.Duration) (*mgo.Session, error)](#New)
+* [func Query(value interface{}) string](#Query)
 
 
-## func New
+#### <a name="pkg-files">Package files</a>
+[mongo.go](/src/github.com/coralproject/shelf/internal/platform/db/mongo/mongo.go) 
+
+
+
+
+
+## <a name="New">func</a> [New](/src/target/mongo.go?s=387:452#L6)
 ``` go
 func New(url string, timeout time.Duration) (*mgo.Session, error)
 ```
@@ -18,12 +33,12 @@ localhost:27017. If a zero value timeout is specified, a timeout of 60sec
 will be used instead.
 
 
-## func Query
+
+## <a name="Query">func</a> [Query](/src/target/mongo.go?s=1180:1216#L31)
 ``` go
 func Query(value interface{}) string
 ```
 Query provides a string version of the value
-
 
 
 

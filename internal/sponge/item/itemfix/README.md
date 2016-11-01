@@ -1,39 +1,58 @@
 
+
 # itemfix
-    import "github.com/coralproject/shelf/internal/sponge/item/itemfix"
+`import "github.com/coralproject/shelf/internal/sponge/item/itemfix"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, items []item.Item) error](#Add)
+* [func Get() ([]item.Item, error)](#Get)
+* [func GetData(filename string) (map[string]interface{}, error)](#GetData)
+* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
+
+
+#### <a name="pkg-files">Package files</a>
+[itemfix.go](/src/github.com/coralproject/shelf/internal/sponge/item/itemfix/itemfix.go) 
 
 
 
 
 
-
-## func Add
+## <a name="Add">func</a> [Add](/src/target/itemfix.go?s=679:744#L27)
 ``` go
 func Add(context interface{}, db *db.DB, items []item.Item) error
 ```
 Add inserts items for testing.
 
 
-## func Get
+
+## <a name="Get">func</a> [Get](/src/target/itemfix.go?s=382:413#L10)
 ``` go
 func Get() ([]item.Item, error)
 ```
 Get loads item data based on item.json.
 
 
-## func GetData
+
+## <a name="GetData">func</a> [GetData](/src/target/itemfix.go?s=1278:1339#L53)
 ``` go
 func GetData(filename string) (map[string]interface{}, error)
 ```
 GetData loads data based from data.json.
 
 
-## func Remove
+
+## <a name="Remove">func</a> [Remove](/src/target/itemfix.go?s=929:994#L38)
 ``` go
 func Remove(context interface{}, db *db.DB, pattern string) error
 ```
 Remove removes items in Mongo that match a given pattern.
-
 
 
 

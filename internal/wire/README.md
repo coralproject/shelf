@@ -1,14 +1,35 @@
 
-# wire
-    import "github.com/coralproject/shelf/internal/wire"
 
+# wire
+`import "github.com/coralproject/shelf/internal/wire"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 Package wire provides support for generating views.
 
 
 
 
+## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#AddToGraph)
+* [func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#RemoveFromGraph)
+* [type QuadParam](#QuadParam)
+  * [func (q *QuadParam) Validate() error](#QuadParam.Validate)
+* [type Result](#Result)
+  * [func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Execute)
+* [type ViewParams](#ViewParams)
 
-## Variables
+
+#### <a name="pkg-files">Package files</a>
+[relationships.go](/src/github.com/coralproject/shelf/internal/wire/relationships.go) [wire.go](/src/github.com/coralproject/shelf/internal/wire/wire.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
 ``` go
 var (
 
@@ -29,14 +50,16 @@ var (
 )
 ```
 
-## func AddToGraph
+
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1309:1413#L42)
 ``` go
 func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
 AddToGraph adds relationships as quads into the cayley graph.
 
 
-## func RemoveFromGraph
+
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2363:2472#L80)
 ``` go
 func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
 ```
@@ -44,7 +67,8 @@ RemoveFromGraph removes relationship quads from the cayley graph.
 
 
 
-## type QuadParam
+
+## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=908:1071#L27)
 ``` go
 type QuadParam struct {
     Subject   string `validate:"required,min=2"`
@@ -64,8 +88,7 @@ to/from the cayley graph.
 
 
 
-
-### func (\*QuadParam) Validate
+### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1130:1166#L34)
 ``` go
 func (q *QuadParam) Validate() error
 ```
@@ -73,7 +96,8 @@ Validate checks the QuadParams value for consistency.
 
 
 
-## type Result
+
+## <a name="Result">type</a> [Result](/src/target/wire.go?s=956:1016#L29)
 ``` go
 type Result struct {
     Results interface{} `json:"results"`
@@ -87,9 +111,7 @@ Result represents what a user will receive after generating a view.
 
 
 
-
-
-### func Execute
+### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1634:1746#L53)
 ``` go
 func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
 ```
@@ -98,7 +120,8 @@ Execute executes a graph query to generate the specified view.
 
 
 
-## type ViewParams
+
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1267:1484#L43)
 ``` go
 type ViewParams struct {
     ViewName          string `json:"view_name"`
@@ -108,9 +131,6 @@ type ViewParams struct {
 }
 ```
 ViewParams represents how the View will be generated and persisted.
-
-
-
 
 
 

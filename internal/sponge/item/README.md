@@ -1,39 +1,64 @@
 
+
 # item
-    import "github.com/coralproject/shelf/internal/sponge/item"
+`import "github.com/coralproject/shelf/internal/sponge/item"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, id string) error](#Delete)
+* [func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)](#GetByIDs)
+* [func Upsert(context interface{}, db *db.DB, item *Item) error](#Upsert)
+* [type Item](#Item)
+  * [func GetByID(context interface{}, db *db.DB, id string) (Item, error)](#GetByID)
+  * [func (item *Item) InferIDFromData() error](#Item.InferIDFromData)
+  * [func (item *Item) Validate() error](#Item.Validate)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[item.go](/src/github.com/coralproject/shelf/internal/sponge/item/item.go) [model.go](/src/github.com/coralproject/shelf/internal/sponge/item/model.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const Collection = "items"
 ```
 Collection is the Mongo collection containing item values.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var ErrNotFound = errors.New("Item(s) Not found")
 ```
 ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/item.go?s=3218:3278#L105)
 ``` go
 func Delete(context interface{}, db *db.DB, id string) error
 ```
 Delete removes an item from from Mongo.
 
 
-## func GetByIDs
+
+## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=2373:2448#L77)
 ``` go
 func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)
 ```
 GetByIDs retrieves items by ID from Mongo.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=557:618#L13)
 ``` go
 func Upsert(context interface{}, db *db.DB, item *Item) error
 ```
@@ -41,7 +66,8 @@ Upsert upserts an item to the items collections.
 
 
 
-## type Item
+
+## <a name="Item">type</a> [Item](/src/target/model.go?s=897:1477#L20)
 ``` go
 type Item struct {
     ID        string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
@@ -64,9 +90,7 @@ may differ greatly between items) is encoded into the Data interface.
 
 
 
-
-
-### func GetByID
+### <a name="GetByID">func</a> [GetByID](/src/target/item.go?s=1728:1797#L54)
 ``` go
 func GetByID(context interface{}, db *db.DB, id string) (Item, error)
 ```
@@ -75,7 +99,8 @@ GetByID retrieves a single item by ID from Mongo.
 
 
 
-### func (\*Item) InferIDFromData
+
+### <a name="Item.InferIDFromData">func</a> (\*Item) [InferIDFromData](/src/target/model.go?s=1713:1754#L40)
 ``` go
 func (item *Item) InferIDFromData() error
 ```
@@ -83,12 +108,12 @@ InferIDFromData infers an item_id from type and source id.
 
 
 
-### func (\*Item) Validate
+
+### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1535:1569#L31)
 ``` go
 func (item *Item) Validate() error
 ```
 Validate validates an Item value with the validator.
-
 
 
 

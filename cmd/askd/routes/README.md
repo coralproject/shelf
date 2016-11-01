@@ -1,11 +1,25 @@
 
+
 # routes
-    import "github.com/coralproject/shelf/cmd/askd/routes"
+`import "github.com/coralproject/shelf/cmd/askd/routes"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+
+## <a name="pkg-overview">Overview</a>
 
 
 
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [func API() http.Handler](#API)
 
-## Constants
+
+#### <a name="pkg-files">Package files</a>
+[routes.go](/src/github.com/coralproject/shelf/cmd/askd/routes/routes.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const (
 
@@ -16,12 +30,12 @@ const (
 ```
 
 
-## func API
+
+## <a name="API">func</a> [API](/src/target/routes.go?s=1523:1546#L43)
 ``` go
 func API() http.Handler
 ```
 API returns a handler for a set of routes.
-
 
 
 
