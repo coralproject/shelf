@@ -39,9 +39,9 @@ func TestDigest(t *testing.T) {
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
 			if len(fm.Questions) != 5 {
-				t.Fatalf("\t%s\tShould be able to return 5 questions.", tests.Failed)
+				t.Fatalf("\t%s\tShould be able to return 1 question instead of %v.", tests.Failed, len(fm.Questions))
 			}
-			t.Logf("\t%s\tShould be able to return 5 questions.", tests.Success)
+			t.Logf("\t%s\tShould be able to return 1 question.", tests.Success)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func TestAggregateGroup(t *testing.T) {
 
 	t.Log("Given the need aggregate across a form's submissions.")
 	{
-		url := "/v1/form/580627b42600e2035218509f/aggregate/34d4637c0412f2df0030332922d07885"
+		url := "/v1/form/580627b42600e2035218509f/aggregate/all"
 		r := httptest.NewRequest("GET", url, nil)
 		w := httptest.NewRecorder()
 
@@ -107,7 +107,7 @@ func TestAggregateGroup(t *testing.T) {
 			}
 			t.Logf("\t%s\tShould be able to unmarshal the results.", tests.Success)
 
-			if ag.Count != 1 {
+			if ag.Count != 9 {
 				t.Fatalf("\t%s\tShould have only one aggregation instead of %v.", tests.Failed, ag.Count)
 			}
 			t.Logf("\t%s\tShould have only one aggregation.", tests.Success)

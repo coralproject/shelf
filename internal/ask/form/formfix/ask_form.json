@@ -36,7 +36,7 @@
 
             },
             "type": "field",
-            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb6",
+            "id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb6",
             "identity": true
           },
           {
@@ -51,7 +51,7 @@
               "validationMessage": "Please type a valid e-mail."
             },
             "type": "field",
-            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb7",
+            "id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb7",
             "identity": true
           },
           {
@@ -65,7 +65,7 @@
 
             },
             "type": "field",
-            "_id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb8",
+            "id": "94edb701-ba5d-48f9-b4c6-7d28e7268fb8",
             "identity": false
           }
         ],

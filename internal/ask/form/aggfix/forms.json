@@ -40,11 +40,11 @@
   },
   "steps": [
     {
-      "_id": "c685f7ff-82ef-44b2-8df8-b331f7977f87",
+      "id": "c685f7ff-82ef-44b2-8df8-b331f7977f87",
       "name": "first_step",
       "widgets": [
         {
-          "_id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
+          "id": "d21eda82-8000-4e5d-9506-3a41907b6b59",
           "type": "field",
           "identity": false,
           "component": "MultipleChoice",
@@ -91,7 +91,7 @@
           }
         },
         {
-          "_id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
+          "id": "80bd7b99-edc6-435d-9585-8a6014cea52e",
           "type": "field",
           "identity": false,
           "component": "MultipleChoice",
@@ -122,7 +122,7 @@
           }
         },
         {
-          "_id": "d452b94d-e650-41c6-80af-c56091315c90",
+          "id": "d452b94d-e650-41c6-80af-c56091315c90",
           "type": "field",
           "identity": false,
           "component": "TextArea",
@@ -136,7 +136,7 @@
           }
         },
         {
-          "_id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
+          "id": "74bf66e7-7413-4cf1-a6f4-b8d4149863e3",
           "type": "field",
           "identity": true,
           "component": "TextField",
@@ -150,7 +150,7 @@
           }
         },
         {
-          "_id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
+          "id": "6e8ce7ef-5310-4e65-9995-bdf492394f3c",
           "type": "field",
           "identity": true,
           "component": "TextField",
@@ -175,4 +175,3 @@
   "date_created": "2016-10-18T13:46:28+00:00",
   "date_updated": "2016-10-28T13:25:40+00:00"
 }
-

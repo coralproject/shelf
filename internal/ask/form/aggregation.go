@@ -265,7 +265,10 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 		for _, widget := range step.Widgets {
 
 			// Type the props value.
-			props := widget.Props.(bson.M)
+			props, ok := widget.Props.(bson.M)
+			if !ok {
+				continue
+			}
 
 			// If includeInGroups is set, add the ID to the map of questions to include.
 			if props["includeInGroups"] == true {
@@ -300,23 +303,43 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 
 			// Options == nil points to a non MultipleChoice answer.
 			var answer string
-			a := ans.Answer.(bson.M)
+
+			a, ok := ans.Answer.(bson.M)
+			if !ok {
+				continue
+			}
+
 			options := a["options"]
 			if options == nil {
 				// Unpack the answer and add it to the map at the widgetID
-				a := ans.Answer.(bson.M)
-				answer = a["text"].(string)
+				a, ok := ans.Answer.(bson.M)
+				if !ok {
+					continue
+				}
+				answer, ok = a["text"].(string)
+				if !ok {
+					continue
+				}
 			}
 
 			// If we have multiple choice, use the first selection.
 			if options != nil {
-				opts := options.([]interface{})
+				opts, ok := options.([]interface{})
+				if !ok {
+					continue
+				}
 
 				// Unpack the option.
-				op := opts[0].(bson.M)
+				op, ok := opts[0].(bson.M)
+				if !ok {
+					continue
+				}
 
 				// Use the title of the option as the map key.
-				answer = op["title"].(string)
+				answer, ok = op["title"].(string)
+				if !ok {
+					continue
+				}
 
 			}
 
@@ -416,7 +439,11 @@ func mcAggregate(context interface{}, db *db.DB, formID string, subs []submissio
 
 				// Hash the ansewr text for a unique key, as no actual key exists.
 				hasher := md5.New()
-				hasher.Write([]byte(op["title"].(string)))
+				title, ok := op["title"].(string)
+				if !ok {
+					continue
+				}
+				hasher.Write([]byte(title))
 				optKeyStr := hex.EncodeToString(hasher.Sum(nil))
 
 				// If this question is not in the map then we can skip as it is not a current answer.
