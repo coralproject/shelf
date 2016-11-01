@@ -11,12 +11,21 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func GetCommands() *cobra.Command](#GetCommands)
 
 
 #### <a name="pkg-files">Package files</a>
 [commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/get.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/xenia/cmdrelationship/upsert.go) 
 
 
+
+
+
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=330:363#L2)
+``` go
+func GetCommands() *cobra.Command
+```
+GetCommands returns the relationship commands.
 
 
 

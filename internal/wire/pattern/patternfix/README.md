@@ -11,12 +11,39 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error](#Add)
+* [func Get() ([]pattern.Pattern, []map[string]interface{}, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
 [patternfix.go](/src/github.com/coralproject/shelf/internal/wire/pattern/patternfix/patternfix.go) 
 
 
+
+
+
+## <a name="Add">func</a> [Add](/src/target/patternfix.go?s=1079:1153#L42)
+``` go
+func Add(context interface{}, db *db.DB, patterns []pattern.Pattern) error
+```
+Add inserts patterns for testing.
+
+
+
+## <a name="Get">func</a> [Get](/src/target/patternfix.go?s=397:460#L10)
+``` go
+func Get() ([]pattern.Pattern, []map[string]interface{}, error)
+```
+Get loads pattern data based on patterns.json.
+
+
+
+## <a name="Remove">func</a> [Remove](/src/target/patternfix.go?s=1348:1412#L53)
+``` go
+func Remove(context interface{}, db *db.DB, prefix string) error
+```
+Remove removes patterns in Mongo that match a given prefix.
 
 
 

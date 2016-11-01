@@ -11,12 +11,39 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Add(context interface{}, db *db.DB, gs []gallery.Gallery) error](#Add)
+* [func Get(fixture string) ([]gallery.Gallery, error)](#Get)
+* [func Remove(context interface{}, db *db.DB, pattern string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
 [galleryfix.go](/src/github.com/coralproject/shelf/internal/ask/form/gallery/galleryfix/galleryfix.go) 
 
 
+
+
+
+## <a name="Add">func</a> [Add](/src/target/galleryfix.go?s=705:773#L27)
+``` go
+func Add(context interface{}, db *db.DB, gs []gallery.Gallery) error
+```
+Add inserts gallerys for testing.
+
+
+
+## <a name="Get">func</a> [Get](/src/target/galleryfix.go?s=382:433#L10)
+``` go
+func Get(fixture string) ([]gallery.Gallery, error)
+```
+Get loads gallery data.
+
+
+
+## <a name="Remove">func</a> [Remove](/src/target/galleryfix.go?s=1063:1128#L40)
+``` go
+func Remove(context interface{}, db *db.DB, pattern string) error
+```
+Remove removes gallerys in Mongo that match a given pattern.
 
 
 

@@ -12,12 +12,95 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Asset(name string) ([]byte, error)](#Asset)
+* [func AssetDir(name string) ([]string, error)](#AssetDir)
+* [func AssetInfo(name string) (os.FileInfo, error)](#AssetInfo)
+* [func AssetNames() []string](#AssetNames)
+* [func MustAsset(name string) []byte](#MustAsset)
+* [func RestoreAsset(dir, name string) error](#RestoreAsset)
+* [func RestoreAssets(dir, name string) error](#RestoreAssets)
 
 
 #### <a name="pkg-files">Package files</a>
 [json.gen.go](/src/github.com/coralproject/shelf/cmd/corald/fixtures/json/json.gen.go) 
 
 
+
+
+
+## <a name="Asset">func</a> [Asset](/src/target/json.gen.go?s=120904:120943#L189)
+``` go
+func Asset(name string) ([]byte, error)
+```
+Asset loads and returns the asset for the given name.
+It returns an error if the asset could not be found or
+could not be loaded.
+
+
+
+## <a name="AssetDir">func</a> [AssetDir](/src/target/json.gen.go?s=123117:123161#L259)
+``` go
+func AssetDir(name string) ([]string, error)
+```
+AssetDir returns the file names below a certain
+directory embedded in the file by go-bindata.
+For example if you run go-bindata on data/... and data contains the
+following hierarchy:
+
+
+	data/
+	  foo.txt
+	  img/
+	    a.png
+	    b.png
+
+then AssetDir("data") would return []string{"foo.txt", "img"}
+AssetDir("data/img") would return []string{"a.png", "b.png"}
+AssetDir("foo.txt") and AssetDir("notexist") would return an error
+AssetDir("") will return []string{"data"}.
+
+
+
+## <a name="AssetInfo">func</a> [AssetInfo](/src/target/json.gen.go?s=121663:121711#L215)
+``` go
+func AssetInfo(name string) (os.FileInfo, error)
+```
+AssetInfo loads and returns the asset info for the given name.
+It returns an error if the asset could not be found or
+could not be loaded.
+
+
+
+## <a name="AssetNames">func</a> [AssetNames](/src/target/json.gen.go?s=122059:122085#L228)
+``` go
+func AssetNames() []string
+```
+AssetNames returns the names of the assets.
+
+
+
+## <a name="MustAsset">func</a> [MustAsset](/src/target/json.gen.go?s=121367:121401#L203)
+``` go
+func MustAsset(name string) []byte
+```
+MustAsset is like Asset but panics when Asset would return an error.
+It simplifies safe initialization of global variables.
+
+
+
+## <a name="RestoreAsset">func</a> [RestoreAsset](/src/target/json.gen.go?s=124433:124474#L301)
+``` go
+func RestoreAsset(dir, name string) error
+```
+RestoreAsset restores an asset under the given directory
+
+
+
+## <a name="RestoreAssets">func</a> [RestoreAssets](/src/target/json.gen.go?s=124997:125039#L326)
+``` go
+func RestoreAssets(dir, name string) error
+```
+RestoreAssets restores an asset under the given directory recursively
 
 
 

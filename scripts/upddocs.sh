@@ -23,6 +23,6 @@ do
 
   echo "godoc2md $PACKAGE > $GOPATH/src/$PACKAGE/README.md"
 
-  godoc2md $PACKAGE -links=false > $GOPATH/src/$PACKAGE/README.md
+  godoc2md $PACKAGE > $GOPATH/src/$PACKAGE/README.md
 
 done

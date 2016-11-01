@@ -8,14 +8,133 @@
 * [Subdirectories](#pkg-subdirectories)
 
 ## <a name="pkg-overview">Overview</a>
+Package wire provides support for generating views.
+
 
 
 
 ## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#AddToGraph)
+* [func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error](#RemoveFromGraph)
+* [type QuadParam](#QuadParam)
+  * [func (q *QuadParam) Validate() error](#QuadParam.Validate)
+* [type Result](#Result)
+  * [func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)](#Execute)
+* [type ViewParams](#ViewParams)
 
 
 #### <a name="pkg-files">Package files</a>
 [relationships.go](/src/github.com/coralproject/shelf/internal/wire/relationships.go) [wire.go](/src/github.com/coralproject/shelf/internal/wire/wire.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var (
+
+    // ErrItemType is used in item parsing.
+    ErrItemType = errors.New("Could not parse item type")
+
+    // ErrItemData is used in item parsing.
+    ErrItemData = errors.New("Could not parse item data")
+
+    // ErrItemID is used in item parsing.
+    ErrItemID = errors.New("Could not parse item ID")
+)
+```
+``` go
+var (
+    // ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
+    ErrNotFound = errors.New("View items Not found")
+)
+```
+
+
+## <a name="AddToGraph">func</a> [AddToGraph](/src/target/relationships.go?s=1309:1413#L42)
+``` go
+func AddToGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
+```
+AddToGraph adds relationships as quads into the cayley graph.
+
+
+
+## <a name="RemoveFromGraph">func</a> [RemoveFromGraph](/src/target/relationships.go?s=2363:2472#L80)
+``` go
+func RemoveFromGraph(context interface{}, db *db.DB, store *cayley.Handle, item map[string]interface{}) error
+```
+RemoveFromGraph removes relationship quads from the cayley graph.
+
+
+
+
+## <a name="QuadParam">type</a> [QuadParam](/src/target/relationships.go?s=908:1071#L27)
+``` go
+type QuadParam struct {
+    Subject   string `validate:"required,min=2"`
+    Predicate string `validate:"required,min=2"`
+    Object    string `validate:"required,min=2"`
+}
+```
+QuadParam contains information needed to add/remove relationships
+to/from the cayley graph.
+
+
+
+
+
+
+
+
+
+
+### <a name="QuadParam.Validate">func</a> (\*QuadParam) [Validate](/src/target/relationships.go?s=1130:1166#L34)
+``` go
+func (q *QuadParam) Validate() error
+```
+Validate checks the QuadParams value for consistency.
+
+
+
+
+## <a name="Result">type</a> [Result](/src/target/wire.go?s=956:1016#L29)
+``` go
+type Result struct {
+    Results interface{} `json:"results"`
+}
+```
+Result represents what a user will receive after generating a view.
+
+
+
+
+
+
+
+### <a name="Execute">func</a> [Execute](/src/target/wire.go?s=1634:1746#L53)
+``` go
+func Execute(context interface{}, mgoDB *db.DB, graphDB *cayley.Handle, viewParams *ViewParams) (*Result, error)
+```
+Execute executes a graph query to generate the specified view.
+
+
+
+
+
+## <a name="ViewParams">type</a> [ViewParams](/src/target/wire.go?s=1267:1484#L43)
+``` go
+type ViewParams struct {
+    ViewName          string `json:"view_name"`
+    ItemKey           string `json:"item_key"`
+    ResultsCollection string `json:"results_collection"`
+    BufferLimit       int    `json:"buffer_limit"`
+}
+```
+ViewParams represents how the View will be generated and persisted.
+
+
+
+
 
 
 

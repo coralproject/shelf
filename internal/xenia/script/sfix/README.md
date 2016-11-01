@@ -11,12 +11,40 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Add(db *db.DB, scr script.Script) error](#Add)
+* [func Get(fileName string) (script.Script, error)](#Get)
+* [func Remove(db *db.DB, pattern string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
 [sfix.go](/src/github.com/coralproject/shelf/internal/xenia/script/sfix/sfix.go) 
 
 
+
+
+
+## <a name="Add">func</a> [Add](/src/target/sfix.go?s=847:891#L31)
+``` go
+func Add(db *db.DB, scr script.Script) error
+```
+Add inserts a script for testing.
+
+
+
+## <a name="Get">func</a> [Get](/src/target/sfix.go?s=512:560#L13)
+``` go
+func Get(fileName string) (script.Script, error)
+```
+Get retrieves a set document from the filesystem for testing.
+
+
+
+## <a name="Remove">func</a> [Remove](/src/target/sfix.go?s=1107:1151#L41)
+``` go
+func Remove(db *db.DB, pattern string) error
+```
+Remove is used to clear out all the test sets from the collection.
+All test documents must start with STEST in their name.
 
 
 

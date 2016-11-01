@@ -11,10 +11,105 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func GetCommands(db *db.DB) *cobra.Command](#GetCommands)
+* [type Collection](#Collection)
+* [type DBMeta](#DBMeta)
+* [type Field](#Field)
+* [type Index](#Index)
 
 
 #### <a name="pkg-files">Package files</a>
 [commands.go](/src/github.com/coralproject/shelf/cmd/xenia/cmddb/commands.go) [create.go](/src/github.com/coralproject/shelf/cmd/xenia/cmddb/create.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var (
+    // ErrCollectionExists is return when a collection to be
+    // created already exists.
+    ErrCollectionExists = errors.New("Collection already exists.")
+)
+```
+
+
+## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=389:431#L8)
+``` go
+func GetCommands(db *db.DB) *cobra.Command
+```
+GetCommands returns the db commands.
+
+
+
+
+## <a name="Collection">type</a> [Collection](/src/target/create.go?s=1200:1291#L46)
+``` go
+type Collection struct {
+    Name    string  `json:"name"`
+    Indexes []Index `json:"indexes"`
+}
+```
+Collection is the container for a db collection definition.
+
+
+
+
+
+
+
+
+
+
+## <a name="DBMeta">type</a> [DBMeta](/src/target/create.go?s=1073:1135#L41)
+``` go
+type DBMeta struct {
+    Cols []Collection `json:"collections"`
+}
+```
+DBMeta is the container for all db objects.
+
+
+
+
+
+
+
+
+
+
+## <a name="Field">type</a> [Field](/src/target/create.go?s=1517:1635#L59)
+``` go
+type Field struct {
+    Name      string `json:"name"`
+    Type      int    `json:"type"`
+    OtherType string `json:"other"`
+}
+```
+Field is the container for a field definition.
+
+
+
+
+
+
+
+
+
+
+## <a name="Index">type</a> [Index](/src/target/create.go?s=1344:1465#L52)
+``` go
+type Index struct {
+    Name     string  `json:"name"`
+    IsUnique bool    `json:"unique"`
+    Fields   []Field `json:"fields"`
+}
+```
+Index is the container for an index definition.
+
+
+
+
 
 
 

@@ -7,16 +7,36 @@
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
+Package cayley provides support for the cayley Graph DB with a Mongo backend.
+
 
 
 
 ## <a name="pkg-index">Index</a>
+* [func InitQuadStore(mongoURL string) error](#InitQuadStore)
+* [func New(mongoURL string, ses *mgo.Session) (*cayley.Handle, error)](#New)
 
 
 #### <a name="pkg-files">Package files</a>
 [cayley.go](/src/github.com/coralproject/shelf/internal/platform/db/cayley/cayley.go) 
 
 
+
+
+
+## <a name="InitQuadStore">func</a> [InitQuadStore](/src/target/cayley.go?s=1965:2006#L71)
+``` go
+func InitQuadStore(mongoURL string) error
+```
+InitQuadStore initializes the quadstore.
+
+
+
+## <a name="New">func</a> [New](/src/target/cayley.go?s=972:1039#L30)
+``` go
+func New(mongoURL string, ses *mgo.Session) (*cayley.Handle, error)
+```
+New creates a new cayley handle.
 
 
 

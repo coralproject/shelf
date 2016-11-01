@@ -7,16 +7,57 @@
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
+Package handlers contains the handler logic for processing requests.
+
 
 
 
 ## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler](#Proxy)
 
 
 #### <a name="pkg-files">Package files</a>
 [action.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/action.go) [proxy.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/proxy.go) [version.go](/src/github.com/coralproject/shelf/cmd/corald/handlers/version.go) 
 
 
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var (
+    // ErrParameterNotFound is action not found error.
+    ErrParameterNotFound = errors.New("Parameter not found")
+
+    // ErrActionNotFound is action not found error.
+    ErrActionNotFound = errors.New("Action not found")
+
+    //ErrActionNotAllowed is an error when the action is not allowed.
+    ErrActionNotAllowed = errors.New("Action not allowed")
+
+    //ErrTypeNotExpected comes when the type asserted was not expected.
+    ErrTypeNotExpected = errors.New("Type not expected")
+)
+```
+``` go
+var Action actionHandle
+```
+Action fronts the access to the action service functionality.
+
+``` go
+var Version verHandle
+```
+Version fronts the access to the ver service functionality.
+
+
+
+## <a name="Proxy">func</a> [Proxy](/src/target/proxy.go?s=382:457#L2)
+``` go
+func Proxy(targetURL string, rewrite func(*web.Context) string) web.Handler
+```
+Proxy will setup a direct proxy inbetween this service and the destination
+service using the rewrite function if specified. If the rewrite function is
+not specified, the path on the target will be set to the target path
+concatenated with the request path.
 
 
 

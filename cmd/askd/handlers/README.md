@@ -7,14 +7,138 @@
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
+Package handlers contains the handler logic for processing requests.
+
 
 
 
 ## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func ValidateReacaptchaResponse(c *web.Context, recaptchaSecret, response string) error](#ValidateReacaptchaResponse)
+* [type AggregationKeys](#AggregationKeys)
+* [type FormDigest](#FormDigest)
+* [type FormQuestionDigest](#FormQuestionDigest)
+* [type FormQuestionOptionDigest](#FormQuestionOptionDigest)
 
 
 #### <a name="pkg-files">Package files</a>
 [aggregations.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/aggregations.go) [csv_handler.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/csv_handler.go) [form.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form.go) [form_gallery.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form_gallery.go) [form_submission.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/form_submission.go) [version.go](/src/github.com/coralproject/shelf/cmd/askd/handlers/version.go) 
+
+
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var Aggregation aggregationHandle
+```
+Aggregation fronts the access to the form service functionality.
+
+``` go
+var ErrInvalidCaptcha = errors.New("captcha invalid")
+```
+ErrInvalidCaptcha is returned when a captcha is required for a form but it
+is not valid on the request.
+
+``` go
+var Form formHandle
+```
+Form fronts the access to the form service functionality.
+
+``` go
+var FormGallery formGalleryHandle
+```
+FormGallery fronts the access to the form service functionality.
+
+``` go
+var FormSubmission formSubmissionHandle
+```
+FormSubmission fronts the access to the form service functionality.
+
+``` go
+var Version verHandle
+```
+Version fronts the access to the ver service functionality.
+
+
+
+## <a name="ValidateReacaptchaResponse">func</a> [ValidateReacaptchaResponse](/src/target/form_submission.go?s=702:789#L17)
+``` go
+func ValidateReacaptchaResponse(c *web.Context, recaptchaSecret, response string) error
+```
+ValidateReacaptchaResponse will compare the response provided by the request
+and check with the Google Recaptcha Web Service if it's valid.
+
+
+
+
+## <a name="AggregationKeys">type</a> [AggregationKeys](/src/target/aggregations.go?s=808:903#L17)
+``` go
+type AggregationKeys struct {
+    Aggregations map[string]form.Aggregation `json:"aggregations"`
+}
+```
+AggregationKeys is a transport type that describes the json format for return value of the
+aggregate endpoint including a key lookup structure allowing consumers to easily find group keys.
+
+
+
+
+
+
+
+
+
+
+## <a name="FormDigest">type</a> [FormDigest](/src/target/aggregations.go?s=3007:3110#L85)
+``` go
+type FormDigest struct {
+    Questions map[string]FormQuestionDigest `json:"questions" bson:"questions"`
+}
+```
+FormDigest is the blueprint for how we send form digests to clients.
+
+
+
+
+
+
+
+
+
+
+## <a name="FormQuestionDigest">type</a> [FormQuestionDigest](/src/target/aggregations.go?s=2493:2933#L75)
+``` go
+type FormQuestionDigest struct {
+    ID      string                     `json:"id" bson:"id"`
+    Type    string                     `json:"type" bson:"type"`
+    Title   string                     `json:"title" bson:"title"`
+    GroupBy bool                       `json:"group_by" bson:"group_by"`
+    Options []FormQuestionOptionDigest `json:"options,omitempty" bson:"options,omitempty"`
+    Order   int                        `json:"order" bson:"order"`
+}
+```
+FormQuestionDigest is the bluprint for a question in a form group.
+
+
+
+
+
+
+
+
+
+
+## <a name="FormQuestionOptionDigest">type</a> [FormQuestionOptionDigest](/src/target/aggregations.go?s=2303:2421#L69)
+``` go
+type FormQuestionOptionDigest struct {
+    ID    string `json:"id" bson:"id"`
+    Value string `json:"value" bson:"value"`
+}
+```
+FormQuestionOptionDigest is the blueprint for a single multiple choice option.
+
+
+
+
 
 
 

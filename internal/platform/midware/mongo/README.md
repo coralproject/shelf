@@ -11,12 +11,21 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [func Midware(mongoURI *url.URL) web.Middleware](#Midware)
 
 
 #### <a name="pkg-files">Package files</a>
 [midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/mongo/midware.go) 
 
 
+
+
+
+## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=240:286#L2)
+``` go
+func Midware(mongoURI *url.URL) web.Middleware
+```
+Midware handles databse session management and manages a MongoDB session.
 
 
 

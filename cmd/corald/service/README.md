@@ -11,12 +11,74 @@
 
 
 ## <a name="pkg-index">Index</a>
+* [Variables](#pkg-variables)
+* [func GetItemByID(c *web.Context, itemID string) (*item.Item, error)](#GetItemByID)
+* [func Rewrite(c *web.Context) func(*http.Request)](#Rewrite)
+* [func RewritePath(c *web.Context, targetPath string) func(*http.Request)](#RewritePath)
+* [func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error](#SignServiceRequest)
+* [func UpsertItem(c *web.Context, itm *item.Item) error](#UpsertItem)
 
 
 #### <a name="pkg-files">Package files</a>
 [service.go](/src/github.com/coralproject/shelf/cmd/corald/service/service.go) [sponge.go](/src/github.com/coralproject/shelf/cmd/corald/service/sponge.go) 
 
 
+
+## <a name="pkg-variables">Variables</a>
+``` go
+var (
+    // ErrItemNotFound is when the item is not found.
+    ErrItemNotFound = errors.New("Item not found")
+
+    // ErrNotAnItem is returned when the interface{} is not an Item{}.
+    ErrNotAnItem = errors.New("Not an item")
+
+    // ErrServiceNotSet is returned when the URL for the service is not setup.
+    ErrServiceNotSet = errors.New("Service Sponged not found")
+)
+```
+
+
+## <a name="GetItemByID">func</a> [GetItemByID](/src/target/sponge.go?s=629:696#L16)
+``` go
+func GetItemByID(c *web.Context, itemID string) (*item.Item, error)
+```
+GetItemByID returns an item based on its item_id.
+
+
+
+## <a name="Rewrite">func</a> [Rewrite](/src/target/service.go?s=509:557#L10)
+``` go
+func Rewrite(c *web.Context) func(*http.Request)
+```
+Rewrite will add service request headers to the request and add other
+standards.
+
+
+
+## <a name="RewritePath">func</a> [RewritePath](/src/target/service.go?s=973:1044#L32)
+``` go
+func RewritePath(c *web.Context, targetPath string) func(*http.Request)
+```
+RewritePath will rewrite the path given a PathRewriter and return the request
+director function.
+
+
+
+## <a name="SignServiceRequest">func</a> [SignServiceRequest](/src/target/service.go?s=239:326#L2)
+``` go
+func SignServiceRequest(context interface{}, signer auth.Signer, r *http.Request) error
+```
+SignServiceRequest signs a request with the claims necessary to authenticate
+with downstream services.
+
+
+
+## <a name="UpsertItem">func</a> [UpsertItem](/src/target/sponge.go?s=1257:1310#L47)
+``` go
+func UpsertItem(c *web.Context, itm *item.Item) error
+```
+UpsertItem upserts an item
 
 
 
