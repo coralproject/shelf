@@ -29,7 +29,7 @@ func GetItemByID(c *web.Context, itemID string) (*item.Item, error) {
 		return nil, ErrServiceNotSet
 	}
 
-	// Get the item by ID
+	// Get the item by ID.
 	url := spongedURL + "/v1/item/" + itemID
 
 	resp, err := requestSponge(c, http.MethodGet, url, nil)
