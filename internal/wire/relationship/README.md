@@ -12,94 +12,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Delete(context interface{}, db *db.DB, predicate string) error](#Delete)
-* [func GetAll(context interface{}, db *db.DB) ([]Relationship, error)](#GetAll)
-* [func Upsert(context interface{}, db *db.DB, rel *Relationship) error](#Upsert)
-* [type Relationship](#Relationship)
-  * [func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error)](#GetByPredicate)
-  * [func (r *Relationship) Validate() error](#Relationship.Validate)
 
 
 #### <a name="pkg-files">Package files</a>
 [model.go](/src/github.com/coralproject/shelf/internal/wire/relationship/model.go) [relationship.go](/src/github.com/coralproject/shelf/internal/wire/relationship/relationship.go) 
 
 
-## <a name="pkg-constants">Constants</a>
-``` go
-const Collection = "relationships"
-```
-Collection is the Mongo collection containing relationship metadata.
-
-
-## <a name="pkg-variables">Variables</a>
-``` go
-var ErrNotFound = errors.New("Relationship Not found")
-```
-ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-
-
-
-## <a name="Delete">func</a> [Delete](/src/target/relationship.go?s=2711:2778#L81)
-``` go
-func Delete(context interface{}, db *db.DB, predicate string) error
-```
-Delete removes a relationship from from Mongo.
-
-
-
-## <a name="GetAll">func</a> [GetAll](/src/target/relationship.go?s=1359:1426#L36)
-``` go
-func GetAll(context interface{}, db *db.DB) ([]Relationship, error)
-```
-GetAll retrieves the current relationships from Mongo.
-
-
-
-## <a name="Upsert">func</a> [Upsert](/src/target/relationship.go?s=582:650#L10)
-``` go
-func Upsert(context interface{}, db *db.DB, rel *Relationship) error
-```
-Upsert upserts a relationship to the collection of currently utilized relationships.
-
-
-
-
-## <a name="Relationship">type</a> [Relationship](/src/target/model.go?s=505:962#L8)
-``` go
-type Relationship struct {
-    SubjectTypes []string `bson:"subject_types" json:"subject_types" validate:"required,min=1"`
-    Predicate    string   `bson:"predicate" json:"predicate" validate:"required,min=2"`
-    ObjectTypes  []string `bson:"object_types" json:"object_types" validate:"required,min=1"`
-    InString     string   `bson:"in_string,omitempty" json:"in_string,omitempty"`
-    OutString    string   `bson:"out_string,omitempty" json:"out_string,omitempty"`
-}
-```
-Relationship contains metadata about a relationship.
-Note, predicate should be unique.
-
-
-
-
-
-
-
-### <a name="GetByPredicate">func</a> [GetByPredicate](/src/target/relationship.go?s=1981:2073#L58)
-``` go
-func GetByPredicate(context interface{}, db *db.DB, predicate string) (*Relationship, error)
-```
-GetByPredicate retrieves a relationship by predicate from Mongo.
-
-
-
-
-
-### <a name="Relationship.Validate">func</a> (\*Relationship) [Validate](/src/target/model.go?s=1023:1062#L17)
-``` go
-func (r *Relationship) Validate() error
-```
-Validate checks the Relationship value for consistency.
 
 
 

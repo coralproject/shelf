@@ -11,21 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Midware(mongoURI *url.URL) web.Middleware](#Midware)
 
 
 #### <a name="pkg-files">Package files</a>
 [midware.go](/src/github.com/coralproject/shelf/internal/platform/midware/cayley/midware.go) 
 
 
-
-
-
-## <a name="Midware">func</a> [Midware](/src/target/midware.go?s=208:254#L2)
-``` go
-func Midware(mongoURI *url.URL) web.Middleware
-```
-Midware handles the Cayley session management.
 
 
 

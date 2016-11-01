@@ -11,39 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Add(context interface{}, db *db.DB, subs []submission.Submission) error](#Add)
-* [func GetMany(fileName string) ([]submission.Submission, error)](#GetMany)
-* [func Remove(context interface{}, db *db.DB, prefix string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
 [submissionfix.go](/src/github.com/coralproject/shelf/internal/ask/form/submission/submissionfix/submissionfix.go) 
 
 
-
-
-
-## <a name="Add">func</a> [Add](/src/target/submissionfix.go?s=794:870#L28)
-``` go
-func Add(context interface{}, db *db.DB, subs []submission.Submission) error
-```
-Add inserts submissions to the DB for testing.
-
-
-
-## <a name="GetMany">func</a> [GetMany](/src/target/submissionfix.go?s=443:505#L10)
-``` go
-func GetMany(fileName string) ([]submission.Submission, error)
-```
-GetMany retrieves a submission document from the filesystem for testing.
-
-
-
-## <a name="Remove">func</a> [Remove](/src/target/submissionfix.go?s=1080:1144#L39)
-``` go
-func Remove(context interface{}, db *db.DB, prefix string) error
-```
-Remove removes forms in Mongo that match a given pattern.
 
 
 

@@ -11,67 +11,11 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)](#DecodePrivateKey)
-* [func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)](#DecodePublicKey)
-* [func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error](#SignRequest)
-* [type Signer](#Signer)
-  * [func NewSigner(privateKeyBase64Str string) (Signer, error)](#NewSigner)
 
 
 #### <a name="pkg-files">Package files</a>
 [keys.go](/src/github.com/coralproject/shelf/internal/platform/auth/keys.go) [signer.go](/src/github.com/coralproject/shelf/internal/platform/auth/signer.go) 
 
-
-
-
-
-## <a name="DecodePrivateKey">func</a> [DecodePrivateKey](/src/target/keys.go?s=1053:1129#L25)
-``` go
-func DecodePrivateKey(privateKeyBase64Str string) (*ecdsa.PrivateKey, error)
-```
-DecodePrivateKey pulls the private key out of the string passed by first
-decoding from base64 and parsing the PEM encoding.
-
-
-
-## <a name="DecodePublicKey">func</a> [DecodePublicKey](/src/target/keys.go?s=225:298#L2)
-``` go
-func DecodePublicKey(publicKeyBase64Str string) (*ecdsa.PublicKey, error)
-```
-DecodePublicKey pulls the public key out of the string passed by first
-decoding from base64 and parsing the PEM encoding.
-
-
-
-## <a name="SignRequest">func</a> [SignRequest](/src/target/signer.go?s=1062:1168#L29)
-``` go
-func SignRequest(context interface{}, signer Signer, claims map[string]interface{}, r *http.Request) error
-```
-SignRequest will take a given signer, and adds a Authorization header
-with the token that is generated from the signer.
-
-
-
-
-## <a name="Signer">type</a> [Signer](/src/target/signer.go?s=248:311#L4)
-``` go
-type Signer func(claims map[string]interface{}) (string, error)
-```
-Signer is a function that can be used to sign claims with and generate a
-signed JWT token from them.
-
-
-
-
-
-
-
-### <a name="NewSigner">func</a> [NewSigner](/src/target/signer.go?s=409:467#L8)
-``` go
-func NewSigner(privateKeyBase64Str string) (Signer, error)
-```
-NewSigner will return a signer that can be used to sign tokens for a given
-set of claims.
 
 
 

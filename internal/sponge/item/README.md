@@ -12,108 +12,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [Constants](#pkg-constants)
-* [Variables](#pkg-variables)
-* [func Delete(context interface{}, db *db.DB, id string) error](#Delete)
-* [func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)](#GetByIDs)
-* [func Upsert(context interface{}, db *db.DB, item *Item) error](#Upsert)
-* [type Item](#Item)
-  * [func GetByID(context interface{}, db *db.DB, id string) (Item, error)](#GetByID)
-  * [func (item *Item) InferIDFromData() error](#Item.InferIDFromData)
-  * [func (item *Item) Validate() error](#Item.Validate)
 
 
 #### <a name="pkg-files">Package files</a>
 [item.go](/src/github.com/coralproject/shelf/internal/sponge/item/item.go) [model.go](/src/github.com/coralproject/shelf/internal/sponge/item/model.go) 
 
 
-## <a name="pkg-constants">Constants</a>
-``` go
-const Collection = "items"
-```
-Collection is the Mongo collection containing item values.
-
-
-## <a name="pkg-variables">Variables</a>
-``` go
-var ErrNotFound = errors.New("Item(s) Not found")
-```
-ErrNotFound is an error variable thrown when no results are returned from a Mongo query.
-
-
-
-## <a name="Delete">func</a> [Delete](/src/target/item.go?s=3218:3278#L105)
-``` go
-func Delete(context interface{}, db *db.DB, id string) error
-```
-Delete removes an item from from Mongo.
-
-
-
-## <a name="GetByIDs">func</a> [GetByIDs](/src/target/item.go?s=2373:2448#L77)
-``` go
-func GetByIDs(context interface{}, db *db.DB, ids []string) ([]Item, error)
-```
-GetByIDs retrieves items by ID from Mongo.
-
-
-
-## <a name="Upsert">func</a> [Upsert](/src/target/item.go?s=557:618#L13)
-``` go
-func Upsert(context interface{}, db *db.DB, item *Item) error
-```
-Upsert upserts an item to the items collections.
-
-
-
-
-## <a name="Item">type</a> [Item](/src/target/model.go?s=897:1477#L20)
-``` go
-type Item struct {
-    ID        string                 `bson:"item_id" json:"item_id" validate:"required,min=1"`
-    Type      string                 `bson:"type" json:"type" validate:"required,min=2"`
-    Version   int                    `bson:"version" json:"version" validate:"required,min=1"`
-    Data      map[string]interface{} `bson:"data" json:"data"`
-    CreatedAt time.Time              `bson:"created_at" json:"created_at"`
-    UpdatedAt time.Time              `bson:"updated_at" json:"updated_at"`
-    Related   map[string]interface{} `bson:"related,omitempty" json:"related,omitempty"`
-}
-```
-Item is data, properties and behavior associated with one of a comment,
-asset, action, etc. Regardless of type (comment, asset, etc.), all Items
-are formatted with an ID, Type, and Version, and asssociated data (which
-may differ greatly between items) is encoded into the Data interface.
-
-
-
-
-
-
-
-### <a name="GetByID">func</a> [GetByID](/src/target/item.go?s=1728:1797#L54)
-``` go
-func GetByID(context interface{}, db *db.DB, id string) (Item, error)
-```
-GetByID retrieves a single item by ID from Mongo.
-
-
-
-
-
-### <a name="Item.InferIDFromData">func</a> (\*Item) [InferIDFromData](/src/target/model.go?s=1713:1754#L40)
-``` go
-func (item *Item) InferIDFromData() error
-```
-InferIDFromData infers an item_id from type and source id.
-
-
-
-
-### <a name="Item.Validate">func</a> (\*Item) [Validate](/src/target/model.go?s=1535:1569#L31)
-``` go
-func (item *Item) Validate() error
-```
-Validate validates an Item value with the validator.
 
 
 

@@ -11,21 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command](#GetCommands)
 
 
 #### <a name="pkg-files">Package files</a>
 [commands.go](/src/github.com/coralproject/shelf/cmd/wire/cmdview/commands.go) [execute.go](/src/github.com/coralproject/shelf/cmd/wire/cmdview/execute.go) 
 
 
-
-
-
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=494:560#L14)
-``` go
-func GetCommands(conn *db.DB, store *cayley.Handle) *cobra.Command
-```
-GetCommands returns the view commands.
 
 
 

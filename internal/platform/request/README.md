@@ -11,54 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [type Client](#Client)
-  * [func (c *Client) Do(req *http.Request) ([]byte, error)](#Client.Do)
-  * [func (c *Client) New(context interface{}, verb, path string, body io.Reader) (*http.Request, error)](#Client.New)
 
 
 #### <a name="pkg-files">Package files</a>
 [request.go](/src/github.com/coralproject/shelf/internal/platform/request/request.go) 
 
 
-
-
-
-
-## <a name="Client">type</a> [Client](/src/target/request.go?s=280:339#L6)
-``` go
-type Client struct {
-    BaseURL string
-    Signer  auth.Signer
-}
-```
-Client contains the necessary pieces to perform requests down to a service
-layer that has platform authentication enabled.
-
-
-
-
-
-
-
-
-
-
-### <a name="Client.Do">func</a> (\*Client) [Do](/src/target/request.go?s=1325:1379#L44)
-``` go
-func (c *Client) Do(req *http.Request) ([]byte, error)
-```
-Do executes the http request on the default http client and returns the bytes
-in the event that the response code was < 400.
-
-
-
-
-### <a name="Client.New">func</a> (\*Client) [New](/src/target/request.go?s=475:574#L13)
-``` go
-func (c *Client) New(context interface{}, verb, path string, body io.Reader) (*http.Request, error)
-```
-New creates a new request sourced from the client. If a signer is present on
-the client, requests will automatically be signed.
 
 
 

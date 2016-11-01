@@ -11,21 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func GetCommands() *cobra.Command](#GetCommands)
 
 
 #### <a name="pkg-files">Package files</a>
 [commands.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/commands.go) [delete.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/delete.go) [get.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/get.go) [upsert.go](/src/github.com/coralproject/shelf/cmd/sponge/cmditem/upsert.go) 
 
 
-
-
-
-## <a name="GetCommands">func</a> [GetCommands](/src/target/commands.go?s=259:292#L2)
-``` go
-func GetCommands() *cobra.Command
-```
-GetCommands returns the item commands.
 
 
 

@@ -7,68 +7,16 @@
 * [Index](#pkg-index)
 
 ## <a name="pkg-overview">Overview</a>
-Package handlers contains the handler logic for processing requests.
-
-Package handlers contains the handler logic for processing requests.
-
-Package handlers contains the handler logic for processing requests.
-
-Package handlers contains the handler logic for processing requests.
-
-Package handlers contains the handler logic for processing requests.
-
 
 
 
 ## <a name="pkg-index">Index</a>
-* [Variables](#pkg-variables)
 
 
 #### <a name="pkg-files">Package files</a>
 [exec.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/exec.go) [mask.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/mask.go) [query.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/query.go) [regex.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/regex.go) [relationship.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/relationship.go) [script.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/script.go) [version.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/version.go) [view.go](/src/github.com/coralproject/shelf/cmd/xeniad/handlers/view.go) 
 
 
-
-## <a name="pkg-variables">Variables</a>
-``` go
-var Exec execHandle
-```
-Exec fronts the access to the exec service functionality.
-
-``` go
-var Mask maskHandle
-```
-Mask fronts the access to the mask service functionality.
-
-``` go
-var Query queryHandle
-```
-Query fronts the access to the query service functionality.
-
-``` go
-var Regex regexHandle
-```
-Regex fronts the access to the regex service functionality.
-
-``` go
-var Relationship relationshipHandle
-```
-Relationship fronts the access to the relationship service functionality.
-
-``` go
-var Script scriptHandle
-```
-Script fronts the access to the script service functionality.
-
-``` go
-var Version verHandle
-```
-Version fronts the access to the ver service functionality.
-
-``` go
-var View viewHandle
-```
-View fronts the access to the view service functionality.
 
 
 

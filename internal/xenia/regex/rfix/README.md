@@ -11,40 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Add(db *db.DB, rgx regex.Regex) error](#Add)
-* [func Get(fileName string) (regex.Regex, error)](#Get)
-* [func Remove(db *db.DB, pattern string) error](#Remove)
 
 
 #### <a name="pkg-files">Package files</a>
 [rfix.go](/src/github.com/coralproject/shelf/internal/xenia/regex/rfix/rfix.go) 
 
 
-
-
-
-## <a name="Add">func</a> [Add](/src/target/rfix.go?s=838:880#L31)
-``` go
-func Add(db *db.DB, rgx regex.Regex) error
-```
-Add inserts a regex for testing.
-
-
-
-## <a name="Get">func</a> [Get](/src/target/rfix.go?s=512:558#L13)
-``` go
-func Get(fileName string) (regex.Regex, error)
-```
-Get retrieves a regex document from the filesystem for testing.
-
-
-
-## <a name="Remove">func</a> [Remove](/src/target/rfix.go?s=1238:1282#L47)
-``` go
-func Remove(db *db.DB, pattern string) error
-```
-Remove is used to clear out all the test regexs from the collection.
-All test documents must start with QSTEST in their name.
 
 
 

@@ -11,21 +11,12 @@
 
 
 ## <a name="pkg-index">Index</a>
-* [func Init(p cfg.Provider)](#Init)
 
 
 #### <a name="pkg-files">Package files</a>
 [app.go](/src/github.com/coralproject/shelf/internal/platform/app/app.go) 
 
 
-
-
-
-## <a name="Init">func</a> [Init](/src/target/app.go?s=252:277#L5)
-``` go
-func Init(p cfg.Provider)
-```
-Init sets up the configuration and logging systems.
 
 
 
