@@ -41,8 +41,12 @@ const (
 )
 
 var (
+
+	// spongedURL is the URL on which corald will try to talk with sponged.
 	spongedURL string
-	xeniadURL  string
+
+	// xeniadURL is the URL on which corald will try to talk with xeniad.
+	xeniadURL string
 )
 
 func init() {

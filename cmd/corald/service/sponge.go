@@ -12,6 +12,7 @@ import (
 )
 
 var (
+
 	// ErrItemNotFound is when the item is not found.
 	ErrItemNotFound = errors.New("Item not found")
 
