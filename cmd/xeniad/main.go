@@ -1,4 +1,4 @@
-// Xenia is a web service for handling query related calls.
+// Xeniad is a web service for handling query related calls.
 package main
 
 import (
