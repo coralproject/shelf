@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/coralproject/shelf?status.svg)](https://godoc.org/github.com/coralproject/shelf)
+
 # Shelf
 
 Shelf provides a number of open source services that can be used to power community (comments, forms, etc.) on a site (e.g., a blog or newsroom site).  More specifically, [Shelf](https://github.com/coralproject/shelf) is a configurable service layer that publishes endpoints against functionality for: 
