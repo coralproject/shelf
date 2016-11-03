@@ -1,14 +1,38 @@
 
-# regex
-    import "github.com/coralproject/shelf/internal/xenia/regex"
 
+# regex
+`import "github.com/coralproject/shelf/internal/xenia/regex"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
 Package regex provides the service layer for building apps using
 regex functionality.
 
 
 
 
-## Constants
+## <a name="pkg-index">Index</a>
+* [Constants](#pkg-constants)
+* [Variables](#pkg-variables)
+* [func Delete(context interface{}, db *db.DB, name string) error](#Delete)
+* [func GetAll(context interface{}, db *db.DB, tags []string) ([]Regex, error)](#GetAll)
+* [func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error)](#GetByNames)
+* [func GetNames(context interface{}, db *db.DB) ([]string, error)](#GetNames)
+* [func Upsert(context interface{}, db *db.DB, rgx Regex) error](#Upsert)
+* [type Regex](#Regex)
+  * [func GetByName(context interface{}, db *db.DB, name string) (Regex, error)](#GetByName)
+  * [func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Regex, error)](#GetLastHistoryByName)
+  * [func (r Regex) Validate() error](#Regex.Validate)
+
+
+#### <a name="pkg-files">Package files</a>
+[model.go](/src/github.com/coralproject/shelf/internal/xenia/regex/model.go) [regex.go](/src/github.com/coralproject/shelf/internal/xenia/regex/regex.go) 
+
+
+## <a name="pkg-constants">Constants</a>
 ``` go
 const (
     Collection        = "query_regexs"
@@ -18,7 +42,7 @@ const (
 Contains the name of Mongo collections.
 
 
-## Variables
+## <a name="pkg-variables">Variables</a>
 ``` go
 var (
     ErrNotFound = errors.New("Regex Not found")
@@ -27,35 +51,40 @@ var (
 Set of error variables.
 
 
-## func Delete
+
+## <a name="Delete">func</a> [Delete](/src/target/regex.go?s=9532:9594#L355)
 ``` go
 func Delete(context interface{}, db *db.DB, name string) error
 ```
 Delete is used to remove an existing Regex document.
 
 
-## func GetAll
+
+## <a name="GetAll">func</a> [GetAll](/src/target/regex.go?s=4335:4410#L165)
 ``` go
 func GetAll(context interface{}, db *db.DB, tags []string) ([]Regex, error)
 ```
 GetAll retrieves a list of regexs.
 
 
-## func GetByNames
+
+## <a name="GetByNames">func</a> [GetByNames](/src/target/regex.go?s=6423:6503#L242)
 ``` go
 func GetByNames(context interface{}, db *db.DB, names []string) ([]Regex, error)
 ```
 GetByNames retrieves the documents for the specified names.
 
 
-## func GetNames
+
+## <a name="GetNames">func</a> [GetNames](/src/target/regex.go?s=3205:3268#L119)
 ``` go
 func GetNames(context interface{}, db *db.DB) ([]string, error)
 ```
 GetNames retrieves a list of query regex names.
 
 
-## func Upsert
+
+## <a name="Upsert">func</a> [Upsert](/src/target/regex.go?s=1107:1167#L36)
 ``` go
 func Upsert(context interface{}, db *db.DB, rgx Regex) error
 ```
@@ -63,7 +92,8 @@ Upsert is used to create or update an existing Regex document.
 
 
 
-## type Regex
+
+## <a name="Regex">type</a> [Regex](/src/target/model.go?s=473:649#L11)
 ``` go
 type Regex struct {
     Name string `bson:"name" json:"name" validate:"required,min=3"`
@@ -80,16 +110,14 @@ Regex contains a single regular expresion bound to a name.
 
 
 
-
-
-### func GetByName
+### <a name="GetByName">func</a> [GetByName](/src/target/regex.go?s=5322:5396#L202)
 ``` go
 func GetByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```
 GetByName retrieves the document for the specified Regex.
 
 
-### func GetLastHistoryByName
+### <a name="GetLastHistoryByName">func</a> [GetLastHistoryByName](/src/target/regex.go?s=8100:8185#L306)
 ``` go
 func GetLastHistoryByName(context interface{}, db *db.DB, name string) (Regex, error)
 ```
@@ -98,12 +126,12 @@ GetLastHistoryByName gets the last written Regex within the history.
 
 
 
-### func (Regex) Validate
+
+### <a name="Regex.Validate">func</a> (Regex) [Validate](/src/target/model.go?s=724:755#L19)
 ``` go
 func (r Regex) Validate() error
 ```
 Validate checks the regex value for consistency and that it compiles.
-
 
 
 

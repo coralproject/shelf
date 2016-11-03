@@ -140,6 +140,12 @@ func routes(w *web.Web) {
 	internal.Handle("GET", "/v1/form/:id", handlers.Form.Retrieve)
 	internal.Handle("DELETE", "/v1/form/:id", handlers.Form.Delete)
 
+	// form aggregations
+	internal.Handle("GET", "/v1/form/:form_id/digest", handlers.Aggregation.Digest)
+	internal.Handle("GET", "/v1/form/:form_id/aggregate", handlers.Aggregation.Aggregate)
+	internal.Handle("GET", "/v1/form/:form_id/aggregate/:group_id", handlers.Aggregation.AggregateGroup)
+	internal.Handle("GET", "/v1/form/:form_id/aggregate/:group_id/submission", handlers.Aggregation.SubmissionGroup)
+
 	// form submissions
 	internal.Handle("GET", "/v1/form/:form_id/submission", handlers.FormSubmission.Search)
 	internal.Handle("GET", "/v1/form/:form_id/submission/:id", handlers.FormSubmission.Retrieve)

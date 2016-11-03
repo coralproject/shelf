@@ -219,7 +219,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 				}
 
 				// Track this as a subpath.
-				subPaths = append(subPaths, *graphPath)
+				subPaths = append(subPaths, *graphPath.Clone())
 
 				level++
 				continue
@@ -239,7 +239,7 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 			}
 
 			// Add this as a subpath.
-			subPaths = append(subPaths, *graphPath)
+			subPaths = append(subPaths, *graphPath.Clone())
 
 			level++
 		}
@@ -258,7 +258,8 @@ func viewPathToGraphPath(v *view.View, key string, graphDB *cayley.Handle) (*pat
 		// Otherwise add all the subpaths to the output path.
 		for _, subPath := range subPaths {
 			if outputPath == nil {
-				outputPath = &subPath
+				addedPath := &subPath
+				outputPath = addedPath.Clone()
 				continue
 			}
 			outputPath = outputPath.Clone().Or(&subPath)

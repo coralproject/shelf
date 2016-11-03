@@ -1,13 +1,34 @@
 
+
 # json
-    import "github.com/coralproject/shelf/cmd/corald/fixtures/json"
+`import "github.com/coralproject/shelf/cmd/corald/fixtures/json"`
+
+* [Overview](#pkg-overview)
+* [Index](#pkg-index)
+* [Subdirectories](#pkg-subdirectories)
+
+## <a name="pkg-overview">Overview</a>
+
+
+
+## <a name="pkg-index">Index</a>
+* [func Asset(name string) ([]byte, error)](#Asset)
+* [func AssetDir(name string) ([]string, error)](#AssetDir)
+* [func AssetInfo(name string) (os.FileInfo, error)](#AssetInfo)
+* [func AssetNames() []string](#AssetNames)
+* [func MustAsset(name string) []byte](#MustAsset)
+* [func RestoreAsset(dir, name string) error](#RestoreAsset)
+* [func RestoreAssets(dir, name string) error](#RestoreAssets)
+
+
+#### <a name="pkg-files">Package files</a>
+[json.gen.go](/src/github.com/coralproject/shelf/cmd/corald/fixtures/json/json.gen.go) 
 
 
 
 
 
-
-## func Asset
+## <a name="Asset">func</a> [Asset](/src/target/json.gen.go?s=120904:120943#L189)
 ``` go
 func Asset(name string) ([]byte, error)
 ```
@@ -16,7 +37,8 @@ It returns an error if the asset could not be found or
 could not be loaded.
 
 
-## func AssetDir
+
+## <a name="AssetDir">func</a> [AssetDir](/src/target/json.gen.go?s=123117:123161#L259)
 ``` go
 func AssetDir(name string) ([]string, error)
 ```
@@ -38,7 +60,8 @@ AssetDir("foo.txt") and AssetDir("notexist") would return an error
 AssetDir("") will return []string{"data"}.
 
 
-## func AssetInfo
+
+## <a name="AssetInfo">func</a> [AssetInfo](/src/target/json.gen.go?s=121663:121711#L215)
 ``` go
 func AssetInfo(name string) (os.FileInfo, error)
 ```
@@ -47,14 +70,16 @@ It returns an error if the asset could not be found or
 could not be loaded.
 
 
-## func AssetNames
+
+## <a name="AssetNames">func</a> [AssetNames](/src/target/json.gen.go?s=122059:122085#L228)
 ``` go
 func AssetNames() []string
 ```
 AssetNames returns the names of the assets.
 
 
-## func MustAsset
+
+## <a name="MustAsset">func</a> [MustAsset](/src/target/json.gen.go?s=121367:121401#L203)
 ``` go
 func MustAsset(name string) []byte
 ```
@@ -62,19 +87,20 @@ MustAsset is like Asset but panics when Asset would return an error.
 It simplifies safe initialization of global variables.
 
 
-## func RestoreAsset
+
+## <a name="RestoreAsset">func</a> [RestoreAsset](/src/target/json.gen.go?s=124433:124474#L301)
 ``` go
 func RestoreAsset(dir, name string) error
 ```
 RestoreAsset restores an asset under the given directory
 
 
-## func RestoreAssets
+
+## <a name="RestoreAssets">func</a> [RestoreAssets](/src/target/json.gen.go?s=124997:125039#L326)
 ``` go
 func RestoreAssets(dir, name string) error
 ```
 RestoreAssets restores an asset under the given directory recursively
-
 
 
 

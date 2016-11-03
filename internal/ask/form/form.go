@@ -146,6 +146,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 
 	objectID := bson.ObjectIdHex(id)
 
+	// Find the number of submissions on this form
 	count, err := submission.Count(context, db, id)
 	if err != nil {
 		log.Error(context, "UpdateStats", ErrInvalidID, "Completed")
@@ -155,6 +156,7 @@ func UpdateStats(context interface{}, db *db.DB, id string) (*Stats, error) {
 	stats := Stats{
 		Responses: count,
 	}
+
 	f := func(c *mgo.Collection) error {
 		u := bson.M{
 			"$set": bson.M{
