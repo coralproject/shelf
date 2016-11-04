@@ -51,8 +51,13 @@ type Group struct {
 // runs aggregations and counts for each one.
 func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[string]Aggregation, error) {
 
+	// Aggregations are hardcoded to only work with bookmarked submissions.
+	opts := submission.SearchOpts{
+		FilterBy: "bookmarked",
+	}
+
 	// Group the submissions.
-	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, submission.SearchOpts{})
+	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, opts)
 	if err != nil {
 		return nil, err
 	}
