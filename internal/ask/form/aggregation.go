@@ -49,12 +49,7 @@ type Group struct {
 
 // AggregateFormSubmissions retrieves the submissions for a form, groups them then
 // runs aggregations and counts for each one.
-func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[string]Aggregation, error) {
-
-	// Aggregations are hardcoded to only work with bookmarked submissions.
-	opts := submission.SearchOpts{
-		FilterBy: "bookmarked",
-	}
+func AggregateFormSubmissions(context interface{}, db *db.DB, id string, opts submission.SearchOpts) (map[string]Aggregation, error) {
 
 	// Group the submissions.
 	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, opts)
