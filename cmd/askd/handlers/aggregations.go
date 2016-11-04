@@ -33,7 +33,13 @@ type AggregationKeys struct {
 func (aggregationHandle) Aggregate(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	// Aggregations can be based on Queries or Filters.
+	opts := submission.SearchOpts{
+		Query:    c.Request.URL.Query().Get("search"),
+		FilterBy: c.Request.URL.Query().Get("filterby"),
+	}
+
+	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id, opts)
 	if err == mgo.ErrNotFound {
 		c.Respond(nil, http.StatusBadRequest)
 	}
@@ -55,7 +61,13 @@ func (aggregationHandle) Aggregate(c *web.Context) error {
 func (aggregationHandle) AggregateGroup(c *web.Context) error {
 	id := c.Params["form_id"]
 
-	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id)
+	// Aggregations can be based on Queries or Filters.
+	opts := submission.SearchOpts{
+		Query:    c.Request.URL.Query().Get("search"),
+		FilterBy: c.Request.URL.Query().Get("filterby"),
+	}
+
+	aggregations, err := form.AggregateFormSubmissions(c.SessionID, c.Ctx["DB"].(*db.DB), id, opts)
 	if err != nil {
 		return err
 	}

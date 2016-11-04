@@ -49,10 +49,10 @@ type Group struct {
 
 // AggregateFormSubmissions retrieves the submissions for a form, groups them then
 // runs aggregations and counts for each one.
-func AggregateFormSubmissions(context interface{}, db *db.DB, id string) (map[string]Aggregation, error) {
+func AggregateFormSubmissions(context interface{}, db *db.DB, id string, opts submission.SearchOpts) (map[string]Aggregation, error) {
 
 	// Group the submissions.
-	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, submission.SearchOpts{})
+	groupedSubmissions, err := GroupSubmissions(context, db, id, 0, 0, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -326,6 +326,11 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 			if options != nil {
 				opts, ok := options.([]interface{})
 				if !ok {
+					continue
+				}
+
+				// Skip submissions with no choices for this quesiton.
+				if len(opts) == 0 {
 					continue
 				}
 
