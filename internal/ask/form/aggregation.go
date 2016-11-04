@@ -334,6 +334,11 @@ func TextAggregate(context interface{}, db *db.DB, formID string, subs []submiss
 					continue
 				}
 
+				// Skip submissions with no choices for this quesiton.
+				if len(opts) == 0 {
+					continue
+				}
+
 				// Unpack the option.
 				op, ok := opts[0].(bson.M)
 				if !ok {
