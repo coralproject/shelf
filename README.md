@@ -3,7 +3,7 @@
 # Shelf
 
 Shelf provides a number of open source services that can be used to power community (comments, forms, etc.) on a site (e.g., a blog or newsroom site).  More specifically, [Shelf](https://github.com/coralproject/shelf) is a configurable service layer that publishes endpoints against functionality for: 
-- [mongo aggregation pipeline queries](https://docs.mongodb.org/manual/core/aggregation-introduction/).
+- [mongo aggregation pipeline queries version 3.0](https://docs.mongodb.com/v3.0/core/aggregation-introduction/).
 - importing, formatting, and validation of data.
 - management of relationships between pieces of data.
 - management and generation of views of imported data.
@@ -16,4 +16,6 @@ The individual services providing these functionalities can be built from the `c
 - `askd` - allows a user to create forms and manage submissions to those forms.
 - `corald` - proxies some of the endpoints exposed by the above services and serves as a central point for interaction with the platform services (assuming you are running more than one of the above).
 
-All of the Shelf documentation (including installation instructions) can be found in the [Coral Project Documentation](https://coralprojectdocs.herokuapp.com/).
+## Installling Shelf
+
+The installation docs are being revised and once can be found in the [Coral Project Documentation](https://docs.coralproject.net/).
